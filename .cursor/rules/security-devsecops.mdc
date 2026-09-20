@@ -1,0 +1,13 @@
+---
+description: DevSecOps baseline for PlayKiln
+alwaysApply: true
+---
+
+# Security baseline
+
+- Validate inputs at trust boundaries; minimize Android permissions.
+- Do not mark Activities/Services/Receivers exported unless required and protected.
+- Prefer HTTPS; pin only with a clear threat model.
+- No `eval`-like dynamic code execution.
+- Log no tokens, passwords, or PII beyond what the slot's privacy policy allows.
+- Dependency additions need a reason in the slot's OpenSpec/design notes.

@@ -1,0 +1,16 @@
+---
+description: PlayKiln factory conventions — shared harness, isolated Android slots
+alwaysApply: true
+---
+
+# PlayKiln conventions
+
+- This repo is an **APK factory**, not a single product.
+- New apps live under `apps/<date>-<slug>/` with unique `applicationId`
+  `com.playkiln.<slug>`.
+- Stack: **Kotlin + Jetpack Compose + Material 3 + Gradle KTS**.
+- Do **not** copy `.cursor/`, `.agents/`, or OpenSpec factory config into a slot.
+- Do **not** use Flutter, React Native, Expo, or Next.js for new slots.
+- Improve the root harness when the same mistake repeats across apps.
+- Secrets/keystores never committed. Use `.env.example` placeholders only.
+- Cursor and Codex are peers — see `harness/dual-agent.md`.

@@ -1,0 +1,15 @@
+schema: spec-driven
+
+context: |
+  PlayKiln is an Android APK/AAB factory monorepo. Default stack: Kotlin,
+  Jetpack Compose, Material 3, Gradle KTS. Apps live under apps/<date>-<slug>/
+  with applicationId com.playkiln.<slug>. Cursor and Codex are peer agents.
+  Never commit keystores or Play credentials.
+
+rules:
+  proposal:
+    - State the app idea, target user, and non-goals in under 400 words
+    - Include unique applicationId / slug
+  tasks:
+    - Prefer tasks that fit one dual-agent role card (Build, Store, or Verify)
+    - End with a Gradle assembleDebug verification task

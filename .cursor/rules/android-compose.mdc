@@ -1,0 +1,17 @@
+---
+description: Kotlin Jetpack Compose standards for PlayKiln app slots
+globs: apps/**/*.{kt,kts,toml}
+alwaysApply: false
+---
+
+# Android / Compose
+
+- Compose-first UI; Material 3 theming via `MaterialTheme`.
+- Prefer unidirectional data flow: ViewModel + `StateFlow`/`UiState`.
+- Keep business logic out of composables.
+- Use `Modifier` chains; avoid unnecessary `Box` wrappers.
+- Navigation: Navigation Compose; type-safe routes when practical.
+- Gradle: version catalog; Kotlin Compose compiler plugin (Kotlin 2.x).
+- Prefer KSP over kapt.
+- Release artifact for Play is **AAB** (`bundleRelease`).
+- minSdk ≥ 26 unless the slot's OpenSpec explicitly requires otherwise.

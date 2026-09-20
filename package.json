@@ -1,0 +1,11 @@
+{
+  "name": "playkiln",
+  "private": true,
+  "type": "module",
+  "description": "PlayKiln — Android APK factory harness",
+  "scripts": {
+    "new-slot": "node scripts/new-slot.mjs",
+    "verify": "node scripts/verify-slot.mjs",
+    "setup-mcp": "node scripts/setup-mcp.mjs"
+  }
+}
