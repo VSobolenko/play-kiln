@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">PlayKiln Smoke</string>
+    <string name="app_idea" translatable="true">Pipeline smoke test: proves new-slot -> signed APK + AAB -> store pack -> verify PASS.</string>
+    <string name="home_about_action" translatable="true">About</string>
+    <string name="home_intro" translatable="true">A focused starting point, ready to become your app.</string>
+    <string name="home_idea_label" translatable="true">The idea</string>
+    <string name="home_primary_action" translatable="true">Try the starter action</string>
+    <string name="home_primary_action_again" translatable="true">Run it again</string>
+    <string name="home_status_ready" translatable="true">Ready when you are</string>
+    <string name="home_status_complete" translatable="true">Starter action complete</string>
+    <string name="home_snackbar_completed" translatable="true">Starter action completed.</string>
+    <string name="home_snackbar_already_completed" translatable="true">The starter action is already complete.</string>
+    <string name="about_title" translatable="true">About this app</string>
+    <string name="about_back" translatable="true">Back</string>
+    <string name="about_body" translatable="true">%1$s began as a PlayKiln starter: native Kotlin, Material 3, accessible controls, and a small architecture meant to be replaced by the real product.</string>
+    <string name="about_privacy_note" translatable="true">This starter requests no permissions and sends no data.</string>
+</resources>

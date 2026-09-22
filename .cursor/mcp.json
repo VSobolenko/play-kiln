@@ -1,20 +1,28 @@
 {
   "mcpServers": {
     "context7": {
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@latest"]
+      "command": "node",
+      "args": ["${workspaceFolder}/.cursor/mcp/run-mcp.cjs", "context7"]
     },
     "playwright": {
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"]
+      "command": "node",
+      "args": ["${workspaceFolder}/.cursor/mcp/run-mcp.cjs", "playwright"]
     },
     "codex": {
       "command": "node",
       "args": ["${workspaceFolder}/.cursor/mcp/codex-launcher.cjs", "mcp-server"]
     },
+    "android-skills": {
+      "command": "node",
+      "args": ["${workspaceFolder}/.cursor/mcp/run-mcp.cjs", "android-skills"]
+    },
+    "droidagentkit": {
+      "command": "node",
+      "args": ["${workspaceFolder}/.cursor/mcp/run-mcp.cjs", "droidagentkit"]
+    },
     "firebase": {
-      "command": "npx",
-      "args": ["-y", "firebase-tools@latest", "mcp", "--dir", "."]
+      "command": "node",
+      "args": ["${workspaceFolder}/.cursor/mcp/run-mcp.cjs", "firebase"]
     }
   }
 }

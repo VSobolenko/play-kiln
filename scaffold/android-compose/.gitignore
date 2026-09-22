@@ -1,0 +1,31 @@
+# Local SDK configuration and build-system state.
+local.properties
+.gradle/
+.kotlin/
+
+# Generated build and packaged artifacts.
+build/
+**/build/
+*.apk
+*.aab
+captures/
+# dist/ holds release artifacts and must never be committed.
+dist/
+.cxx/
+
+# Signing material. keystore.properties configures the upload key; neither the
+# configuration nor any key file may ever be committed.
+*.jks
+*.keystore
+keystore.properties
+
+# Local environment and service credentials.
+.env
+.env.*
+!.env.example
+google-services.json
+play-service-account.json
+
+# IDE-local files.
+.idea/
+*.iml

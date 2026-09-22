@@ -1,0 +1,9 @@
+{
+  "slug": "smoke",
+  "applicationId": "com.gexetr.smoke",
+  "appName": "PlayKiln Smoke",
+  "idea": "Pipeline smoke test: proves new-slot -> signed APK + AAB -> store pack -> verify PASS.",
+  "createdAt": "2026-09-22T17:57:31.567Z",
+  "scaffoldVersion": "android-compose-v1",
+  "status": "scaffolded"
+}

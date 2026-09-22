@@ -33,13 +33,17 @@ Grow into feature modules only when the OpenSpec design says so.
 
 ## Do
 
-- Unique `applicationId` = `com.playkiln.<slug>`
+- Unique `applicationId` = `com.gexetr.<slug>`
+- `compileSdk` / `targetSdk` ≥ **36**
+- `dataExtractionRules` + backup XML; `enableEdgeToEdge`
 - Theme via `MaterialTheme`; dynamic color optional
 - Previews for non-trivial composables
 - `assembleDebug` before claiming UI works; `bundleRelease` before Play
+- Run `.cursor/skills/play-compliance/` before status `ready`
 
 ## Don't
 
 - Flutter / RN / Expo / XML-first new screens
 - Commit keystores or real `google-services.json`
 - Copy the factory harness into the slot
+- Ship without Data safety / privacy drafts in `store/`

@@ -1,120 +1,204 @@
 # AGENTS.md — PlayKiln
 
-> Single source of truth for AI agents (Cursor **and** Codex). Codex auto-reads
-> this file; `.cursor/rules/*.mdc` are Cursor-only. Put every convention an
-> external agent must follow here.
+> L1 contract for Cursor and Codex. Read this file before changing the factory or
+> a slot. Cursor-only rules may add detail but may not contradict it.
 
-## What this repo is
+## Mission
 
-**PlayKiln** — a monorepo *factory* that produces many independent Android APK/AAB
-attempts for Google Play. One shared agent harness; many app slots under `apps/`.
-We try ideas (calendar, notes, courses, games, AI tutors…), publish or kill them,
-and keep searching for a hit. Improving the harness once upgrades every future slot.
+PlayKiln is a factory that turns one app idea into one isolated, publishable
+Android/Google Play release; it is not a single-product repository. The human-facing
+factory brief is [`MISSION.md`](./MISSION.md) and must be honored in every session.
 
-This is **not** a single product app. The product is the kiln.
+## Factory pipeline
+
+| Order | Stage | Owner | Gate or output |
+|---:|---|---|---|
+| 0 | `<idea>` and plan | Human + Cursor | **Human checkpoint 1:** approve the plan |
+| 1 | `/ship <idea>` | Cursor | Automatic after approval |
+| 2 | `scripts/new-slot.mjs` | Factory | Automatic isolated `apps/<date>-<slug>/` slot |
+| 3 | Implement | Codex workers, orchestrated by Cursor | Automatic code, tests, and app behavior |
+| 4 | `scripts/store-kit.py` | Factory | Automatic complete store pack |
+| 5 | `scripts/prepare-release.mjs` | Factory | Automatic signed APK, signed AAB, and release manifest |
+| 6 | `scripts/verify-slot.mjs` | Factory + Cursor | Automatic objective gates plus a read diff |
+| 7 | `/eval` | Cursor evaluator | Automatic independent verdict; repair until green |
+| 8 | Play Console legal steps, first upload, publish | Human | **Human checkpoint 2:** complete declarations, upload once, press publish |
+
+One idea must take one command through this pipeline. Never silently upload, commit
+an edit, or publish on the human's behalf.
+
+## Published namespace
+
+Every slot's `applicationId` is `com.gexetr.<slug>`, because `com.gexetr` is the
+developer account's existing Play namespace and already-published apps use it. An
+applicationId is permanent after the first upload, so it is never changed for a
+shipped slot. The rule is defined once in `scripts/lib/namespaces.mjs` and imported
+by `new-slot.mjs`, `verify-slot.mjs`, and `kiln-status.mjs`; do not restate it.
+
+## Required toolchain
+
+| Component | Factory contract |
+|---|---|
+| Gradle | **9.7.1** |
+| Android Gradle Plugin | **9.4.1** with built-in Kotlin |
+| Kotlin / Compose Compiler plugin | **2.3.21**; versions must match |
+| Compose BOM | **2026.09.00** (`compose.ui` 1.12.0, Material 3 1.4.0) |
+| SDK | `compileSdk = 37`, `targetSdk = 36`, `minSdk = 26` |
+| JDK | **17 minimum** |
+| SDK Build Tools | **36.0.0** |
+| R8 | Full mode defaults; release minification and resource shrinking; refined keep rules; `proguard-android-optimize.txt` |
+| Baseline profiles | `androidx.baselineprofile` 1.5.0, Profile Installer 1.4.1, Macrobenchmark 1.4.1; generation uses a device/emulator and `com.android.test` module |
+| 16 KB pages | Pure Kotlin/Java is ready; native code requires AGP 8.5.1+ and NDK r28+; never use legacy JNI packaging |
+
+## Agent model
+
+Cursor is the orchestrator and verifier. Codex is a co-lead engineer with its own
+worker channel and writes production code; it is not merely a reviewer.
+
+- Run long Codex tasks with `node scripts/codex-run.mjs`; the MCP `codex` tool is
+  only for short dialogue because long MCP requests time out.
+- Give each worker a bounded role and file list. Parallel code writers must have
+  disjoint files or separate worktrees.
+- If a worker reports `RATE_LIMITED`, hand the task to the Cursor `generator`
+  subagent. Follow `harness/dual-agent.md` for other failure signals.
+- Never accept Cursor or Codex self-reporting as proof. Run
+  `scripts/verify-slot.mjs` and read the diff before a PASS.
+- Adjudicate disagreements against OpenSpec, this file, and observable evidence.
+
+Operator details: [`harness/codex-workers.md`](harness/codex-workers.md).
+
+## Store-pack contract
+
+Every publishable slot contains this complete, truthful pack:
+
+```text
+store/listing.json
+store/listing.md
+store/privacy.md
+store/data-safety.md
+store/review-notes.md
+store/graphics.md
+store/checklist.md
+store/assets/icon-512.png
+store/assets/feature-graphic-1024x500.png
+store/assets/<locale>/icon-512.png
+store/assets/<locale>/feature-graphic-1024x500.png
+store/assets/<locale>/phone-01.png ... phone-06.png
+store/assets/<locale>/tablet-7-01.png ... tablet-7-04.png
+store/assets/<locale>/tablet-10-01.png ... tablet-10-04.png
+```
+
+| Item | Contract |
+|---|---|
+| Listing text | Title ≤ 30, short description ≤ 80, full description ≤ 4000 characters |
+| App icon | 512×512, 32-bit PNG with alpha, sRGB, ≤ 1024 KB; no drawn rounded mask or shadow |
+| Feature graphic | Exactly 1024×500, JPEG or 24-bit PNG without alpha |
+| Phone set | Exactly 6 at 1080×1920; Play permits 2–8, no alpha, ≤ 8 MB each, sides 320–3840, long side ≤ 2× short side |
+| 7-inch set | Exactly 4 at 1200×1920; Play permits 4–8, short edge ≥ 1080, long edge ≤ 7680 |
+| 10-inch set | Exactly 4 at 1600×2560; Play permits 4–8, short edge ≥ 1080, long edge ≤ 7680 |
+
+Default locale is `en-US`; supported additional locale is `ru-RU`. If login gates
+content, `review-notes.md` must provide usable demo access. Claims and screenshots
+must describe the shipped app; synthetic captures must be identified as synthetic.
+
+## Play compliance floor
+
+Before a slot is `ready`:
+
+- Data safety is complete even when no data is collected, matches every SDK, and
+  matches a public privacy policy.
+- Apps with accounts provide deletion in-app and through an external web resource.
+- Permissions are minimized; Photo Picker is preferred; foreground-service types
+  are declared; exact alarms are treated as restricted.
+- Backup rules separate cloud backup from device transfer and exclude secrets.
+- Edge-to-edge and predictive back behavior work at the target SDK.
+- Ads, content rating, target audience, review access, and AI-content declarations
+  are truthful and complete.
+- Native libraries have confirmed 16 KB readiness.
+
+Use [`docs/play-publishing-playbook.md`](docs/play-publishing-playbook.md) for the
+human/agent handoff and
+[`docs/research/2026-09-22-android-play-requirements.md`](docs/research/2026-09-22-android-play-requirements.md)
+for the requirements brief.
+
+## Defaults to suppress
+
+| Do not use | Use instead |
+|---|---|
+| `org.jetbrains.kotlin.android` | AGP 9 built-in Kotlin |
+| `android.kotlinOptions {}` | `android.compileOptions.targetCompatibility`; built-in Kotlin derives `jvmTarget` |
+| `proguard-android.txt` | `proguard-android-optimize.txt` |
+| `kapt` | KSP when annotation processing is required |
+| XML View layouts for new screens | Jetpack Compose + Material 3 |
+| Flutter, React Native, Expo, or Next.js | Native Kotlin + Compose |
+| Invented MCP servers or APIs | Committed MCP configuration and verified documentation |
+| `jniLibs.useLegacyPackaging = true` | 16 KB-compatible packaging |
+| Keystores, passwords, service-account JSON, or keyed `google-services.json` in Git | Environment variables or ignored local paths |
+| Hardcoded Material colors | `MaterialTheme.colorScheme` |
+| Shared `applicationId` values | Unique `com.gexetr.<slug>` per slot |
+| A thin AI chat wrapper | A differentiated workflow with required content reporting |
+
+Do not set obsolete AGP flags such as `android.enableR8.fullMode`,
+`android.builtInKotlin`, or `android.newDsl`. Use `androidComponents.onVariants`, not
+the removed `applicationVariants` API.
 
 ## Layout
 
+```text
+AGENTS.md                         L1 contract for Cursor and Codex
+MISSION.md                        Russian human-facing factory brief
+DESIGN.md                         L1 visual guidance
+.cursor/                          commands, rules, hooks, MCP, and Cursor agents
+.agents/skills/                   shared and official Android skills
+.codex/agents/                    Codex-compatible agent roles
+.kiln/                            gitignored worker state, prompts, logs, and ledgers
+openspec/                         factory specs and per-slot changes
+harness/                          protocols, ambition, surface map, and lessons
+apps/<date>-<slug>/               isolated Android projects
+scaffold/android-compose/         new-slot template
+registry/apps.json                slot registry
+scripts/new-slot.mjs              create a slot
+scripts/lib/namespaces.mjs        single source of truth for `com.gexetr.*`
+scripts/selftest.mjs              regression tests for the factory scripts
+scripts/codex-run.mjs             durable Codex worker runner
+scripts/store-kit.py              generate and validate store packs
+scripts/sign-release.mjs          configure and inspect local upload signing
+scripts/prepare-release.mjs       build, sign, verify, and stage APK/AAB artifacts
+scripts/media-capture.mjs         capture store media through ADB journeys
+scripts/play-upload.mjs           update an existing Play app after its first manual upload
+scripts/verify-slot.mjs           objective factory and slot gates
+scripts/kiln-status.mjs           factory health summary
 ```
-AGENTS.md                 # this file — agent contract
-.cursor/                  # commands, rules, hooks, mcp, project skills
-.agents/skills/           # installed methodology skills (superpowers)
-openspec/                 # factory specs + per-slot changes
-harness/                  # dual-agent protocol, role cards
-apps/<date>-<slug>/       # isolated Android projects (one attempt each)
-scaffold/android-compose/ # seed expanded by scripts/new-slot.mjs (not a harness fork)
-registry/apps.json        # catalog of attempts + status
-scripts/                  # new-slot, verify-slot, setup-mcp
-```
 
-## Default app stack (every new slot)
-
-| Layer | Choice |
-|-------|--------|
-| Language | Kotlin |
-| UI | Jetpack Compose + Material 3 |
-| Architecture | single `:app` module first; split features only when needed |
-| Async | coroutines + Flow |
-| DI | prefer constructor injection; Hilt only when complexity demands it |
-| Persistence | DataStore / Room as needed |
-| Build | Gradle Kotlin DSL + version catalog (`libs.versions.toml`) |
-| Compose compiler | Kotlin Compose Compiler plugin (Kotlin 2.x) |
-| minSdk | 26+ |
-| targetSdk / compileSdk | current stable (keep current) |
-| Packaging | release **AAB** for Play; APK for sideload/debug |
-
-### Defaults to suppress (agents get these wrong)
-
-| Do NOT use | Use instead |
-|---|---|
-| Flutter / Dart | Kotlin + Compose |
-| React Native / Expo / Next.js | Kotlin + Compose |
-| XML View layouts for new screens | Compose |
-| Java for new code | Kotlin |
-| kapt | KSP (when annotation processing is needed) |
-| Hardcoded Material colors | `MaterialTheme.colorScheme` |
-| Committing keystores / `google-services.json` secrets | env / local ignored paths |
-| Sharing `applicationId` across slots | unique `com.playkiln.<slug>` per slot |
-| Copying `.cursor/` into an app folder | shared root harness only |
-
-## Factory workflow
-
-1. Human brings an idea ("calendar with reminders", "English tutor", "simple puzzle").
-2. Agent runs **`/forge <idea>`** (or `/ship` for an existing OpenSpec change).
-3. Pipeline: propose → create isolated slot → dual-agent implement → verify →
-   Play listing assets → human decides publish / iterate / archive.
-4. Human checkpoints only: **plan approval** and **integration / Play upload**.
-
-## Dual agents (Cursor ∥ Codex) — peers
-
-Cursor and Codex are **equal peers**, not "author + rubber-stamp reviewer".
-
-- Split work by **task type**: Build (code), Store (Play assets/copy), Verify (cross-check).
-- Either agent may implement; the other must independently verify when the task is
-  non-trivial. Swap roles across tasks so neither always writes or always reviews.
-- Parallel **code** writes require separate git worktrees. Parallel read-only review
-  on the same tree is fine.
-- Never accept either agent's "done" without `node scripts/verify-slot.mjs` (and
-  reading the diff). Self-reports are not evidence.
-- Put durable conventions in **this file** so Codex sees them automatically.
-  Use Codex `developer-instructions` only for task-local constraints.
-
-Details: `harness/dual-agent.md` and `.cursor/skills/dual-agent-peers/SKILL.md`.
-
-## OpenSpec
-
-- Factory-level specs live in `openspec/specs/`.
-- Each app attempt gets a change `app-<slug>` with proposal / design / tasks / delta specs.
-- Archive completed or abandoned changes; dead apps may be deleted from `apps/`
-  after registry status is set to `archived` or `killed`.
-
-## Security
-
-- Never commit secrets, API keys, keystore passwords, Play service-account JSON.
-- Keystores and Play credentials live outside git (env vars / local paths listed in
-  each slot's `.env.example`).
-- Hooks: `secret-guard` on writes, `git-guard` on destructive git.
+`.kiln/` is disposable local state and never a source of product secrets. Durable
+factory conventions belong in this file, OpenSpec, or `harness/`.
 
 ## Verification
 
 ```bash
-node scripts/verify-slot.mjs                 # harness + touched slots (uncommitted)
-node scripts/verify-slot.mjs --slot <slug>   # one app
+node scripts/selftest.mjs                         # factory scripts vs a sandbox slot
+node scripts/verify-slot.mjs                      # runs the self-test too
+node scripts/verify-slot.mjs --slot <slug>
+node scripts/verify-slot.mjs --slot <slug> --strict-store
+node scripts/verify-slot.mjs --slot <slug> --build
 node scripts/verify-slot.mjs --base main
+node scripts/verify-slot.mjs --no-selftest        # skip the self-test (rare)
+node scripts/kiln-status.mjs
 ```
 
-For an Android slot the objective gate is Gradle (`assembleDebug` / `bundleRelease`
-when requested). Harness JS scripts are syntax-checked. UNVERIFIED means read the
-diff by hand — do not treat silence as a pass.
+`UNVERIFIED` requires a manual diff/read; it is not PASS. For release preparation,
+the required evidence is a verified signed release APK, signed release AAB, release
+manifest, strict store-pack PASS, green slot verification, and `/eval` acceptance.
 
-## MCP
-
-See `.cursor/mcp.json`. Onboarding: `node scripts/setup-mcp.mjs`.
+`scripts/selftest.mjs` exercises the factory's own scripts (real `new-slot.mjs`
+against a temp scaffold sandbox) instead of trusting them by inspection. When a
+factory defect is fixed, add a check there and confirm it fails before the fix —
+see `.cursor/rules/verification-discipline.mdc`.
 
 ## Working rules
 
-- One idea → one new folder under `apps/` unless the human asks to extend an existing slot.
-- Do not couple slots to each other.
-- Do not invent a second harness inside an app.
-- Evidence before "done".
-- Prefer improving root harness skills/rules when the same mistake repeats across slots.
+- One idea creates one slot unless the human explicitly asks to extend a slot.
+- Slots never depend on each other; the shared harness remains at repository root.
+- No secret may be committed or printed into a worker prompt or log.
+- Improve the root harness when the same failure recurs across slots.
+- Archive or kill failed attempts; do not turn PlayKiln into one product repo.
+- Human approval is mandatory for legal declarations, first upload, and publish.

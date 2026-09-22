@@ -1,0 +1,11 @@
+---
+description: Compose quality reminders
+globs: apps/**/*.kt
+alwaysApply: false
+---
+
+# Compose
+
+- State hoisting; stable Lazy keys; a11y contentDescriptions
+- collectAsStateWithLifecycle; previews for non-trivial UI
+- See skill `compose-quality` and android-skills MCP `edge-to-edge`

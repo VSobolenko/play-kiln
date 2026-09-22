@@ -1,5 +1,7 @@
 node_modules/
 .superpowers/
+# Codex worker logs, prompts and ledgers (orchestration state, not source)
+.kiln/
 .env
 .env.*
 !.env.example
@@ -19,3 +21,4 @@ Thumbs.db
 *.aab
 *.ap_
 *.dex
+.tmp-android-skills/

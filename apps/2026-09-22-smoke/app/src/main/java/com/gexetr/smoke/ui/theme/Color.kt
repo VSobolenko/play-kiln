@@ -1,0 +1,28 @@
+package com.gexetr.smoke.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+internal val Green10 = Color(0xFF002116)
+internal val Green20 = Color(0xFF003828)
+internal val Green30 = Color(0xFF00513A)
+internal val Green40 = Color(0xFF006C4C)
+internal val Green80 = Color(0xFF63DBA6)
+internal val Green90 = Color(0xFF82F8C1)
+internal val Teal20 = Color(0xFF12372F)
+internal val Teal30 = Color(0xFF294E45)
+internal val Teal40 = Color(0xFF41665D)
+internal val Teal80 = Color(0xFFA8D0C4)
+internal val Teal90 = Color(0xFFC3ECE0)
+internal val Amber30 = Color(0xFF684D00)
+internal val Amber40 = Color(0xFF876500)
+internal val Amber80 = Color(0xFFFFC94B)
+internal val Amber90 = Color(0xFFFFE088)
+internal val Error40 = Color(0xFFBA1A1A)
+internal val Error80 = Color(0xFFFFB4AB)
+internal val Neutral10 = Color(0xFF191C1A)
+internal val Neutral90 = Color(0xFFE1E3DF)
+internal val Neutral99 = Color(0xFFFBFDF9)
+internal val NeutralVariant30 = Color(0xFF404943)
+internal val NeutralVariant50 = Color(0xFF707972)
+internal val NeutralVariant80 = Color(0xFFBFC9C1)
+internal val NeutralVariant90 = Color(0xFFDBE5DD)

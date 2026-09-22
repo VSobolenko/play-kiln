@@ -1,5 +1,15 @@
-﻿{
+{
   "version": 1,
-  "apps": []
+  "apps": [
+    {
+      "id": "smoke",
+      "dir": "apps/2026-09-22-smoke",
+      "name": "PlayKiln Smoke",
+      "applicationId": "com.gexetr.smoke",
+      "idea": "Pipeline smoke test: proves new-slot -> signed APK + AAB -> store pack -> verify PASS.",
+      "status": "scaffolded",
+      "createdAt": "2026-09-22T17:57:31.567Z",
+      "updatedAt": "2026-09-22T17:57:31.567Z"
+    }
+  ]
 }
-

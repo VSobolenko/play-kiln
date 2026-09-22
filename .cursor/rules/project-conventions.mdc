@@ -7,7 +7,12 @@ alwaysApply: true
 
 - This repo is an **APK factory**, not a single product.
 - New apps live under `apps/<date>-<slug>/` with unique `applicationId`
-  `com.playkiln.<slug>`.
+  `com.gexetr.<slug>`.
+  - `com.gexetr` is the developer account's existing Play namespace; already
+    published apps use it, so every new slot must match.
+  - An applicationId is permanent after the first Play upload — never change it for
+    a slot that has shipped.
+  - The rule lives in `scripts/lib/namespaces.mjs`; import it, do not restate it.
 - Stack: **Kotlin + Jetpack Compose + Material 3 + Gradle KTS**.
 - Do **not** copy `.cursor/`, `.agents/`, or OpenSpec factory config into a slot.
 - Do **not** use Flutter, React Native, Expo, or Next.js for new slots.

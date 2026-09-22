@@ -9,7 +9,9 @@ const SECRET_PATTERNS = [
   { name: 'AWS access key', regex: /AKIA[0-9A-Z]{16}/ },
   { name: 'GitHub token', regex: /ghp_[0-9A-Za-z]{36}/ },
   { name: 'GitHub fine-grained token', regex: /github_pat_[0-9A-Za-z_]{22,}/ },
-  { name: 'Private key block', regex: /-----BEGIN (RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/ }
+  { name: 'Private key block', regex: /-----BEGIN (RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/ },
+  { name: 'Google service account private_key', regex: /"private_key"\s*:\s*"-----BEGIN/ },
+  { name: 'Likely keystore password assignment', regex: /keystorePassword\s*=\s*['"][^'"]{8,}['"]/ }
 ]
 
 function findSecrets(text) {

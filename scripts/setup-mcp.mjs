@@ -11,7 +11,9 @@ const mcpPath = join(root, '.cursor', 'mcp.json')
 
 const MANUAL_NOTES = {
   firebase: 'optional — `firebase login` + a Firebase project when a slot needs it',
-  codex: 'needs ChatGPT/Codex editor extension (or CODEX_BIN)'
+  codex: 'needs ChatGPT/Codex editor extension (or CODEX_BIN)',
+  droidagentkit: 'needs JDK 17+; optional ANDROID_HOME for device tools — run `npx -y @droidagentkit/launcher doctor`',
+  'android-skills': 'npx package — enable in Cursor MCP; lists/searches Google android skills'
 }
 
 function runNpx(pkg) {

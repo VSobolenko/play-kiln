@@ -1,6 +1,11 @@
 {
   "version": 1,
   "hooks": {
+    "sessionStart": [
+      {
+        "command": "node .cursor/hooks/session-start.cjs"
+      }
+    ],
     "preToolUse": [
       {
         "command": "node .cursor/hooks/secret-guard.cjs",
@@ -11,6 +16,22 @@
       {
         "command": "node .cursor/hooks/git-guard.cjs",
         "matcher": "git"
+      }
+    ],
+    "beforeMCPExecution": [
+      {
+        "command": "node .cursor/hooks/mcp-audit.cjs"
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "node .cursor/hooks/after-edit-ledger.cjs"
+      }
+    ],
+    "stop": [
+      {
+        "command": "node .cursor/hooks/stop-gate.cjs",
+        "loop_limit": 1
       }
     ]
   }

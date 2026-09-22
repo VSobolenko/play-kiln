@@ -1,0 +1,12 @@
+---
+description: Android architecture defaults for PlayKiln slots
+globs: apps/**/*.{kt,kts}
+alwaysApply: false
+---
+
+# Architecture
+
+- Single `:app` until OpenSpec requires modules
+- UDF: ViewModel + UiState; no logic in composables
+- Feature modules must not depend on each other
+- See skill `android-architecture`

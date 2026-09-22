@@ -9,12 +9,12 @@ never corrupt each other or the shared harness.
 
 ### Requirement: Unique application identity
 
-Each slot SHALL use a unique `applicationId` of the form `com.playkiln.<slug>`
+Each slot SHALL use a unique `applicationId` of the form `com.gexetr.<slug>`
 and a unique directory `apps/<YYYY-MM-DD>-<slug>/`.
 
 #### Scenario: New idea creates a new slot
 
-- **WHEN** a human requests a new app via `/forge`
+- **WHEN** a human requests a new app via `/ship`
 - **THEN** the factory creates a new directory under `apps/` and a registry entry
   with status `building`
 

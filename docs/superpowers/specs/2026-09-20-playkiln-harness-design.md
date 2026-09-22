@@ -24,7 +24,7 @@ Delete or iterate dead attempts without forking the factory.
 ## Architecture
 
 ```
-idea → /forge (or /ship)
+idea → /ship
      → OpenSpec change + registry entry
      → new isolated apps/<date>-<slug>/
      → dual-agent implement (Cursor ∥ Codex)
@@ -34,7 +34,7 @@ idea → /forge (or /ship)
 
 ## Isolation rules
 
-- Unique `applicationId` per slot (`com.playkiln.<slug>`)
+- Unique `applicationId` per slot (`com.gexetr.<slug>`)
 - Own OpenSpec change name `app-<slug>`
 - Own signing secrets in env / local keystore path (never committed)
 - Own ledger under `.superpowers/sdd/<slug>/`
@@ -55,6 +55,6 @@ self-report as evidence.
 ## Success criteria for this harness milestone
 
 1. Clone → open in Cursor → MCP + hooks + commands work
-2. `/forge "simple calendar"` creates an isolated slot and runs the pipeline
+2. `/ship "simple calendar"` creates an isolated slot and runs the pipeline
 3. Codex and Cursor can both write (via worktrees when parallel) and verify each other
 4. No coupling to any other product codebase

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "appName": "PlayKiln Smoke",
+  "slug": "smoke",
+  "applicationId": "com.gexetr.smoke",
+  "idea": "PlayKiln slot — isolated Android attempt. Factory harness lives at the repo root.",
+  "defaultLocale": "en-US",
+  "category": "PRODUCTIVITY",
+  "tags": [
+    "offline",
+    "focus",
+    "productivity"
+  ],
+  "contactEmail": "support@example.com",
+  "privacyPolicyUrl": "https://example.com/privacy",
+  "locales": {
+    "en-US": {
+      "title": "PlayKiln Smoke",
+      "shortDescription": "PlayKiln slot — isolated Android attempt. Factory harness lives at the repo roo…",
+      "fullDescription": "PlayKiln Smoke helps you turn intention into steady progress.\n\nPlayKiln slot — isolated Android attempt. Factory harness lives at the repo root.\n\nWhat you can do:\n• Stay focused with a clear, distraction-free workflow\n• See meaningful progress at a glance\n• Keep your experience private and fully offline\n\nDesigned for a calm, direct experience without accounts, ads, analytics, or cloud tracking.",
+      "screenshotCaptions": [
+        "Start with a clear overview",
+        "Choose what matters now",
+        "Take the next focused step",
+        "See your progress clearly",
+        "Build a steady daily rhythm",
+        "Finish with confidence"
+      ],
+      "featureBullets": [
+        "Stay focused with a clear, distraction-free workflow",
+        "See meaningful progress at a glance",
+        "Keep your experience private and fully offline"
+      ]
+    },
+    "ru-RU": {
+      "title": "PlayKiln Smoke",
+      "shortDescription": "PlayKiln Smoke: простой способ сосредоточиться и видеть свой прогресс",
+      "fullDescription": "PlayKiln Smoke помогает превращать намерения в устойчивый прогресс.\n\nPlayKiln slot — isolated Android attempt. Factory harness lives at the repo root.\n\nВозможности:\n• Спокойный и понятный рабочий процесс\n• Наглядный прогресс без лишних действий\n• Полностью автономная и приватная работа\n\nПриложение работает без аккаунтов, рекламы, аналитики и облачного отслеживания.",
+      "screenshotCaptions": [
+        "Начните с понятного обзора",
+        "Выберите главное на сегодня",
+        "Сделайте следующий шаг",
+        "Следите за прогрессом",
+        "Создайте устойчивый ритм",
+        "Завершайте дела уверенно"
+      ],
+      "featureBullets": [
+        "Спокойный и понятный рабочий процесс",
+        "Наглядный прогресс без лишних действий",
+        "Полностью автономная и приватная работа"
+      ]
+    }
+  },
+  "dataSafety": {
+    "collectsData": false,
+    "reason": "Fully offline. No accounts, no analytics, no ads.",
+    "dataTypes": [],
+    "thirdPartySdks": [],
+    "encryptedInTransit": true,
+    "hasAccountDeletion": false
+  },
+  "permissions": [],
+  "ads": {
+    "containsAds": false,
+    "reason": "The app contains no advertising SDKs."
+  },
+  "contentRating": {
+    "questionnaire": "notes",
+    "targetAudience": "18+"
+  },
+  "graphicsSource": {
+    "iconGlyph": "focus",
+    "brandColor": "#8da142",
+    "accentColor": "#fbd10a"
+  }
+}

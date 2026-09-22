@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://playkiln.local/schema/capability.schema.json",
+  "title": "PlayKiln capability manifest",
+  "description": "Machine-readable description of what a capability artifact brings into a slot: SDKs, permissions, collected data and its test double. scripts/capability-registry.mjs and scripts/store-kit.py read these files to generate the Play Data safety answers, so they must stay truthful.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "id",
+    "version",
+    "artifact",
+    "summary",
+    "sdkDependencies",
+    "permissions",
+    "dataCollected",
+    "requiresConsent",
+    "networkRequired",
+    "testDoubles"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Must equal the Gradle module name."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Must equal playkiln.capabilityVersion in capabilities/gradle.properties."
+    },
+    "artifact": {
+      "type": "string",
+      "pattern": "^com\\.playkiln\\.capability:[a-z][a-z0-9-]*$"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 20,
+      "description": "One sentence a human reads in the capability registry."
+    },
+    "status": {
+      "enum": ["experimental", "stable", "deprecated"],
+      "default": "stable"
+    },
+    "since": { "type": "string", "description": "Capability version this module first shipped in." },
+    "supersededBy": { "type": "string" },
+    "optionalForSlots": {
+      "type": "boolean",
+      "default": true,
+      "description": "false means every slot must include it (e.g. a safety or compliance baseline)."
+    },
+    "sdkDependencies": {
+      "type": "array",
+      "description": "Third-party/Google SDKs bundled by this artifact. Reported in Play Data safety as third-party SDKs.",
+      "items": {
+        "type": "object",
+        "required": ["name", "version", "policyUrl"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "version": { "type": "string" },
+          "policyUrl": { "type": "string", "format": "uri" }
+        }
+      }
+    },
+    "permissions": {
+      "type": "array",
+      "description": "Manifest permissions the artifact declares. Anything dangerous needs a justification here or verify-slot fails.",
+      "items": {
+        "type": "object",
+        "required": ["name", "why", "dangerous"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "pattern": "^[a-zA-Z0-9_.]+$" },
+          "why": { "type": "string", "minLength": 10 },
+          "dangerous": { "type": "boolean" },
+          "runtimeRequested": { "type": "boolean", "default": false }
+        }
+      }
+    },
+    "dataCollected": {
+      "type": "array",
+      "description": "Play Data safety data types. Empty means the capability collects nothing.",
+      "items": {
+        "type": "object",
+        "required": ["type", "purpose", "shared", "optional"],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "enum": [
+              "Location",
+              "Personal info",
+              "Financial info",
+              "Health and fitness",
+              "Messages",
+              "Photos and videos",
+              "Audio",
+              "Files and docs",
+              "Calendar",
+              "Contacts",
+              "App activity",
+              "Web browsing",
+              "App info and performance",
+              "Device or other IDs"
+            ]
+          },
+          "purpose": {
+            "enum": [
+              "App functionality",
+              "Analytics",
+              "Developer communications",
+              "Advertising or marketing",
+              "Personalization",
+              "Account management",
+              "Fraud prevention, security, and compliance"
+            ]
+          },
+          "shared": { "type": "boolean" },
+          "optional": {
+            "type": "boolean",
+            "description": "true when the user can use the app without providing it."
+          },
+          "ephemeral": { "type": "boolean", "default": false },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "requiresConsent": {
+      "type": "boolean",
+      "description": "true when the capability must not do network work before the user resolves a consent dialog (EEA/UK obligations)."
+    },
+    "networkRequired": { "type": "boolean" },
+    "adsPresent": {
+      "type": "boolean",
+      "default": false,
+      "description": "true forces the store pack to declare ads in the listing and Data safety."
+    },
+    "testDoubles": {
+      "type": "array",
+      "description": "Deterministic implementations slots must use in unit tests. Mandatory for networked capabilities.",
+      "items": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]*$" }
+    },
+    "publicApi": {
+      "type": "array",
+      "description": "Entry points a slot is expected to use; everything else is internal.",
+      "items": { "type": "string" }
+    },
+    "policyNotes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Non-obvious Play policy obligations this capability creates."
+    }
+  }
+}

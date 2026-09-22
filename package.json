@@ -3,9 +3,14 @@
   "private": true,
   "type": "module",
   "description": "PlayKiln — Android APK factory harness",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
-    "new-slot": "node scripts/new-slot.mjs",
-    "verify": "node scripts/verify-slot.mjs",
-    "setup-mcp": "node scripts/setup-mcp.mjs"
+    "kiln:status": "node scripts/kiln-status.mjs",
+    "kiln:verify": "node scripts/verify-slot.mjs",
+    "kiln:release": "node scripts/prepare-release.mjs",
+    "kiln:new": "node scripts/new-slot.mjs",
+    "kiln:assets": "node scripts/store-kit.mjs"
   }
 }

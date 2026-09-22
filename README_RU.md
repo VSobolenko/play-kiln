@@ -2,7 +2,7 @@
 
 Завод по производству Android APK/AAB для экспериментов в Google Play.
 
-Один общий агентский харнес (Cursor ∥ Codex, OpenSpec, skills, MCP, `/forge`).
+Один общий агентский харнес (Cursor ∥ Codex, OpenSpec, skills, MCP, `/ship`).
 Много изолированных попыток в `apps/`. Улучшили харнес один раз — все новые
 слоты получают это сразу.
 
@@ -13,6 +13,6 @@ node scripts/setup-mcp.mjs
 npx skills add obra/superpowers --skill '*' -a cursor --copy -y
 ```
 
-В Cursor: `/forge простой офлайн-календарь с напоминаниями`
+В Cursor: `/ship простой офлайн-календарь с напоминаниями`
 
 Подробности для агентов — в `AGENTS.md`.

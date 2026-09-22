@@ -1,0 +1,15 @@
+---
+description: Google Play / Android 15–16 compliance for PlayKiln slots
+globs: apps/**/*
+alwaysApply: false
+---
+
+# Play compliance reminders
+
+- `targetSdk` / `compileSdk` ≥ 36 for new Play submissions (from 2026-08-31).
+- Declare `android:dataExtractionRules` + XML; exclude secrets from backup.
+- Edge-to-edge is enforced; handle insets (Material3 Scaffold).
+- Prefer Photo Picker over broad media permissions.
+- Pure Kotlin is 16 KB-safe; native `.so` needs AGP 8.5.1+ / NDK r28+.
+- Data safety form required even when collecting nothing.
+- See `docs/research/2026-09-20-android-play-ai-agents.md`.

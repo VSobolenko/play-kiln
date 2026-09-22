@@ -1,0 +1,67 @@
+---
+description: Evidence and code-hygiene rules that prevent repeat factory defects
+alwaysApply: true
+---
+
+# Verification discipline
+
+PlayKiln shipped avoidable defects that were only found by *running* the code, not
+by reading it. Each rule below exists because it was violated once. They are not
+style preferences; they are the fix.
+
+## Never claim a script works until it ran
+
+- Writing a script is half the job. Run it on real input before reporting it done.
+- "The code looks correct" is not evidence. `node scripts/selftest.mjs` and
+  `node scripts/verify-slot.mjs` are evidence.
+- If a script cannot be run, say so explicitly instead of implying it works.
+
+## Recursive copies must filter
+
+- Any `cpSync` / `Copy-Item -Recurse` over a project tree must exclude build
+  outputs, IDE state, and machine-local files: `build/`, `.gradle/`, `.kotlin/`,
+  `.idea/`, `.cxx/`, `dist/`, `captures/`, `*.apk`, `*.aab`, `*.jks`, `*.so`,
+  `local.properties`, `keystore.properties`.
+- Before writing the copy step, list the source directory. Never assume what is in
+  a directory you have not listed.
+- Reuse the shared predicate (`scripts/new-slot.mjs` → `isExcludedScaffoldPath`)
+  instead of re-implementing the filter somewhere else.
+
+## Text rewriting must never touch binary files
+
+- Any search/replace pass over a tree must skip files containing NUL bytes.
+- Match whole tokens; a rewrite that fires inside a binary silently corrupts it and
+  is invisible until a build fails.
+
+## One source of truth, imported — never restated
+
+- A value used by two scripts lives in one module and is imported.
+  Namespace/applicationId rules belong to `scripts/lib/namespaces.mjs`.
+- Never hand-write an error message that repeats a rule. Build the message from the
+  check itself (`${pattern}`), so the wording cannot drift away from the logic.
+  A hardcoded message telling users to pass `com.playkiln.*` while the regex
+  required `com.gexetr.*` is exactly the defect this prevents.
+
+## After changing a shared constant, sweep the repo
+
+- A rename is not done until a repo-wide search finds zero leftovers.
+- Search **all** textual forms, because the same prefix hides in several:
+  plain (`com.x.y`), regex-escaped (`com\.x\.y`), string-escaped (`com\\.x\\.y`),
+  and path form (`com/x/y`).
+- Rename package *directories* too, not just file contents.
+- Then prove it with the selftest's "no leftover reference" checks.
+
+## Kotlin / Compose specifics that already broke once
+
+- Compose-only apps do **not** bundle Material Components View libraries. A theme
+  must not use `Theme.Material3.*` or `Theme.MaterialComponents.*` parents; use an
+  `android:Theme.Material.*` parent or a Compose `MaterialTheme`.
+- A `when` over a sealed type is exhaustive. Never add `else -> error(...)`; it
+  removes the compiler's exhaustiveness check and hides new cases.
+
+## Every repeated defect earns a regression check
+
+- When a defect is fixed, add a check to `scripts/selftest.mjs` that fails on the
+  old behaviour, then confirm the check fails when you reintroduce the defect.
+- A check that cannot fail is not a check. Verify the sensor before trusting it.
+- Record what happened in `harness/lessons.md` (symptom → root cause → fix class).

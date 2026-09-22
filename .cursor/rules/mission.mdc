@@ -1,0 +1,13 @@
+---
+description: Always load PlayKiln factory mission — what this repo is for
+alwaysApply: true
+---
+
+# Mission rule
+
+Before planning or coding, treat **MISSION.md** (repo root) as the factory brief:
+
+- This is an Android/Play **app factory**, not one product app.
+- Ideas become isolated slots under `apps/`; harness stays at repo root.
+- Evidence before "done"; Evaluator grades; human decides Play upload.
+- Read `MISSION.md` if the user's intent is unclear.

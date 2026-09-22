@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "telemetry",
+  "version": "1.0.0",
+  "artifact": "com.gexetr.capability:telemetry",
+  "summary": "PII-safe logging and product-event surface whose shipped default is a no-op recorder, so a slot collects nothing until it opts in.",
+  "status": "stable",
+  "optionalForSlots": true,
+  "sdkDependencies": [],
+  "permissions": [],
+  "dataCollected": [],
+  "requiresConsent": false,
+  "networkRequired": false,
+  "adsPresent": false,
+  "testDoubles": [
+    "RecordingTelemetry"
+  ],
+  "publicApi": [
+    "Telemetry",
+    "NoOpTelemetry",
+    "RecordingTelemetry",
+    "Redaction.scrub"
+  ],
+  "policyNotes": [
+    "The default implementation sends nothing, so a slot that keeps it must answer Data safety with 'no data collected'.",
+    "A slot that replaces the default with a networked analytics or crash-reporting SDK must update this manifest (dataCollected and sdkDependencies), the Play Data safety form and the privacy policy in the same change.",
+    "Never pass user content, account identifiers, advertising identifiers, e-mail addresses or free-form user text to log() or event(); Redaction.scrub only masks the common shapes and is a safety net, not a licence."
+  ]
+}

@@ -1,0 +1,23 @@
+﻿# Keep Agent index lean and secrets out of @-context.
+# Note: terminal/MCP can still reach ignored paths — hooks remain the backstop.
+
+**/build/
+**/.gradle/
+**/captures/
+**/.idea/
+**/*.iml
+**/*.apk
+**/*.aab
+**/*.dex
+**/*.jks
+**/*.keystore
+**/local.properties
+google-services.json
+play-service-account.json
+.env
+.env.*
+!.env.example
+.superpowers/
+node_modules/
+.tmp-android-skills/
+*.log

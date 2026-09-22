@@ -3,7 +3,7 @@ schema: spec-driven
 context: |
   PlayKiln is an Android APK/AAB factory monorepo. Default stack: Kotlin,
   Jetpack Compose, Material 3, Gradle KTS. Apps live under apps/<date>-<slug>/
-  with applicationId com.playkiln.<slug>. Cursor and Codex are peer agents.
+  with applicationId com.gexetr.<slug>. Cursor and Codex are peer agents.
   Never commit keystores or Play credentials.
 
 rules:

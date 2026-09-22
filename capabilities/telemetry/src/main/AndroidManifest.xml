@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  capability:telemetry adds nothing to the merged manifest.
+
+  The shipped default (NoOpTelemetry) collects nothing and needs no permission. A slot that
+  replaces it with a networked analytics or crash SDK must:
+    1. update capabilities/telemetry/capability.json (dataCollected, sdkDependencies),
+    2. declare any required permission here or in the slot manifest with a reason,
+    3. update the Play Data safety form and privacy policy.
+-->
+<manifest />

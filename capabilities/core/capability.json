@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "core",
+  "version": "1.0.0",
+  "artifact": "com.gexetr.capability:core",
+  "summary": "Shared lifecycle, result, diagnostics, and clock contracts for every PlayKiln capability.",
+  "status": "stable",
+  "since": "1.0.0",
+  "optionalForSlots": false,
+  "sdkDependencies": [],
+  "permissions": [],
+  "dataCollected": [],
+  "requiresConsent": false,
+  "networkRequired": false,
+  "adsPresent": false,
+  "testDoubles": [],
+  "publicApi": [
+    "PlayKilnResult",
+    "PlayKilnResult.getOrNull",
+    "PlayKilnResult.map",
+    "CapabilityAvailability",
+    "CapabilityAvailability.isUsable",
+    "CapabilityId",
+    "CapabilityReport",
+    "CapabilityDiagnostics",
+    "MutableCapabilityDiagnostics",
+    "Clock"
+  ]
+}

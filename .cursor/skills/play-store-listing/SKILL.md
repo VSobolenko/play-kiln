@@ -1,6 +1,6 @@
 ---
 name: play-store-listing
-description: Produce Google Play listing assets and copy for a PlayKiln slot (title, descriptions, privacy, icons, screenshots). Use during /forge Store role or when preparing publish.
+description: Produce Google Play listing assets and copy for a PlayKiln slot (title, descriptions, privacy, icons, screenshots). Use during /ship Store role or when preparing publish.
 ---
 
 # Play Store listing pack

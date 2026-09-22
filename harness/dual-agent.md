@@ -1,49 +1,87 @@
-# Dual-agent protocol (Cursor ∥ Codex)
+# Codex co-lead protocol
 
-Cursor and Codex are **peers**. Neither is permanently "the writer" or "the
-reviewer". The controller (the agent the human is talking to) owns orchestration,
-the ledger, and objective gates.
+Cursor owns orchestration and final verification. Codex is a co-lead engineer with
+a durable worker channel and may implement any bounded factory task. A worker result
+is input to verification, never proof of completion.
 
-## Role cards (assign per task)
+## Role cards
 
-| Role | Responsibility |
-|------|----------------|
-| **Build** | Implement code, tests, Gradle wiring in the slot |
-| **Store** | Play listing, privacy text, icons, screenshots, store/ |
-| **Verify** | Independent check: diff read, verify-slot, challenge design |
+| Role | Responsibility | Required handoff |
+|---|---|---|
+| **Build** | App code, tests, Gradle wiring, release behavior | Files changed, tests run, exact blockers |
+| **Store** | Listing, policy drafts, icon, feature graphic, phone/tablet screenshots | Store inventory and validation result |
+| **Verify** | Read-only diff review, commands, requirement challenges | Evidence and a PASS/FAIL/BLOCKED verdict |
+| **Adjudicate** | Resolve Build/Store/Verify disagreement against contracts | Ruling, evidence, cost if wrong, next owner |
 
-Typical first split for a new app:
+Cursor normally orchestrates and verifies; it may take any role when needed. Keep
+parallel writers on disjoint file lists or in separate worktrees. Read-only reviews
+may share a working directory.
 
-1. Cursor **Build** core screens + Codex **Store** listing/assets in parallel
-2. Swap: Codex **Verify** (or Build remaining tasks) + Cursor **Verify**/fix
-3. Both must agree the objective gate is green before claiming done
+## Worker lifecycle
 
-## Concurrency
+Write a bounded prompt under `.kiln/codex/prompts/`, then use the foreground runner.
+The shell or orchestrator may background several independent runner processes.
 
-| Situation | Rule |
-|-----------|------|
-| Two agents editing the same slot sources | Separate git worktrees; controller merges |
-| One writes, one reviews | Same tree OK if reviewer is read-only |
-| Codex MCP write | Prefer worktree; remember `secret-guard` does not see Codex writes — run `verify-slot` + secret scan after |
-| Codex session continuity | Reuse `threadId` via `codex-reply` |
+```bash
+node scripts/codex-run.mjs run --id <worker-id> --prompt-file .kiln/codex/prompts/<prompt>.md
+node scripts/codex-run.mjs status --id <worker-id>
+node scripts/codex-run.mjs status
+node scripts/codex-run.mjs last --id <worker-id> --chars 4000
+node scripts/codex-run.mjs log --id <worker-id> --lines 60
+node scripts/codex-run.mjs resume --id <worker-id> --prompt-file .kiln/codex/prompts/<follow-up>.md
+node scripts/codex-run.mjs list
+```
 
-## Ledger
+1. `run` records metadata and streams durable stdout/stderr.
+2. `status` or `list` reports running, done, failed, or classified blocked state.
+3. `last` reads the final worker message; use it for the concise handoff.
+4. `log` reads recent stdout and stderr when the final message is absent or unclear.
+5. `resume` continues the exact recorded Codex session with a new prompt.
+6. Verify the result with a diff and the relevant factory commands.
 
-Path: `.superpowers/sdd/<slug>/progress.md`
+Do not use the MCP `codex` tool for implementation or other long tasks. Its request
+can time out and lose the work. Reserve it for short dialogue; use
+`scripts/codex-run.mjs` for durable work.
 
-Every dispatch and verdict gets a line. After context loss, trust the ledger.
+## Session continuity and ledger
 
-## Accountability
+The worker ledger is `.kiln/codex/`. For worker `<id>`, the runner writes:
 
-1. **Prevent** — conventions in `AGENTS.md`; task constraints in Codex
-   `developer-instructions`.
-2. **Contain** — worktrees for risky writes.
-3. **Verify** — `node scripts/verify-slot.mjs` + human-readable diff.
-4. **Reject** — send concrete failures back on the same Codex thread or resume
-   the Cursor implementer; do not silently patch in the controller session when
-   SDD says otherwise.
+```text
+.kiln/codex/<id>.meta.json
+.kiln/codex/<id>.log
+.kiln/codex/<id>.err
+.kiln/codex/<id>.last.md
+.kiln/codex/<id>.exit.json
+```
 
-## When they disagree
+The Codex CLI emits `session id: <uuid>` into stderr. `resume --id <id>` reads that
+exact UUID and resumes it. Never use “resume last”: several workers may share the
+same working directory, so the most recently completed session may belong to a
+different task. Worker state and prompts are gitignored; durable rulings belong in
+OpenSpec or the appropriate tracked harness document.
 
-Adjudicate against `openspec/` + `AGENTS.md`. Record a **Ruling** in the ledger
-with the cost if wrong. Prefer the more testable claim.
+## Fallback ladder
+
+| Signal or failure | Immediate response | Next owner |
+|---|---|---|
+| `RATE_LIMITED` | Stop retrying Codex; preserve prompt and evidence | Cursor `generator` subagent |
+| `CONTEXT_LIMIT` | Reduce the task to a bounded file list and resume once with the exact session ID | Cursor `generator` if still blocked |
+| `AUTH_ERROR` | Do not paste credentials or create an API key; record the auth blocker | Cursor `generator` |
+| Same issue fails twice | Stop repeating the same worker path; record both failures | Cursor `generator`, then orchestrator |
+
+The full ladder is **Codex worker → Cursor `generator` subagent → orchestrator**.
+The orchestrator may finish the bounded task directly only after the earlier owner is
+blocked or has failed twice. If completing it would require new authority, external
+credentials, or a changed product decision, stop and ask the human.
+
+## Acceptance and adjudication
+
+- Read the actual diff; do not trust summaries.
+- Run `node scripts/verify-slot.mjs --slot <slug> --strict-store` for a publishable
+  slot and any narrower tests required by the change.
+- Verify signed release artifacts through `scripts/prepare-release.mjs` evidence.
+- A Verify-role FAIL returns to the current implementer once with exact evidence.
+- If peers disagree, Adjudicate against `AGENTS.md`, OpenSpec, the shared facts, and
+  command output. Prefer the claim that can be tested.
+- Record recurring failure patterns in `harness/lessons.md`.

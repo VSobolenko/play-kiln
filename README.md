@@ -1,42 +1,37 @@
 # PlayKiln
 
-Automated **Android APK/AAB factory** for Google Play experiments.
+PlayKiln is an Android/Google Play app factory: one idea becomes one isolated,
+publishable app with signed APK/AAB artifacts and a complete store pack. It is not a
+single app repository.
 
-One shared agent harness (Cursor ∥ Codex, OpenSpec, skills, MCP, `/forge` / `/ship`).
-Many isolated app attempts under `apps/`. Improve the kiln once — every future
-attempt inherits it.
-
-## Quick start
+## Two-minute path
 
 ```bash
-# 1. Open this folder in Cursor
-# 2. Enable MCP servers (Settings → MCP), then:
-node scripts/setup-mcp.mjs
-
-# 3. Install methodology skills (once):
-npx skills add obra/superpowers --skill '*' -a cursor --copy -y
-
-# 4. Bring an idea to the agent, e.g.:
-#    /forge simple offline calendar with reminders
+node scripts/kiln-status.mjs
+# Then ask the agent:
+# /ship <your app idea>
 ```
 
-## Layout
+| Stage | Owner |
+|---|---|
+| Approve the plan | Human checkpoint |
+| `/ship` → `scripts/new-slot.mjs` | Factory |
+| Codex workers implement | Factory |
+| `store-kit.py` → `prepare-release.mjs` → `verify-slot.mjs` → `/eval` | Factory |
+| Legal declarations, first upload, publish | Human checkpoint |
 
-| Path | Role |
-|------|------|
-| `AGENTS.md` | Contract for Cursor **and** Codex |
-| `.cursor/` | Commands, rules, hooks, MCP, project skills |
-| `.agents/skills/` | Installed superpowers methodology |
-| `openspec/` | Specs + changes |
-| `apps/` | One folder per APK attempt |
-| `scaffold/android-compose/` | Seed for `new-slot` (not a harness fork) |
-| `registry/apps.json` | Attempt catalog |
-| `harness/` | Dual-agent protocol |
+New slots come from [`scaffold/android-compose/`](scaffold/android-compose/) and are
+created under `apps/<date>-<slug>/` with a unique `com.gexetr.<slug>`
+`applicationId` — the developer account's existing Play namespace.
 
-## Stack (new apps)
+The factory tests itself, so a broken script cannot reach a slot:
 
-Kotlin · Jetpack Compose · Material 3 · Gradle KTS · version catalogs.
+```bash
+node scripts/selftest.mjs   # runs new-slot.mjs against a temp sandbox and asserts the contract
+```
 
-## License
+It also runs automatically inside `scripts/verify-slot.mjs`.
 
-Private / unset — add one when you publish the factory itself.
+Read the agent contract in [`AGENTS.md`](AGENTS.md), the Russian operator brief in
+[`MISSION.md`](MISSION.md), and the live-release handoff in
+[`docs/play-publishing-playbook.md`](docs/play-publishing-playbook.md).
