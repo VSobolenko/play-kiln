@@ -7,6 +7,7 @@ com.gexetr.capability:core        1.0.0   contracts, availability, diagnostics, 
 com.gexetr.capability:telemetry   1.0.0   PII-safe logging/events, no-op by default
 com.gexetr.capability:ads         1.0.0   consent-gated ads over Google Mobile Ads + UMP
 com.gexetr.capability:billing     1.0.0   entitlement state over Google Play Billing
+com.gexetr.capability:remoteconfig 1.0.0  offline-safe flags and parameters over Firebase Remote Config
 ```
 
 ## Why this exists (and what it is not)

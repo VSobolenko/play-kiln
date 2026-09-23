@@ -1,0 +1,6 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Remote Config fetches parameter values from Firebase. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+</manifest>

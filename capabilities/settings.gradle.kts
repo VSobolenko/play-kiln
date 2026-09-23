@@ -23,4 +23,4 @@ rootProject.name = "playkiln-capabilities"
 
 // Opt-in building blocks shared by many PlayKiln slots.
 // A slot depends on a pinned published version and never on another slot's source.
-include(":core", ":ads", ":billing", ":telemetry")
+include(":core", ":ads", ":billing", ":telemetry", ":remoteconfig")

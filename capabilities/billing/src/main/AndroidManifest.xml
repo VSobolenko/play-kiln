@@ -1,0 +1,10 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      Google Play Billing requires no permission and contributes no components: the billing
+      service belongs to the Play Store app, and this library only binds to it. This manifest
+      exists so the module has an explicit, empty contribution instead of relying on a
+      default.
+    -->
+
+</manifest>

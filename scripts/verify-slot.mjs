@@ -26,6 +26,11 @@ import {
   validateListingText
 } from './lib/play-assets.mjs'
 import { applicationIdPattern } from './lib/namespaces.mjs'
+import {
+  aggregateSlotCapabilities,
+  discoverCapabilities
+} from './lib/capabilities.mjs'
+import { runGradleTasks } from './lib/gradle.mjs'
 
 const ROOT = process.cwd()
 const ARGV = process.argv.slice(2)
@@ -35,6 +40,21 @@ const slotIndex = ARGV.indexOf('--slot')
 const SLOT = slotIndex !== -1 ? ARGV[slotIndex + 1] : null
 const RUN_BUILD = ARGV.includes('--build')
 const STRICT_STORE = ARGV.includes('--strict-store')
+
+if (ARGV.includes('--help') || ARGV.includes('-h')) {
+  console.log(`Usage: node scripts/verify-slot.mjs [options]
+
+  --slot <slug>     verify one slot under apps/
+  --base <ref>      verify the diff against a base ref
+  --strict-store    require the full store-pack contract
+  --build           compile the slot (assembleDebug)
+  --no-selftest     skip the factory self-test (rare)
+  --help            print this message
+
+Without --build the slot is not compiled, so the verdict is UNVERIFIED rather
+than PASS: source-only evidence cannot prove the app builds.`)
+  process.exit(0)
+}
 
 let failed = false
 let blocked = false
@@ -109,10 +129,19 @@ function checkNodeSyntax(files) {
 }
 
 function gradleAssemble(slotDir) {
-  const windows = process.platform === 'win32'
-  const wrapper = path.join(slotDir, windows ? 'gradlew.bat' : 'gradlew')
-  if (!existsSync(wrapper)) return { ok: false, missing: true, out: 'gradlew not found' }
-  return run(wrapper, ['assembleDebug', '--quiet'], slotDir, { useShell: windows })
+  let gradleRun
+  try {
+    gradleRun = runGradleTasks(slotDir, 'assembleDebug')
+  } catch (error) {
+    const out = error?.message || String(error)
+    return { ok: false, missing: /^gradlew(?:\.bat)? not found$/.test(out), out }
+  }
+  const { result } = gradleRun
+  const out = `${result.stdout || ''}${result.stderr || ''}`.trim()
+  if (result.error) {
+    return { ok: false, missing: result.error.code === 'ENOENT', out: result.error.message }
+  }
+  return { ok: result.status === 0, status: result.status, out }
 }
 
 function indent(value, padding = '        ') {
@@ -328,6 +357,127 @@ function checkDangerousPermissions(slotDir, manifestText) {
   for (const permission of declared) {
     if (disclosure.includes(permission)) line('PASS', `${permission} disclosed in store/data-safety.md`)
     else line('FAIL', `${permission} is not mentioned in store/data-safety.md`)
+  }
+}
+
+function mergedManifestFor(slotDir, variant = null) {
+  const root = path.join(slotDir, 'app', 'build', 'intermediates', 'merged_manifests')
+  const manifests = walkFiles(root).filter((file) => {
+    if (path.basename(file) !== 'AndroidManifest.xml') return false
+    if (!variant) return true
+    return file.split(path.sep).some((segment) => segment.toLowerCase() === variant.toLowerCase())
+  })
+  manifests.sort((left, right) => statSync(right).mtimeMs - statSync(left).mtimeMs)
+  return manifests[0] ?? null
+}
+
+function manifestPermissions(manifestText) {
+  return new Set(
+    [...manifestText.matchAll(/<uses-permission(?:-sdk-23)?\b[^>]*\bandroid:name\s*=\s*["']([^"']+)["']/gi)]
+      .map((match) => match[1])
+  )
+}
+
+function verifyCapabilityCompliance(slotDir) {
+  console.log('\n#### capability compliance')
+  let aggregate
+  try {
+    aggregate = aggregateSlotCapabilities({ rootDir: ROOT, slotDir })
+    line('PASS', `capability registry: ${aggregate.enabled.length ? aggregate.enabled.join(', ') : 'none enabled'}`)
+  } catch (error) {
+    line('FAIL', error.message)
+    return
+  }
+
+  const mergedManifest = mergedManifestFor(slotDir, RUN_BUILD ? 'debug' : null)
+  if (!mergedManifest) {
+    line('FAIL', 'merged AndroidManifest.xml is missing; run the slot build before strict verification')
+  } else {
+    const requested = manifestPermissions(readFileSync(mergedManifest, 'utf8'))
+    const declared = new Set(aggregate.permissions.map((permission) => permission.name))
+    let permissionsMatch = true
+    for (const permission of declared) {
+      if (!requested.has(permission)) {
+        line('FAIL', `capability permission missing from merged manifest: ${permission}`)
+        permissionsMatch = false
+      }
+    }
+
+    const allCapabilities = discoverCapabilities(ROOT)
+    const relatedPermissions = new Set(
+      ['ads', 'billing'].flatMap((id) =>
+        (allCapabilities.get(id)?.permissions ?? []).map((permission) => permission.name)
+      )
+    )
+    for (const permission of requested) {
+      if (relatedPermissions.has(permission) && !declared.has(permission)) {
+        line('FAIL', `ads/billing permission has no enabled capability: ${permission}`)
+        permissionsMatch = false
+      }
+    }
+    if (permissionsMatch) line('PASS', 'capability permissions match merged manifest')
+  }
+
+  const listingFile = path.join(slotDir, 'store', 'listing.json')
+  let listing = null
+  if (existsSync(listingFile)) {
+    try {
+      listing = JSON.parse(readFileSync(listingFile, 'utf8'))
+    } catch (error) {
+      line('FAIL', `store/listing.json could not be parsed for capability compliance: ${error.message}`)
+    }
+  }
+  if (aggregate.adsPresent) {
+    if (listing?.ads?.containsAds === true) {
+      line('PASS', 'store ads declaration matches capabilities: ads present')
+    } else {
+      line('FAIL', 'enabled capabilities contain ads but store/listing.json claims no ads')
+    }
+  } else {
+    if (listing?.ads?.containsAds === true) {
+      line('FAIL', 'store/listing.json claims ads but no enabled capability declares ads')
+    } else {
+      line('PASS', 'enabled capabilities declare no ads')
+    }
+  }
+
+  const dataSafetyFile = path.join(slotDir, 'store', 'data-safety.md')
+  const dataSafety = existsSync(dataSafetyFile) ? readFileSync(dataSafetyFile, 'utf8') : ''
+  const collectedRows = new Set()
+  for (const lineText of dataSafety.split(/\r?\n/)) {
+    if (!lineText.trim().startsWith('|')) continue
+    const cells = lineText
+      .split('|')
+      .slice(1, -1)
+      .map((cell) => cell.replace(/[`*_]/g, '').trim())
+    if (cells.length >= 2 && cells[1].toLocaleLowerCase('en-US') === 'yes') {
+      collectedRows.add(cells[0].toLocaleLowerCase('en-US'))
+    }
+  }
+  let dataTypesMatch = true
+  const dataTypes = [...new Set(aggregate.dataCollected.map((item) => item.type))].sort()
+  for (const dataType of dataTypes) {
+    if (!collectedRows.has(dataType.toLocaleLowerCase('en-US'))) {
+      line('FAIL', `capability data type missing from store/data-safety.md: ${dataType}`)
+      dataTypesMatch = false
+    }
+  }
+  if (dataTypesMatch) line('PASS', 'capability data types disclosed in store/data-safety.md')
+
+  if (aggregate.requiresPurchaseAuthority) {
+    if (!aggregate.purchaseAuthority) {
+      line('FAIL', 'SERVER_COST consumable requires billing.purchaseAuthority documentation')
+    } else {
+      const reviewNotesFile = path.join(slotDir, 'store', 'review-notes.md')
+      const reviewNotes = existsSync(reviewNotesFile) ? readFileSync(reviewNotesFile, 'utf8') : ''
+      if (reviewNotes.includes(aggregate.purchaseAuthority)) {
+        line('PASS', 'SERVER_COST purchase authority documented')
+      } else {
+        line('FAIL', 'purchase authority missing from store/review-notes.md')
+      }
+    }
+  } else {
+    line('PASS', 'no SERVER_COST purchase authority required')
   }
 }
 
@@ -560,8 +710,13 @@ for (const name of slotDirs) {
       console.log(indent(result.out.split(/\r?\n/).slice(-40).join('\n')))
     }
   } else {
-    line('SKIP', 'assembleDebug (pass --build to run)')
+    line('SKIP', 'assembleDebug - pass --build to compile')
+    // Skipping the build means nothing proved the slot compiles, so the run cannot
+    // end in PASS. Uncompilable code must never look like release evidence.
+    unverified.push('build')
   }
+
+  if (STRICT_STORE) verifyCapabilityCompliance(dir)
 }
 
 console.log('\n---')

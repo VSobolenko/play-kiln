@@ -75,9 +75,29 @@ local files.
 
 1. Run `status --id <id>`.
 2. On `DONE`, read `last`; then read the diff and execute the required verification.
-3. On `FAILED`, `BLOCKED(...)`, or no final message, read `log` and the `.err` tail.
+3. On `FAILED`, `BLOCKED(...)`, `LOST`, or no final message, read `log` and the `.err` tail.
 4. Treat the worker's claimed tests as unverified until reproduced by the controller.
 5. Use `resume` only when a narrow follow-up can fix the same task safely.
+
+## Ledger verdicts
+
+`status`/`list` derive one verdict per worker from its recorded status, its exit
+record, and whether its recorded pid is still alive:
+
+| Verdict | Meaning |
+|---|---|
+| `DONE` | Exit record with exit code 0 and no diagnosed signal |
+| `FAILED(<code>)` | Exit record with a non-zero exit code and no signal |
+| `BLOCKED(<signal>)` | Exit record diagnosed a signal; a signal outranks a zero exit code, because a worker that stopped on a limit has not delivered |
+| `LOST` | Recorded `running`, no exit record, and the recorded pid is not alive (including no usable recorded pid) |
+
+`DONE` is the runner's process verdict, not evidence the deliverable exists: read the
+diff and reproduce the verification. A `LOST` worker died without reporting, so its
+work is **unverified** — list and read its files on disk directly, and never assume the
+task completed. Liveness is a heuristic with a known pid-reuse limitation: pids are
+recycled, so a dead worker's pid can now belong to an unrelated live process and stay
+reported `running`; only `ESRCH` proves death, and `EPERM` is treated as alive, so the
+check can miss a death but never invents a `LOST`.
 
 ## Classified failures
 
@@ -89,6 +109,22 @@ local files.
 
 An unclassified failure gets one evidence-driven resume. If the same issue occurs
 twice, stop retries and use the ladder in `harness/dual-agent.md`.
+
+## Codex-first availability
+
+A `BLOCKED(...)` label from `list` is not evidence that Codex is unavailable. Before
+assigning a Cursor `generator`, run a fresh read-only, trivial `tier-smoke`-shaped
+probe worker in this session at the tier the task will use, and record its observed
+exit in the handoff. Apply the failure table to the failed worker task only:
+`RATE_LIMITED` does not retry and goes to `generator`; `CONTEXT_LIMIT` reduces scope
+and resumes once, then goes to `generator`; `AUTH_ERROR` records the blocker and goes
+to `generator`. One blocked worker does not disable Codex while the fresh probe
+answers.
+
+Historical exit records predate the current classifier and can describe its bug rather
+than the worker's fate. Check the deliverable on disk before trusting a label; see
+“2026-09-23 - the failure classifier reported finished work as blocked, because it
+matched prose” in `harness/lessons.md`.
 
 ## Three-worker parallel example
 

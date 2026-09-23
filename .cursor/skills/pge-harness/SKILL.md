@@ -1,6 +1,6 @@
 ---
 name: pge-harness
-description: Planner–Generator–Evaluator loop for PlayKiln slots. Use on non-trivial /ship and /ship work so generation and grading stay separated.
+description: Planner–Generator–Evaluator loop for PlayKiln slots. Use on non-trivial /ship work so generation and grading stay separated.
 ---
 
 # Planner–Generator–Evaluator

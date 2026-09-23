@@ -50,7 +50,10 @@ Create the app in Play Console and register the exact `applicationId` from
 
 The Play Developer API cannot create a new app, so this cannot be automated.
 
-Sources: **NEEDS-VERIFICATION** — `FACTS.md` supplies no official API-limitation or package-registration URL.
+Sources: <https://developers.google.com/android-publisher/edits> ("You can only use
+this API to make changes to an existing app (that has at least one APK uploaded)").
+Until the first manual release exists, a draft app also accepts only draft releases
+through the API — see <https://developers.google.com/android-publisher/tracks>.
 
 ## 4. Establish signing — Factory + Human
 
@@ -100,7 +103,7 @@ provide demo credentials and review instructions when the app is gated.
 
 Sources: **NEEDS-VERIFICATION** — `FACTS.md` names Play Console Help article 9866151 but provides no official URL.
 
-## 7. Complete legal and audience declarations — Human
+## 7. Complete legal and audience declarations — Human, Data safety may be automated
 
 Use the generated files as evidence, not as authorization to guess:
 
@@ -116,7 +119,45 @@ Use the generated files as evidence, not as authorization to guess:
 The human owns the truth and legal effect of these declarations. If code, policy,
 and form disagree, stop and fix the app or the draft before submission.
 
-Sources: **NEEDS-VERIFICATION** — no official Data safety, privacy, deletion, ads, rating, or audience URLs are present in `FACTS.md`.
+### Capability-derived Data safety surface
+
+Each slot records shared integrations in `apps/<date>-<slug>/capabilities.json`.
+`enabled` is the explicit list of capability IDs. A billing slot also records its
+consumable fulfilment (`LOCAL` or `SERVER_COST`); every `SERVER_COST` catalog must
+describe `billing.purchaseAuthority`, the server that verifies purchase tokens and
+owns the paid balance. An empty `enabled` list is the explicit declaration that the
+slot uses none of the shared capabilities.
+
+`scripts/lib/capabilities.mjs` reads that slot file and the selected
+`capabilities/<id>/capability.json` manifests. It derives the permission and collected
+data-type unions, bundled SDKs, ads presence, consent requirement, and purchase-authority
+requirement. `store-kit.py` writes those facts into `listing.json`, `data-safety.md`,
+`privacy.md`, and `review-notes.md`; these fields are generated compliance evidence, not
+free-form answers.
+
+Before submission, run `node scripts/verify-slot.mjs --slot <slug> --strict-store
+--build`. The strict gate compares the derived permissions with the build's merged
+manifest, rejects ads or collected-data omissions in the store pack, and rejects a
+`SERVER_COST` catalog without documented authority. Unknown capability IDs fail with
+the valid ID list. The human still reviews the derived answers and owns their legal
+submission; editing the generated prose to contradict the declarations cannot make the
+gate pass.
+
+Data safety is the one form with a documented write endpoint, so the factory may
+upload it from a reviewed CSV instead of typing it by hand:
+`POST /androidpublisher/v3/applications/{packageName}/dataSafety` with body
+`{"safetyLabels": "<CSV contents>"}`. The CSV is still authored from the slot's real
+SDK surface and approved by the human before it is sent; automatic upload of an
+unreviewed CSV is a truthfulness risk and must not happen.
+
+The privacy-policy URL is **not** settable through `edits.details` (which exposes
+only `defaultLanguage`, `contactWebsite`, `contactEmail`, `contactPhone`), so it
+stays a Console step.
+
+Sources: <https://developers.google.com/android-publisher/api-ref/rest/v3/applications/dataSafety>,
+<https://support.google.com/googleplay/android-developer/answer/10787469>,
+<https://developers.google.com/android-publisher/api-ref/rest/v3/edits.details>.
+Full surface: [`docs/research/2026-09-23-google-play-automation-surface.md`](research/2026-09-23-google-play-automation-surface.md).
 
 ## 8. Complete AI-content declarations when relevant — Factory + Human
 

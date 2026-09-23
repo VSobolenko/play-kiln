@@ -1,0 +1,85 @@
+---
+description: Keep the edit-build-verify loop fast; never pay for the same work twice
+alwaysApply: true
+---
+
+# Build speed discipline
+
+PlayKiln ships many apps in a row, so the inner loop — edit, build, verify — is the
+factory's real throughput limit. A slow loop is not a nuisance; it is the reason a
+one-line fix costs an hour. Each rule below exists because a measured defect made
+the loop slower than it needed to be.
+
+## One Gradle process per build
+
+- Pass **every** task for one build to a single Gradle invocation:
+ `gradlew assembleDebug assembleRelease bundleRelease` — not three separate runs.
+- Three processes mean three JVM startups, three configuration-cache restores, and
+ three task graphs for work that is largely shared. Measured on a warm cache:
+ **6.3 s → 2.3 s**; the gap is wider on a real build where dependency resolution
+ and configuration are also paid each time.
+- Use `runGradleTasks()` from `scripts/lib/gradle.mjs`. Do not call `gradlew`
+ directly from a script.
+- `scripts/selftest.mjs` asserts this contract with a fake process. Do not weaken
+ that check to make a change pass.
+
+## Never disable the daemon
+
+- `--no-daemon` forces a single-use daemon. It discards the JVM, configuration, and
+ task-graph reuse that make the *second* build of a session cheap, which is the
+ build you actually run while iterating.
+- `gradleArgs()` throws on `--no-daemon`; that is deliberate.
+- Keep `org.gradle.caching` and `org.gradle.configuration-cache` enabled. Verify a
+ speed claim by measuring, never by intuition.
+
+## Pin one JDK — this is the biggest lever
+
+- Gradle keeps **one daemon per JDK**. If the JDK differs between runs, the old
+ daemon is not reused: the project is re-configured, incremental state is
+ invalidated, and the build restarts cold.
+- Measured on one slot, same tasks, same machine:
+
+ | JDK used | Build time |
+ |---|---|
+ | `JAVA_HOME` = JDK 17 | **2.4 s** |
+ | same, repeated | **2.9 s** |
+ | `JAVA_HOME` unset, PATH JDK 24 | **70.1 s** |
+
+- Observed in `gradlew --status` while both were live: two idle daemons, one under
+ `jdk-17` and one under `jdk-24`.
+- Never let a Gradle run inherit an ambient JDK. `runGradleTasks()` resolves the JDK
+ through `scripts/lib/java.mjs` and passes `JAVA_HOME` explicitly, and
+ `prepare-release.mjs` prints `build JDK <major> (<source>)` so the choice is visible.
+- `scripts/lib/java.mjs` is the **only** place that discovers a Java home. Do not
+ write a second discovery routine; the first duplicate built the Windows vendor path
+ as `<jdk>\keytool.exe` instead of `<jdk>\bin\keytool.exe`, so signing failed
+ whenever `JAVA_HOME` was unset.
+- Resolution order is deliberate and stable: `PLAYKILN_JAVA_HOME`, then a supported
+ `JAVA_HOME`, then a discovered JDK preferring major 17. Stability matters more than
+ picking the newest available JDK — an unstable choice is what costs the 70 seconds.
+
+## Build only what the current question needs
+
+- Do not regenerate release artifacts to answer a question about source code.
+ `--skip-build` exists on `prepare-release.mjs` for staging already-built artifacts.
+- During iteration, run a single task (`assembleDebug`) rather than the full release
+ pipeline. Reserve the full pipeline for release preparation.
+- Do not re-run a gate whose inputs have not changed; if you must re-run it, say why.
+
+## Multiple Gradle processes must not share one slot
+
+- `org.gradle.caching` and `org.gradle.configuration-cache` are safe, but concurrent
+ builds in the same project directory contend for `build/` and can corrupt
+ incremental state. Serialize them, or build in separate worktrees.
+
+## Report cost, not just outcome
+
+- `runGradleTasks` returns `elapsedMs`; `prepare-release.mjs` prints the build time
+ alongside the tasks. Keep that visible — a regression in loop speed should be
+ obvious in the output, not something a human has to time by hand.
+
+## Related
+
+- `.cursor/rules/verification-discipline.mdc` — a check that cannot fail is not a
+ check; verify a sensor before trusting it.
+- `harness/lessons.md` — the measurement that produced these rules.

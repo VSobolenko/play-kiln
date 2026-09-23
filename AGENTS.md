@@ -60,9 +60,35 @@ worker channel and writes production code; it is not merely a reviewer.
   disjoint files or separate worktrees.
 - If a worker reports `RATE_LIMITED`, hand the task to the Cursor `generator`
   subagent. Follow `harness/dual-agent.md` for other failure signals.
+- A ledger `BLOCKED(...)` label, including a wall of historical labels, is not evidence
+  that Codex is unavailable. Before assigning a Cursor `generator`, run a fresh
+  read-only, trivial `tier-smoke`-shaped Codex probe in this session at the tier the
+  task will use; record its observed exit in the handoff.
+- Apply fallback per failed worker task, not to the channel globally: `RATE_LIMITED`
+  does not retry and goes to `generator`; `CONTEXT_LIMIT` reduces scope and resumes
+  once, then goes to `generator`; `AUTH_ERROR` records the blocker and goes to
+  `generator`. A blocked worker does not disable Codex while the fresh probe answers.
+- Historical exit records predate the current classifier and may preserve a classifier
+  bug rather than the worker's fate. Check the deliverable on disk before trusting a
+  label; see “2026-09-23 - the failure classifier reported finished work as blocked,
+  because it matched prose” in `harness/lessons.md`.
 - Never accept Cursor or Codex self-reporting as proof. Run
   `scripts/verify-slot.mjs` and read the diff before a PASS.
 - Adjudicate disagreements against OpenSpec, this file, and observable evidence.
+
+Worker ledger verdicts from `node scripts/codex-run.mjs list`:
+
+| Verdict | Written when |
+|---|---|
+| `DONE` | an exit record exists with exit code 0 and no diagnosed signal |
+| `FAILED(<code>)` | an exit record exists with a non-zero exit code and no signal |
+| `BLOCKED(<signal>)` | the exit record diagnosed a signal; a signal outranks a zero exit code, because a worker that stopped on a limit has not delivered |
+| `LOST` | the recorded status is `running`, no exit record exists, and the recorded pid is not alive (including no usable recorded pid) |
+
+A `LOST` worker died without reporting, so its work is **unverified**: inspect its
+files on disk and never assume the task landed. Liveness is a heuristic — a recycled
+pid can leave a dead worker reported `running` — so `running` alone is not proof of
+life.
 
 Operator details: [`harness/codex-workers.md`](harness/codex-workers.md).
 
@@ -93,8 +119,13 @@ store/assets/<locale>/tablet-10-01.png ... tablet-10-04.png
 | App icon | 512×512, 32-bit PNG with alpha, sRGB, ≤ 1024 KB; no drawn rounded mask or shadow |
 | Feature graphic | Exactly 1024×500, JPEG or 24-bit PNG without alpha |
 | Phone set | Exactly 6 at 1080×1920; Play permits 2–8, no alpha, ≤ 8 MB each, sides 320–3840, long side ≤ 2× short side |
-| 7-inch set | Exactly 4 at 1200×1920; Play permits 4–8, short edge ≥ 1080, long edge ≤ 7680 |
-| 10-inch set | Exactly 4 at 1600×2560; Play permits 4–8, short edge ≥ 1080, long edge ≤ 7680 |
+| 7-inch set | Exactly 4 at 1200×1920; Play permits 4–8, short edge ≥ 1080; Play's Large screens rule allows long edges to 7,680 but its general Requirements cap any dimension at 3,840, so the factory enforces the conservative 3,840 (`scripts/store-kit.py`) — <https://support.google.com/googleplay/android-developer/answer/9866151?hl=en> |
+| 10-inch set | Exactly 4 at 1600×2560; Play permits 4–8, short edge ≥ 1080; Play's Large screens rule allows long edges to 7,680 but its general Requirements cap any dimension at 3,840, so the factory enforces the conservative 3,840 (`scripts/store-kit.py`) — <https://support.google.com/googleplay/android-developer/answer/9866151?hl=en> |
+
+The tablet sets are 5:8 (`1200×1920`, `1600×2560`), not the 16:9/9:16 ratio Play's Large
+screens section recommends. Accepted deviation recorded 2026-09-24: the hard Requirements
+caps (320–3840 px, max dimension ≤ 2× min, short edge ≥ 1080) are met, and the ratio
+affects only large-screen surface selection, not review eligibility — <https://support.google.com/googleplay/android-developer/answer/9866151?hl=en>
 
 Default locale is `en-US`; supported additional locale is `ru-RU`. If login gates
 content, `review-notes.md` must provide usable demo access. Claims and screenshots
@@ -116,9 +147,12 @@ Before a slot is `ready`:
 - Native libraries have confirmed 16 KB readiness.
 
 Use [`docs/play-publishing-playbook.md`](docs/play-publishing-playbook.md) for the
-human/agent handoff and
+human/agent handoff,
 [`docs/research/2026-09-22-android-play-requirements.md`](docs/research/2026-09-22-android-play-requirements.md)
-for the requirements brief.
+for the requirements brief, and
+[`docs/research/2026-09-23-google-play-automation-surface.md`](docs/research/2026-09-23-google-play-automation-surface.md)
+for what the Play API can and cannot automate (no official Play MCP exists; the API
+cannot create an app; Data safety can be written from a reviewed CSV).
 
 ## Defaults to suppress
 
@@ -165,6 +199,12 @@ scripts/sign-release.mjs          configure and inspect local upload signing
 scripts/prepare-release.mjs       build, sign, verify, and stage APK/AAB artifacts
 scripts/media-capture.mjs         capture store media through ADB journeys
 scripts/play-upload.mjs           update an existing Play app after its first manual upload
+scripts/scan-market.mjs           screen a query set for reachable pockets
+scripts/enrich-market.mjs         per-app facts behind the top search cards
+scripts/scan-ai-niches.mjs        fixed AI-utility query set over the same screen
+scripts/scan-plant-vertical.mjs   screen the plant vertical and enrich its top cards
+scripts/lib/play-scan.mjs         Play search screen: verdicts and a relevance guard
+scripts/lib/play-app-detail.mjs   per-app installs, ads, IAP, and price
 scripts/verify-slot.mjs           objective factory and slot gates
 scripts/kiln-status.mjs           factory health summary
 ```
@@ -180,10 +220,15 @@ node scripts/verify-slot.mjs                      # runs the self-test too
 node scripts/verify-slot.mjs --slot <slug>
 node scripts/verify-slot.mjs --slot <slug> --strict-store
 node scripts/verify-slot.mjs --slot <slug> --build
+node scripts/verify-slot.mjs --slot <slug> --strict-store --build   # release evidence
 node scripts/verify-slot.mjs --base main
 node scripts/verify-slot.mjs --no-selftest        # skip the self-test (rare)
 node scripts/kiln-status.mjs
 ```
+
+`--build` compiles the slot. Without it the gate reports `UNVERIFIED` (exit 2), not
+PASS, because source-only evidence cannot prove the app builds; never cite a
+build-less run as release evidence.
 
 `UNVERIFIED` requires a manual diff/read; it is not PASS. For release preparation,
 the required evidence is a verified signed release APK, signed release AAB, release

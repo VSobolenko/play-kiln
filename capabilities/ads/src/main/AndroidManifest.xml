@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      Declared explicitly rather than arriving silently through the Ads SDK's manifest merge,
+      so the dependency is reviewable in this module and in every consuming app's merged
+      manifest. A slot that ships this capability must answer Play Data safety with
+      "Device or other IDs" collected for "Advertising or marketing".
+    -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+
+</manifest>

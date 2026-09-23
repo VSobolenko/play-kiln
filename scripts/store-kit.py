@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import html
 import json
 import os
 from pathlib import Path
@@ -32,6 +33,51 @@ SCREEN_TARGETS = {
     "phone": (6, (1080, 1920)),
     "tablet-7": (4, (1200, 1920)),
     "tablet-10": (4, (1600, 2560)),
+}
+
+# Screenshot limits, keyed by asset kind.  The rule is per kind because Play
+# states one rule for phone screenshots and a *different, conflicting* rule for
+# large screens; a single blanket predicate got one of the two wrong.
+#
+# Source (HTTP 200, fetched 2026-09-24):
+#   https://support.google.com/googleplay/android-developer/answer/9866151?hl=en
+#
+# The page states two rules.
+#
+# 1. Under "Requirements":
+#      "JPEG or 24-bit PNG (no alpha) Minimum dimension: 320px Maximum
+#       dimension: 3840px The maximum dimension of your screenshot can't be
+#       more than twice as long as the minimum dimension."
+#
+# 2. Under the device-specific "Large screens" section:
+#      "Large screens: For Chromebook and tablets, you can add a minimum of 4
+#       screenshots to demonstrate your in-app experience. Upload screenshots
+#       between 1,080 and 7,680px Use a 16:9 aspect ratio for landscape and a
+#       9:16 aspect ratio for portrait"
+#
+# These two statements CONTRADICT each other for tablets: the general
+# Requirements section caps any dimension at 3,840px, while the Large screens
+# section permits a long edge up to 7,680px.  We do not pretend otherwise.
+# The factory must never ship an asset that either reading rejects, so the
+# tablet rule enforces the conservative intersection of the two readings:
+#   * short side >= 1080  (from the large-screen "between 1,080 and 7,680px")
+#   * long  side <= 3840  (from the Requirements "Maximum dimension: 3840px")
+# The 7,680px allowance is recorded here but deliberately NOT accepted: a
+# stricter gate can only over-reject the factory's own assets, never ship one
+# that Play rejects (whereas accepting 7,680 would ship assets the general
+# requirement forbids).
+#
+# "max_ratio" is the Requirements "no more than twice as long as the minimum
+# dimension" cap.  The device-specific section instead asks for 16:9 / 9:16 for
+# tablets, so max_ratio is applied to phone only and left as None for tablets.
+# NOTE: the factory's chosen tablet sizes in SCREEN_TARGETS (1200x1920 and
+# 1600x2560) are 5:8 (0.625), i.e. neither 16:9 (0.5625) nor 9:16; they
+# therefore do not match the device-specific aspect recommendation.  That is a
+# known factory-size choice, not a gate result, and the sizes are left unchanged.
+SCREENSHOT_LIMITS: dict[str, dict[str, int | None]] = {
+    "phone": {"min_short": 320, "max_long": 3840, "max_ratio": 2},
+    "tablet-7": {"min_short": 1080, "max_long": 3840, "max_ratio": None},
+    "tablet-10": {"min_short": 1080, "max_long": 3840, "max_ratio": None},
 }
 FONT_CANDIDATES = (
     "DejaVuSans.ttf",
@@ -122,6 +168,26 @@ def read_text(path: Path) -> str:
         raise StoreKitError(f"cannot read {path}: {exc}") from exc
 
 
+def capability_compliance(slot: Path) -> dict[str, Any]:
+    helper = ROOT / "scripts" / "lib" / "capabilities.mjs"
+    result = subprocess.run(
+        ["node", str(helper), "--root", str(ROOT), "--slot", str(slot)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        detail = (result.stderr or result.stdout or "capability aggregator failed").strip()
+        raise StoreKitError(detail.removeprefix("FAIL: ").strip())
+    try:
+        value = json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise StoreKitError(f"capability aggregator returned invalid JSON: {exc.msg}") from exc
+    if not isinstance(value, dict):
+        raise StoreKitError("capability aggregator must return a JSON object")
+    return value
+
+
 def match_gradle(text: str, name: str, *, required: bool = True) -> str:
     match = re.search(rf"\b{re.escape(name)}\s*=\s*[\"']([^\"']+)[\"']", text)
     if match:
@@ -159,6 +225,56 @@ def heading(path: Path) -> str:
     return ""
 
 
+def recorded_idea(slot: Path, slug: str, strings_path: Path) -> str:
+    state_path = slot / ".kiln-state.json"
+    if state_path.is_file():
+        try:
+            state = json.loads(read_text(state_path))
+        except json.JSONDecodeError as exc:
+            raise StoreKitError(
+                f"invalid JSON in {state_path}: line {exc.lineno}: {exc.msg}"
+            ) from exc
+        if isinstance(state, dict) and isinstance(state.get("idea"), str):
+            idea = state["idea"].strip()
+            if idea:
+                return idea
+
+    registry_path = ROOT / "registry" / "apps.json"
+    if registry_path.is_file():
+        try:
+            registry = json.loads(read_text(registry_path))
+        except json.JSONDecodeError as exc:
+            raise StoreKitError(
+                f"invalid JSON in {registry_path}: line {exc.lineno}: {exc.msg}"
+            ) from exc
+        apps = registry.get("apps", []) if isinstance(registry, dict) else []
+        for app in apps if isinstance(apps, list) else []:
+            if isinstance(app, dict) and app.get("id") == slug and isinstance(app.get("idea"), str):
+                idea = app["idea"].strip()
+                if idea:
+                    return idea
+
+    if strings_path.is_file():
+        found = re.search(
+            r'<string\s+name=["\']app_idea["\'](?:\s+[^>]*)?>(.*?)</string>',
+            read_text(strings_path),
+            re.S,
+        )
+        if found:
+            idea = html.unescape(re.sub(r"<[^>]+>", "", found.group(1))).strip()
+            if idea:
+                return idea
+
+    return ""
+
+
+def normalize_idea(text: str) -> str:
+    text = re.sub(r"\s+", " ", text).strip().rstrip()
+    if text and not text.endswith((".", "!", "?")):
+        text += "."
+    return text
+
+
 def slot_metadata(slot: Path) -> dict[str, str]:
     gradle_path = slot / "app" / "build.gradle.kts"
     if not gradle_path.is_file():
@@ -183,11 +299,14 @@ def slot_metadata(slot: Path) -> dict[str, str]:
     if not app_name:
         stem = (namespace or application_id).split(".")[-1]
         app_name = " ".join(word.capitalize() for word in re.split(r"[-_]", stem) if word)
-    sources = prose_lines(readme) + prose_lines(agents)
-    idea = sources[0] if sources else f"A focused offline tool for {app_name}."
-    idea = re.sub(r"\s+", " ", idea).strip().rstrip()
-    if not idea.endswith((".", "!", "?")):
-        idea += "."
+    slug = re.sub(r"^\d{4}-\d{2}-\d{2}-", "", slot.name)
+    recorded = recorded_idea(slot, slug, strings_path)
+    if recorded:
+        idea = recorded
+    else:
+        sources = prose_lines(readme) + prose_lines(agents)
+        idea = sources[0] if sources else f"A focused offline tool for {app_name}."
+    idea = normalize_idea(idea)
     return {
         "app_name": app_name,
         "application_id": application_id,
@@ -195,19 +314,31 @@ def slot_metadata(slot: Path) -> dict[str, str]:
         "version_name": version_name,
         "version_code": version_code,
         "idea": idea,
-        "slug": re.sub(r"^\d{4}-\d{2}-\d{2}-", "", slot.name),
+        "recordedIdea": normalize_idea(recorded),
+        "slug": slug,
     }
 
 
 def truncate_chars(text: str, limit: int) -> str:
     text = re.sub(r"\s+", " ", text).strip()
+    if limit <= 0:
+        return ""
     if len(text) <= limit:
         return text
-    clipped = text[: max(1, limit - 1)].rstrip(" ,.;:-")
+    if limit == 1:
+        return "…"
+    clipped = text[: limit - 1]
+    if " " in clipped:
+        clipped = clipped.rsplit(" ", 1)[0]
+    clipped = clipped.rstrip(" ,.;:-")
+    if not clipped:
+        clipped = text[: limit - 1]
     return clipped + "…"
 
 
-def english_copy(meta: dict[str, str]) -> dict[str, Any]:
+def english_copy(
+    meta: dict[str, str], compliance: dict[str, Any] | None = None
+) -> dict[str, Any]:
     name = truncate_chars(meta["app_name"], 30)
     idea = truncate_chars(meta["idea"], 80)
     bullets = [
@@ -215,12 +346,19 @@ def english_copy(meta: dict[str, str]) -> dict[str, Any]:
         "See meaningful progress at a glance",
         "Keep your experience private and fully offline",
     ]
+    compliance = compliance or {}
+    if compliance.get("adsPresent"):
+        disclosure = "Advertising and data use are disclosed in the Data safety section."
+    elif compliance.get("dataCollected"):
+        disclosure = "Data use is disclosed in the Data safety section."
+    else:
+        disclosure = "No enabled capability declares ads, analytics, or cloud tracking."
     full = (
         f"{name} helps you turn intention into steady progress.\n\n"
         f"{meta['idea']}\n\n"
         "What you can do:\n"
         + "\n".join(f"• {item}" for item in bullets)
-        + "\n\nDesigned for a calm, direct experience without accounts, ads, analytics, or cloud tracking."
+        + f"\n\n{disclosure}"
     )
     return {
         "title": name,
@@ -238,7 +376,9 @@ def english_copy(meta: dict[str, str]) -> dict[str, Any]:
     }
 
 
-def russian_copy(meta: dict[str, str]) -> dict[str, Any]:
+def russian_copy(
+    meta: dict[str, str], compliance: dict[str, Any] | None = None
+) -> dict[str, Any]:
     name = truncate_chars(meta["app_name"], 30)
     bullets = [
         "Спокойный и понятный рабочий процесс",
@@ -246,12 +386,19 @@ def russian_copy(meta: dict[str, str]) -> dict[str, Any]:
         "Полностью автономная и приватная работа",
     ]
     short = truncate_chars(f"{name}: простой способ сосредоточиться и видеть свой прогресс", 80)
+    compliance = compliance or {}
+    if compliance.get("adsPresent"):
+        disclosure = "Приложение содержит рекламу; использование данных раскрыто в разделе безопасности данных."
+    elif compliance.get("dataCollected"):
+        disclosure = "Использование данных раскрыто в разделе безопасности данных."
+    else:
+        disclosure = "Подключенные возможности не декларируют рекламу, аналитику или облачное отслеживание."
     full = (
         f"{name} помогает превращать намерения в устойчивый прогресс.\n\n"
         f"{meta['idea']}\n\n"
         "Возможности:\n"
         + "\n".join(f"• {item}" for item in bullets)
-        + "\n\nПриложение работает без аккаунтов, рекламы, аналитики и облачного отслеживания."
+        + f"\n\n{disclosure}"
     )
     return {
         "title": name,
@@ -269,14 +416,20 @@ def russian_copy(meta: dict[str, str]) -> dict[str, Any]:
     }
 
 
-def default_listing(meta: dict[str, str], locales: list[str]) -> dict[str, Any]:
+def default_listing(
+    meta: dict[str, str], locales: list[str], compliance: dict[str, Any]
+) -> dict[str, Any]:
     locale_data = {}
     for locale in locales:
-        locale_data[locale] = russian_copy(meta) if locale == "ru-RU" else english_copy(meta)
+        locale_data[locale] = (
+            russian_copy(meta, compliance)
+            if locale == "ru-RU"
+            else english_copy(meta, compliance)
+        )
     digest = hashlib.sha256(meta["application_id"].encode("utf-8")).hexdigest()
     brand = f"#{digest[:6]}"
     accent = f"#{digest[6:12]}"
-    return {
+    listing = {
         "schemaVersion": 1,
         "appName": meta["app_name"],
         "slug": meta["slug"],
@@ -301,14 +454,174 @@ def default_listing(meta: dict[str, str], locales: list[str]) -> dict[str, Any]:
         "contentRating": {"questionnaire": "notes", "targetAudience": "18+"},
         "graphicsSource": {"iconGlyph": "focus", "brandColor": brand, "accentColor": accent},
     }
+    apply_capability_compliance(listing, compliance)
+    return listing
 
 
-def merge_missing_locales(listing: dict[str, Any], meta: dict[str, str], locales: list[str]) -> None:
+def apply_capability_compliance(
+    listing: dict[str, Any], compliance: dict[str, Any]
+) -> None:
+    data_types = compliance.get("dataCollected", [])
+    sdks = compliance.get("sdkDependencies", [])
+    listing["permissions"] = compliance.get("permissions", [])
+    listing["ads"] = {
+        "containsAds": bool(compliance.get("adsPresent")),
+        "reason": (
+            "Enabled capabilities include advertising SDKs."
+            if compliance.get("adsPresent")
+            else "Enabled capabilities declare no advertising SDKs."
+        ),
+    }
+    listing["dataSafety"] = {
+        "collectsData": bool(data_types),
+        "reason": (
+            "Derived from the enabled capabilities and their bundled SDK declarations."
+            if data_types
+            else "Enabled capabilities declare no collected data."
+        ),
+        "dataTypes": data_types,
+        "thirdPartySdks": sdks,
+        "encryptedInTransit": True,
+        "hasAccountDeletion": False,
+    }
+    listing["capabilityCompliance"] = {
+        "enabled": compliance.get("enabled", []),
+        "requiresConsent": bool(compliance.get("requiresConsent")),
+        "requiresPurchaseAuthority": bool(compliance.get("requiresPurchaseAuthority")),
+        "purchaseAuthority": compliance.get("purchaseAuthority"),
+    }
+    if compliance.get("adsPresent") or data_types:
+        replacement = (
+            "Advertising and data use are disclosed in the Data safety section."
+            if compliance.get("adsPresent")
+            else "Data use is disclosed in the Data safety section."
+        )
+        for locale in listing.get("locales", {}).values():
+            if isinstance(locale, dict) and isinstance(locale.get("fullDescription"), str):
+                locale["fullDescription"] = locale["fullDescription"].replace(
+                    "Designed for a calm, direct experience without accounts, ads, analytics, or cloud tracking.",
+                    replacement,
+                )
+
+
+def merge_missing_locales(
+    listing: dict[str, Any],
+    meta: dict[str, str],
+    locales: list[str],
+    compliance: dict[str, Any],
+) -> None:
     locale_map = listing.setdefault("locales", {})
     for locale in locales:
         if locale not in locale_map:
-            locale_map[locale] = russian_copy(meta) if locale == "ru-RU" else english_copy(meta)
+            locale_map[locale] = (
+                russian_copy(meta, compliance)
+                if locale == "ru-RU"
+                else english_copy(meta, compliance)
+            )
     listing["defaultLocale"] = listing.get("defaultLocale") if listing.get("defaultLocale") in locales else locales[0]
+
+
+IDEA_DERIVED_FIELDS = (
+    "shortDescription",
+    "fullDescription",
+    "featureBullets",
+    "screenshotCaptions",
+)
+
+
+def generator_localized_copy(
+    meta: dict[str, str], compliance: dict[str, Any], locale: str
+) -> dict[str, Any]:
+    return russian_copy(meta, compliance) if locale == "ru-RU" else english_copy(meta, compliance)
+
+
+def is_idea_derived_output(value: Any, prior_value: Any, previous_idea: str) -> bool:
+    """Provenance test for one locale copy field against the listing's PREVIOUS idea.
+
+    A field counts as generator output when either:
+
+    * it is byte-identical to what the current generator would have produced for
+      the previous idea (``prior_value``), or
+    * it is an ellipsis-truncated *prefix* of the previous idea.  This is how the
+      short description renders the idea, and it covers both the current
+      word-boundary ``truncate_chars`` and the older mid-word truncation
+      (``idea[:limit-1] + "…"``), so packs written by an earlier revision of the
+      generator are still recognised as generator output rather than human copy.
+
+    Anything else is treated as human-authored and preserved.  Limit: a human
+    string that happens to end in ``…`` with a body equal to a prefix of the
+    stored idea would be misread as generator output; that is implausible for a
+    distinct authored sentence.
+    """
+    if value == prior_value:
+        return True
+    return (
+        isinstance(value, str)
+        and isinstance(previous_idea, str)
+        and bool(previous_idea)
+        and value.endswith("…")
+        and previous_idea.startswith(value[:-1])
+    )
+
+
+def refresh_idea_from_record(
+    listing: dict[str, Any],
+    meta: dict[str, str],
+    compliance: dict[str, Any],
+) -> None:
+    """Refresh ``idea`` and the copy the generator derives from it, from the slot record.
+
+    The slot record (``.kiln-state.json`` / ``registry/apps.json`` /
+    ``res/values/strings.xml`` ``app_idea``) is the source of truth for the idea.
+    An existing store pack used to keep its scaffold boilerplate forever because
+    generation preserved the existing ``listing.json`` untouched, so this refresh
+    happens at the source instead.
+
+    Each derived field is rewritten only when ``is_idea_derived_output`` proves it
+    is still generator output for the listing's PREVIOUS ``idea``; a human edit
+    fails that test, is preserved, and is reported.  ``contactEmail``,
+    ``privacyPolicyUrl``, ``category``, ``tags``, the price fields, ``appName``,
+    ``title``, and every other non-derived field are never touched here.  Limits:
+    the previous idea is reconstructed from ``listing["idea"]`` (capped at 240
+    chars), so a >240-char original idea leaves the full description unmatched and
+    therefore preserved; and any change to ``app_name`` or to the compliance
+    disclosure also makes the exact-match branch fail (preserved).  Failing safe
+    means preserving, never clobbering.
+    """
+    recorded = meta.get("recordedIdea", "")
+    if not recorded:
+        return
+    previous_idea = listing.get("idea") if isinstance(listing.get("idea"), str) else ""
+    capped = truncate_chars(recorded, 240)
+    if capped == previous_idea:
+        return
+    listing["idea"] = capped
+    print(f"REFRESH listing.idea — {len(previous_idea)} -> {len(capped)} chars")
+    prior_meta = {**meta, "idea": previous_idea}
+    for locale, entry in list(listing.get("locales", {}).items()):
+        if locale not in SUPPORTED_LOCALES or not isinstance(entry, dict):
+            continue
+        prior = generator_localized_copy(prior_meta, compliance, locale)
+        fresh = generator_localized_copy(meta, compliance, locale)
+        refreshed: list[str] = []
+        preserved: list[str] = []
+        for field in IDEA_DERIVED_FIELDS:
+            if field not in prior or field not in fresh:
+                continue
+            current = entry.get(field)
+            if is_idea_derived_output(current, prior[field], previous_idea):
+                if current != fresh[field]:
+                    entry[field] = fresh[field]
+                    refreshed.append(field)
+            else:
+                preserved.append(field)
+        if refreshed:
+            print(f"REFRESH {locale} — refreshed {', '.join(refreshed)} from the slot record")
+        if preserved:
+            print(
+                f"REFRESH {locale} — preserved {', '.join(preserved)} "
+                "(not provably generator output for the previous idea)"
+            )
 
 
 def write_json(path: Path, value: Any) -> None:
@@ -454,11 +767,9 @@ def draw_abstract_mark(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int]
 def render_icon(path: Path, listing: dict[str, Any]) -> None:
     graphics = listing["graphicsSource"]
     start, end = rgb(graphics["brandColor"]), rgb(graphics["accentColor"])
-    base = gradient((512, 512), start, end).convert("RGBA")
-    mask = Image.new("L", base.size, 0)
-    ImageDraw.Draw(mask).rounded_rectangle((16, 16, 496, 496), radius=112, fill=255)
-    canvas = Image.new("RGBA", base.size, (0, 0, 0, 0))
-    canvas.paste(base, (0, 0), mask)
+    # Keep the source artwork rectangular: the factory contract forbids a baked-in
+    # rounded mask or transparent corners.
+    canvas = gradient((512, 512), start, end).convert("RGBA")
     draw = ImageDraw.Draw(canvas)
     draw_abstract_mark(draw, (146, 146, 366, 366), (255, 255, 255, 235))
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -640,6 +951,8 @@ ads/content-rating declarations, and `graphicsSource`. Each locale contains `tit
         if permissions
         else ["- None declared beyond platform-normal capabilities."]
     )
+    sdk_rows = safety.get("thirdPartySdks", [])
+    collects_data = bool(safety.get("collectsData"))
     privacy = f"""# Privacy policy — {listing['appName']}
 
 **Last updated:** {time.strftime('%Y-%m-%d')}
@@ -650,7 +963,7 @@ ads/content-rating declarations, and `graphicsSource`. Each locale contains `tit
 
 ## Data collection and sharing
 
-The app does not collect, transmit, sell, or share personal data. Data created in the app remains on the user's device and is subject to the device's backup settings.
+{('The app and its enabled SDKs collect the data types documented in store/data-safety.md.' if collects_data else 'The enabled capabilities declare no collection, transmission, sale, or sharing of user data. Data created in the app remains on the user\'s device and is subject to the device\'s backup settings.')}
 
 ## Permissions
 
@@ -658,7 +971,7 @@ The app does not collect, transmit, sell, or share personal data. Data created i
 
 ## Third-party services
 
-No third-party SDKs that collect user data are declared.
+{('None declared.' if not sdk_rows else chr(10).join(f"- {sdk['name']} {sdk['version']} — {sdk['policyUrl']}" for sdk in sdk_rows))}
 
 ## Data retention and deletion
 
@@ -666,7 +979,7 @@ The app has no account system. Users can delete locally stored data by clearing 
 
 ## Security
 
-Because the app does not transmit user data, data-in-transit exposure is not applicable. Platform security and encrypted transport are used for any operating-system services.
+Platform security and encrypted transport are required for networked capabilities and operating-system services.
 
 ## Contact
 
@@ -676,11 +989,13 @@ Privacy questions: {listing['contactEmail']}
 
     type_rows = safety.get("dataTypes", [])
     data_rows = (
-        [f"| {markdown_escape(item)} | Yes | No | As declared in Play Console |" for item in type_rows]
+        [
+            f"| {markdown_escape(item['type'])} | Yes | {'Yes' if item['shared'] else 'No'} | {markdown_escape(item['purpose'])} |"
+            for item in type_rows
+        ]
         if type_rows
         else ["| None | No | No | Not applicable |"]
     )
-    sdk_rows = safety.get("thirdPartySdks", [])
     data_safety = f"""# Play Console data safety answers — {listing['appName']}
 
 ## Data collection and sharing
@@ -694,7 +1009,7 @@ Privacy questions: {listing['contactEmail']}
 
 ## Third-party SDKs
 
-{'None.' if not sdk_rows else chr(10).join(f'- {sdk}' for sdk in sdk_rows)}
+{'None.' if not sdk_rows else chr(10).join(f"- {sdk['name']} {sdk['version']} — {sdk['policyUrl']}" for sdk in sdk_rows)}
 
 ## Security practices
 
@@ -707,6 +1022,13 @@ Privacy questions: {listing['contactEmail']}
 - Is an account-deletion mechanism required? **No**
 """
     (store / "data-safety.md").write_text(data_safety, encoding="utf-8")
+
+    capability_compliance = listing["capabilityCompliance"]
+    authority_note = (
+        capability_compliance.get("purchaseAuthority")
+        if capability_compliance.get("requiresPurchaseAuthority")
+        else "Not required — no SERVER_COST consumables are declared."
+    )
 
     review = f"""# Reviewer notes — {listing['appName']}
 
@@ -724,6 +1046,12 @@ No account, payment, invitation, or demo credentials are required.
 ## Permissions
 
 {chr(10).join(permission_lines)}
+
+## Capability compliance
+
+- Enabled: {', '.join(capability_compliance['enabled']) or 'none'}
+- Consent required: **{'Yes' if capability_compliance['requiresConsent'] else 'No'}**
+- Purchase authority: {authority_note or 'MISSING — release is blocked'}
 
 ## Human checks required before upload
 
@@ -744,7 +1072,7 @@ Screenshot source status: **{status}**.
 
 | Asset | Dimensions | Format / purpose |
 |---|---:|---|
-| `assets/icon-512.png` | 512×512 | RGBA Play store icon; transparent corners |
+| `assets/icon-512.png` | 512×512 | RGBA Play store icon; rectangular source artwork with nontransparent corners |
 | `assets/feature-graphic-1024x500.png` | 1024×500 | RGB feature graphic |
 | `assets/<locale>/phone-01..06.png` | 1080×1920 | RGB phone screenshots |
 | `assets/<locale>/tablet-7-01..04.png` | 1200×1920 | RGB 7-inch tablet screenshots |
@@ -896,13 +1224,39 @@ def render_all(store: Path, listing: dict[str, Any], locales: list[str], meta: d
     write_documents(store, listing, locales, synthetic, meta)
 
 
+def screenshot_rule_failures(kind: str, size: tuple[int, int]) -> list[str]:
+    """Return the Play rule violations for a screenshot of ``kind`` and ``size``.
+
+    The limits are per kind because Play's general screenshot requirements and
+    its large-screen device section disagree; see ``SCREENSHOT_LIMITS``.
+    """
+    limits = SCREENSHOT_LIMITS.get(kind)
+    if limits is None:
+        raise StoreKitError(f"unknown screenshot kind: {kind!r}")
+    short, long = sorted(size)
+    failures: list[str] = []
+    min_short = limits["min_short"]
+    max_long = limits["max_long"]
+    if min_short is not None and short < min_short:
+        failures.append(f"{kind}: short side {short}px is below the {min_short}px minimum")
+    if max_long is not None and long > max_long:
+        failures.append(f"{kind}: long side {long}px exceeds the {max_long}px maximum")
+    ratio = limits["max_ratio"]
+    if ratio is not None and long > ratio * short:
+        failures.append(
+            f"{kind}: long side {long}px is more than {ratio}x the short side {short}px"
+        )
+    return failures
+
+
 def inspect_image(
     path: Path,
     expected: tuple[int, int],
     mode: str,
     *,
     max_bytes: int = MAX_PNG_BYTES,
-    screenshot_rules: bool = False,
+    screenshot_kind: str | None = None,
+    require_nontransparent_corners: bool = False,
 ) -> list[str]:
     failures = []
     if not path.is_file():
@@ -919,10 +1273,13 @@ def inspect_image(
                 failures.append(f"mode {image.mode}, expected {mode}")
             if image.format != "PNG":
                 failures.append(f"format {image.format}, expected PNG")
-            if screenshot_rules:
-                short, long = sorted(image.size)
-                if short < 320 or long > 3840 or long > 2 * short:
-                    failures.append("violates Play screenshot side/aspect limits")
+            if require_nontransparent_corners and image.mode == "RGBA":
+                alpha = image.getchannel("A")
+                corners = ((0, 0), (image.width - 1, 0), (0, image.height - 1), (image.width - 1, image.height - 1))
+                if any(alpha.getpixel(corner) == 0 for corner in corners):
+                    failures.append("contains fully transparent corner pixels; drawn rounded masks are forbidden")
+            if screenshot_kind is not None:
+                failures.extend(screenshot_rule_failures(screenshot_kind, image.size))
     except OSError as exc:
         failures.append(f"unreadable image: {exc}")
     return failures
@@ -945,26 +1302,27 @@ def validate_store(store: Path, listing: dict[str, Any], locales: list[str]) -> 
             print(f"FAIL {name} — missing or empty")
             failures.append(f"missing or empty {name}")
 
-    specs: list[tuple[Path, tuple[int, int], str, bool]] = [
-        (store / "assets" / "icon-512.png", (512, 512), "RGBA", False),
-        (store / "assets" / "feature-graphic-1024x500.png", (1024, 500), "RGB", False),
+    specs: list[tuple[Path, tuple[int, int], str, str | None, bool]] = [
+        (store / "assets" / "icon-512.png", (512, 512), "RGBA", None, True),
+        (store / "assets" / "feature-graphic-1024x500.png", (1024, 500), "RGB", None, False),
     ]
     for locale in locales:
         base = store / "assets" / locale
         specs += [
-            (base / "icon-512.png", (512, 512), "RGBA", False),
-            (base / "feature-graphic-1024x500.png", (1024, 500), "RGB", False),
+            (base / "icon-512.png", (512, 512), "RGBA", None, True),
+            (base / "feature-graphic-1024x500.png", (1024, 500), "RGB", None, False),
         ]
         for kind, (count, dimensions) in SCREEN_TARGETS.items():
             for index in range(1, count + 1):
-                specs.append((base / f"{kind}-{index:02d}.png", dimensions, "RGB", True))
-    for path, dimensions, mode, screenshot_rules in specs:
+                specs.append((base / f"{kind}-{index:02d}.png", dimensions, "RGB", kind, False))
+    for path, dimensions, mode, screenshot_kind, require_nontransparent_corners in specs:
         image_failures = inspect_image(
             path,
             dimensions,
             mode,
             max_bytes=(1024 * 1024 if path.name == "icon-512.png" else MAX_PNG_BYTES),
-            screenshot_rules=screenshot_rules,
+            screenshot_kind=screenshot_kind,
+            require_nontransparent_corners=require_nontransparent_corners,
         )
         relative = path.relative_to(store).as_posix()
         if image_failures:
@@ -991,13 +1349,17 @@ def main(argv: list[str] | None = None) -> int:
         raise StoreKitError("--capture and --render-only are mutually exclusive")
     slot = resolve_slot(args)
     meta = slot_metadata(slot)
+    capability_config = slot / "capabilities.json"
+    if not args.validate_only and not capability_config.is_file():
+        write_json(capability_config, {"schemaVersion": 1, "enabled": []})
+    compliance = capability_compliance(slot)
     store = slot / "store"
     listing_path = store / "listing.json"
 
     existing = load_listing(listing_path) if listing_path.is_file() else None
     locales = parse_locales(args.locales, existing)
     if args.init:
-        listing = default_listing(meta, locales)
+        listing = default_listing(meta, locales, compliance)
         write_json(listing_path, listing)
         review = store / "review-notes.md"
         review.write_text(
@@ -1011,15 +1373,18 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if existing is None:
-        existing = default_listing(meta, locales)
+        existing = default_listing(meta, locales, compliance)
         write_json(listing_path, existing)
         print(f"WARN: listing.json was missing; initialized draft before generation")
     listing = existing
-    merge_missing_locales(listing, meta, locales)
+    if not args.validate_only:
+        refresh_idea_from_record(listing, meta, compliance)
+    merge_missing_locales(listing, meta, locales, compliance)
+    apply_capability_compliance(listing, compliance)
     preflight = validate_listing(listing, locales)
     if preflight:
         raise StoreKitError("listing validation failed:\n  - " + "\n  - ".join(preflight))
-    if args.locales:
+    if not args.validate_only:
         write_json(listing_path, listing)
 
     if args.validate_only:

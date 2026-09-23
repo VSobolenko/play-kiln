@@ -14,6 +14,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { bytesToHuman, sha256 } from './lib/play-assets.mjs'
+import { RELEASE_TASKS, runGradleTasks } from './lib/gradle.mjs'
 import { ensureSigning } from './sign-release.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -98,23 +99,32 @@ function rewriteVersionCode(metadata, requested) {
   return parseGradleMetadata(path.dirname(path.dirname(metadata.file)))
 }
 
-function runGradle(slotDir, task) {
-  const windows = process.platform === 'win32'
-  const wrapper = path.join(slotDir, windows ? 'gradlew.bat' : 'gradlew')
-  if (!existsSync(wrapper)) throw new ReleaseError(`${path.basename(wrapper)} not found`)
-  const result = spawnSync(wrapper, [task, '--console=plain'], {
-    cwd: slotDir,
-    encoding: 'utf8',
-    shell: windows,
-    windowsHide: true
-  })
-  const output = `${result.stdout || ''}\n${result.stderr || ''}`.trim()
-  if (result.error || result.status !== 0) {
-    line('FAIL', task)
-    console.log(indent((result.error?.message || output || `exit ${result.status}`).split(/\r?\n/).slice(-60).join('\n')))
-    throw new ReleaseError(`${task} failed`)
+/**
+ * Run the release build as ONE Gradle invocation.
+ *
+ * All three tasks go to a single process so the JVM starts once, configuration
+ * runs once, and the tasks share one task graph. Never add `--no-daemon`: it
+ * would force a single-use daemon and discard reuse between runs. See
+ * `scripts/lib/gradle.mjs` for the encoded contract and its regression test.
+ */
+function buildRelease(slotDir, tasks) {
+  let run
+  try {
+    run = runGradleTasks(slotDir, tasks)
+  } catch (error) {
+    throw new ReleaseError(error.message)
   }
-  line('PASS', task)
+  const elapsed = `${(run.elapsedMs / 1000).toFixed(1)}s`
+  const output = `${run.result.stdout || ''}\n${run.result.stderr || ''}`.trim()
+  const label = `${run.tasks.join(' ')} (${elapsed})`
+  if (run.result.error || run.result.status !== 0) {
+    line('FAIL', label)
+    console.log(indent((run.result.error?.message || output || `exit ${run.result.status}`).split(/\r?\n/).slice(-60).join('\n')))
+    throw new ReleaseError(`${run.tasks.join(' ')} failed`)
+  }
+  line('PASS', label)
+  // Surface the pinned JDK: an unpinned build silently pays a cold-start penalty.
+  if (run.javaHome) line('PASS', `build JDK ${run.javaMajor} (${run.javaSource}) — ${run.javaHome}`)
 }
 
 function indent(value) {
@@ -274,11 +284,11 @@ function runCli() {
 
     const signing = ensureSigning(slotDir, { generate: false, log: line })
 
-    const tasks = ['assembleDebug', 'assembleRelease', 'bundleRelease']
+    const tasks = RELEASE_TASKS
     if (process.argv.includes('--skip-build')) {
       for (const task of tasks) line('SKIP', `${task} (--skip-build)`)
     } else {
-      for (const task of tasks) runGradle(slotDir, task)
+      buildRelease(slotDir, tasks)
     }
 
     const sourceArtifacts = [

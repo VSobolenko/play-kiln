@@ -1,0 +1,97 @@
+# Parallel execution discipline
+
+The factory's limit is wall-clock time, not effort. Producing one app took ~26 hours of
+sequential work that was mostly independent, and the owner had to point it out twice. A
+correct agent that runs one thing at a time is a slow agent, and a slow factory is a failed
+factory: the whole model depends on screening ideas and shipping slots faster than a human
+could alone.
+
+These rules exist because serial work was chosen by default, over and over, for tasks that had
+no dependency between them.
+
+## Default to parallel
+
+- **Assume work is independent until you prove otherwise.** Then run it together.
+- Batch independent tool calls into **one** message: several `Read`, `Grep`, `Glob`, or `Shell`
+  calls in a single block, not one per turn. Every sequential round-trip is a wasted minute.
+- Before starting a task, spend one sentence asking: *what in this task does not depend on
+  anything else?* That part starts now, in parallel.
+
+## Launch subagents for independent streams
+
+- Two or more genuinely independent pieces of work → **multiple `Task` calls in one message**.
+  Independent means different files, different questions, or different documents.
+- Never serialize streams that could run together: code vs documentation, research vs
+  implementation, an audit vs a build, one module vs another.
+- Give every writer a **disjoint file list**. Parallel writers touching the same file corrupt
+  each other, and the corruption looks like a mystery defect later.
+- Read-only work (reviews, audits, research) has no file conflict and should nearly always run
+  in parallel with implementation.
+
+## Codex first, not last
+
+- `AGENTS.md` makes Codex a co-lead engineer, not a reviewer. For any bounded engineering task,
+  the order is **Codex worker → Cursor `generator` subagent → orchestrator**.
+- Long Codex tasks go through `node scripts/codex-run.mjs run --id <id> --prompt-file <path>`,
+  backgrounded so several workers run at once. The MCP `codex` tool is for short dialogue only.
+- Launch several Codex workers **in the same message**, each with a bounded prompt file and a
+  disjoint file list.
+- Falling back to a Cursor subagent is correct **after** a worker reports `RATE_LIMITED`,
+  `CONTEXT_LIMIT`, `AUTH_ERROR`, or has failed twice — not before trying Codex at all.
+- Doing a bounded task personally is the last resort. It is acceptable only when the earlier
+  owners are blocked, and the reason must be stated.
+
+## Match the subagent type to the deliverable
+
+- **Some subagent types are read-only and cannot write files at all.** Confirmed twice by
+  evidence, not by reading descriptions: `evaluator` was rejected writing its audit report
+  (*"Ask mode forbids edits"*), and `planner` was rejected writing an OpenSpec proposal
+  (*"Ask mode is active in this session and rejected my write"*). In both cases the agent did the
+  work and could not deliver it, so the turn was wasted and the output survived only in a
+  transcript.
+- The type descriptions are **not** a reliable guide to this. `planner` reads as *"OpenSpec
+  proposal/tasks only"*, which sounds like it writes proposals; in practice it cannot.
+- So, for any task whose deliverable is **a file**:
+  - use a writing-capable type (`generalPurpose`), or
+  - write the file yourself from the agent's returned text, or
+  - expect to harvest the content from the transcript — the worst option, because it is manual,
+    lossy, and easy to skip.
+- For genuinely read-only work — audit, review, research, exploration — a read-only type is the
+  right and safer choice, and running it in parallel costs nothing.
+- Before launching, ask which of the two the task is. A read-only agent sent to write a file
+  cannot report the failure as a defect in its own reasoning; it reports "blocked", which looks
+  like an environment problem rather than a delegation mistake.
+
+## The one real serialization constraint: Gradle
+
+- **One Gradle process per project directory.** Concurrent builds in the same directory contend
+  for `build/` and corrupt incremental state (see `.cursor/rules/build-speed.mdc`).
+- So: parallel Gradle only across **different** project directories or worktrees.
+- If a worker needs Gradle, tell it not to run it and run the authoritative build yourself once,
+  after the writers finish. Combine every task for one build into a **single** invocation.
+
+## Do not confuse parallel with careless
+
+- Parallelism never relaxes verification. Independent work runs at the same time; it is **read
+  and verified** before any PASS is claimed.
+- A worker's report is input to verification, never proof (`harness/dual-agent.md`).
+- Never report "done" for work that was launched but has not returned. Say what is running and
+  what is being waited on.
+
+## What good looks like
+
+```text
+One message:
+  Task(explore)   find how the gates read capability.json
+  Task(explore)   find every place applicationId is derived
+  Shell           start the release build (background)
+  Read            the rule file the change must honour
+```
+Four independent things, one round-trip, instead of four turns.
+
+## Related
+
+- `AGENTS.md` — agent model and the Codex-first ladder.
+- `harness/dual-agent.md` — role cards, worker lifecycle, fallback ladder.
+- `.cursor/rules/build-speed.mdc` — why Gradle is the exception.
+- `.cursor/rules/verification-discipline.mdc` — parallelism does not weaken evidence.

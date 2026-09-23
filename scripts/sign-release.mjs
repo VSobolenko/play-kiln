@@ -15,6 +15,7 @@ import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { candidateJavaHomes, resolveJavaHome } from './lib/java.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -213,39 +214,41 @@ function safeToolError(result) {
   return output.split(/\r?\n/).filter(Boolean).slice(-3).join(' | ') || `exit ${result.status}`
 }
 
+/**
+ * Locate `keytool`.
+ *
+ * JDK discovery is delegated to `scripts/lib/java.mjs` so this script and the
+ * Gradle runner cannot disagree about which Java installation the factory uses.
+ * A previous private implementation built the Windows vendor path as
+ * `<jdk>\keytool.exe` instead of `<jdk>\bin\keytool.exe`, so signing only worked
+ * when JAVA_HOME happened to be exported.
+ *
+ * Extra fallbacks stay here because they are valid keytool sources that are not
+ * the JDK Gradle should build with: Android Studio's bundled JBR, and PATH.
+ */
 function findKeytool() {
   const executable = process.platform === 'win32' ? 'keytool.exe' : 'keytool'
   const candidates = []
-  if (process.env.JAVA_HOME) {
-    candidates.push(path.join(process.env.JAVA_HOME.replace(/^"|"$/g, ''), 'bin', executable))
+  const push = (value) => {
+    if (value) candidates.push(value)
   }
-  for (const entry of (process.env.PATH || '').split(path.delimiter).filter(Boolean)) {
-    candidates.push(path.join(entry.replace(/^"|"$/g, ''), executable))
-  }
+
+  const resolved = resolveJavaHome()
+  if (resolved?.home) push(path.join(resolved.home, 'bin', executable))
+  for (const home of candidateJavaHomes()) push(path.join(home, 'bin', executable))
 
   if (process.platform === 'win32') {
     const programFiles = [process.env.ProgramFiles, process.env['ProgramFiles(x86)']].filter(Boolean)
     for (const root of programFiles) {
-      candidates.push(path.join(root, 'Android', 'Android Studio', 'jbr', 'bin', executable))
-      addJdkChildren(candidates, path.join(root, 'Java'), executable)
-      addJdkChildren(candidates, path.join(root, 'Eclipse Adoptium'), executable)
+      push(path.join(root, 'Android', 'Android Studio', 'jbr', 'bin', executable))
     }
-  } else if (process.platform === 'darwin') {
-    addJdkChildren(candidates, '/Library/Java/JavaVirtualMachines', path.join('Contents', 'Home', 'bin', executable))
-  } else {
-    addJdkChildren(candidates, '/usr/lib/jvm', path.join('bin', executable))
+  }
+
+  for (const entry of (process.env.PATH || '').split(path.delimiter).filter(Boolean)) {
+    push(path.join(entry.replace(/^"|"$/g, ''), executable))
   }
 
   return candidates.find((candidate) => isFile(candidate)) || null
-}
-
-function addJdkChildren(candidates, root, executableRelativePath) {
-  if (!existsSync(root)) return
-  try {
-    for (const name of readdirSync(root)) candidates.push(path.join(root, name, executableRelativePath))
-  } catch {
-    // An unreadable optional JDK search location is equivalent to no candidate there.
-  }
 }
 
 function isFile(file) {

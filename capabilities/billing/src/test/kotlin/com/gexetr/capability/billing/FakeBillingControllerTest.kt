@@ -51,4 +51,73 @@ class FakeBillingControllerTest {
         assertTrue(result is PlayKilnResult.Success)
         assertTrue(fake.entitlements.value.hasActiveSubscription(ProductKey(subscription.value)))
     }
+
+    @Test
+    fun `a consumable purchase credits the wallet and never becomes an entitlement`() = runTest {
+        val pack = ProductId("tokens_100")
+        val fake = FakeBillingController()
+        fake.connect(
+            BillingCatalog(consumables = listOf(ConsumablePack(pack, grants = 100, unit = "tokens")))
+        )
+
+        fake.purchase(pack)
+
+        assertEquals(100L, fake.wallet.value.balanceOf("tokens"))
+        // Owning the pack would break the second purchase: a consumable is spent, not owned.
+        assertFalse(fake.entitlements.value.owns(pack.key()))
+    }
+
+    @Test
+    fun `the same pack can be bought repeatedly and each purchase credits`() = runTest {
+        // The case the factory previously could not express at all: a repeatable purchase.
+        val pack = ProductId("tokens_100")
+        val fake = FakeBillingController()
+        fake.connect(
+            BillingCatalog(consumables = listOf(ConsumablePack(pack, grants = 100, unit = "tokens")))
+        )
+
+        fake.purchase(pack)
+        fake.purchase(pack)
+        fake.purchase(pack)
+
+        assertEquals(300L, fake.wallet.value.balanceOf("tokens"))
+    }
+
+    @Test
+    fun `spending reduces the wallet`() = runTest {
+        val pack = ProductId("tokens_100")
+        val fake = FakeBillingController(seedWallet = Wallet.EMPTY.credited("tokens", 30))
+        fake.connect(
+            BillingCatalog(consumables = listOf(ConsumablePack(pack, grants = 100, unit = "tokens")))
+        )
+
+        val result = fake.spend("tokens", 10)
+
+        assertTrue(result is PlayKilnResult.Success)
+        assertEquals(20L, fake.wallet.value.balanceOf("tokens"))
+    }
+
+    @Test
+    fun `spending more than the balance fails and leaves the wallet untouched`() = runTest {
+        val fake = FakeBillingController(seedWallet = Wallet.EMPTY.credited("tokens", 5))
+
+        val result = fake.spend("tokens", 6)
+
+        assertEquals(PlayKilnResult.Failure(PlayKilnResult.Reason.NOT_AVAILABLE), result)
+        assertEquals(5L, fake.wallet.value.balanceOf("tokens"))
+    }
+
+    @Test
+    fun `a catalog needing an authority is refused when none is supplied`() = runTest {
+        val fake = FakeBillingController()
+        val serverCost = BillingCatalog(
+            consumables = listOf(
+                ConsumablePack(ProductId("gen_10"), 10, "generations", Fulfillment.SERVER_COST)
+            )
+        )
+
+        val result = fake.connect(serverCost)
+
+        assertEquals(PlayKilnResult.Failure(PlayKilnResult.Reason.NOT_CONFIGURED), result)
+    }
 }

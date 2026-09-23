@@ -148,11 +148,25 @@ Sources: **NEEDS-VERIFICATION** — no official Play App Signing or key-rotation
   320–3840 px, long side no more than twice the short side; 1080×1920 is recommended.
 - Large-format eligibility: at least four screenshots with at least 1080 px on the
   short side.
-- 7-inch and 10-inch tablet screenshots: 4–8 each, short edge at least 1080 px,
-  long edge at most 7680 px.
+- 7-inch and 10-inch tablet screenshots: 4–8 each, short edge at least 1080 px.
+  Play's page gives two long-edge rules that genuinely conflict for tablets. Its
+  general **Requirements** section says: "JPEG or 24-bit PNG (no alpha) Minimum
+  dimension: 320px Maximum dimension: 3840px The maximum dimension of your
+  screenshot can't be more than twice as long as the minimum dimension." Its
+  device-specific **Large screens** section says: "Large screens: For Chromebook and
+  tablets, you can add a minimum of 4 screenshots to demonstrate your in-app
+  experience. Upload screenshots between 1,080 and 7,680px Use a 16:9 aspect ratio
+  for landscape and a 9:16 aspect ratio for portrait." Because the two statements
+  conflict for tablets, the factory deliberately enforces their intersection: the
+  conservative 3840 px long-edge cap plus the ≥ 1080 px short edge. Source:
+  <https://support.google.com/googleplay/android-developer/answer/9866151?hl=en>.
+  The factory's 1200×1920 and 1600×2560 tablet sets are a **5:8 DEVIATION** from the
+  recommended 9:16 portrait ratio, accepted 2026-09-24 for the same reason: the hard
+  Requirements caps are satisfied and the ratio affects only which large-screen
+  surfaces Play selects, not review eligibility.
 - Gated apps require review notes and usable demo access.
 
-Sources: **NEEDS-VERIFICATION** — `FACTS.md` names Play Console Help article 9866151 but provides no official URL.
+Sources: <https://support.google.com/googleplay/android-developer/answer/9866151?hl=en>.
 
 PlayKiln's stricter output contract is 6 phone, 4 seven-inch tablet, and 4 ten-inch
 tablet screenshots per locale, plus the icon and feature graphic.
@@ -210,17 +224,29 @@ The Android Publisher v3 edit flow is:
 include `icon`, `featureGraphic`, `phoneScreenshots`, `sevenInchScreenshots`, and
 `tenInchScreenshots`.
 
-Sources: **NEEDS-VERIFICATION** — no official Android Publisher API reference URL is present in `FACTS.md`.
+Sources: <https://developers.google.com/android-publisher/api-ref/rest>,
+<https://developers.google.com/android-publisher/edits>.
 
 API access uses the `https://www.googleapis.com/auth/androidpublisher` scope and a
 service account configured in Google Cloud and invited in Play Console with the
 required store-listing and release permissions.
 
-Sources: `FACTS.md` contains the OAuth scope URL but no official authentication documentation URL; **NEEDS-VERIFICATION**.
+Sources: <https://developers.google.com/android-publisher/edits>.
 
-The API cannot create a new Play app. A human must create the app, perform the first
-AAB upload, and complete all legal declarations once in Play Console. Factory upload
-automation is for updates, not creation; no upload or commit happens without human
-approval.
+The API cannot create a new Play app or fill the legal consents. A human must
+create the app, perform the first AAB upload, complete the legal consents and the
+content rating questionnaire, and press publish. Factory upload automation is for
+updates, not creation; no upload or commit happens without human approval.
 
-Sources: **NEEDS-VERIFICATION** — no official API limitation URL is present in `FACTS.md`.
+Most — but not all — of the "App content" page is automatable. The Data safety
+declaration has a documented write endpoint
+(`POST /androidpublisher/v3/applications/{packageName}/dataSafety`, body
+`{"safetyLabels": "<CSV>"}`); the remaining declarations do not, so they stay a
+Console step.
+
+Sources: <https://developers.google.com/android-publisher/edits>,
+<https://developers.google.com/android-publisher/api-ref/rest/v3/applications/dataSafety>.
+
+The full verified automation surface, the monetization catalogue endpoints, and the
+MCP landscape are mapped in
+[`2026-09-23-google-play-automation-surface.md`](./2026-09-23-google-play-automation-surface.md).

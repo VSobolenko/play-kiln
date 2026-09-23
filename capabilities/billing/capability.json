@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "id": "billing",
+  "version": "1.0.0",
+  "artifact": "com.gexetr.capability:billing",
+  "summary": "Entitlement state over Google Play Billing that survives process death, reinstall and device change, with purchase acknowledgement and pending-purchase recovery.",
+  "status": "stable",
+  "since": "1.0.0",
+  "optionalForSlots": true,
+  "sdkDependencies": [
+    {
+      "name": "Google Play Billing Library",
+      "version": "9.1.0",
+      "policyUrl": "https://developer.android.com/google/play/billing"
+    }
+  ],
+  "permissions": [],
+  "dataCollected": [
+    {
+      "type": "Financial info",
+      "purpose": "App functionality",
+      "shared": false,
+      "optional": false,
+      "notes": "Purchase history: product IDs the user bought and their entitlement state. Payment instruments are handled entirely by Google Play and never reach the app."
+    }
+  ],
+  "requiresConsent": false,
+  "networkRequired": true,
+  "adsPresent": false,
+  "testDoubles": [
+    "FakeBillingController"
+  ],
+  "publicApi": [
+    "BillingController",
+    "BillingCatalog",
+    "ProductId",
+    "ProductKey",
+    "Entitlements",
+    "SubscriptionStatus",
+    "FakeBillingController"
+  ],
+  "policyNotes": [
+    "A slot that sells anything must answer the 'In-app purchases' question in App content and provide the price and renewal terms in the listing, not only inside the app.",
+    "Play refunds any purchase left unacknowledged for three days, which reads as a lost sale; BillingController.acknowledgePendingPurchases() must run on cold start, not only after a purchase.",
+    "Product IDs must be created in Play Console before review, because a purchase flow that references an unknown product fails in the reviewer's session.",
+    "Deleting a product that has subscribers is a policy and support problem: subscriptions must be cancellable, and users must be told how.",
+    "This module deliberately ships no paywall UI: pricing and renewal disclosure are slot decisions, and a slot that hides them risks a policy rejection."
+  ]
+}

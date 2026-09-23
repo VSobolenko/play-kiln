@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "id": "ads",
+  "version": "1.0.0",
+  "artifact": "com.gexetr.capability:ads",
+  "summary": "Consent-gated ad loading over the Google Mobile Ads and UMP SDKs, with banner, interstitial and opt-in rewarded formats that never request inventory before consent resolves.",
+  "status": "stable",
+  "since": "1.0.0",
+  "optionalForSlots": true,
+  "sdkDependencies": [
+    {
+      "name": "Google Mobile Ads SDK",
+      "version": "25.5.0",
+      "policyUrl": "https://policies.google.com/technologies/partner-sites"
+    },
+    {
+      "name": "Google User Messaging Platform",
+      "version": "4.0.0",
+      "policyUrl": "https://developers.google.com/admob/android/privacy"
+    }
+  ],
+  "permissions": [
+    {
+      "name": "com.google.android.gms.permission.AD_ID",
+      "why": "Declared by the Google Mobile Ads SDK to serve and measure ads; removing it disables the advertising ID and reduces ad revenue.",
+      "dangerous": false
+    }
+  ],
+  "dataCollected": [
+    {
+      "type": "Device or other IDs",
+      "purpose": "Advertising or marketing",
+      "shared": true,
+      "optional": false,
+      "notes": "Advertising ID, used for ad delivery and measurement; disabled by consent refusal in the EEA/UK."
+    },
+    {
+      "type": "App activity",
+      "purpose": "Advertising or marketing",
+      "shared": true,
+      "optional": false,
+      "notes": "Ad interaction events (impressions, clicks, rewarded completions) reported by the ad SDK."
+    },
+    {
+      "type": "App info and performance",
+      "purpose": "Analytics",
+      "shared": true,
+      "optional": false,
+      "notes": "Ad SDK diagnostics and crash data reported by the SDK itself."
+    }
+  ],
+  "requiresConsent": true,
+  "networkRequired": true,
+  "adsPresent": true,
+  "testDoubles": [
+    "FakeAdsController"
+  ],
+  "publicApi": [
+    "AdsController",
+    "AdsConfig",
+    "ConsentFormError",
+    "FakeAdsController"
+  ],
+  "policyNotes": [
+    "Data safety is not optional once this module is present: the app must declare advertising ID collection and select an ads declaration in App content, even when no ad is ever shown.",
+    "requiresConsent is true because a personalised ad request before the user resolves the UMP form violates EEA/UK obligations; AdsController.canRequestAds() is the gate and starts false.",
+    "Families policy is much stricter than this module can enforce: an app that targets children must not use this capability as-is, because it would require child-directed ad inventory and a verified ad SDK configuration.",
+    "Rewarded formats must stay opt-in. The Disruptive Ads policy forbids a full-screen ad on launch or one that blocks the app's own function.",
+    "If a slot adds a second ad network directly instead of through this module, this manifest and the Data safety form must be updated in the same change."
+  ]
+}

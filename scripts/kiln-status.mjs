@@ -9,6 +9,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
 import { applicationIdPattern, scaffoldPackage } from './lib/namespaces.mjs'
+import { resolveJavaHome } from './lib/java.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 let hasFailure = false
@@ -90,6 +91,8 @@ const requiredHarnessFiles = [
   'scripts/new-slot.mjs',
   'scripts/selftest.mjs',
   'scripts/lib/namespaces.mjs',
+  'scripts/lib/gradle.mjs',
+  'scripts/lib/java.mjs',
   'scripts/codex-run.mjs',
   'scripts/prepare-release.mjs',
   'scripts/sign-release.mjs',
@@ -100,8 +103,11 @@ const requiredHarnessFiles = [
   'harness/lessons.md',
   'docs/research/2026-09-20-android-play-ai-agents.md',
   'docs/research/2026-09-22-android-play-requirements.md',
+  'docs/research/2026-09-23-google-play-automation-surface.md',
   'docs/play-publishing-playbook.md',
-  '.cursor/rules/verification-discipline.mdc'
+  'docs/monetization-strategy.md',
+  '.cursor/rules/verification-discipline.mdc',
+  '.cursor/rules/build-speed.mdc'
 ]
 for (const relativePath of requiredHarnessFiles) {
   line(existsSync(join(root, relativePath)) ? 'PASS' : 'FAIL', relativePath)
@@ -169,36 +175,33 @@ section('Environment')
 const nodeResult = run(process.execPath, ['--version'])
 line(nodeResult.ok ? 'PASS' : 'FAIL', `node ${firstLine(nodeResult.output) || 'unavailable'}`)
 
-const javaResult = run('java', ['-version'])
-const pathJavaMajor = javaMajor(javaResult.output)
-if (!javaResult.ok || pathJavaMajor === null) {
-  line('FAIL', `java on PATH unavailable${javaResult.error ? `: ${javaResult.error.message}` : ''}`)
-} else if (pathJavaMajor < 17) {
-  line('FAIL', `java on PATH is JDK ${pathJavaMajor}; JDK 17 or newer is required`)
-} else if (pathJavaMajor >= 21) {
+/**
+ * The factory pins one JDK so Gradle reuses a single daemon. A build under a
+ * different JDK starts a second daemon and reconfigures from scratch (measured:
+ * 2.4s pinned vs 70.1s unpinned), so report the JDK the factory will actually use
+ * rather than whatever happens to be on PATH.
+ */
+const resolvedJava = resolveJavaHome()
+let javaHomeBin = null
+if (!resolvedJava) {
   line(
-    'WARN',
-    `java on PATH is JDK ${pathJavaMajor}; AGP 9 targets JDK 17 and a JDK 17 toolchain must be available`
+    'FAIL',
+    'no JDK 17+ found; set PLAYKILN_JAVA_HOME or JAVA_HOME (the factory pins a JDK to keep the Gradle daemon warm)'
   )
 } else {
-  line('PASS', `java on PATH is JDK ${pathJavaMajor}`)
-}
-
-const javaHome = process.env.JAVA_HOME
-let javaHomeBin = null
-if (!javaHome || !existsSync(javaHome)) {
-  line('FAIL', 'JAVA_HOME is missing or does not exist')
-} else {
-  javaHomeBin = join(javaHome, 'bin')
-  const javaHomeExecutable = join(javaHomeBin, process.platform === 'win32' ? 'java.exe' : 'java')
-  const homeJavaResult = existsSync(javaHomeExecutable) ? run(javaHomeExecutable, ['-version']) : null
-  const homeJavaMajor = homeJavaResult ? javaMajor(homeJavaResult.output) : null
-  if (!homeJavaResult?.ok || homeJavaMajor === null) {
-    line('FAIL', `JAVA_HOME does not contain a working Java runtime: ${javaHome}`)
-  } else if (homeJavaMajor < 17) {
-    line('FAIL', `JAVA_HOME points to JDK ${homeJavaMajor}; JDK 17 or newer is required`)
+  javaHomeBin = join(resolvedJava.home, 'bin')
+  line('PASS', `factory JDK ${resolvedJava.major} (${resolvedJava.source}): ${resolvedJava.home}`)
+  const pathResult = run('java', ['-version'])
+  const pathMajor = javaMajor(pathResult.output)
+  if (pathMajor === null) {
+    line('WARN', 'java on PATH is unavailable; factory runs are unaffected because the JDK is pinned')
+  } else if (pathMajor !== resolvedJava.major) {
+    line(
+      'WARN',
+      `java on PATH is JDK ${pathMajor} but the factory builds with JDK ${resolvedJava.major}; a build that skips the pin starts a second Gradle daemon and rebuilds cold`
+    )
   } else {
-    line('PASS', `JAVA_HOME provides JDK ${homeJavaMajor}: ${javaHome}`)
+    line('PASS', `java on PATH matches the pinned JDK ${pathMajor}`)
   }
 }
 

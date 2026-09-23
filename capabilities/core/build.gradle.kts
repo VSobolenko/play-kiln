@@ -6,7 +6,7 @@ plugins {
     `maven-publish`
 }
 
-group = "com.gexetr.capability"
+group = providers.gradleProperty("playkiln.capabilityGroup").get()
 version = providers.gradleProperty("playkiln.capabilityVersion").get()
 
 android {

@@ -226,6 +226,27 @@ function readRegistry() {
   return registry
 }
 
+/**
+ * Refuse an applicationId that another slot already owns.
+ *
+ * An applicationId is permanent after the first Play upload, and
+ * `applicationIdForSlug` drops dashes, so distinct slugs can collide:
+ * `my-app` and `myapp` both derive `com.gexetr.myapp`. Without this check the
+ * second slot would be scaffolded against an ID the account can never publish,
+ * and the collision would only surface at upload time.
+ */
+function assertApplicationIdIsFree(applicationId, slug) {
+  const registry = readRegistry()
+  const owner = registry.apps.find((app) => app?.applicationId === applicationId && app?.id !== slug)
+  if (owner) {
+    throw new Error(
+      `applicationId ${applicationId} is already owned by slot '${owner.id}' ` +
+        `(${owner.dir}); an applicationId is permanent after the first Play upload, ` +
+        `so '${slug}' needs a different slug`
+    )
+  }
+}
+
 function registerSlot({ slug, dirName, name, applicationId, idea, createdAt }) {
   const registry = readRegistry()
   const index = registry.apps.findIndex((app) => app?.id === slug)
@@ -268,6 +289,7 @@ function main() {
   if (!applicationIdPattern.test(applicationId)) {
     throw new Error(`--package must match ${applicationIdPattern}`)
   }
+  assertApplicationIdIsFree(applicationId, slug)
   if (!existsSync(scaffold)) throw new Error(`Missing scaffold: ${scaffold}`)
 
   const dirName = `${date}-${slug}`

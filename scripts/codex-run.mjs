@@ -42,12 +42,62 @@ import {
   writeFileSync
 } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
+import { homedir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(HERE, '..')
 const STATE = join(ROOT, '.kiln', 'codex')
 const LAUNCHER = join(ROOT, '.cursor', 'mcp', 'codex-launcher.cjs')
+
+/**
+ * Codex model tiers.
+ *
+ * Why this exists: this runner used to default `--effort` to `medium` and always pass
+ * `-c model_reasoning_effort=...`, which silently OVERRODE the effort set in the user's own
+ * `~/.codex/config.toml` (`low`). Most workers therefore ran at `high`, and reasoning effort is
+ * the main driver of Codex quota consumption — a batch of workers drained the allowance from
+ * ~50% to ~30%. Two rules follow from that defect:
+ *
+ *   1. Effort is INHERITED from the user's config unless explicitly requested. The runner must
+ *      never pick a costlier effort on the user's behalf.
+ *   2. Model choice is explicit, and defaults to the balanced tier rather than the strongest one.
+ *
+ * Descriptions are read from Codex's own `~/.codex/models_cache.json`, so the tiers track what
+ * the CLI actually advertises instead of a hardcoded guess. If a slug is not present on this
+ * machine the CLI will reject it — verify with `codex-run.mjs models`.
+ */
+const MODEL_TIERS = {
+  // Cheapest: mechanical or low-judgement work (docs, glue, bulk rewrites, report typing).
+  eco: { model: 'gpt-5.6-luna', note: 'fast and efficient' },
+  // Default: most slot work. Judgement without the top-tier price.
+  balanced: { model: 'gpt-5.6-terra', note: 'balanced for straightforward work' },
+  // Only for genuinely hard reasoning: architecture, security, subtle concurrency.
+  strong: { model: 'gpt-5.6-sol', note: 'older coding model for complex work' },
+  // Explicitly strong + deep effort, for problems that justify the cost.
+  max: { model: 'gpt-5.6-sol', effort: 'high', note: 'complex work at high effort' }
+}
+
+/** No tier given means the balanced one; `--model` still overrides the tier's model. */
+const DEFAULT_TIER = 'balanced'
+
+/**
+ * Resolves a tier plus explicit overrides into the model and effort to launch with.
+ *
+ * `effort` stays null unless the caller asked, so the config file's setting survives. That is the
+ * whole point of this function: it makes "do not silently raise the cost" the default path.
+ */
+function resolveModelSelection({ tier, model, effort }) {
+  const chosen = MODEL_TIERS[tier ?? DEFAULT_TIER]
+  if (!chosen) fail(`unknown --tier ${tier} (use: ${Object.keys(MODEL_TIERS).join(' | ')})`)
+
+  return {
+    tier: tier ?? DEFAULT_TIER,
+    model: model ?? chosen.model,
+    // An explicit --effort wins; otherwise a tier may define one; otherwise inherit.
+    effort: effort ?? chosen.effort ?? null
+  }
+}
 
 const argv = process.argv.slice(2)
 const cmd = argv[0]
@@ -77,19 +127,26 @@ function ensureDirs() {
 function readMeta(id) {
   const p = metaPath(id)
   if (!existsSync(p)) fail(`unknown worker id: ${id} (no ${p})`)
-  return JSON.parse(readFileSync(p, 'utf8'))
+  // Same hazard as `status()`: a truncated or BOM-prefixed meta makes `JSON.parse` throw. Here the
+  // caller is a single-worker command, so a clean failure naming the file beats an unhandled throw
+  // (the CLI has no top-level catch, so the raw stack is all the operator would see).
+  const read = readJsonSafe(p)
+  if (!read.ok) fail(`unreadable meta for ${id}: ${p} (${read.error})`)
+  return read.value
 }
 
-/** Detect Codex quota / auth problems so the orchestrator can switch writers. */
-function diagnose(text) {
-  const t = (text || '').toLowerCase()
-  if (!t) return null
-  if (/usage limit|rate limit|429|too many requests|quota exceeded|limit reached/.test(t))
-    return 'RATE_LIMITED'
-  if (/context (window|length)|too many tokens|token limit|compact/.test(t)) return 'CONTEXT_LIMIT'
-  if (/not logged in|unauthorized|invalid api key|refresh token|401/.test(t)) return 'AUTH_ERROR'
-  return null
-}
+/**
+ * Failure-signal diagnosis lives in `scripts/lib/codex-signals.mjs` so it can be unit-tested.
+ * Importing this CLI would execute its dispatch, which is why the classifier is not defined here.
+ */
+import { DIAGNOSIS_WINDOW_LINES, classifyRun, diagnose } from './lib/codex-signals.mjs'
+
+/**
+ * Ledger state resolution lives in `scripts/lib/codex-ledger.mjs` for the same reason, and adds the
+ * one thing this file never checked: whether the recorded pid is still alive. A worker that died
+ * without writing an exit record used to be reported `running` forever.
+ */
+import { LOST_NOTE, LOST_STATE, classifyWorkerFromDisk, readJsonSafe } from './lib/codex-ledger.mjs'
 
 function tail(file, lines) {
   if (!existsSync(file)) return ''
@@ -105,13 +162,22 @@ function run() {
   if (!existsSync(pf)) fail(`prompt file not found: ${pf}`)
   const prompt = readFileSync(pf, 'utf8')
 
+  // Effort is inherited from ~/.codex/config.toml unless explicitly requested. Do not default
+  // it: defaulting to a costlier level than the user configured is what drained the allowance.
+  const selection = resolveModelSelection({
+    tier: arg('--tier', null),
+    model: arg('--model', null),
+    effort: arg('--effort', null)
+  })
+
   const meta = {
     id,
     label: arg('--label', ''),
     promptFile: pf,
     cwd: resolve(ROOT, arg('--cwd', ROOT)),
-    model: arg('--model', null),
-    effort: arg('--effort', 'medium'),
+    model: selection.model,
+    tier: selection.tier,
+    effort: selection.effort,
     sandbox: arg('--sandbox', 'workspace-write'),
     timeoutMin: arg('--timeout-min', null),
     log: logPath(id),
@@ -134,10 +200,9 @@ function run() {
     '--color',
     'never',
     '-o',
-    meta.lastMessage,
-    '-c',
-    `model_reasoning_effort="${meta.effort}"`
+    meta.lastMessage
   ]
+  if (meta.effort) args.push('-c', `model_reasoning_effort="${meta.effort}"`)
   if (meta.model) args.push('-m', meta.model)
   args.push('-')
 
@@ -182,8 +247,14 @@ function run() {
 }
 
 function finish(id, meta, code, errText) {
-  const outText = existsSync(meta.log) ? readFileSync(meta.log, 'utf8') : ''
-  const signal = diagnose(String(errText || '') + '\n' + outText)
+  // The tail is diagnosed, not the whole transcript: the full log echoes the prompt and every file
+  // the worker read, which is how the harness once reported its own documentation as a failure.
+  // The tail is only the second defence — the first is that `diagnose` considers diagnostic-shaped
+  // lines only, so a worker's own document (which discusses auth, limits and fraud as subject
+  // matter) cannot be mistaken for an error.
+  const outText = existsSync(meta.log) ? tail(meta.log, DIAGNOSIS_WINDOW_LINES) : ''
+  const errTail = String(errText || '').split(/\r?\n/).slice(-DIAGNOSIS_WINDOW_LINES).join('\n')
+  const signal = diagnose(errTail + '\n' + outText)
   const record = {
     id,
     exitCode: code,
@@ -191,7 +262,10 @@ function finish(id, meta, code, errText) {
     finishedAt: new Date().toISOString()
   }
   writeFileSync(exitPath(id), JSON.stringify(record, null, 2) + '\n')
-  meta.status = code === 0 ? 'done' : signal ? 'blocked' : 'failed'
+  // A diagnosed signal outranks a zero exit code: a worker that stopped on a limit has not
+  // delivered, and calling that `done` is a false confidence the orchestrator then acts on. The
+  // reverse matters just as much, so `diagnose` stays silent unless the evidence is error-shaped.
+  meta.status = classifyRun(code, errTail + '\n' + outText)
   meta.exitCode = code
   meta.signal = signal
   writeFileSync(metaPath(id), JSON.stringify(meta, null, 2) + '\n')
@@ -223,20 +297,35 @@ function status() {
       console.log(`${'MISSING'.padEnd(18)} ${id}`)
       continue
     }
-    const meta = JSON.parse(readFileSync(mp, 'utf8'))
-    let state = meta.status || 'unknown'
-    if (existsSync(exitPath(id))) {
-      const rec = JSON.parse(readFileSync(exitPath(id), 'utf8'))
-      state =
-        rec.exitCode === 0
-          ? 'DONE'
-          : rec.signal
-            ? `BLOCKED(${rec.signal})`
-            : `FAILED(${rec.exitCode})`
+    // A worker killed mid-write leaves a truncated meta file, and a hand-edited one can carry a
+    // BOM; either used to throw and abort the whole listing, hiding every worker after the
+    // broken one. The ledger is the orchestrator's only view of what is running, so one
+    // unreadable file must not blind it: name the file and keep going.
+    const readMeta = readJsonSafe(mp)
+    if (!readMeta.ok) {
+      console.log(`${'UNREADABLE'.padEnd(18)} ${id}  (${readMeta.error})`)
+      continue
     }
+    const meta = readMeta.value
+    const exitFile = exitPath(id)
+    let exitRecord = null
+    if (existsSync(exitFile)) {
+      const readExit = readJsonSafe(exitFile)
+      if (!readExit.ok) {
+        console.log(`${'UNREADABLE'.padEnd(18)} ${id}  (exit record: ${readExit.error})`)
+        continue
+      }
+      exitRecord = readExit.value
+    }
+    // Signal before exit code, and `running` downgraded to LOST only when the recorded pid is
+    // provably gone and no exit record exists — see scripts/lib/codex-ledger.mjs.
+    const state = classifyWorkerFromDisk(meta, exitRecord)
     const mins = ((Date.now() - Date.parse(meta.startedAt)) / 60000).toFixed(1)
     const hasLast = existsSync(lastPath(id)) ? 'last=yes' : 'last=no'
-    console.log(`${String(state).padEnd(18)} ${id.padEnd(24)} ${mins}m ${hasLast} ${meta.label || ''}`)
+    // A lost worker did not report, so its result is unverified. Say so rather than letting the
+    // label be read as a finished job, which is how a ghost stays on the ledger unnoticed.
+    const lost = state === LOST_STATE ? ` ${LOST_NOTE}` : ''
+    console.log(`${String(state).padEnd(18)} ${id.padEnd(24)} ${mins}m ${hasLast} ${meta.label || ''}${lost}`)
   }
 }
 
@@ -279,29 +368,84 @@ function resume() {
   if (!sid) fail(`no session id found in ${errPath(id)} — cannot resume safely`)
 
   appendFileSync(meta.log, `\n=== resume ${sid} @ ${new Date().toISOString()} ===\n`)
-  const child = spawnSync(
-    process.execPath,
-    [
-      LAUNCHER,
-      'exec',
-      'resume',
-      sid,
-      '-o',
-      meta.lastMessage,
-      '-c',
-      `model_reasoning_effort="${meta.effort}"`,
-      '-'
-    ],
-    {
-      cwd: meta.cwd,
-      input: readFileSync(pf, 'utf8'),
-      encoding: 'utf8',
-      windowsHide: true
-    }
-  )
+  const resumeArgs = [
+    LAUNCHER,
+    'exec',
+    'resume',
+    sid,
+    '-o',
+    meta.lastMessage
+  ]
+  // Only override effort when the original run explicitly set one; otherwise inherit, exactly as
+  // in `run`. A resume must not quietly raise the cost of continuing the same work.
+  if (meta.effort) resumeArgs.push('-c', `model_reasoning_effort="${meta.effort}"`)
+  if (meta.model) resumeArgs.push('-m', meta.model)
+  resumeArgs.push('-')
+
+  const child = spawnSync(process.execPath, resumeArgs, {
+    cwd: meta.cwd,
+    input: readFileSync(pf, 'utf8'),
+    encoding: 'utf8',
+    windowsHide: true
+  })
   appendFileSync(meta.log, child.stdout || '')
   appendFileSync(meta.err, child.stderr || '')
   finish(id, meta, child.status, child.stderr || '')
+}
+
+/**
+ * Prints the tier table and checks each slug against Codex's own model cache.
+ *
+ * An unavailable slug is a launch failure that would otherwise only surface deep inside a worker's
+ * stderr, so this verifies the tier mapping against the machine instead of trusting the constants.
+ */
+function models() {
+  const cacheFile = join(homedir(), '.codex', 'models_cache.json')
+  let available = []
+  if (existsSync(cacheFile)) {
+    try {
+      const raw = JSON.parse(readFileSync(cacheFile, 'utf8'))
+      const seen = new Set()
+      const walk = (node) => {
+        if (!node || typeof node !== 'object') return
+        if (Array.isArray(node)) return node.forEach(walk)
+        if (typeof node.slug === 'string') seen.add(node.slug)
+        Object.values(node).forEach(walk)
+      }
+      walk(raw)
+      available = [...seen].sort()
+    } catch (error) {
+      console.log(`could not read ${cacheFile}: ${error.message}`)
+    }
+  } else {
+    console.log(`no model cache at ${cacheFile} — cannot verify slugs on this machine`)
+  }
+
+  const configFile = join(homedir(), '.codex', 'config.toml')
+  let configModel = '(unknown)'
+  let configEffort = '(unset)'
+  if (existsSync(configFile)) {
+    const toml = readFileSync(configFile, 'utf8')
+    configModel = toml.match(/^\s*model\s*=\s*"([^"]+)"/m)?.[1] ?? '(unset)'
+    configEffort = toml.match(/^\s*model_reasoning_effort\s*=\s*"([^"]+)"/m)?.[1] ?? '(unset)'
+  }
+
+  console.log(`config.toml default : ${configModel}  effort=${configEffort}`)
+  console.log(`runner default tier : ${DEFAULT_TIER}`)
+  console.log('')
+  console.log('tier      model            effort   available  note')
+  console.log('--------  ---------------  -------  ---------  ------------------------------------')
+  for (const [tier, spec] of Object.entries(MODEL_TIERS)) {
+    const ok = available.length === 0 ? '?' : available.includes(spec.model) ? 'yes' : 'NO'
+    const effort = spec.effort ?? 'inherit'
+    console.log(
+      `${tier.padEnd(9)} ${spec.model.padEnd(16)} ${effort.padEnd(8)} ${ok.padEnd(10)} ${spec.note}`
+    )
+  }
+  if (available.length > 0) {
+    console.log('')
+    console.log(`slugs advertised by this CLI: ${available.join(', ')}`)
+  }
 }
 
 switch (cmd) {
@@ -325,17 +469,26 @@ switch (cmd) {
   case 'resume':
     resume()
     break
+  case 'models':
+    models()
+    break
   default:
     console.log(
       [
         'PlayKiln Codex worker runner (foreground; let your shell tool background it)',
         '',
-        '  run    --id <id> --prompt-file <file> [--cwd dir] [--model m] [--effort lvl] [--sandbox mode] [--timeout-min n]',
+        '  run    --id <id> --prompt-file <file> [--cwd dir] [--tier eco|balanced|strong|max]',
+        '                        [--model m] [--effort lvl] [--sandbox mode] [--timeout-min n]',
         '  status [--id <id>]',
         '  last   --id <id> [--chars n]',
         '  log    --id <id> [--lines n]',
         '  resume --id <id> --prompt-file <file>',
-        '  list'
+        '  models',
+        '  list',
+        '',
+        'Model cost: --tier defaults to "balanced". Effort is INHERITED from ~/.codex/config.toml',
+        'unless --effort is passed, so a worker never silently costs more than you configured.',
+        'Use --tier eco for mechanical work and --tier strong|max only for genuinely hard reasoning.'
       ].join('\n')
     )
     process.exit(cmd ? 1 : 0)

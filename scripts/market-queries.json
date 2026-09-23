@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "note": "Archetype-spread query set for the market screen. Keep the two control queries: they are calibrated against manual readings in scripts/validate-play-scan.mjs, so a change in their verdict means the sensor drifted, not that the market moved.",
+  "archetypes": [
+    {
+      "id": "trade-calculators",
+      "label": "Trade and professional calculators",
+      "why": "Proven money-maker archetype: the measured electrician field has a 5M+ install leader selling ads + IAP, with weak mid-tier competitors. Users are professionals who buy tools.",
+      "queries": [
+        "electrician calculator",
+        "hvac load calculator",
+        "concrete calculator",
+        "welding calculator",
+        "bolt torque calculator"
+      ]
+    },
+    {
+      "id": "hobby-tools",
+      "label": "Hobby and enthusiast tools",
+      "why": "Passionate users with repeat use and disposable income, and jobs that incumbents often serve badly.",
+      "queries": [
+        "knitting counter",
+        "guitar practice log",
+        "mushroom foraging guide",
+        "beekeeping log",
+        "aquarium water log"
+      ]
+    },
+    {
+      "id": "narrow-health",
+      "label": "Narrow-angle health and care tracking",
+      "why": "The measured assistive field (visual schedule autism) had the weakest incumbents seen: many rated apps, most of them poor.",
+      "queries": [
+        "migraine tracker",
+        "baby feeding tracker",
+        "pet medication reminder",
+        "visual schedule autism"
+      ]
+    },
+    {
+      "id": "ai-engine",
+      "label": "AI-capability tools (DeepSeek as engine)",
+      "why": "The factory holds a DeepSeek key, so a slot can sell consumable inference credit (SERVER_COST fulfilment). Only viable where AI does a tedious niche job, never as a chat window — see AGENTS.md 'Defaults to suppress'.",
+      "queries": [
+        "plant disease identifier",
+        "language pronunciation practice"
+      ]
+    },
+    {
+      "id": "controls",
+      "label": "Calibration controls",
+      "why": "Known verdicts from manual reading. Used to detect sensor drift, not as candidates.",
+      "queries": ["bjj training log"]
+    }
+  ]
+}

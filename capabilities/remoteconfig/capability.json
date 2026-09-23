@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "id": "remoteconfig",
+  "version": "1.0.0",
+  "artifact": "com.gexetr.capability:remoteconfig",
+  "summary": "Offline-safe feature flags and monetization parameters over Firebase Remote Config, with declared defaults and a deterministic test double.",
+  "status": "stable",
+  "since": "1.0.0",
+  "optionalForSlots": true,
+  "sdkDependencies": [
+    {
+      "name": "Firebase Remote Config",
+      "version": "23.1.0",
+      "policyUrl": "https://firebase.google.com/support/privacy"
+    }
+  ],
+  "permissions": [
+    {
+      "name": "android.permission.INTERNET",
+      "why": "Required to fetch feature flags and parameter values from Firebase Remote Config.",
+      "dangerous": false
+    }
+  ],
+  "dataCollected": [
+    {
+      "type": "Device or other IDs",
+      "purpose": "App functionality",
+      "shared": false,
+      "optional": false,
+      "notes": "Firebase Installations generates and sends a per-installation identifier required by Remote Config fetch requests."
+    },
+    {
+      "type": "Location",
+      "purpose": "Personalization",
+      "shared": false,
+      "optional": false,
+      "notes": "Remote Config automatically collects country code so parameters can be targeted by coarse location."
+    },
+    {
+      "type": "App info and performance",
+      "purpose": "App functionality",
+      "shared": false,
+      "optional": false,
+      "notes": "Remote Config sends app/package identifiers, SDK and app platform versions, OS version, language, and time zone to select and deliver parameter values."
+    }
+  ],
+  "requiresConsent": false,
+  "networkRequired": true,
+  "adsPresent": false,
+  "testDoubles": [
+    "FakeRemoteConfigController"
+  ],
+  "publicApi": [
+    "RemoteConfigConfig",
+    "RemoteConfigController",
+    "FirebaseRemoteConfigController",
+    "FakeRemoteConfigController"
+  ],
+  "policyNotes": [
+    "Including Remote Config also includes Firebase Installations; Data safety must disclose the installation identifier even when Analytics is not present.",
+    "This capability does not include Firebase Analytics. A slot that adds Analytics or enables Remote Config personalization must add the resulting collection to its disclosures.",
+    "Remote parameters must not weaken safety, privacy, paid-feature access, or other policy-critical behavior below the reviewed defaults shipped in the app."
+  ]
+}

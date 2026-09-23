@@ -1,6 +1,6 @@
 ---
 name: dual-agent-peers
-description: Run Cursor and Codex as equal peers (Build/Store/Verify role cards) for PlayKiln slots. Use on /ship, /ship, or any non-trivial slot work.
+description: Run Cursor and Codex as equal peers (Build/Store/Verify role cards) for PlayKiln slots. Use on /ship or any non-trivial slot work.
 ---
 
 # Dual-agent peers
