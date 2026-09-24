@@ -27,7 +27,7 @@
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, isAbsolute, join, resolve } from 'node:path';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   DEMAND_PROVEN_SHARE,
@@ -53,6 +53,8 @@ Options:
   --archetype <id>    Scan only this archetype (repeatable). See --help query set for ids.
   --query <text>      Add an ad-hoc query (repeatable). Ad-hoc queries are scanned in addition
                       to the archetype set and reported under the "ad-hoc" group.
+  --query-set <path>  Read archetypes from this query-set JSON instead of the default
+                      (default: scripts/market-queries.json). Path is relative to the repo root.
   --json              Print machine-readable JSON to stdout instead of the tables.
   --concurrency <n>   Parallel fetches (default ${DEFAULT_CONCURRENCY}). Bounded on purpose.
   --out <path>        Also write the markdown report (path is relative to the repo root).
@@ -80,6 +82,7 @@ function parseArgs(argv) {
   const options = {
     archetypes: [],
     queries: [],
+    querySet: null,
     json: false,
     concurrency: DEFAULT_CONCURRENCY,
     out: null,
@@ -103,6 +106,9 @@ function parseArgs(argv) {
       if (!arg.includes('=')) index += 1;
     } else if (arg === '--query' || arg.startsWith('--query=')) {
       options.queries.push(value('--query', index));
+      if (!arg.includes('=')) index += 1;
+    } else if (arg === '--query-set' || arg.startsWith('--query-set=')) {
+      options.querySet = value('--query-set', index);
       if (!arg.includes('=')) index += 1;
     } else if (arg === '--out' || arg.startsWith('--out=')) {
       options.out = value('--out', index);
@@ -194,7 +200,7 @@ function signalsLine(scan) {
   return `${a.ratedCount}/${a.total} rated, ${a.weakCount} weak (< ${WEAK_RATING}), ${a.strongCount} strong (>= ${STRONG_RATING}), weak share ${a.weakShare}, strong share ${a.strongShare}, median ${a.medianRating === null ? 'n/a' : a.medianRating}`;
 }
 
-function renderReport({ groups, groupScans, allScans, generatedAt, concurrency, exitCode, outPath }) {
+function renderReport({ groups, groupScans, allScans, generatedAt, concurrency, exitCode, outPath, querySetLabel }) {
   const reportDate = generatedAt.slice(0, 10);
   const ranked = rankCandidates(allScans);
   const rejected = allScans.filter((scan) => !scan.error && (scan.verdict === 'fortress' || scan.verdict === 'dead-zone'));
@@ -212,7 +218,7 @@ function renderReport({ groups, groupScans, allScans, generatedAt, concurrency, 
   );
   lines.push('');
   lines.push(
-    `Signed-out Google Play search (\`?c=apps\`, \`hl=en\`, \`gl=US\`), ${allScans.length} queries, bounded concurrency ${concurrency}. Query set: \`scripts/market-queries.json\`. Screening library: \`scripts/lib/play-scan.mjs\` (unmodified).`,
+    `Signed-out Google Play search (\`?c=apps\`, \`hl=en\`, \`gl=US\`), ${allScans.length} queries, bounded concurrency ${concurrency}. Query set: \`${querySetLabel}\`. Screening library: \`scripts/lib/play-scan.mjs\` (unmodified).`,
   );
   lines.push('');
   lines.push(
@@ -394,7 +400,12 @@ async function main() {
     process.exit(0);
   }
 
-  const querySetPath = DEFAULT_QUERY_SET;
+  const querySetPath = options.querySet
+    ? resolve(ROOT, options.querySet)
+    : DEFAULT_QUERY_SET;
+  // One source of truth for the label: it is derived from the path actually read, so a report can
+  // never name a query set the run did not use.
+  const querySetLabel = relative(ROOT, querySetPath).split('\\').join('/');
   const querySet = readQuerySet(querySetPath);
   const archetypes = querySet.archetypes;
 
@@ -453,7 +464,7 @@ async function main() {
     const payload = {
       generatedAt,
       storefront: { hl: 'en', gl: 'US', surface: 'signed-out /store/search?c=apps' },
-      querySet: 'scripts/market-queries.json',
+      querySet: querySetLabel,
       concurrency: options.concurrency,
       elapsedMs,
       exitCode,
@@ -533,6 +544,7 @@ async function main() {
       concurrency: options.concurrency,
       exitCode,
       outPath: options.out,
+      querySetLabel,
     });
     mkdirSync(dirname(target), { recursive: true });
     writeFileSync(target, report, 'utf8');

@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "note": "Deep exploration query set (2026-09-24). Separate from market-queries.json on purpose: that file is the calibrated archetype set whose control queries are asserted in scripts/validate-play-scan.mjs, and this set must be free to grow without touching those assertions. The 'controls' group below re-states one query with a manually known verdict (mushroom foraging guide = mixed, read 2026-09-23) so a run of this file can detect sensor drift on its own. Every 'why' here is a HYPOTHESIS being tested, never a finding.",
+  "archetypes": [
+    {
+      "id": "trades-unmeasured",
+      "label": "Trades and professions not yet measured",
+      "why": "The measured electrician field has a 5M+ install leader selling ads + IAP, which proves tradespeople buy tools. Only electrician, HVAC, concrete, welding and bolt-torque were screened, so the same archetype is largely unmeasured elsewhere.",
+      "queries": [
+        "plumber pipe sizing calculator",
+        "irrigation design calculator",
+        "tile flooring estimator",
+        "roofing pitch calculator",
+        "solar panel sizing calculator",
+        "generator sizing calculator",
+        "machinist feeds and speeds",
+        "cnc tool offset calculator",
+        "pool chemical calculator",
+        "septic system design calculator"
+      ]
+    },
+    {
+      "id": "field-service-logs",
+      "label": "Field-service paperwork for non-developers",
+      "why": "Hypothesis: a job log a professional must produce on site is a job where the user would never build the app, and where the incumbent is often a paper form. Distinct from the calculator archetype because the value is a retained record, not a one-off number.",
+      "queries": [
+        "home inspection report app",
+        "pest control service log",
+        "property maintenance inspection app",
+        "notary journal app",
+        "process server log",
+        "safety inspection checklist",
+        "forklift inspection checklist",
+        "toolbox talk app",
+        "cleaning business quote app",
+        "field service work order app"
+      ]
+    },
+    {
+      "id": "animal-professionals",
+      "label": "Animal care as a professional or serious-hobby job",
+      "why": "Hypothesis: animal records are a repeat-use log kept by people whose identity is not software. The measured pet-medication field was mixed, not a fortress, so the parent category is not obviously saturated.",
+      "queries": [
+        "farrier hoof record",
+        "dog groomer appointment book",
+        "kennel management app",
+        "horse health record",
+        "livestock breeding record",
+        "chicken flock record",
+        "reptile husbandry tracker",
+        "beekeeping hive inspection"
+      ]
+    },
+    {
+      "id": "collections-with-money",
+      "label": "Collections held by people who pay for them",
+      "why": "Hypothesis: a collector's inventory has real money behind it and a strong reason to record. The measured board-game and yarn fields were fortresses, so this archetype may be uniformly owned; it is included to test that rather than assume it.",
+      "queries": [
+        "vinyl record collection app",
+        "watch collection tracker",
+        "sneaker collection tracker",
+        "coin collection catalog",
+        "wine cellar inventory",
+        "whisky collection tracker",
+        "cigar humidor tracker",
+        "reloading load data",
+        "archery sight marks",
+        "fishing tackle inventory"
+      ]
+    },
+    {
+      "id": "caregiver-weekly",
+      "label": "Caregiver and family care records",
+      "why": "The single 'candidate' verdict the factory has measured so far is assistive (visual schedule autism). This group tests whether the caregiver jobs around it are the same shape, while deliberately avoiding child-directed phrasings that trigger the Families policy question.",
+      "queries": [
+        "dementia caregiver log",
+        "elderly medication reminder",
+        "aphasia communication app",
+        "stuttering practice app",
+        "wheelchair accessible places",
+        "sign language practice app",
+        "special needs behavior tracker",
+        "disability support worker app"
+      ]
+    },
+    {
+      "id": "life-admin-hate",
+      "label": "Life-admin chores people dislike",
+      "why": "Hypothesis: paperwork people postpone is a job with an emotional reason to pay for help, and it is rarely served by a developer's own passion. The measured packing-list pocket passed the screen at a knife edge, so this family is not clearly empty.",
+      "queries": [
+        "home inventory insurance app",
+        "warranty receipt tracker",
+        "subscription tracker app",
+        "document expiry reminder",
+        "mileage log for taxes",
+        "pet vaccination record app",
+        "appliance manual library",
+        "moving inventory checklist"
+      ]
+    },
+    {
+      "id": "food-craft-logs",
+      "label": "Food and drink craft logs",
+      "why": "Hypothesis: a craft hobby with measurable variables and repeat use. The measured recipe-scaling pocket was 'mixed' twice under different phrasings, which is the most stable pocket the factory has measured, so adjacent craft jobs are worth screening.",
+      "queries": [
+        "sourdough baking log",
+        "coffee brewing log",
+        "bbq smoker log",
+        "homebrew recipe calculator",
+        "kombucha brewing log",
+        "fermentation tracker"
+      ]
+    },
+    {
+      "id": "outdoors-record-keeping",
+      "label": "Outdoors and radio record keeping",
+      "why": "Hypothesis: a licence or a sighting creates a record someone is obliged or eager to keep. The measured fishing-knot and mushroom fields disagree (fortress vs mixed), so 'outdoors' is not one market and must be screened query by query.",
+      "queries": [
+        "astronomy observation log",
+        "birding life list",
+        "metal detecting finds log",
+        "drone flight log",
+        "ham radio log book"
+      ]
+    },
+    {
+      "id": "controls",
+      "label": "Calibration controls",
+      "why": "Not candidates. A query whose verdict was read by hand on 2026-09-23 (mushroom foraging guide = mixed, score 68.8) is re-run here so a change in its verdict is readable as sensor drift rather than market movement.",
+      "queries": ["mushroom foraging guide"]
+    }
+  ]
+}

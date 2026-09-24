@@ -203,8 +203,13 @@ scripts/scan-market.mjs           screen a query set for reachable pockets
 scripts/enrich-market.mjs         per-app facts behind the top search cards
 scripts/scan-ai-niches.mjs        fixed AI-utility query set over the same screen
 scripts/scan-plant-vertical.mjs   screen the plant vertical and enrich its top cards
+scripts/scan-complaints.mjs       read the weakest incumbents' critical reviews and classify them
+scripts/scan-titles.mjs           print visible titles so a human can classify them by job
 scripts/lib/play-scan.mjs         Play search screen: verdicts and a relevance guard
 scripts/lib/play-app-detail.mjs   per-app installs, ads, IAP, and price
+scripts/lib/play-reviews.mjs      review-text sensor and the complaint taxonomy
+scripts/test-play-reviews.mjs     offline regression tests for the review sensor
+scripts/verify-reviews-sensor.mjs live validation of the review sensor against Play
 scripts/verify-slot.mjs           objective factory and slot gates
 scripts/kiln-status.mjs           factory health summary
 ```
@@ -224,11 +229,19 @@ node scripts/verify-slot.mjs --slot <slug> --strict-store --build   # release ev
 node scripts/verify-slot.mjs --base main
 node scripts/verify-slot.mjs --no-selftest        # skip the self-test (rare)
 node scripts/kiln-status.mjs
+node scripts/test-play-reviews.mjs                # review-sensor unit tests (offline, fast)
+node scripts/verify-reviews-sensor.mjs            # review sensor vs live Play pages
 ```
 
 `--build` compiles the slot. Without it the gate reports `UNVERIFIED` (exit 2), not
 PASS, because source-only evidence cannot prove the app builds; never cite a
 build-less run as release evidence.
+
+`scripts/test-play-reviews.mjs` is the offline regression suite for the review-text sensor
+(`scripts/lib/play-reviews.mjs`); `scripts/verify-reviews-sensor.mjs` checks the same sensor
+against live Play pages, including the star-histogram trap where a page carries more
+`aria-label="Rated…"` anchors than reviews. Run the offline suite after any taxonomy change —
+it fails loudly on a class whose pattern no longer matches real phrasing.
 
 `UNVERIFIED` requires a manual diff/read; it is not PASS. For release preparation,
 the required evidence is a verified signed release APK, signed release AAB, release
