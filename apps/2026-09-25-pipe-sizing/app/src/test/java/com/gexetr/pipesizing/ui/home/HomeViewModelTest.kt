@@ -6,8 +6,11 @@ import com.gexetr.pipesizing.sizing.SizingMethod
 import com.gexetr.pipesizing.sizing.UnitSystem
 import com.gexetr.pipesizing.sizing.Units
 import com.gexetr.pipesizing.sizing.UserProvenance
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
@@ -16,7 +19,7 @@ class HomeViewModelTest {
 
     @Test
     fun refusedEvaluationSurfacesCorrectionAndNoResultValue() {
-        val result = evaluate(HomeViewModel())
+        val result = evaluate(newVm())
 
         assertTrue(result is SizingEvaluation.Refused)
         val refused = result as SizingEvaluation.Refused
@@ -43,7 +46,7 @@ class HomeViewModelTest {
 
     @Test
     fun capacityMustBeConfirmedBeforeAnyResultIsShown() {
-        val vm = HomeViewModel()
+        val vm = newVm()
         field(vm, HomeField.MATERIAL, "steel")
         field(vm, HomeField.PRESSURE, "low")
         field(vm, HomeField.LOAD, "100")
@@ -137,6 +140,79 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun enteredCaseIsWrittenToTheStore() {
+        val store = FakeCasePersistence()
+        val vm = completeVm(store = store)
+
+        assertEquals("steel", store.saved[CaseKeys.MATERIAL])
+        assertEquals(entry(100.0, metric = false, Units::mbhToKilowatts), store.saved[CaseKeys.LOAD])
+        assertEquals(SizingMethod.CAPACITY_COMPARISON.name, store.saved[CaseKeys.METHOD])
+        assertEquals(true.toString(), store.saved[CaseKeys.CAPACITY_CONFIRMED])
+    }
+
+    @Test
+    fun storedCaseIsRestoredAsThoughTheProcessHadDied() {
+        val store = FakeCasePersistence()
+        val first = completeVm(store = store)
+        val original = first.uiState.value
+
+        // A second state holder over the same store stands in for the next app run.
+        val restored = newVm(store).uiState.value
+
+        assertEquals(original.material, restored.material)
+        assertEquals(original.pressure, restored.pressure)
+        assertEquals(original.loadMbh, restored.loadMbh)
+        assertEquals(original.lengthFeet, restored.lengthFeet)
+        assertEquals(original.fittingQuantity, restored.fittingQuantity)
+        assertEquals(original.fittingLengthFeet, restored.fittingLengthFeet)
+        assertEquals(original.capacity, restored.capacity)
+        assertEquals(original.method, restored.method)
+        assertEquals(original.unitSystem, restored.unitSystem)
+        assertEquals(original.provenanceMode, restored.provenanceMode)
+        assertEquals(original.capacityConfirmed, restored.capacityConfirmed)
+    }
+
+    @Test
+    fun aRestoredCaseStillComputes() {
+        val store = FakeCasePersistence()
+        completeVm(store = store)
+
+        val restored = newVm(store)
+
+        val result = evaluate(restored) as SizingEvaluation.Computed
+        assertEquals(45.0, result.totalLengthFeet, TOLERANCE)
+    }
+
+    @Test
+    fun aRestoredCaseIsNotTreatedAsEvaluated() {
+        val store = FakeCasePersistence()
+        evaluate(completeVm(store = store))
+
+        val restored = newVm(store)
+
+        // A stored result would otherwise be shown for inputs the user cannot see, so none is kept.
+        assertNull(restored.uiState.value.evaluation)
+    }
+
+    @Test
+    fun aRestoredCaseWithoutAConfirmedCapacityStillRefuses() {
+        val store = FakeCasePersistence()
+        val vm = newVm(store)
+        field(vm, HomeField.MATERIAL, "steel")
+        field(vm, HomeField.PRESSURE, "low")
+        field(vm, HomeField.LOAD, "100")
+        field(vm, HomeField.LENGTH, "40")
+        field(vm, HomeField.CAPACITY, "120")
+
+        // Restoring the entered readings must not also restore a result or a confirmation.
+        val restored = newVm(store)
+        val result = evaluate(restored)
+
+        assertTrue(result is SizingEvaluation.Refused)
+        assertEquals(RefusalKind.MISSING_INPUT, (result as SizingEvaluation.Refused).kind)
+    }
+
+    @Test
     fun shippedCopyCarriesNoScaffoldMarkers() {
         val xml = stringsXml().readText().lowercase()
 
@@ -152,12 +228,16 @@ class HomeViewModelTest {
             .firstOrNull { it.isFile }
             ?: error("strings.xml not found from ${File("").absolutePath}")
 
+    private fun newVm(store: CasePersistence = FakeCasePersistence()): HomeViewModel =
+        HomeViewModel(persistence = store, scope = CoroutineScope(Dispatchers.Unconfined))
+
     private fun completeVm(
         method: SizingMethod = SizingMethod.CAPACITY_COMPARISON,
         metric: Boolean = false,
         withFittings: Boolean = true,
+        store: CasePersistence = FakeCasePersistence(),
     ): HomeViewModel {
-        val vm = HomeViewModel()
+        val vm = newVm(store)
         vm.onEvent(HomeEvent.UnitChanged(if (metric) UnitSystem.METRIC else UnitSystem.IMPERIAL))
         vm.onEvent(HomeEvent.MethodChanged(method))
         field(vm, HomeField.MATERIAL, "steel")
@@ -184,6 +264,16 @@ class HomeViewModelTest {
 
     private fun field(vm: HomeViewModel, field: HomeField, value: String) {
         vm.onEvent(HomeEvent.FieldChanged(field, value))
+    }
+
+    private class FakeCasePersistence(private var stored: Map<String, String> = emptyMap()) : CasePersistence {
+        val saved: Map<String, String> get() = stored
+
+        override suspend fun load(): Map<String, String> = stored
+
+        override suspend fun save(values: Map<String, String>) {
+            stored = values
+        }
     }
 
     private companion object {

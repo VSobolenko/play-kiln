@@ -13,7 +13,7 @@ Enter loads, developed lengths, fitting allowances, units, and user-confirmed ca
 
 The app provides no code-table data and does not determine compliance, certify work, or endorse a source. It asserts no result when a required input, citation, range, or consistency check is missing; instead, it identifies what to correct.
 
-Your entries remain on the device while the app is running. The current release does not provide case history or process-death restoration. No account, ads, subscription, in-app purchase, or network connection is required.
+Your entries are saved on the device and restored the next time you open the app, including after the process has been killed. No history of previous cases is kept. No account, ads, subscription, in-app purchase, or network connection is required.
 
 ## Category
 Tools

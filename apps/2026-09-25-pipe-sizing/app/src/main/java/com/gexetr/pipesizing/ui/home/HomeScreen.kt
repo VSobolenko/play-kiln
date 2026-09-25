@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -19,7 +20,11 @@ import com.gexetr.pipesizing.sizing.Units
 import java.util.Locale
 
 @Composable
-fun HomeRoute(onNavigateToAbout: () -> Unit, modifier: Modifier = Modifier, viewModel: HomeViewModel = viewModel()) {
+fun HomeRoute(
+    onNavigateToAbout: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel(factory = HomeViewModel.factory(LocalContext.current)),
+) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     HomeScreen(state, viewModel::onEvent, modifier, onNavigateToAbout)
 }

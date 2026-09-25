@@ -4,7 +4,7 @@
 
 ## Data collection, transmission, and sharing
 
-Gas Pipe Sizing Workbook collects no data, transmits no data, and shares no data. It has no account, analytics, advertising, cloud service, or network feature. User-entered sizing values remain on the device while the app is running; the current release does not promise saving, history, or restoration after process death.
+Gas Pipe Sizing Workbook collects no data, transmits no data, and shares no data. It has no account, analytics, advertising, cloud service, or network feature. User-entered sizing values are stored only on the device and are restored when the app is reopened, including after the process has ended. No history of previous cases is kept, and nothing leaves the device.
 
 ## Permissions
 

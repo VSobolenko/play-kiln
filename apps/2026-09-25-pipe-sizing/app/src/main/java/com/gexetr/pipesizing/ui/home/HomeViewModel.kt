@@ -1,15 +1,35 @@
 package com.gexetr.pipesizing.ui.home
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.gexetr.pipesizing.sizing.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(
+    private val persistence: CasePersistence = CasePersistence.None,
+    scope: CoroutineScope? = null,
+) : ViewModel() {
+    // Resolved lazily so a state holder constructed with an explicit scope never touches the main
+    // dispatcher, which is what keeps these tests runnable as plain JVM tests.
+    private val workScope: CoroutineScope by lazy { scope ?: viewModelScope }
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+
+    init {
+        workScope.launch {
+            val stored = persistence.load()
+            if (stored.isNotEmpty()) _uiState.update { it.restoredFrom(stored) }
+        }
+    }
 
     fun onEvent(event: HomeEvent) {
         _uiState.update { state ->
@@ -22,6 +42,7 @@ class HomeViewModel : ViewModel() {
                 HomeEvent.Evaluate -> state.copy(evaluation = evaluate(state))
             }
         }
+        workScope.launch { persistence.save(_uiState.value.toStoredCase()) }
     }
 
     internal fun evaluate(state: HomeUiState): SizingEvaluation {
@@ -104,5 +125,15 @@ class HomeViewModel : ViewModel() {
         HomeField.GAS_SPECIFIC_GRAVITY -> copy(gasSpecificGravity = value)
         HomeField.PRESSURE_DROP -> copy(pressureDropAllowance = value)
         HomeField.PIPE_DIAMETER -> copy(pipeInsideDiameter = value)
+    }
+
+    companion object {
+        /** Supplies the on-device store so a case survives process death. */
+        fun factory(context: Context): ViewModelProvider.Factory {
+            val applicationContext = context.applicationContext
+            return viewModelFactory {
+                initializer { HomeViewModel(DataStoreCasePersistence(applicationContext)) }
+            }
+        }
     }
 }

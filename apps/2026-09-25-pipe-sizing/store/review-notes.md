@@ -10,7 +10,7 @@ No account, login, invitation, or demo credentials are required. The release is 
 4. Review the arithmetic and calculation-aid disclaimer.
 5. Remove one required input to see guidance identify what must be corrected.
 
-The app performs arithmetic and bookkeeping only. It supplies no code-table data and does not determine compliance or certify work. It does not provide case history or restore inputs after process death.
+The app performs arithmetic and bookkeeping only. It supplies no code-table data and does not determine compliance or certify work. It restores the current case after the process ends by reading it back from local storage, and keeps no history of previous cases.
 
 ## Permissions, data, and media
 
