@@ -16,7 +16,7 @@ The app performs arithmetic and bookkeeping only. It supplies no code-table data
 
 The manifest declares no permissions. No data is collected, transmitted, or shared; the entered case is local to the device.
 
-The phone screenshots are real captures of the signed release build, driven by `store/journey.json` on a phone AVD. The tablet screenshots are that same phone capture framed at tablet dimensions rather than captures taken on a tablet device, so the large-screen eligibility they support should be re-confirmed on real large-screen hardware before upload.
+The phone screenshots are real captures driven by `store/journey.json` on a phone AVD. `scripts/media-capture.mjs` refuses to publish them unless the installed APK is byte-identical to the release artifact recorded in `dist/release-manifest.json`, and records that binding, including the sha256 of each composed asset, in `store/provenance.json`. The tablet screenshots are that same phone capture framed at tablet dimensions rather than captures taken on a tablet device, so the large-screen eligibility they support should be re-confirmed on real large-screen hardware before upload.
 
 ## Capability compliance
 

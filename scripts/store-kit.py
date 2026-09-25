@@ -1103,11 +1103,25 @@ Version reviewed: `{meta['version_name']}` (code `{meta['version_code'] or 'not 
         status = "real device captures, composed by `scripts/store-studio.py`"
         provenance = f"""## How these are produced
 
-`scripts/store-studio.py` renders all of them. The screen inside every mock-up is a real capture of
-the signed release build, taken by `scripts/media-capture.mjs` from `journey.json` and stored under
-`captures/raw/`; the studio adds the branded field, the device bezel, and the headline. It invents no
-UI and never redraws the captured screen. Re-run it after changing the palette, or after a new
-capture: `python scripts/store-studio.py --slot {listing['slug']}`.
+`scripts/store-studio.py` renders all of them. The screen inside every mock-up is a real capture, taken
+by `scripts/media-capture.mjs` from `journey.json` and stored under `captures/raw/`; the studio adds the
+branded field, the device bezel, and the headline. It invents no UI and never redraws the captured
+screen. Re-run it after changing the palette, or after a new capture:
+`python scripts/store-studio.py --slot {listing['slug']}`.
+
+## What build these captures show
+
+`scripts/media-capture.mjs` will not publish unless the installed package is the release artifact. It
+walks HEAD -> `dist/release-manifest.json` -> the recorded sha256 of the release APK -> that APK file on
+disk -> the installed `base.apk`, and requires every link to match; any missing or mismatched link stops
+the run before anything is published or rendered.
+
+The result is recorded in `store/provenance.json`, which is committed and lists the sha256 of each
+composed asset above. That record is the durable evidence, because both `captures/` and `dist/` are
+excluded from version control: the images here survive in git, their inputs do not. If
+`store/provenance.json` is absent, or names a different commit, these images are **not attested to any
+build** - re-run `node scripts/media-capture.mjs --slot {listing['slug']}` against a built release to
+restore the link.
 
 ## Large-screen assets are framed phone captures
 

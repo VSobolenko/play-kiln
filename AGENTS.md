@@ -270,9 +270,22 @@ node scripts/verify-slot.mjs --slot <slug> --strict-store --build   # release ev
 node scripts/verify-slot.mjs --base main
 node scripts/verify-slot.mjs --no-selftest        # skip the self-test (rare)
 node scripts/kiln-status.mjs
+node scripts/test-capture-publish.mjs             # capture-publish failure injection (offline, fast)
 node scripts/test-play-reviews.mjs                # review-sensor unit tests (offline, fast)
 node scripts/verify-reviews-sensor.mjs            # review sensor vs live Play pages
 ```
+
+`scripts/test-capture-publish.mjs` injects the interruptions that publish's fail-closed claim
+depends on — a swap killed between its two renames, a throwing rename, a leftover backup beside a
+surviving `raw/`, and a stale file from a previous run. The happy path proves none of those, so a
+change to `scripts/lib/capture-publish.mjs` needs this suite, and the suite is expected to fail
+against the previous implementation.
+
+`media-capture.mjs` publishes nothing until the installed package is proven to be the release
+artifact. It walks HEAD → `dist/release-manifest.json` → the recorded sha256 → the release APK file
+on disk → the installed `base.apk`, and a missing or mismatched link is fatal. It then writes
+`store/provenance.json`, which is committed beside the assets because `captures/` and `dist/` are
+not, and is the only durable record tying the committed images to a build.
 
 `--build` compiles the slot. Without it the gate reports `UNVERIFIED` (exit 2), not
 PASS, because source-only evidence cannot prove the app builds; never cite a

@@ -7,6 +7,8 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, s
 import path from 'node:path'
 import process from 'node:process'
 
+import { publishCaptures, recoverInterruptedPublish } from './lib/capture-publish.mjs'
+
 const ROOT = process.cwd()
 
 function usage() {
@@ -305,33 +307,77 @@ function verifyInstalledBuild(adbPath, serial, applicationId, stageDir, slotDir)
 }
 
 /**
- * Swap the verified captures into place as a whole directory, not file by file.
+ * Repair a publish that was killed between its two renames.
  *
- * Renaming file by file into an existing `captures/raw/` means an interruption leaves a mixture of
- * two runs, and files a previous run left behind (an old `07.png`, an old dump) survive into the new
- * set. Replacing the directory makes both impossible: `raw/` is either the previous complete set or
- * the new complete verified set, and stale files cannot exist because nothing is carried over. The
- * previous set is kept until the swap succeeds and restored if it does not.
+ * The swap in `publishCaptures` is two operations: `raw/` moves aside to `raw.previous/`, then the
+ * staged set moves into `raw/`. Between them `raw/` does not exist, and a process death there cannot
+ * run the rollback, so the *next* run has to repair it. Two consequences, both load-bearing:
+ *
+ *  - the backup must not be deleted before checking whether `raw/` is missing, or the only surviving
+ *    copy of a good capture set is destroyed by the run that was supposed to recover it;
+ *  - this must run before anything recreates `raw/`, because an empty `raw/` looks exactly like a set
+ *    that survived a completed publish, and the backup would be discarded as a leftover.
+ *
+ * Returns true when a previous run's capture set had to be restored.
  */
-function publishCaptures(stageDir, rawDir) {
-  const names = readdirSync(stageDir).filter((name) => name.endsWith('.png'))
-  const backupDir = `${rawDir}.previous`
-  rmSync(backupDir, { recursive: true, force: true })
-  const hadPrevious = existsSync(rawDir)
-  if (hadPrevious) renameSync(rawDir, backupDir)
-  try {
-    renameSync(stageDir, rawDir)
-  } catch (error) {
-    // A failed swap must leave the previous good set, not an empty directory.
-    if (hadPrevious && !existsSync(rawDir)) renameSync(backupDir, rawDir)
-    throw error
-  }
-  rmSync(backupDir, { recursive: true, force: true })
-  return names.length
-}
-
 function sha256(bytes) {
   return createHash('sha256').update(bytes).digest('hex')
+}
+
+/** Hash every file of the given extension under `dir`, keyed by slot-relative path. */
+function hashTree(dir, slotDir, extension) {
+  if (!existsSync(dir)) return []
+  const found = []
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name)
+    if (entry.isDirectory()) {
+      found.push(...hashTree(full, slotDir, extension))
+    } else if (entry.name.endsWith(extension)) {
+      found.push({
+        file: path.relative(slotDir, full).split(path.sep).join('/'),
+        bytes: statSync(full).size,
+        sha256: sha256(readFileSync(full))
+      })
+    }
+  }
+  return found.sort((a, b) => a.file.localeCompare(b.file))
+}
+
+/**
+ * Record, in a tracked file, which build the committed screenshots came from.
+ *
+ * The per-run evidence and the release manifest both live under ignored paths (`store/captures/`,
+ * `dist/`), so they vanish with a clean checkout. What survives is the committed images plus the
+ * documentation calling them captures of the release build - a claim with nothing left to check it
+ * against. This writes the binding into `store/`, which is committed, and hashes both the raw captures
+ * the composition was built from and the composed assets that are actually committed, so the images in
+ * git can be shown to be the ones this run verified against this artifact.
+ */
+function writeProvenance(store, slotDir, slot, listing, observed) {
+  const record = {
+    slot,
+    applicationId: listing.applicationId,
+    versionName: observed.versionName,
+    versionCode: observed.versionCode,
+    gitCommit: observed.gitCommit,
+    manifestPath: observed.manifestPath,
+    artifactPath: observed.artifactPath,
+    artifactSha256: observed.artifactSha256,
+    installedSha256: observed.installedSha256,
+    installedApkPath: observed.installedApkPath,
+    artifactMatch: observed.artifactMatch,
+    recordedAt: new Date().toISOString(),
+    note: 'Raw captures live under the ignored store/captures/. Re-run scripts/media-capture.mjs to reproduce them; the composed asset hashes below are the committed evidence.',
+    rawCaptures: hashTree(path.join(store, 'captures', 'raw'), slotDir, '.png'),
+    composedAssets: hashTree(path.join(store, 'assets'), slotDir, '.png')
+  }
+  const target = path.join(store, 'provenance.json')
+  writeFileSync(target, `${JSON.stringify(record, null, 2)}\n`, 'utf8')
+  console.log(
+    `PASS provenance - ${path.relative(ROOT, target)} binds ${record.composedAssets.length} committed ` +
+    `asset(s) to commit ${String(observed.gitCommit).slice(0, 12)} (sha256 ${String(observed.artifactSha256).slice(0, 12)}…)`
+  )
+  return target
 }
 
 /**
@@ -340,42 +386,97 @@ function sha256(bytes) {
  *
  * `dumpsys package` confirms the id and that it is not debuggable, which rules out the `.debug`
  * variant but says nothing about *which* build is installed: a stale release APK from an earlier
- * commit passes both. The signed artifact's SHA-256 is recorded in `dist/release-manifest.json`, and
- * `adb install` copies the APK verbatim, so the installed `base.apk` can be hashed and compared.
- * That turns "was this really the release build" from an assumption into a check, and it fails loudly
- * when the artifact has been rebuilt since the last install - which is exactly the staleness that
- * produced screenshots of a build nobody intended to ship.
+ * commit passes both. So the check walks the whole chain and requires every link to hold:
+ *
+ *   HEAD -> manifest.gitCommit -> manifest sha256 -> the APK file on disk -> the installed base.apk
+ *
+ * Each link catches a distinct staleness. The commit link rejects a manifest built from other sources.
+ * The file link rejects a manifest whose recorded hash no longer describes the artifact it names, which
+ * is the case a hash-string-only comparison passes: a manifest and an installed APK can agree with each
+ * other about a build that neither of them is. The installed link rejects an artifact that was rebuilt
+ * since the last install, which is the staleness that produced screenshots of a build nobody shipped.
+ *
+ * Every failure throws. An unproven identity must not reach publication, because the committed
+ * screenshots and `graphics.md` say they show the release build, and a warning leaves that claim
+ * standing while the evidence for it is missing.
  */
 function verifyArtifactIdentity(adbPath, serial, applicationId, slotDir, stageDir, observed) {
   const manifestPath = path.join(slotDir, 'dist', 'release-manifest.json')
+  const manifestLabel = path.relative(ROOT, manifestPath)
   if (!existsSync(manifestPath)) {
-    console.log(`WARN installed build - ${path.relative(ROOT, manifestPath)} is absent; the installed APK is NOT proven to be the signed artifact`)
-    return { ...observed, artifactMatch: 'unverified', reason: 'no release manifest' }
+    throw new Error(
+      `${manifestLabel} is absent, so the installed APK cannot be tied to a signed artifact. Build the ` +
+      'release first (node scripts/prepare-release.mjs --slot <slug>): publishing a capture of an ' +
+      'unidentified build would commit screenshots the documentation calls the release build.'
+    )
   }
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
   const entry = (manifest.artifacts || []).find((item) => String(item.path || '').endsWith('release.apk'))
   if (!entry?.sha256) {
-    console.log(`WARN installed build - ${path.relative(ROOT, manifestPath)} records no release-APK sha256; identity NOT proven`)
-    return { ...observed, artifactMatch: 'unverified', reason: 'manifest has no release-apk hash' }
+    throw new Error(`${manifestLabel} records no release-APK sha256, so identity cannot be checked`)
   }
+  const recorded = String(entry.sha256).toLowerCase()
+
+  const head = String(run('git', ['rev-parse', 'HEAD'])).trim()
+  if (!manifest.gitCommit) {
+    throw new Error(`${manifestLabel} records no gitCommit, so it cannot be tied to the current sources`)
+  }
+  if (String(manifest.gitCommit) !== head) {
+    throw new Error(
+      `${manifestLabel} was built from commit ${String(manifest.gitCommit).slice(0, 12)} but HEAD is ` +
+      `${head.slice(0, 12)}. Rebuild the release so the manifest describes the sources being shipped, ` +
+      'otherwise the capture would attest to a build the current tree does not produce.'
+    )
+  }
+
+  // Manifest artifact paths are slot-relative, as `prepare-release.mjs` writes them.
+  const artifactPath = entry.path ? path.join(slotDir, entry.path) : null
+  if (!artifactPath || !existsSync(artifactPath)) {
+    throw new Error(
+      `${manifestLabel} names ${entry.path}, which does not exist, so the artifact cannot be hashed. ` +
+      'Comparing only the recorded hash string would let a stale manifest pass.'
+    )
+  }
+  const artifactHash = sha256(readFileSync(artifactPath))
+  if (artifactHash !== recorded) {
+    throw new Error(
+      `the release artifact does not match its own manifest: ${entry.path} hashes to ` +
+      `${artifactHash.slice(0, 12)}… but ${manifestLabel} records ${recorded.slice(0, 12)}…. Rebuild ` +
+      'the release.'
+    )
+  }
+
   const pmPath = String(adb(adbPath, serial, ['shell', 'pm', 'path', applicationId]))
   const apk = (pmPath.match(/package:(\S+base\.apk)/) || [])[1]
   if (!apk) {
-    console.log('WARN installed build - could not locate the installed base.apk; identity NOT proven')
-    return { ...observed, artifactMatch: 'unverified', reason: 'base.apk path not found' }
-  }
-  const installedHash = sha256(adb(adbPath, serial, ['exec-out', 'cat', apk], { binary: true }))
-  const recorded = String(entry.sha256).toLowerCase()
-  if (installedHash !== recorded) {
     throw new Error(
-      `the installed APK does not match the signed artifact. installed sha256=${installedHash} but ` +
-      `${path.relative(ROOT, manifestPath)} records ${recorded} for ${entry.path}. Re-install the ` +
-      'current release APK (adb install -r app/build/outputs/apk/release/app-release.apk), because a ' +
-      'capture of a stale build would photograph a package that is not the one being uploaded.'
+      `could not locate the installed base.apk for ${applicationId} via 'pm path', so the installed ` +
+      'APK cannot be hashed against the artifact'
     )
   }
-  console.log(`PASS installed build - installed APK matches the signed artifact (sha256 ${installedHash.slice(0, 12)}…)`)
-  return { ...observed, artifactMatch: 'exact', artifactSha256: installedHash, manifestPath: path.relative(ROOT, manifestPath) }
+  const installedHash = sha256(adb(adbPath, serial, ['exec-out', 'cat', apk], { binary: true }))
+  if (installedHash !== artifactHash) {
+    throw new Error(
+      `the installed APK does not match the signed artifact. installed sha256=${installedHash} but ` +
+      `${entry.path} is ${artifactHash}. Re-install the current release APK (adb install -r ` +
+      'app/build/outputs/apk/release/app-release.apk), because a capture of a stale build would ' +
+      'photograph a package that is not the one being uploaded.'
+    )
+  }
+  console.log(
+    `PASS installed build - HEAD ${head.slice(0, 12)} -> ${manifestLabel} -> ${path.basename(entry.path)} ` +
+    `sha256 ${artifactHash.slice(0, 12)}… -> installed base.apk is byte-identical`
+  )
+  return {
+    ...observed,
+    artifactMatch: 'exact',
+    gitCommit: head,
+    manifestPath: path.relative(ROOT, manifestPath),
+    artifactPath: entry.path,
+    artifactSha256: artifactHash,
+    installedSha256: installedHash,
+    installedApkPath: apk
+  }
 }
 
 function findPython() {
@@ -432,6 +533,11 @@ function main() {
 
   const rawDir = path.join(store, 'captures', 'raw')
   const stageDir = path.join(store, 'captures', 'staging')
+  // Repair an interrupted publish before `mkdirSync` can create the empty `raw/` that would make the
+  // recovery check read the backup as a stale leftover and delete it.
+  if (recoverInterruptedPublish(rawDir)) {
+    console.log('RECOVER publish - restored the capture set a previous run left mid-swap')
+  }
   mkdirSync(rawDir, { recursive: true })
   let lastError = null
   for (let attempt = 1; attempt <= options.attempts; attempt += 1) {
@@ -456,7 +562,10 @@ function main() {
   }
   const published = publishCaptures(stageDir, rawDir)
   rmSync(stageDir, { recursive: true, force: true })
-  console.log(`PASS publish - ${published} verified capture(s) moved into ${path.relative(ROOT, rawDir)}`)
+  if (published.recovered) {
+    console.log('RECOVER publish - a previous run died mid-swap; its capture set was restored first')
+  }
+  console.log(`PASS publish - ${published.published} verified capture(s) moved into ${path.relative(ROOT, rawDir)}`)
 
   const python = findPython()
   if (!python) block('Python was not found; set PYTHON or add python to PATH')
@@ -466,7 +575,9 @@ function main() {
     stdio: 'inherit'
   })
   if (render.error || render.status !== 0) block(`store-kit framing failed with exit code ${render.status ?? 'unknown'}`)
-  console.log(`PASS media-capture — 6 raw captures from ${serial} framed for ${options.slot}`)
+  const observed = loadJson(path.join(rawDir, 'installed-build.json'), 'installed build')
+  writeProvenance(store, slotDir, options.slot, listing, observed)
+  console.log(`PASS media-capture — ${published} raw captures from ${serial} framed for ${options.slot}`)
 }
 
 main()

@@ -25,8 +25,11 @@ no local Gradle installation is needed and this file should not be regenerated a
 See `store/` for the Play listing, privacy and data-safety declarations, reviewer notes, checklist,
 and the graphics inventory.
 
-The phone screenshots are real captures of the signed release build, driven by `store/journey.json`
-on a `Medium_Phone` AVD and composed into marketing images by `scripts/store-studio.py`. The tablet
+The phone screenshots are real captures driven by `store/journey.json` on a `Medium_Phone` AVD and
+composed into marketing images by `scripts/store-studio.py`. `scripts/media-capture.mjs` refuses to
+publish them unless the installed APK is byte-identical to the release artifact recorded in
+`dist/release-manifest.json`, and writes that binding, plus the sha256 of every composed asset, to
+`store/provenance.json`. The tablet
 screenshots are that same phone capture framed at tablet dimensions, **not** captures taken on a
 tablet device or emulator - no tablet AVD was available here. Replace them with genuine large-screen
 captures before relying on the large-screen eligibility they are meant to support.

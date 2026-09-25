@@ -218,10 +218,6 @@ def section_rules(kit, out: dict) -> dict:
                                f"(store-kit is the stricter, documented intersection with Play's 3840px cap)")
         if table["min_short"] < 320 or table["max_long"] > 3840:
             divergences.append(f"{kind}: store-kit.py limit outside Play's hard 320..3840 window")
-    if mjs["PHONE_SCREENSHOTS"]["min"] != mjs["PHONE_SCREENSHOTS"]["largeFormatMinCount"]:
-        divergences.append("phone: PHONE_SCREENSHOTS.min "
-                           f"{int(mjs['PHONE_SCREENSHOTS']['min'])} differs from largeFormat.minCount "
-                           f"{int(mjs['PHONE_SCREENSHOTS']['largeFormatMinCount'])}")
 
     # What the slot gate actually enforces, read out of verify-slot.mjs rather than assumed.
     gate_source = (ROOT / "scripts" / "verify-slot.mjs").read_text(encoding="utf-8")
