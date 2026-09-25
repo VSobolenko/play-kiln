@@ -20,8 +20,34 @@
  *  - the installed hash ties what was photographed to that artifact.
  */
 
+import { spawnSync } from 'node:child_process'
+import process from 'node:process'
+
 /** Thrown for any unproven identity. Publication must not continue. */
 export class ProvenanceError extends Error {}
+
+/**
+ * True when `head` would still build the artifact recorded at `gitCommit`.
+ *
+ * Comparing commits for exact equality is wrong for this purpose: committing the captures advances
+ * HEAD past the build they record, so the claim would fail the moment it was written down. What the
+ * link actually needs to express is "HEAD would still produce this APK", so compare the app sources.
+ *
+ * The `ls-files` probe is not decoration. `git diff --quiet <a> <b> -- <path>` exits **0 when the
+ * pathspec matches nothing**, so a renamed, absent, or misspelled app directory reads as "no changes"
+ * and licenses precisely the staleness this exists to catch. Require tracked files to exist under the
+ * path before trusting a clean diff.
+ */
+export function appSourcesUnchangedBetween(gitCommit, head, appDir, cwd = process.cwd()) {
+  if (!gitCommit || !head) return false
+  if (String(gitCommit) === String(head)) return true
+  const tracked = spawnSync('git', ['ls-files', '--', appDir], { cwd, encoding: 'utf8' })
+  if (tracked.status !== 0 || !String(tracked.stdout || '').trim()) return false
+  const diff = spawnSync('git', ['diff', '--quiet', String(gitCommit), String(head), '--', appDir], {
+    cwd, encoding: 'utf8'
+  })
+  return diff.status === 0
+}
 
 /**
  * @param {object} input

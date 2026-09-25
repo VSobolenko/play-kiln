@@ -8,7 +8,7 @@ import path from 'node:path'
 import process from 'node:process'
 
 import { publishCaptures, recoverInterruptedPublish } from './lib/capture-publish.mjs'
-import { verifyArtifactChain } from './lib/apk-provenance.mjs'
+import { appSourcesUnchangedBetween, verifyArtifactChain } from './lib/apk-provenance.mjs'
 
 const ROOT = process.cwd()
 
@@ -429,10 +429,9 @@ function verifyArtifactIdentity(adbPath, serial, applicationId, slotDir, stageDi
   // whether HEAD would still build this same APK, so compare the app sources between the two commits.
   let appSourcesUnchanged = false
   if (manifest?.gitCommit && String(manifest.gitCommit) !== head) {
-    const diff = spawnSync('git', ['diff', '--quiet', String(manifest.gitCommit), head, '--', path.join(slotDir, 'app')], {
-      cwd: ROOT, encoding: 'utf8'
-    })
-    appSourcesUnchanged = diff.status === 0
+    appSourcesUnchanged = appSourcesUnchangedBetween(
+      String(manifest.gitCommit), head, path.join(slotDir, 'app'), ROOT
+    )
   }
   let artifactPath = null
   let artifactHash = null

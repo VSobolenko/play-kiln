@@ -8,9 +8,13 @@
  * stale manifest and the matching stale installed APK agreed with each other about a build that was
  * neither of them. That case is cast 1 below.
  */
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
 import process from 'node:process'
 
-import { ProvenanceError, verifyArtifactChain } from './lib/apk-provenance.mjs'
+import { appSourcesUnchangedBetween, ProvenanceError, verifyArtifactChain } from './lib/apk-provenance.mjs'
 
 let failures = 0
 let checks = 0
@@ -150,6 +154,56 @@ refuses(
   base({ manifest: manifestFor({ gitCommit: OLD_COMMIT }), appSourcesUnchanged: false }),
   'the app sources differ'
 )
+
+/* 14-18. The commit-gap relaxation, against a real temporary repository. The dangerous case is a
+ *        pathspec that matches nothing: `git diff --quiet` exits 0 for it, which would read as "the
+ *        app sources never changed" and license exactly the staleness the link exists to reject. */
+{
+  const repo = mkdtempSync(path.join(tmpdir(), 'kiln-appsrc-'))
+  const git = (...args) => spawnSync('git', args, { cwd: repo, encoding: 'utf8' })
+  git('init', '-q')
+  git('config', 'user.email', 'test@example.invalid')
+  git('config', 'user.name', 'test')
+
+  const appDir = path.join(repo, 'slot', 'app')
+  mkdirSync(appDir, { recursive: true })
+  writeFileSync(path.join(appDir, 'Main.kt'), 'version 1\n', 'utf8')
+  git('add', '-A')
+  git('commit', '-q', '-m', 'one')
+  const first = String(git('rev-parse', 'HEAD').stdout).trim()
+
+  check('identical commits are unchanged', appSourcesUnchangedBetween(first, first, appDir, repo) === true)
+
+  writeFileSync(path.join(repo, 'slot', 'notes.txt'), 'unrelated\n', 'utf8')
+  git('add', '-A')
+  git('commit', '-q', '-m', 'two')
+  const second = String(git('rev-parse', 'HEAD').stdout).trim()
+
+  check(
+    'a change outside app/ leaves the sources unchanged',
+    appSourcesUnchangedBetween(first, second, appDir, repo) === true
+  )
+
+  writeFileSync(path.join(appDir, 'Main.kt'), 'version 2\n', 'utf8')
+  git('add', '-A')
+  git('commit', '-q', '-m', 'three')
+  const third = String(git('rev-parse', 'HEAD').stdout).trim()
+
+  check(
+    'a change inside app/ is reported as changed',
+    appSourcesUnchangedBetween(first, third, appDir, repo) === false
+  )
+  check(
+    'a pathspec matching nothing is not mistaken for unchanged',
+    appSourcesUnchangedBetween(first, third, path.join(repo, 'slot', 'not-a-real-dir'), repo) === false
+  )
+  check(
+    'a missing commit is not mistaken for unchanged',
+    appSourcesUnchangedBetween('', third, appDir, repo) === false
+  )
+
+  rmSync(repo, { recursive: true, force: true })
+}
 
 console.log(`\n${checks - failures}/${checks} checks passed`)
 process.exit(failures === 0 ? 0 : 1)
