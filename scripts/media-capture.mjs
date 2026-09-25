@@ -2,6 +2,7 @@
 /** Capture a six-step store journey with ADB, then delegate framing to store-kit.py. */
 
 import { spawnSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
@@ -237,13 +238,13 @@ function assertReadings(texts, expected, label) {
  * Replay the journey from a wiped, keyboard-free state and verify every screen before it is
  * photographed. Throws on the first screen that does not show what its shot claims to show.
  */
-function replayJourney({ adbPath, serial, journey, stageDir, listing }) {
+function replayJourney({ adbPath, serial, journey, stageDir, slotDir, listing }) {
   // Enforce the preconditions the journey documents but the tool used to leave to the operator.
   adb(adbPath, serial, ['shell', 'pm', 'clear', listing.applicationId])
   if (!disableImes(adbPath, serial)) {
     throw new Error('a soft keyboard is still enabled; it autocorrects typed values and rescrolls the form')
   }
-  verifyInstalledBuild(adbPath, serial, listing.applicationId, stageDir)
+  verifyInstalledBuild(adbPath, serial, listing.applicationId, stageDir, slotDir)
   adb(adbPath, serial, ['shell', 'monkey', '-p', listing.applicationId, '-c', 'android.intent.category.LAUNCHER', '1'])
   sleep(1000)
   journey.shots.slice(0, 6).forEach((shot, index) => {
@@ -268,15 +269,14 @@ function replayJourney({ adbPath, serial, journey, stageDir, listing }) {
 }
 
 /**
- * Confirm the package about to be photographed is the signed release build, and record what it was.
+ * Confirm which build is installed, and record what was observed.
  *
- * The debug variant carries a `.debug` applicationId suffix, so launching the bare applicationId
- * already targets the release package - but a debug-signed build of the same id would slip through,
- * and a screenshot of a debuggable build is a screenshot of something that never ships. This is the
- * only place that can tell them apart, so it asserts rather than assumes, and writes the observed
- * version and flags next to the captures as provenance.
+ * `dumpsys package` rules out the `.debug` variant (which carries a `.debug` applicationId suffix,
+ * so the bare id already targets release) and rejects a debuggable build of any kind. That alone
+ * does not identify *which* release build is installed, which `verifyArtifactIdentity` then
+ * establishes by hashing the installed APK against the signed artifact.
  */
-function verifyInstalledBuild(adbPath, serial, applicationId, stageDir) {
+function verifyInstalledBuild(adbPath, serial, applicationId, stageDir, slotDir) {
   const dump = String(adb(adbPath, serial, ['shell', 'dumpsys', 'package', applicationId]))
   if (!dump.trim() || /Unable to find package/i.test(dump)) {
     throw new Error(
@@ -287,35 +287,95 @@ function verifyInstalledBuild(adbPath, serial, applicationId, stageDir) {
   const flags = (dump.match(/pkgFlags=\[([^\]]*)\]/) || [])[1] || ''
   const versionName = (dump.match(/\bversionName=(\S+)/) || [])[1] || 'unknown'
   const versionCode = (dump.match(/\bversionCode=(\S+)/) || [])[1] || 'unknown'
-  writeFileSync(
-    path.join(stageDir, 'installed-build.json'),
-    `${JSON.stringify({ applicationId, versionName, versionCode, pkgFlags: flags }, null, 2)}\n`,
-    'utf8'
-  )
   if (/DEBUGGABLE/i.test(flags)) {
     throw new Error(
       `${applicationId} is installed as a DEBUGGABLE build (pkgFlags=${flags}); a capture of a ` +
       'debug build would photograph a package that never ships. Install the release APK.'
     )
   }
+  const observed = verifyArtifactIdentity(adbPath, serial, applicationId, slotDir, stageDir, {
+    applicationId, versionName, versionCode, pkgFlags: flags
+  })
+  writeFileSync(
+    path.join(stageDir, 'installed-build.json'),
+    `${JSON.stringify(observed, null, 2)}\n`,
+    'utf8'
+  )
   console.log(`PASS installed build - ${applicationId} ${versionName} (${versionCode}), not debuggable`)
 }
 
 /**
- * Move verified captures into place. Nothing is written to `captures/raw/` until the whole journey
- * has verified, so the directory always holds either the previous complete good set or the new
- * complete verified set - never a mixture of the two. Before this, each shot was written as it was
- * taken, so a run that failed at shot five left shots one to four overwritten by unverified
- * captures, and the next render would compose the pack from that half-state.
+ * Swap the verified captures into place as a whole directory, not file by file.
+ *
+ * Renaming file by file into an existing `captures/raw/` means an interruption leaves a mixture of
+ * two runs, and files a previous run left behind (an old `07.png`, an old dump) survive into the new
+ * set. Replacing the directory makes both impossible: `raw/` is either the previous complete set or
+ * the new complete verified set, and stale files cannot exist because nothing is carried over. The
+ * previous set is kept until the swap succeeds and restored if it does not.
  */
 function publishCaptures(stageDir, rawDir) {
-  mkdirSync(rawDir, { recursive: true })
-  let published = 0
-  for (const name of readdirSync(stageDir)) {
-    renameSync(path.join(stageDir, name), path.join(rawDir, name))
-    published += 1
+  const names = readdirSync(stageDir).filter((name) => name.endsWith('.png'))
+  const backupDir = `${rawDir}.previous`
+  rmSync(backupDir, { recursive: true, force: true })
+  const hadPrevious = existsSync(rawDir)
+  if (hadPrevious) renameSync(rawDir, backupDir)
+  try {
+    renameSync(stageDir, rawDir)
+  } catch (error) {
+    // A failed swap must leave the previous good set, not an empty directory.
+    if (hadPrevious && !existsSync(rawDir)) renameSync(backupDir, rawDir)
+    throw error
   }
-  return published
+  rmSync(backupDir, { recursive: true, force: true })
+  return names.length
+}
+
+function sha256(bytes) {
+  return createHash('sha256').update(bytes).digest('hex')
+}
+
+/**
+ * Prove the installed package is the signed artifact, not just a non-debuggable build of the right
+ * package id.
+ *
+ * `dumpsys package` confirms the id and that it is not debuggable, which rules out the `.debug`
+ * variant but says nothing about *which* build is installed: a stale release APK from an earlier
+ * commit passes both. The signed artifact's SHA-256 is recorded in `dist/release-manifest.json`, and
+ * `adb install` copies the APK verbatim, so the installed `base.apk` can be hashed and compared.
+ * That turns "was this really the release build" from an assumption into a check, and it fails loudly
+ * when the artifact has been rebuilt since the last install - which is exactly the staleness that
+ * produced screenshots of a build nobody intended to ship.
+ */
+function verifyArtifactIdentity(adbPath, serial, applicationId, slotDir, stageDir, observed) {
+  const manifestPath = path.join(slotDir, 'dist', 'release-manifest.json')
+  if (!existsSync(manifestPath)) {
+    console.log(`WARN installed build - ${path.relative(ROOT, manifestPath)} is absent; the installed APK is NOT proven to be the signed artifact`)
+    return { ...observed, artifactMatch: 'unverified', reason: 'no release manifest' }
+  }
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+  const entry = (manifest.artifacts || []).find((item) => String(item.path || '').endsWith('release.apk'))
+  if (!entry?.sha256) {
+    console.log(`WARN installed build - ${path.relative(ROOT, manifestPath)} records no release-APK sha256; identity NOT proven`)
+    return { ...observed, artifactMatch: 'unverified', reason: 'manifest has no release-apk hash' }
+  }
+  const pmPath = String(adb(adbPath, serial, ['shell', 'pm', 'path', applicationId]))
+  const apk = (pmPath.match(/package:(\S+base\.apk)/) || [])[1]
+  if (!apk) {
+    console.log('WARN installed build - could not locate the installed base.apk; identity NOT proven')
+    return { ...observed, artifactMatch: 'unverified', reason: 'base.apk path not found' }
+  }
+  const installedHash = sha256(adb(adbPath, serial, ['exec-out', 'cat', apk], { binary: true }))
+  const recorded = String(entry.sha256).toLowerCase()
+  if (installedHash !== recorded) {
+    throw new Error(
+      `the installed APK does not match the signed artifact. installed sha256=${installedHash} but ` +
+      `${path.relative(ROOT, manifestPath)} records ${recorded} for ${entry.path}. Re-install the ` +
+      'current release APK (adb install -r app/build/outputs/apk/release/app-release.apk), because a ' +
+      'capture of a stale build would photograph a package that is not the one being uploaded.'
+    )
+  }
+  console.log(`PASS installed build - installed APK matches the signed artifact (sha256 ${installedHash.slice(0, 12)}…)`)
+  return { ...observed, artifactMatch: 'exact', artifactSha256: installedHash, manifestPath: path.relative(ROOT, manifestPath) }
 }
 
 function findPython() {
@@ -381,7 +441,7 @@ function main() {
     rmSync(stageDir, { recursive: true, force: true })
     mkdirSync(stageDir, { recursive: true })
     try {
-      replayJourney({ adbPath, serial, journey, stageDir, listing })
+      replayJourney({ adbPath, serial, journey, stageDir, slotDir, listing })
       lastError = null
       break
     } catch (error) {
