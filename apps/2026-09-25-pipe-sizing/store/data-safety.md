@@ -2,19 +2,23 @@
 
 ## Data collection and sharing
 
-- Does the app collect user data? **No.**
-- Does the app share user data? **No.**
-- Does the app transmit user-entered values? **No.** Everything stays on the device.
-- Does the app declare permissions? **No.** The shipped manifest contains no `<uses-permission>` entries.
+- Does the app collect or share required user data? **No**
+- Reason: Enabled capabilities declare no collected data.
 
-## Data types
-
-No data types are collected or shared: no personal information, financial information, files, photos, location, device identifiers, app activity, diagnostics, or other user data.
+| Data category | Collected | Shared | Purpose |
+|---|---:|---:|---|
+| None | No | No | Not applicable |
 
 ## Third-party SDKs
 
-None. The capability declaration is `{"schemaVersion": 1, "enabled": []}`; there are no ads, analytics, account, cloud, or billing capabilities.
+None.
 
-## Security and deletion
+## Security practices
 
-Network encryption is not applicable because the app has no network capability. Account deletion is not applicable because the app has no accounts. Users can clear local app data or uninstall the app.
+- Is collected data encrypted in transit? **Not applicable - no data is collected**
+- Can users request data deletion? **Not applicable — no accounts**
+
+## Account deletion
+
+- Does the app support accounts? **No**
+- Is an account-deletion mechanism required? **No**

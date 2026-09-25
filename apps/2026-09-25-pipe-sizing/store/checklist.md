@@ -1,11 +1,16 @@
-# Pre-upload checklist — Gas Pipe Sizing Workbook
+# Google Play upload checklist — Gas Pipe Sizing Workbook
 
-- [ ] Run strict store validation and resolve every FAIL.
-- [ ] Build and locally test the signed release APK and AAB.
-- [ ] Confirm listing copy describes arithmetic and user-entered citations only.
-- [ ] Confirm the public privacy-policy URL and monitored developer contact before upload.
-- [ ] Confirm the manifest and release dependencies still declare no permissions or data-collecting SDKs.
-- [ ] Review synthetic screenshots against the shipped APK and replace them with truthful captures where needed.
+- [ ] Run `python scripts/store-kit.py --slot pipe-sizing --validate-only` and resolve every FAIL.
+- [ ] Replace synthetic screenshots with real captures when `graphics.md` marks them synthetic.
+- [ ] Compare listing claims and captions with the release build.
+- [ ] Replace placeholder contact email and privacy-policy URL in `listing.json`.
+- [ ] Host `privacy.md` at the HTTPS URL declared in `listing.json`.
+- [ ] Audit permissions and third-party SDK behavior against `data-safety.md`.
+- [ ] Build and locally test the signed release AAB from `dist/`.
+- [ ] Enrol in Play App Signing and keep upload credentials outside the repository.
 - [ ] Complete Ads, Content rating, Target audience, App access, and Data safety declarations.
-- [ ] Complete Play App Signing and keep upload credentials outside the repository.
-- [ ] Obtain explicit human approval before the first upload and publish action.
+- [ ] Upload phone, 7-inch tablet, and 10-inch tablet assets for every locale.
+- [ ] Verify edge-to-edge, orientation, text scale, and tablet layouts on representative devices.
+- [ ] For a brand-new package, upload the first AAB and complete legal declarations manually in Play Console.
+- [ ] Use `node scripts/play-upload.mjs --slot pipe-sizing --track internal --dry-run` before any live upload.
+- [ ] Obtain explicit human approval before committing a Play edit.

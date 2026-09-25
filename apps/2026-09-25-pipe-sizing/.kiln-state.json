@@ -1,8 +1,8 @@
 {
   "slug": "pipe-sizing",
   "applicationId": "com.gexetr.pipesizing",
-  "appName": "Pipe Sizing: NFPA 54",
-  "idea": "Standards-cited US fuel gas pipe sizing per NFPA 54: every input editable, results in the unit system you chose, the cited code edition shown in-app, offline, bought once.",
+  "appName": "Gas Pipe Sizing Workbook",
+  "idea": "US fuel gas pipe sizing workflow: sum loads and developed lengths, convert units both ways, keep every input editable, and record which code edition and table each reading came from. Ships no code tables; results verify against your own book.",
   "createdAt": "2026-09-25T15:37:50.949Z",
   "scaffoldVersion": "android-compose-v1",
   "status": "scaffolded"

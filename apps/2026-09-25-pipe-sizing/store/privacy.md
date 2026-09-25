@@ -2,18 +2,30 @@
 
 **Last updated:** 2026-09-25
 
-## Data collection, transmission, and sharing
+## Summary
 
-Gas Pipe Sizing Workbook collects no data, transmits no data, and shares no data. It has no account, analytics, advertising, cloud service, or network feature. User-entered sizing values are stored only on the device and are restored when the app is reopened, including after the process has ended. No history of previous cases is kept, and nothing leaves the device.
+Enabled capabilities declare no collected data.
+
+## Data collection and sharing
+
+The enabled capabilities declare no collection, transmission, sale, or sharing of user data. Data created in the app remains on the user's device and is subject to the device's backup settings.
 
 ## Permissions
 
-The shipped `AndroidManifest.xml` declares no permissions. The app does not request access to contacts, location, photos, files, camera, microphone, network, or other protected resources.
+- None declared beyond platform-normal capabilities.
 
-## Retention and deletion
+## Third-party services
 
-There is no server-side copy to delete. The user can remove current app data through Android settings or by uninstalling the app.
+None declared.
+
+## Data retention and deletion
+
+The app has no account system. Users can delete locally stored data by clearing app storage or uninstalling the app.
+
+## Security
+
+Platform security and encrypted transport are required for networked capabilities and operating-system services.
 
 ## Contact
 
-Privacy questions can be raised through the developer contact shown on the Google Play listing.
+Privacy questions: support@example.com
