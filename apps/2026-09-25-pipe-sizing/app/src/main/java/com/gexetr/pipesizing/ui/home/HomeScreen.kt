@@ -16,8 +16,6 @@ import com.gexetr.pipesizing.R
 import com.gexetr.pipesizing.sizing.SizingEvaluation
 import com.gexetr.pipesizing.sizing.SizingMethod
 import com.gexetr.pipesizing.sizing.UnitSystem
-import com.gexetr.pipesizing.sizing.Units
-import java.util.Locale
 
 @Composable
 fun HomeRoute(
@@ -78,16 +76,14 @@ fun HomeScreen(state: HomeUiState, onEvent: (HomeEvent) -> Unit, modifier: Modif
                 is SizingEvaluation.Refused -> Text(result.correctionRequired, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.titleMedium)
                 is SizingEvaluation.Computed -> Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(stringResource(R.string.result_title), style = MaterialTheme.typography.titleLarge)
-                    if (metric) {
-                        Text(stringResource(R.string.result_load_metric, format(Units.mbhToKilowatts(result.requiredLoadMbh))))
-                        Text(stringResource(R.string.result_length_metric, format(Units.feetToMeters(result.totalLengthFeet))))
-                    } else {
-                        Text(stringResource(R.string.result_load_imperial, format(result.requiredLoadMbh)))
-                        Text(stringResource(R.string.result_length_imperial, format(result.totalLengthFeet)))
+                    // The result carries the case it evaluated, so a number cannot be read detached
+                    // from the readings, method and citation it came from.
+                    val methodLabel = stringResource(
+                        if (state.method == SizingMethod.CAPACITY_COMPARISON) R.string.method_capacity else R.string.method_physical,
+                    )
+                    computedResultLines(state, result, metric, methodLabel).forEach { line ->
+                        Text(stringResource(line.labelRes, *line.args.toTypedArray()))
                     }
-                    Text(if (result.supportsRequiredLoad) stringResource(R.string.capacity_supports) else stringResource(R.string.capacity_does_not_support))
-                    Text(stringResource(R.string.provenance_result, result.capacityProvenance.toString()))
-                    Text(if (metric) stringResource(R.string.result_fitting_length_metric, format(Units.feetToMeters(result.fittingAllowanceFeet))) else stringResource(R.string.result_fitting_length_imperial, format(result.fittingAllowanceFeet)))
                     Text(stringResource(R.string.disclaimer), style = MaterialTheme.typography.bodyMedium)
                 }
                 null -> Unit
@@ -95,9 +91,6 @@ fun HomeScreen(state: HomeUiState, onEvent: (HomeEvent) -> Unit, modifier: Modif
         }
     }
 }
-
-/** Display rounding only; the domain keeps full precision, so this never changes a physical value. */
-private fun format(value: Double): String = String.format(Locale.US, "%.2f", value)
 
 @Composable private fun Entry(state: HomeUiState, onEvent: (HomeEvent) -> Unit, field: HomeField, label: Int) {
     val value = when (field) { HomeField.MATERIAL -> state.material; HomeField.PRESSURE -> state.pressure; HomeField.LOAD -> state.loadMbh; HomeField.LENGTH -> state.lengthFeet; HomeField.FITTING_QUANTITY -> state.fittingQuantity; HomeField.FITTING_LENGTH -> state.fittingLengthFeet; HomeField.CAPACITY -> state.capacity; HomeField.EDITION -> state.codeEdition; HomeField.TABLE -> state.table; HomeField.ROW -> state.row; HomeField.GAS_SPECIFIC_GRAVITY -> state.gasSpecificGravity; HomeField.PRESSURE_DROP -> state.pressureDropAllowance; HomeField.PIPE_DIAMETER -> state.pipeInsideDiameter }

@@ -45,6 +45,44 @@ class HomeViewModelTest {
     }
 
     @Test
+    fun aCitationWithNoEditionOrTableIsRefusedRatherThanRecorded() {
+        val vm = completeVm()
+        vm.onEvent(HomeEvent.ProvenanceChanged(ProvenanceMode.CODE_CITATION))
+
+        // Selecting the citation mode without naming a source records nothing, so the case must not
+        // compute with an empty citation standing in for provenance.
+        val result = evaluate(vm)
+
+        assertTrue(result is SizingEvaluation.Refused)
+        val refused = result as SizingEvaluation.Refused
+        assertEquals(RefusalKind.MISSING_PROVENANCE, refused.kind)
+        assertTrue(refused.correctionRequired.contains("provenance", ignoreCase = true))
+    }
+
+    @Test
+    fun aCitationWithOnlyAnEditionIsRefused() {
+        val vm = completeVm()
+        vm.onEvent(HomeEvent.ProvenanceChanged(ProvenanceMode.CODE_CITATION))
+        field(vm, HomeField.EDITION, "2024")
+
+        val result = evaluate(vm)
+
+        assertTrue(result is SizingEvaluation.Refused)
+        assertEquals(RefusalKind.MISSING_PROVENANCE, (result as SizingEvaluation.Refused).kind)
+    }
+
+    @Test
+    fun aCitationCompletesOnceEditionAndTableAreNamed() {
+        val vm = completeVm()
+        vm.onEvent(HomeEvent.ProvenanceChanged(ProvenanceMode.CODE_CITATION))
+        field(vm, HomeField.EDITION, "2024")
+        field(vm, HomeField.TABLE, "A")
+
+        // The row is not required: an edition and a table already identify the source.
+        assertTrue(evaluate(vm) is SizingEvaluation.Computed)
+    }
+
+    @Test
     fun capacityMustBeConfirmedBeforeAnyResultIsShown() {
         val vm = newVm()
         field(vm, HomeField.MATERIAL, "steel")
@@ -128,15 +166,75 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun unitToggleAloneChangesNeitherResultNorProvenance() {
+    fun switchingUnitsPreservesEveryPhysicalValue() {
         val vm = completeVm()
-
         val before = evaluate(vm) as SizingEvaluation.Computed
-        vm.onEvent(HomeEvent.UnitChanged(UnitSystem.METRIC))
-        vm.onEvent(HomeEvent.UnitChanged(UnitSystem.IMPERIAL))
-        val after = evaluate(vm) as SizingEvaluation.Computed
 
-        assertEquals(before, after)
+        vm.onEvent(HomeEvent.UnitChanged(UnitSystem.METRIC))
+        val metric = evaluate(vm) as SizingEvaluation.Computed
+
+        // The readings are re-expressed in metric, not retyped: the case is arithmetically identical.
+        assertEquals(before.requiredLoadMbh, metric.requiredLoadMbh, TOLERANCE)
+        assertEquals(before.totalLengthFeet, metric.totalLengthFeet, TOLERANCE)
+        assertEquals(before.fittingAllowanceFeet, metric.fittingAllowanceFeet, TOLERANCE)
+        assertEquals(before.supportsRequiredLoad, metric.supportsRequiredLoad)
+        assertEquals(before.capacityProvenance, metric.capacityProvenance)
+        // And the fields now show the metric equivalent rather than the imperial figure relabelled.
+        // These are literal expectations on purpose: deriving them from Units would make the test
+        // unfalsifiable, so they are the values a correct conversion must produce and they are tight
+        // enough (1e-6) to fail against the imprecise 0.2930711111111111 MBH constant as well.
+        assertEquals(29.30710701722222, vm.uiState.value.loadMbh.toDouble(), TOLERANCE)
+        assertEquals(12.192, vm.uiState.value.lengthFeet.toDouble(), TOLERANCE)
+        assertEquals(1.524, vm.uiState.value.fittingLengthFeet.toDouble(), TOLERANCE)
+        assertEquals(35.168528420666664, vm.uiState.value.capacity.toDouble(), TOLERANCE)
+        // The relabelling failure mode this replaces would have left the imperial numbers in place.
+        assertFalse(vm.uiState.value.loadMbh.startsWith("100"))
+    }
+
+    @Test
+    fun repeatedUnitSwitchingDoesNotDrift() {
+        val vm = completeVm()
+        evaluate(vm)
+
+        repeat(10) {
+            vm.onEvent(HomeEvent.UnitChanged(UnitSystem.METRIC))
+            vm.onEvent(HomeEvent.UnitChanged(UnitSystem.IMPERIAL))
+        }
+
+        val result = evaluate(vm) as SizingEvaluation.Computed
+        assertEquals(100.0, result.requiredLoadMbh, TOLERANCE)
+        assertEquals(45.0, result.totalLengthFeet, TOLERANCE)
+    }
+
+    @Test
+    fun editingAnInputClearsThePreviousResult() {
+        val vm = completeVm()
+        assertTrue(evaluate(vm) is SizingEvaluation.Computed)
+
+        field(vm, HomeField.LOAD, "150")
+
+        // A result computed for the old load must not stay on screen beside the new one.
+        assertNull(vm.uiState.value.evaluation)
+    }
+
+    @Test
+    fun changingTheProvenanceClearsThePreviousResult() {
+        val vm = completeVm()
+        assertTrue(evaluate(vm) is SizingEvaluation.Computed)
+
+        vm.onEvent(HomeEvent.ProvenanceChanged(ProvenanceMode.CODE_CITATION))
+
+        assertNull(vm.uiState.value.evaluation)
+    }
+
+    @Test
+    fun changingTheUnitClearsThePreviousResult() {
+        val vm = completeVm()
+        assertTrue(evaluate(vm) is SizingEvaluation.Computed)
+
+        vm.onEvent(HomeEvent.UnitChanged(UnitSystem.METRIC))
+
+        assertNull(vm.uiState.value.evaluation)
     }
 
     @Test

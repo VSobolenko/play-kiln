@@ -29,4 +29,8 @@
     <string name="result_load_imperial">%1$s MBH required</string><string name="result_load_metric">%1$s kW required</string>
     <string name="result_length_imperial">%1$s ft total run</string><string name="result_length_metric">%1$s m total run</string>
     <string name="result_fitting_length_imperial">Fitting allowance: %1$s ft</string><string name="result_fitting_length_metric">Fitting allowance: %1$s m</string>
+    <string name="result_case_label">Case: %1$s at %2$s</string>
+    <string name="result_method_label">Method: %1$s</string>
+    <string name="result_capacity_imperial">Compared capacity: %1$s MBH</string><string name="result_capacity_metric">Compared capacity: %1$s kW</string>
+    <string name="result_physical_inputs">Gas specific gravity %1$s; pressure-drop allowance %2$s; pipe inside diameter %3$s</string>
 </resources>

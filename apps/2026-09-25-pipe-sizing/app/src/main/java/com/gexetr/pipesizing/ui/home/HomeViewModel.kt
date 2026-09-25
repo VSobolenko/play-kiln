@@ -34,10 +34,12 @@ class HomeViewModel(
     fun onEvent(event: HomeEvent) {
         _uiState.update { state ->
             when (event) {
-                is HomeEvent.FieldChanged -> state.set(event.field, event.value)
-                is HomeEvent.ProvenanceChanged -> state.copy(provenanceMode = event.mode)
+                // Any edit invalidates a shown result. Keeping it would let the screen display figures
+                // computed for one case beside the inputs of another.
+                is HomeEvent.FieldChanged -> state.set(event.field, event.value).copy(evaluation = null)
+                is HomeEvent.ProvenanceChanged -> state.copy(provenanceMode = event.mode, evaluation = null)
                 is HomeEvent.MethodChanged -> state.copy(method = event.method, capacityConfirmed = false, evaluation = null)
-                is HomeEvent.UnitChanged -> state.copy(unitSystem = event.unitSystem, evaluation = null)
+                is HomeEvent.UnitChanged -> state.withUnit(event.unitSystem)
                 HomeEvent.ConfirmCapacity -> state.copy(capacityConfirmed = true, evaluation = null)
                 HomeEvent.Evaluate -> state.copy(evaluation = evaluate(state))
             }
@@ -49,9 +51,9 @@ class HomeViewModel(
         // One provenance is recorded for every capacity-like reading in the case. The evaluator
         // refuses a capacity or fitting equivalent length without one, and the domain surfaces the
         // capacity's provenance on a computed result, so the app never shows a number without it.
-        val provenance = when (state.provenanceMode) {
+        val provenance: UserProvenance? = when (state.provenanceMode) {
             ProvenanceMode.USER_SUPPLIED -> UserProvenance.UserSupplied
-            ProvenanceMode.CODE_CITATION -> UserProvenance.CodeCitation(state.codeEdition, state.table, state.row)
+            ProvenanceMode.CODE_CITATION -> state.citationOrNull()
         }
         val metric = state.unitSystem == UnitSystem.METRIC
         val fittingBlank = state.fittingQuantity.isBlank() && state.fittingLengthFeet.isBlank()
@@ -100,6 +102,53 @@ class HomeViewModel(
     }
 
     /**
+     * Switches the unit mode while preserving every physical quantity. Imperial is the canonical
+     * unit, so a value the user entered in metric is converted back on the way out. Relabelling the
+     * entered numbers instead would silently change what they mean - 100 MBH becoming 100 kW - which
+     * is exactly the reinterpretation this app refuses to do anywhere else.
+     *
+     * Readings with no unit of their own (specific gravity) or no unambiguous conversion
+     * (pressure-drop allowance, pipe inside diameter) are carried across unchanged; the labels for
+     * those say they are recorded as read.
+     */
+    private fun HomeUiState.withUnit(unit: UnitSystem): HomeUiState {
+        if (unit == unitSystem) return copy(evaluation = null)
+        return copy(
+            unitSystem = unit,
+            evaluation = null,
+            loadMbh = convertUnit(loadMbh, unit, Units::kilowattsToMbh, Units::mbhToKilowatts),
+            lengthFeet = convertUnit(lengthFeet, unit, Units::metersToFeet, Units::feetToMeters),
+            fittingLengthFeet = convertUnit(fittingLengthFeet, unit, Units::metersToFeet, Units::feetToMeters),
+            capacity = convertUnit(capacity, unit, Units::kilowattsToMbh, Units::mbhToKilowatts),
+        )
+    }
+
+    /** Re-expresses one entered reading in [target], keeping full precision so a toggle cannot drift. */
+    private fun HomeUiState.convertUnit(
+        text: String,
+        target: UnitSystem,
+        toCanonical: (Double) -> Double,
+        fromCanonical: (Double) -> Double,
+    ): String {
+        val entered = text.toDoubleOrNull() ?: return text
+        val canonical = if (unitSystem == UnitSystem.METRIC) toCanonical(entered) else entered
+        val shown = if (target == UnitSystem.METRIC) fromCanonical(canonical) else canonical
+        return shown.toString()
+    }
+
+    /**
+     * A citation with no edition or table names no source, so it is treated as absent provenance and
+     * the evaluator refuses it. Accepting it would record a citation that points at nothing and
+     * would let a result be shown for a reading whose source the user never supplied.
+     */
+    private fun HomeUiState.citationOrNull(): UserProvenance? =
+        if (codeEdition.isBlank() || table.isBlank()) {
+            null
+        } else {
+            UserProvenance.CodeCitation(codeEdition, table, row)
+        }
+
+    /**
      * Reads a user entry into the domain's canonical imperial units. In metric mode the entry is in
      * the metric unit shown by the field's label and is converted on the way in; the canonical value
      * is what the domain stores, so switching units never changes the physical quantity.
@@ -113,7 +162,7 @@ class HomeViewModel(
      * A method-required reading that the user may not have entered yet: blank means absent, while a
      * non-blank value that will not parse stays invalid so the evaluator can say so.
      */
-    private fun optionalReading(text: String, provenance: UserProvenance): SourcedValue? =
+    private fun optionalReading(text: String, provenance: UserProvenance?): SourcedValue? =
         if (text.isBlank()) null else SourcedValue(text.toDoubleOrNull() ?: Double.NaN, provenance)
 
     private fun HomeUiState.set(field: HomeField, value: String) = when (field) {
