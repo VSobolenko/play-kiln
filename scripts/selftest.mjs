@@ -190,6 +190,15 @@ check(
   'scaffold main package directory matches its namespace'
 )
 
+const scaffoldSettingsFile = join(SLOT_SCAFFOLD, 'settings.gradle.kts')
+const scaffoldSettings = existsSync(scaffoldSettingsFile) ? readFileSync(scaffoldSettingsFile, 'utf8') : ''
+const dependencyRepositories = scaffoldSettings.match(/dependencyResolutionManagement\s*\{[\s\S]*?repositories\s*\{([\s\S]*?)\n\s*}\s*\n}/)?.[1] ?? ''
+const pluginRepositories = scaffoldSettings.match(/pluginManagement\s*\{[\s\S]*?repositories\s*\{([\s\S]*?)\n\s*}\s*\n}/)?.[1] ?? ''
+check(
+  dependencyRepositories.includes('mavenLocal()') && !pluginRepositories.includes('mavenLocal()'),
+  'scaffold resolves published capabilities through dependencyResolutionManagement only'
+)
+
 // --------------------------------------------------------------------------
 // 2b. One rule, one place: the capability artifact group must not be restated.
 // --------------------------------------------------------------------------
@@ -1256,6 +1265,49 @@ try {
     directWrapperNames.length === 0,
     `Gradle wrappers are invoked only through scripts/lib/gradle.mjs${detail(directWrapperNames)}`
   )
+
+  const testRunnerFile = join(ROOT, 'scripts', 'run-slot-tests.mjs')
+  check(existsSync(testRunnerFile), 'a sanctioned slot unit-test runner is available')
+  if (existsSync(testRunnerFile)) {
+    const { runSlotUnitTests } = await import(pathToFileURL(testRunnerFile).href)
+    const fakeApps = join(sandbox, 'test-runner-apps')
+    const fakeSlot = join(fakeApps, '1970-01-01-runner-fixture')
+    mkdirSync(fakeSlot, { recursive: true })
+
+    const noTestsLines = []
+    const noTestsCalls = []
+    const noTests = runSlotUnitTests('runner-fixture', {
+      appsDir: fakeApps,
+      report: (message) => noTestsLines.push(message),
+      runGradle: (directory, tasks) => {
+        noTestsCalls.push({ directory, tasks })
+        return { result: { status: 0, stdout: '', stderr: '' }, elapsedMs: 1 }
+      }
+    })
+    check(
+      noTests.ok && noTestsCalls.length === 1 && noTestsCalls[0].tasks.includes('testDebugUnitTest'),
+      'the slot test runner delegates testDebugUnitTest to runGradleTasks once'
+    )
+    check(
+      noTestsLines.some((message) => message.includes('no tests found')) &&
+        !noTestsLines.some((message) => /^PASS\s+testDebugUnitTest/.test(message)),
+      'the slot test runner reports no tests found distinctly from PASS'
+    )
+
+    const failedLines = []
+    const failed = runSlotUnitTests('runner-fixture', {
+      appsDir: fakeApps,
+      report: (message) => failedLines.push(message),
+      runGradle: () => ({ result: { status: 1, stdout: '', stderr: '' }, elapsedMs: 1 })
+    })
+    check(
+      !failed.ok && failed.exitCode !== 0 && failedLines.some((message) => message.includes('FAIL testDebugUnitTest')),
+      'a failed slot unit-test task reports FAIL and returns a non-zero exit'
+    )
+  } else {
+    check(false, 'the runner can report no tests found distinctly from PASS')
+    check(false, 'a failed slot unit-test task returns a non-zero exit')
+  }
 
   const { RELEASE_TASKS, gradleArgs, runGradleTasks, FORBIDDEN_GRADLE_FLAGS } = await import(
     pathToFileURL(join(ROOT, 'scripts', 'lib', 'gradle.mjs')).href

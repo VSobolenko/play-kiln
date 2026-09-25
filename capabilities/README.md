@@ -59,8 +59,11 @@ dependencies {
 }
 ```
 
-The slot's `settings.gradle.kts` resolves these from `mavenLocal()`; the scaffold already
-configures it.
+The scaffold's `dependencyResolutionManagement` resolves these from `mavenLocal()`, after
+`google()` and `mavenCentral()`. It is intentionally not configured in `pluginManagement`:
+capabilities are library dependencies, not plugins, and keeping trusted remote repositories first
+reduces (but cannot eliminate) the development-machine risk of a local artifact shadowing a remote
+dependency. Publish the pinned artifacts locally before building a slot that consumes one.
 
 ## Build
 

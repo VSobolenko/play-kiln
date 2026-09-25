@@ -1,0 +1,6 @@
+schema: spec-driven
+created: 2026-09-25
+goal: Ship the already-created pipe-sizing slot as an offline US fuel-gas sizing
+  workflow and calculation aid, with user-confirmed capacity inputs and a
+  user-recorded citation on every result; it supplies no code-table data and makes
+  no code-compliance determination.

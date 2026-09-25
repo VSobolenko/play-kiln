@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      The platform theme only needs to avoid a wrong-coloured window before Compose draws.
+
+      It deliberately does NOT parent from `Theme.Material3.DayNight.NoActionBar`: that style
+      lives in the Material Components *View* library, which a Compose-only app does not need.
+      Dark mode is handled by values-night/themes.xml, and edge-to-edge plus transparent system
+      bars are applied programmatically by enableEdgeToEdge() in MainActivity, which is the
+      current AndroidX recommendation.
+
+      In-app styling always comes from PlayKilnTheme (MaterialTheme.colorScheme).
+    -->
+    <style name="Theme.PlayKilnSlot" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowBackground">@color/playkiln_window_background</item>
+    </style>
+</resources>

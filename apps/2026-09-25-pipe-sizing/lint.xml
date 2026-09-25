@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!-- Correctness and security findings block the build; never silence them globally. -->
+    <issue id="NewApi" severity="error" />
+    <issue id="MissingPermission" severity="error" />
+    <issue id="ExportedContentProvider" severity="error" />
+    <issue id="ExportedReceiver" severity="error" />
+    <issue id="ExportedService" severity="error" />
+    <issue id="UnprotectedSMSBroadcastReceiver" severity="error" />
+    <issue id="DataExtractionRules" severity="error" />
+    <issue id="UnsafeOptInUsageError" severity="error" />
+
+    <!-- Maintenance and visual-polish findings stay visible without blocking builds. -->
+    <issue id="ObsoleteSdkInt" severity="warning" />
+    <issue id="UnusedResources" severity="warning" />
+    <issue id="IconMissingDensityFolder" severity="warning" />
+    <issue id="IconLauncherShape" severity="warning" />
+</lint>

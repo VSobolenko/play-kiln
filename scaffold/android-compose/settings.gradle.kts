@@ -16,6 +16,10 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // Capabilities are published locally during factory development. Keep this only in
+        // dependency resolution (not pluginManagement), and after trusted remotes: it enables
+        // com.gexetr.capability artifacts without letting mavenLocal shadow Google plugins.
+        mavenLocal()
     }
 }
 
