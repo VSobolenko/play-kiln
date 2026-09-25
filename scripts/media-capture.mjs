@@ -559,7 +559,10 @@ function main() {
 
   const python = findPython()
   if (!python) block('Python was not found; set PYTHON or add python to PATH')
-  const render = spawnSync(python, ['scripts/store-kit.py', '--slot', options.slot], {
+  // `--skip-provenance` because the record on disk during this render describes the *previous* run's
+  // captures by construction: this run replaces them, and the record naming the new ones is written
+  // below. The check runs for real in the confirmation pass at the end of this function.
+  const render = spawnSync(python, ['scripts/store-kit.py', '--slot', options.slot, '--skip-provenance'], {
     cwd: ROOT,
     encoding: 'utf8',
     stdio: 'inherit'
@@ -567,6 +570,16 @@ function main() {
   if (render.error || render.status !== 0) block(`store-kit framing failed with exit code ${render.status ?? 'unknown'}`)
   const observed = loadJson(path.join(rawDir, 'installed-build.json'), 'installed build')
   writeProvenance(store, slotDir, options.slot, listing, observed)
+  // Confirm the pack now describes itself: this is the pass that checks the hashes written above
+  // against the assets on disk, so a render that did not produce what the record claims stops here.
+  const confirm = spawnSync(python, ['scripts/store-kit.py', '--slot', options.slot, '--validate-only'], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    stdio: 'inherit'
+  })
+  if (confirm.error || confirm.status !== 0) {
+    block(`the pack does not validate against its own provenance record (exit code ${confirm.status ?? 'unknown'})`)
+  }
   console.log(`PASS media-capture — ${published.published} raw captures from ${serial} framed for ${options.slot}`)
 }
 

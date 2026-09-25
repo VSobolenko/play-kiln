@@ -284,9 +284,18 @@ against the previous implementation.
 
 `media-capture.mjs` publishes nothing until the installed package is proven to be the release
 artifact. It walks HEAD → `dist/release-manifest.json` → the recorded sha256 → the release APK file
-on disk → the installed `base.apk`, and a missing or mismatched link is fatal. It then writes
-`store/provenance.json`, which is committed beside the assets because `captures/` and `dist/` are
-not, and is the only durable record tying the committed images to a build.
+on disk → the installed `base.apk`, and a missing or mismatched link is fatal. When the commit in the
+manifest is behind HEAD it compares the slot's `app/` sources between the two commits instead, since
+committing a capture necessarily advances HEAD past the build it records and exact equality would make
+the record unable to outlive itself.
+
+It then writes `store/provenance.json`, which is committed beside the assets because `captures/` and
+`dist/` are not, and is the only durable record tying the committed images to a build. `store-kit.py`
+checks that record on every validation: each committed asset must hash to what it says, so an image
+edited or replaced without a fresh capture fails instead of keeping the previous claim. The render
+inside a capture run passes `--skip-provenance` because the record on disk then describes the run
+being replaced, and the capture ends with a real `--validate-only` pass against the record it just
+wrote.
 
 `scripts/test-apk-provenance.mjs` covers that chain offline. Its first case is the false pass that
 motivated it: a stale manifest and the matching stale installed APK agree with each other about a

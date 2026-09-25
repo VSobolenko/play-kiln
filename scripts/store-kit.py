@@ -119,6 +119,15 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--validate-only", action="store_true", help="Validate existing copy and assets without writing."
     )
+    p.add_argument(
+        "--skip-provenance",
+        action="store_true",
+        help=(
+            "Skip the provenance.json check. Only for scripts/media-capture.mjs, which publishes new "
+            "captures and only afterwards writes the record that describes them, so the record on disk "
+            "during its render is the previous run's by definition."
+        ),
+    )
     return p
 
 
@@ -1364,7 +1373,67 @@ def inspect_image(
     return failures
 
 
-def validate_store(store: Path, listing: dict[str, Any], locales: list[str]) -> bool:
+def validate_provenance(store: Path) -> list[str]:
+    """Verify the committed screenshots still match the record of the build they came from.
+
+    `store/provenance.json` is the only durable link between the committed images and the release APK,
+    because `captures/` and `dist/` are excluded from version control. Checking the recorded hashes
+    turns that link into something falsifiable: an image edited, replaced, or re-rendered without a
+    fresh capture no longer matches, instead of silently keeping the previous claim.
+
+    Absence is reported, not failed: a pack with no captures has nothing to attest to, and `graphics.md`
+    states that an absent record means the images are unattested.
+    """
+    path = store / "provenance.json"
+    if not path.is_file():
+        print(
+            "NOTE provenance.json - absent, so these assets are not attested to any release build; "
+            "run node scripts/media-capture.mjs --slot <slug> against a built release"
+        )
+        return []
+    try:
+        record = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as error:
+        print(f"FAIL provenance.json - unreadable: {error}")
+        return [f"provenance.json unreadable: {error}"]
+
+    slot_dir = store.parent
+    failures: list[str] = []
+    for group in ("composedAssets", "rawCaptures"):
+        entries = record.get(group)
+        if not isinstance(entries, list) or not entries:
+            failures.append(f"provenance.json has no usable {group} list")
+            print(f"FAIL provenance.json - no usable {group} list")
+            continue
+        for entry in entries:
+            relative = str(entry.get("file") or "")
+            target = slot_dir / relative
+            if not target.is_file():
+                # Raw captures live under the ignored captures/ tree, so their absence is expected on a
+                # clean checkout; the composed assets are committed and must be present.
+                if group == "rawCaptures":
+                    continue
+                failures.append(f"{relative} is named in provenance.json but missing")
+                print(f"FAIL provenance.json - {relative} missing")
+                continue
+            actual = hashlib.sha256(target.read_bytes()).hexdigest()
+            if actual != str(entry.get("sha256") or "").lower():
+                failures.append(f"{relative} does not match its recorded sha256")
+                print(f"FAIL provenance.json - {relative} does not match its recorded sha256 ({actual[:12]}…)")
+
+    if not failures:
+        composed = len(record.get("composedAssets") or [])
+        print(
+            f"PASS provenance.json - {composed} committed asset(s) match the record for commit "
+            f"{str(record.get('gitCommit') or '?')[:12]} (artifact sha256 "
+            f"{str(record.get('artifactSha256') or '?')[:12]}…)"
+        )
+    return failures
+
+
+def validate_store(
+    store: Path, listing: dict[str, Any], locales: list[str], skip_provenance: bool = False
+) -> bool:
     failures = validate_listing(listing, locales)
     if failures:
         for failure in failures:
@@ -1410,6 +1479,8 @@ def validate_store(store: Path, listing: dict[str, Any], locales: list[str]) -> 
         else:
             size_bytes = path.stat().st_size
             print(f"PASS {relative} — {dimensions[0]}x{dimensions[1]} {mode}, {size_bytes} bytes")
+    if not skip_provenance:
+        failures.extend(validate_provenance(store))
     return not failures
 
 
@@ -1467,7 +1538,7 @@ def main(argv: list[str] | None = None) -> int:
         write_json(listing_path, listing)
 
     if args.validate_only:
-        ok = validate_store(store, listing, locales)
+        ok = validate_store(store, listing, locales, skip_provenance=args.skip_provenance)
         if ok:
             print(summary(slot, locales))
             return 0
@@ -1476,7 +1547,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.capture:
         capture_with_adb(store, listing)
     render_all(store, listing, locales, meta)
-    ok = validate_store(store, listing, locales)
+    ok = validate_store(store, listing, locales, skip_provenance=args.skip_provenance)
     if not ok:
         return 1
     print(summary(slot, locales))
