@@ -1,39 +1,20 @@
-# Data safety answers (draft) — Pipe Sizing: NFPA 54
+# Play Console data safety answers — Gas Pipe Sizing Workbook
 
-Complete before Play Console submission. Must match the privacy policy and actual
-code/SDK behavior. Even apps that collect **no** user data must file the form.
+## Data collection and sharing
 
-## Does the app collect user data?
+- Does the app collect user data? **No.**
+- Does the app share user data? **No.**
+- Does the app transmit user-entered values? **No.** Everything stays on the device.
+- Does the app declare permissions? **No.** The shipped manifest contains no `<uses-permission>` entries.
 
-- [ ] No — explain briefly why (e.g. fully offline, no analytics, no accounts)
-- [ ] Yes — list categories below
+## Data types
 
-## Data types (check all that apply)
-
-| Category | Collected? | Shared? | Purpose | Ephemeral? |
-|----------|------------|---------|---------|------------|
-| App activity | | | | |
-| Location | | | | |
-| Personal info | | | | |
-| Financial info | | | | |
-| Photos / videos | | | | |
-| Files / docs | | | | |
-| Device IDs | | | | |
-| Diagnostics / crash | | | | |
+No data types are collected or shared: no personal information, financial information, files, photos, location, device identifiers, app activity, diagnostics, or other user data.
 
 ## Third-party SDKs
 
-List every SDK that may collect data (Ads, Analytics, Crash, Auth, AI APIs):
+None. The capability declaration is `{"schemaVersion": 1, "enabled": []}`; there are no ads, analytics, account, cloud, or billing capabilities.
 
-1. …
-2. …
+## Security and deletion
 
-## Security practices
-
-- [ ] Data encrypted in transit (HTTPS)
-- [ ] Users can request deletion (if accounts exist)
-- [ ] Account deletion path documented (Play requirement when accounts exist)
-
-## Agent note
-
-Run `.agents/skills/android-official/play-play-policy-insights/` before marking ready.
+Network encryption is not applicable because the app has no network capability. Account deletion is not applicable because the app has no accounts. Users can clear local app data or uninstall the app.

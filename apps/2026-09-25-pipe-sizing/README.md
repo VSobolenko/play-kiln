@@ -1,8 +1,8 @@
-# Pipe Sizing: NFPA 54
+# Gas Pipe Sizing Workbook
 
 **Slug:** `pipe-sizing`  
 **applicationId:** `com.gexetr.pipesizing`  
-**Idea:** Standards-cited US fuel gas pipe sizing per NFPA 54: every input editable, results in the unit system you chose, the cited code edition shown in-app, offline, bought once.
+**Idea:** A paid-once, offline calculation aid for user-entered gas loads, developed lengths, fitting allowances, unit conversion, and recorded source citations. It performs arithmetic and does not provide code-table data or determine compliance.
 
 PlayKiln slot — isolated Android attempt. Factory harness lives at the repo root.
 
@@ -24,4 +24,4 @@ gradle wrapper --gradle-version 8.11.1
 
 ## Store pack
 
-See `store/` for Play listing drafts.
+See `store/` for the Play listing, privacy and data-safety declarations, reviewer notes, checklist, and synthetic graphics inventory.

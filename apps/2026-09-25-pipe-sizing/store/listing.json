@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "appName": "Gas Pipe Sizing Workbook",
+  "slug": "pipe-sizing",
+  "applicationId": "com.gexetr.pipesizing",
+  "idea": "A paid-once offline calculation aid for user-entered gas loads, lengths, fitting allowances, unit conversion, and recorded source citations.",
+  "defaultLocale": "en-US",
+  "category": "TOOLS",
+  "tags": ["offline", "gas", "pipe sizing", "calculator"],
+  "contactEmail": "support@example.com",
+  "privacyPolicyUrl": "https://example.com/privacy",
+  "locales": {
+    "en-US": {
+      "title": "Gas Pipe Sizing Workbook",
+      "shortDescription": "Offline gas pipe sizing arithmetic with user-entered loads and citations",
+      "fullDescription": "Gas Pipe Sizing Workbook is a paid-once, offline calculation aid for organizing gas pipe sizing inputs and arithmetic.\n\nEnter loads, developed lengths, fitting allowances, units, and user-confirmed capacity-like readings. The app sums loads and lengths, converts imperial and metric units both ways, compares required load with the value you entered, and records your edition, table, and row citation.\n\nThe app provides no code-table data and does not determine compliance, certify work, or endorse a source. It asserts no result when a required input, citation, range, or consistency check is missing; instead, it identifies what to correct.\n\nYour entries remain on the device while the app is running. The current release does not provide case history or process-death restoration. No account, ads, subscription, in-app purchase, or network connection is required.",
+      "screenshotCaptions": ["Enter the sizing inputs", "Add loads and lengths", "Record the source citation", "Convert units both ways", "Review missing-input guidance", "Inspect the arithmetic result"],
+      "featureBullets": ["Sum user-entered loads and developed lengths", "Convert imperial and metric units both ways", "Record citations and explain unavailable results"]
+    }
+  },
+  "dataSafety": {"collectsData": false, "reason": "No data is collected, transmitted, or shared; the app has no permissions and works offline.", "dataTypes": [], "thirdPartySdks": [], "encryptedInTransit": false, "hasAccountDeletion": false},
+  "permissions": [],
+  "ads": {"containsAds": false, "reason": "The paid-once app contains no advertising or billing capability."},
+  "contentRating": {"questionnaire": "notes", "targetAudience": "18+"},
+  "graphicsSource": {"iconGlyph": "pipe", "brandColor": "#17324D", "accentColor": "#E8A83E"},
+  "capabilityCompliance": {"enabled": [], "requiresConsent": false, "requiresPurchaseAuthority": false, "purchaseAuthority": null}
+}

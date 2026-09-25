@@ -1,4 +1,4 @@
-# AGENTS.md — slot: Pipe Sizing: NFPA 54
+# AGENTS.md — slot: Gas Pipe Sizing Workbook
 
 This file is **nested** guidance for `apps/<this-slot>/` only. Root
 `../../AGENTS.md` (factory) still applies and wins on conflicts about harness,
@@ -8,7 +8,7 @@ Play floors, and isolation.
 
 - **Slug:** `pipe-sizing`
 - **applicationId:** `com.gexetr.pipesizing`
-- **Idea:** Standards-cited US fuel gas pipe sizing per NFPA 54: every input editable, results in the unit system you chose, the cited code edition shown in-app, offline, bought once.
+- **Idea:** Offline gas pipe sizing arithmetic using user-entered loads, lengths, allowances, units, and source citations; paid once.
 
 ## Commands (from this directory)
 

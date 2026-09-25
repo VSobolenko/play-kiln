@@ -1,30 +1,11 @@
-# Pre-upload checklist — Pipe Sizing: NFPA 54
+# Pre-upload checklist — Gas Pipe Sizing Workbook
 
-Research baseline: `docs/research/2026-09-20-android-play-ai-agents.md`
-
-## Build / platform
-
-- [ ] `compileSdk` / `targetSdk` ≥ **36**
-- [ ] `assembleDebug` passes
-- [ ] `bundleRelease` AAB produced (Play artifact)
-- [ ] `dataExtractionRules` + `backup_rules` present; secrets excluded
-- [ ] Edge-to-edge + insets verified on API 35/36 emulator
-- [ ] Predictive back OK (or temporary opt-out documented)
-- [ ] If any `.so` / NDK / native SDK: 16 KB page-size check planned (hard block 2027-02-01)
-
-## Play Console
-
-- [ ] Privacy policy URL ready (`store/privacy.md` drafted)
-- [ ] Data safety form answers (`store/data-safety.md`) — even if "no data collected"
-- [ ] Ads declaration accurate
-- [ ] Content rating questionnaire
-- [ ] Target audience / Families policy if applicable
-- [ ] Package name registered / developer verification done
-- [ ] Review notes / demo account (`store/review-notes.md`)
-- [ ] Listing matches real app behavior (no vaporware)
-- [ ] If generative AI: in-app report/flag + not a thin wrapper
-
-## Signing
-
-- [ ] Upload keystore configured locally (not in git)
-- [ ] Play App Signing enrolled
+- [ ] Run strict store validation and resolve every FAIL.
+- [ ] Build and locally test the signed release APK and AAB.
+- [ ] Confirm listing copy describes arithmetic and user-entered citations only.
+- [ ] Confirm the public privacy-policy URL and monitored developer contact before upload.
+- [ ] Confirm the manifest and release dependencies still declare no permissions or data-collecting SDKs.
+- [ ] Review synthetic screenshots against the shipped APK and replace them with truthful captures where needed.
+- [ ] Complete Ads, Content rating, Target audience, App access, and Data safety declarations.
+- [ ] Complete Play App Signing and keep upload credentials outside the repository.
+- [ ] Obtain explicit human approval before the first upload and publish action.
