@@ -55,15 +55,19 @@ class HomeViewModel(
             ProvenanceMode.USER_SUPPLIED -> UserProvenance.UserSupplied
             ProvenanceMode.CODE_CITATION -> state.citationOrNull()
         }
-        val metric = state.unitSystem == UnitSystem.METRIC
-        val fittingBlank = state.fittingQuantity.isBlank() && state.fittingLengthFeet.isBlank()
+        // The arithmetic runs on the canonical readings, never on the display text. Parsing what the
+        // field happens to show would make the result depend on the unit label and on display
+        // rounding, which is the confusion this app exists to avoid.
+        val fittingBlank = state.fittingQuantity.isBlank() && state.canonicalFittingLengthFeet == null
         val case = SizingCase(
             materialOrSystem = state.material,
             pressureClass = state.pressure,
             method = state.method,
             unitSystem = state.unitSystem,
-            loads = if (state.loadMbh.isBlank()) emptyList() else listOf(Load("User load", reading(state.loadMbh, metric, { Units.kilowattsToMbh(it) }))),
-            developedLengths = if (state.lengthFeet.isBlank()) emptyList() else listOf(DevelopedLength("Developed run", reading(state.lengthFeet, metric, { Units.metersToFeet(it) }))),
+            loads = state.canonicalLoadMbh?.let { listOf(Load("User load", it)) } ?: emptyList(),
+            developedLengths = state.canonicalLengthFeet?.let {
+                listOf(DevelopedLength("Developed run", it))
+            } ?: emptyList(),
             // A case with no fittings is expressed as an empty list. Sending a zero quantity instead
             // would be refused as out of range, leaving no way to size a run that has no fittings.
             fittingAllowances = if (fittingBlank) {
@@ -74,7 +78,7 @@ class HomeViewModel(
                         fittingLabel = "User fitting allowance",
                         quantity = state.fittingQuantity.toIntOrNull() ?: 0,
                         equivalentLengthFeet = SourcedValue(
-                            reading(state.fittingLengthFeet, metric, { Units.metersToFeet(it) }),
+                            state.canonicalFittingLengthFeet ?: Double.NaN,
                             provenance,
                         ),
                     ),
@@ -84,7 +88,7 @@ class HomeViewModel(
             // capacity, and dropping the confirmation on any edit keeps a stale value for another
             // method from being reused silently.
             capacity = if (state.capacityConfirmed) {
-                CapacityEntry(reading(state.capacity, metric, { Units.kilowattsToMbh(it) }), provenance, state.method)
+                CapacityEntry(state.canonicalCapacity ?: Double.NaN, provenance, state.method)
             } else {
                 null
             },
@@ -102,10 +106,11 @@ class HomeViewModel(
     }
 
     /**
-     * Switches the unit mode while preserving every physical quantity. Imperial is the canonical
-     * unit, so a value the user entered in metric is converted back on the way out. Relabelling the
-     * entered numbers instead would silently change what they mean - 100 MBH becoming 100 kW - which
-     * is exactly the reinterpretation this app refuses to do anywhere else.
+     * Switches the unit mode while preserving every physical quantity. The canonical readings do not
+     * move at all; only the text shown in the fields is re-expressed in the newly selected unit, which
+     * is why repeated toggling cannot drift. Relabelling the entered numbers instead would silently
+     * change what they mean - 100 MBH becoming 100 kW - which is exactly the reinterpretation this app
+     * refuses to do anywhere else.
      *
      * Readings with no unit of their own (specific gravity) or no unambiguous conversion
      * (pressure-drop allowance, pipe inside diameter) are carried across unchanged; the labels for
@@ -116,24 +121,27 @@ class HomeViewModel(
         return copy(
             unitSystem = unit,
             evaluation = null,
-            loadMbh = convertUnit(loadMbh, unit, Units::kilowattsToMbh, Units::mbhToKilowatts),
-            lengthFeet = convertUnit(lengthFeet, unit, Units::metersToFeet, Units::feetToMeters),
-            fittingLengthFeet = convertUnit(fittingLengthFeet, unit, Units::metersToFeet, Units::feetToMeters),
-            capacity = convertUnit(capacity, unit, Units::kilowattsToMbh, Units::mbhToKilowatts),
+            loadMbh = reUnit(loadMbh, canonicalLoadMbh, unit, Units::mbhToKilowatts),
+            lengthFeet = reUnit(lengthFeet, canonicalLengthFeet, unit, Units::feetToMeters),
+            fittingLengthFeet = reUnit(fittingLengthFeet, canonicalFittingLengthFeet, unit, Units::feetToMeters),
+            capacity = reUnit(capacity, canonicalCapacity, unit, Units::mbhToKilowatts),
         )
     }
 
-    /** Re-expresses one entered reading in [target], keeping full precision so a toggle cannot drift. */
-    private fun HomeUiState.convertUnit(
+    /**
+     * Re-expresses one reading in [target]. Text that never parsed is left exactly as the user typed
+     * it: there is no value to convert, and replacing their entry with a conversion of nothing would
+     * destroy what they are still in the middle of correcting.
+     */
+    private fun reUnit(
         text: String,
+        canonical: Double?,
         target: UnitSystem,
-        toCanonical: (Double) -> Double,
         fromCanonical: (Double) -> Double,
     ): String {
-        val entered = text.toDoubleOrNull() ?: return text
-        val canonical = if (unitSystem == UnitSystem.METRIC) toCanonical(entered) else entered
+        if (canonical == null || canonical.isNaN()) return text
         val shown = if (target == UnitSystem.METRIC) fromCanonical(canonical) else canonical
-        return shown.toString()
+        return readableNumber(shown)
     }
 
     /**
@@ -149,32 +157,43 @@ class HomeViewModel(
         }
 
     /**
-     * Reads a user entry into the domain's canonical imperial units. In metric mode the entry is in
-     * the metric unit shown by the field's label and is converted on the way in; the canonical value
-     * is what the domain stores, so switching units never changes the physical quantity.
-     */
-    private fun reading(text: String, metric: Boolean, metricToCanonical: (Double) -> Double): Double {
-        val parsed = text.toDoubleOrNull() ?: return Double.NaN
-        return if (metric) metricToCanonical(parsed) else parsed
-    }
-
-    /**
      * A method-required reading that the user may not have entered yet: blank means absent, while a
      * non-blank value that will not parse stays invalid so the evaluator can say so.
      */
     private fun optionalReading(text: String, provenance: UserProvenance?): SourcedValue? =
         if (text.isBlank()) null else SourcedValue(text.toDoubleOrNull() ?: Double.NaN, provenance)
 
-    private fun HomeUiState.set(field: HomeField, value: String) = when (field) {
-        HomeField.MATERIAL -> copy(material = value); HomeField.PRESSURE -> copy(pressure = value)
-        HomeField.LOAD -> copy(loadMbh = value); HomeField.LENGTH -> copy(lengthFeet = value)
-        HomeField.FITTING_QUANTITY -> copy(fittingQuantity = value); HomeField.FITTING_LENGTH -> copy(fittingLengthFeet = value)
-        HomeField.CAPACITY -> copy(capacity = value, capacityConfirmed = false)
-        HomeField.EDITION -> copy(codeEdition = value); HomeField.TABLE -> copy(table = value); HomeField.ROW -> copy(row = value)
+    /**
+     * Applies one edit, keeping the canonical value of a quantity field in step with its text. The
+     * text is parsed with the unit the user is currently working in, so the same keystrokes mean the
+     * same physical reading whether the field is labelled MBH or kW.
+     */
+    private fun HomeUiState.set(field: HomeField, value: String): HomeUiState = when (field) {
+        HomeField.MATERIAL -> copy(material = value)
+        HomeField.PRESSURE -> copy(pressure = value)
+        HomeField.LOAD -> copy(loadMbh = value, canonicalLoadMbh = loadReading(value))
+        HomeField.LENGTH -> copy(lengthFeet = value, canonicalLengthFeet = lengthReading(value))
+        HomeField.FITTING_QUANTITY -> copy(fittingQuantity = value)
+        HomeField.FITTING_LENGTH -> copy(
+            fittingLengthFeet = value,
+            canonicalFittingLengthFeet = lengthReading(value),
+        )
+        // Editing the capacity drops the confirmation: a confirmed capacity that no one re-confirmed
+        // for the new number would otherwise be compared against the required load.
+        HomeField.CAPACITY -> copy(capacity = value, canonicalCapacity = loadReading(value), capacityConfirmed = false)
+        HomeField.EDITION -> copy(codeEdition = value)
+        HomeField.TABLE -> copy(table = value)
+        HomeField.ROW -> copy(row = value)
         HomeField.GAS_SPECIFIC_GRAVITY -> copy(gasSpecificGravity = value)
         HomeField.PRESSURE_DROP -> copy(pressureDropAllowance = value)
         HomeField.PIPE_DIAMETER -> copy(pipeInsideDiameter = value)
     }
+
+    private fun HomeUiState.loadReading(text: String): Double? =
+        canonicalReading(text, unitSystem == UnitSystem.METRIC, Units::kilowattsToMbh)
+
+    private fun HomeUiState.lengthReading(text: String): Double? =
+        canonicalReading(text, unitSystem == UnitSystem.METRIC, Units::metersToFeet)
 
     companion object {
         /** Supplies the on-device store so a case survives process death. */

@@ -4,6 +4,8 @@ import androidx.compose.runtime.Immutable
 import com.gexetr.pipesizing.sizing.SizingEvaluation
 import com.gexetr.pipesizing.sizing.SizingMethod
 import com.gexetr.pipesizing.sizing.UnitSystem
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 @Immutable
 data class HomeUiState(
@@ -25,9 +27,39 @@ data class HomeUiState(
     val row: String = "",
     val capacityConfirmed: Boolean = false,
     val evaluation: SizingEvaluation? = null,
+    // The quantity fields above are what the user sees and edits, in whichever unit they have
+    // selected. These are the same readings held once in the canonical imperial units the domain
+    // works in, and they are what the arithmetic runs on and what the fields are re-rendered from
+    // when the unit system changes. Keeping them separate is what lets a unit switch both preserve
+    // the physical value exactly and display a number short enough to read: re-parsing rounded
+    // display text on every toggle would drift a little each time instead.
+    // Null means the field is blank; NaN means it is filled but not a number.
+    val canonicalLoadMbh: Double? = null,
+    val canonicalLengthFeet: Double? = null,
+    val canonicalFittingLengthFeet: Double? = null,
+    val canonicalCapacity: Double? = null,
 )
 
 enum class ProvenanceMode { USER_SUPPLIED, CODE_CITATION }
+
+/**
+ * Parses one editable reading into its canonical value. Blank is absent rather than invalid, so the
+ * evaluator reports a missing input and names the field instead of reporting nonsense arithmetic on
+ * a zero. Text that is present but unparseable stays NaN so the refusal can name it as unusable.
+ */
+internal fun canonicalReading(text: String, metric: Boolean, metricToCanonical: (Double) -> Double): Double? {
+    if (text.isBlank()) return null
+    val parsed = text.toDoubleOrNull() ?: return Double.NaN
+    return if (metric) metricToCanonical(parsed) else parsed
+}
+
+/**
+ * Renders a displayed quantity at a precision worth reading. The value behind it keeps full
+ * precision, so this only affects the text: a converted load reads 29.3071 rather than
+ * 29.307107017222222, and nothing about the case changes.
+ */
+internal fun readableNumber(value: Double): String =
+    BigDecimal(value).setScale(4, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
 
 sealed interface HomeEvent {
     data class FieldChanged(val field: HomeField, val value: String) : HomeEvent

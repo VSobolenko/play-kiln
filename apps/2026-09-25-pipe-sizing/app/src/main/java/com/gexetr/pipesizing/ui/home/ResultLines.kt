@@ -24,12 +24,14 @@ internal fun computedResultLines(
 ): List<ResultLine> = buildList {
     add(ResultLine(R.string.result_case_label, listOf(state.material, state.pressure)))
     add(ResultLine(R.string.result_method_label, listOf(methodLabel)))
-    val capacity = state.capacity.toDoubleOrNull() ?: Double.NaN
+    // The compared capacity is reported from the canonical reading, so it is shown in the unit the
+    // user selected no matter which unit it was entered in.
+    val capacityMbh = state.canonicalCapacity ?: Double.NaN
     add(
         if (metric) {
-            ResultLine(R.string.result_capacity_metric, listOf(display(capacity)))
+            ResultLine(R.string.result_capacity_metric, listOf(display(Units.mbhToKilowatts(capacityMbh))))
         } else {
-            ResultLine(R.string.result_capacity_imperial, listOf(display(capacity)))
+            ResultLine(R.string.result_capacity_imperial, listOf(display(capacityMbh)))
         },
     )
     if (state.method == SizingMethod.CAPACITY_COMPARISON_WITH_PHYSICAL_INPUTS) {

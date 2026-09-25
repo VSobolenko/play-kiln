@@ -183,12 +183,28 @@ class HomeViewModelTest {
         // These are literal expectations on purpose: deriving them from Units would make the test
         // unfalsifiable, so they are the values a correct conversion must produce and they are tight
         // enough (1e-6) to fail against the imprecise 0.2930711111111111 MBH constant as well.
-        assertEquals(29.30710701722222, vm.uiState.value.loadMbh.toDouble(), TOLERANCE)
-        assertEquals(12.192, vm.uiState.value.lengthFeet.toDouble(), TOLERANCE)
-        assertEquals(1.524, vm.uiState.value.fittingLengthFeet.toDouble(), TOLERANCE)
-        assertEquals(35.168528420666664, vm.uiState.value.capacity.toDouble(), TOLERANCE)
+        assertEquals("29.3071", vm.uiState.value.loadMbh)
+        assertEquals("12.192", vm.uiState.value.lengthFeet)
+        assertEquals("1.524", vm.uiState.value.fittingLengthFeet)
+        assertEquals("35.1685", vm.uiState.value.capacity)
         // The relabelling failure mode this replaces would have left the imperial numbers in place.
         assertFalse(vm.uiState.value.loadMbh.startsWith("100"))
+    }
+
+    @Test
+    fun theShownLengthValueStaysReadable() {
+        val vm = completeVm()
+
+        vm.onEvent(HomeEvent.UnitChanged(UnitSystem.METRIC))
+
+        // The converted load is shown rounded to something a person can read. The value behind it is
+        // untouched, which is why this is a display rule and not a limit on the arithmetic.
+        assertEquals("29.3071", vm.uiState.value.loadMbh)
+        assertTrue(vm.uiState.value.loadMbh.length < 9)
+        // The exact canonical value is still what the arithmetic runs on.
+        vm.onEvent(HomeEvent.Evaluate)
+        val result = vm.uiState.value.evaluation as SizingEvaluation.Computed
+        assertEquals(100.0, result.requiredLoadMbh, TOLERANCE)
     }
 
     @Test
@@ -201,9 +217,13 @@ class HomeViewModelTest {
             vm.onEvent(HomeEvent.UnitChanged(UnitSystem.IMPERIAL))
         }
 
+        // Canonical readings never move on a unit switch, so ten round trips land on the exact
+        // original values rather than merely close to them.
         val result = evaluate(vm) as SizingEvaluation.Computed
-        assertEquals(100.0, result.requiredLoadMbh, TOLERANCE)
-        assertEquals(45.0, result.totalLengthFeet, TOLERANCE)
+        assertEquals(100.0, result.requiredLoadMbh, 0.0)
+        assertEquals(45.0, result.totalLengthFeet, 0.0)
+        assertEquals("100", vm.uiState.value.loadMbh)
+        assertEquals("40", vm.uiState.value.lengthFeet)
     }
 
     @Test
@@ -235,6 +255,48 @@ class HomeViewModelTest {
         vm.onEvent(HomeEvent.UnitChanged(UnitSystem.METRIC))
 
         assertNull(vm.uiState.value.evaluation)
+    }
+
+    @Test
+    fun aMetricCaseRestoredFromStoreComputesTheSamePhysicalValues() {
+        val store = FakeCasePersistence()
+        val original = evaluate(completeVm(metric = true, store = store)) as SizingEvaluation.Computed
+
+        // The canonical readings are not stored, so this proves they are rebuilt correctly from the
+        // restored text and unit mode rather than silently defaulting to imperial.
+        val restored = evaluate(newVm(store)) as SizingEvaluation.Computed
+
+        assertEquals(original.requiredLoadMbh, restored.requiredLoadMbh, TOLERANCE)
+        assertEquals(original.totalLengthFeet, restored.totalLengthFeet, TOLERANCE)
+        assertEquals(original.fittingAllowanceFeet, restored.fittingAllowanceFeet, TOLERANCE)
+        assertEquals(UnitSystem.METRIC, newVm(store).uiState.value.unitSystem)
+    }
+
+    @Test
+    fun aUnitSwitchKeepsTextThatNeverParsed() {
+        val vm = completeVm()
+        field(vm, HomeField.LENGTH, "4o")
+
+        vm.onEvent(HomeEvent.UnitChanged(UnitSystem.METRIC))
+
+        // There is no value to convert here, and replacing what the user is still correcting with a
+        // conversion of nothing would destroy their entry. It is carried across verbatim, and the
+        // evaluator keeps reporting it as unusable.
+        assertEquals("4o", vm.uiState.value.lengthFeet)
+        assertEquals(RefusalKind.OUT_OF_RANGE, (evaluate(vm) as SizingEvaluation.Refused).kind)
+    }
+
+    @Test
+    fun aUnitSwitchKeepsBlankFieldsBlank() {
+        val vm = newVm()
+
+        vm.onEvent(HomeEvent.UnitChanged(UnitSystem.METRIC))
+
+        // A blank field is an absent input. It must not acquire a value from the unit switch.
+        assertEquals("", vm.uiState.value.loadMbh)
+        assertEquals("", vm.uiState.value.lengthFeet)
+        assertEquals("", vm.uiState.value.fittingLengthFeet)
+        assertEquals("", vm.uiState.value.capacity)
     }
 
     @Test

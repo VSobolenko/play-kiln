@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.gexetr.pipesizing.sizing.Units
+import com.gexetr.pipesizing.sizing.UnitSystem
 import kotlinx.coroutines.flow.first
 
 /**
@@ -91,27 +93,40 @@ internal fun HomeUiState.toStoredCase(): Map<String, String> = mapOf(
 /**
  * Rebuilds the entered case from storage. Anything missing or unrecognised keeps its default rather
  * than being guessed, and the evaluation is deliberately left absent.
+ *
+ * The canonical readings are rebuilt from the restored text and unit system rather than stored. They
+ * are derived values, and storing them too would create a second source of truth that a hand-edited
+ * or partially written store could leave disagreeing with the text the user sees.
  */
-internal fun HomeUiState.restoredFrom(stored: Map<String, String>): HomeUiState = copy(
-    material = stored[CaseKeys.MATERIAL] ?: material,
-    pressure = stored[CaseKeys.PRESSURE] ?: pressure,
-    loadMbh = stored[CaseKeys.LOAD] ?: loadMbh,
-    lengthFeet = stored[CaseKeys.LENGTH] ?: lengthFeet,
-    fittingQuantity = stored[CaseKeys.FITTING_QUANTITY] ?: fittingQuantity,
-    fittingLengthFeet = stored[CaseKeys.FITTING_LENGTH] ?: fittingLengthFeet,
-    capacity = stored[CaseKeys.CAPACITY] ?: capacity,
-    method = stored[CaseKeys.METHOD].toEnumOr(method),
-    unitSystem = stored[CaseKeys.UNIT_SYSTEM].toEnumOr(unitSystem),
-    gasSpecificGravity = stored[CaseKeys.GAS_SPECIFIC_GRAVITY] ?: gasSpecificGravity,
-    pressureDropAllowance = stored[CaseKeys.PRESSURE_DROP] ?: pressureDropAllowance,
-    pipeInsideDiameter = stored[CaseKeys.PIPE_DIAMETER] ?: pipeInsideDiameter,
-    provenanceMode = stored[CaseKeys.PROVENANCE_MODE].toEnumOr(provenanceMode),
-    codeEdition = stored[CaseKeys.CODE_EDITION] ?: codeEdition,
-    table = stored[CaseKeys.TABLE] ?: table,
-    row = stored[CaseKeys.ROW] ?: row,
-    capacityConfirmed = stored[CaseKeys.CAPACITY_CONFIRMED]?.toBooleanStrictOrNull() ?: capacityConfirmed,
-    evaluation = null,
-)
+internal fun HomeUiState.restoredFrom(stored: Map<String, String>): HomeUiState {
+    val rebuilt = copy(
+        material = stored[CaseKeys.MATERIAL] ?: material,
+        pressure = stored[CaseKeys.PRESSURE] ?: pressure,
+        loadMbh = stored[CaseKeys.LOAD] ?: loadMbh,
+        lengthFeet = stored[CaseKeys.LENGTH] ?: lengthFeet,
+        fittingQuantity = stored[CaseKeys.FITTING_QUANTITY] ?: fittingQuantity,
+        fittingLengthFeet = stored[CaseKeys.FITTING_LENGTH] ?: fittingLengthFeet,
+        capacity = stored[CaseKeys.CAPACITY] ?: capacity,
+        method = stored[CaseKeys.METHOD].toEnumOr(method),
+        unitSystem = stored[CaseKeys.UNIT_SYSTEM].toEnumOr(unitSystem),
+        gasSpecificGravity = stored[CaseKeys.GAS_SPECIFIC_GRAVITY] ?: gasSpecificGravity,
+        pressureDropAllowance = stored[CaseKeys.PRESSURE_DROP] ?: pressureDropAllowance,
+        pipeInsideDiameter = stored[CaseKeys.PIPE_DIAMETER] ?: pipeInsideDiameter,
+        provenanceMode = stored[CaseKeys.PROVENANCE_MODE].toEnumOr(provenanceMode),
+        codeEdition = stored[CaseKeys.CODE_EDITION] ?: codeEdition,
+        table = stored[CaseKeys.TABLE] ?: table,
+        row = stored[CaseKeys.ROW] ?: row,
+        capacityConfirmed = stored[CaseKeys.CAPACITY_CONFIRMED]?.toBooleanStrictOrNull() ?: capacityConfirmed,
+        evaluation = null,
+    )
+    val metric = rebuilt.unitSystem == UnitSystem.METRIC
+    return rebuilt.copy(
+        canonicalLoadMbh = canonicalReading(rebuilt.loadMbh, metric, Units::kilowattsToMbh),
+        canonicalLengthFeet = canonicalReading(rebuilt.lengthFeet, metric, Units::metersToFeet),
+        canonicalFittingLengthFeet = canonicalReading(rebuilt.fittingLengthFeet, metric, Units::metersToFeet),
+        canonicalCapacity = canonicalReading(rebuilt.capacity, metric, Units::kilowattsToMbh),
+    )
+}
 
 private inline fun <reified T : Enum<T>> String?.toEnumOr(fallback: T): T =
     this?.let { name -> enumValues<T>().firstOrNull { it.name == name } } ?: fallback
