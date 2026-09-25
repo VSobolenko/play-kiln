@@ -446,7 +446,7 @@ def default_listing(
             "reason": "Fully offline. No accounts, no analytics, no ads.",
             "dataTypes": [],
             "thirdPartySdks": [],
-            "encryptedInTransit": True,
+            "encryptedInTransit": False,
             "hasAccountDeletion": False,
         },
         "permissions": [],
@@ -481,7 +481,10 @@ def apply_capability_compliance(
         ),
         "dataTypes": data_types,
         "thirdPartySdks": sdks,
-        "encryptedInTransit": True,
+        # Only claimable when there is something to transmit. Asserting "encrypted in transit" for an
+        # app that collects nothing describes a transmission that does not exist, and the Data safety
+        # doc renders this verbatim as "Is collected data encrypted in transit? Yes".
+        "encryptedInTransit": bool(data_types),
         "hasAccountDeletion": False,
     }
     listing["capabilityCompliance"] = {
@@ -907,6 +910,25 @@ def markdown_escape(value: Any) -> str:
     return str(value).replace("|", "\\|")
 
 
+REVIEW_NOTES_MARKER = "<!-- kiln:generated notes - delete this line to keep your own wording -->"
+
+
+def write_preserving(path: Path, content: str, marker: str) -> None:
+    """Write generator output, but never over a file that was written by hand.
+
+    Rendering screenshots regenerates the reviewer notes as a side effect, which gives no hint that it
+    is about to replace prose someone wrote. The generated wording is necessarily generic - it cannot
+    know how this particular app is reviewed - so app-specific notes are the expected outcome rather
+    than an anomaly. Content without the generator marker is therefore treated as a human edit and
+    kept, the same way the listing's copy is preserved rather than clobbered. Delete the file, or
+    restore the marker line, to get generator output back.
+    """
+    if path.is_file() and marker not in read_text(path):
+        print(f"PRESERVE {path.name} - hand-written, not generator output")
+        return
+    path.write_text(content, encoding="utf-8")
+
+
 def write_documents(
     store: Path,
     listing: dict[str, Any],
@@ -1013,7 +1035,7 @@ Privacy questions: {listing['contactEmail']}
 
 ## Security practices
 
-- Is collected data encrypted in transit? **{'Yes' if safety['encryptedInTransit'] else 'No'}**
+- Is collected data encrypted in transit? **{'Not applicable - no data is collected' if not safety.get('collectsData') else ('Yes' if safety['encryptedInTransit'] else 'No')}**
 - Can users request data deletion? **{'Yes' if safety['hasAccountDeletion'] else 'Not applicable — no accounts'}**
 
 ## Account deletion
@@ -1062,8 +1084,10 @@ No account, payment, invitation, or demo credentials are required.
 - TODO-HUMAN: Complete the Play Console legal declarations and first-app setup.
 
 Version reviewed: `{meta['version_name']}` (code `{meta['version_code'] or 'not declared'}`)
+
+{REVIEW_NOTES_MARKER}
 """
-    (store / "review-notes.md").write_text(review, encoding="utf-8")
+    write_preserving(store / "review-notes.md", review, REVIEW_NOTES_MARKER)
 
     status = "synthetic — replace with real captures before publish" if synthetic else "framed from real device captures"
     graphics = f"""# Graphics inventory — {listing['appName']}
