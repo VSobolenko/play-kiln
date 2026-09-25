@@ -109,7 +109,9 @@ def parser() -> argparse.ArgumentParser:
         "--locales", default=None, help="Comma-separated locales (supported: en-US,ru-RU)."
     )
     p.add_argument(
-        "--capture", action="store_true", help="Drive an attached device with ADB before rendering."
+        "--capture",
+        action="store_true",
+        help="Retired; refuses. Use 'node scripts/media-capture.mjs --slot <slug>' instead.",
     )
     p.add_argument(
         "--render-only", action="store_true", help="Render from existing captures or synthetic screens."
@@ -1214,51 +1216,22 @@ def run_adb(adb: str, serial: str, args: list[str], *, binary: bool = False) -> 
 
 
 def capture_with_adb(store: Path, listing: dict[str, Any]) -> bool:
-    journey_path = store / "journey.json"
-    if not journey_path.is_file():
-        write_json(journey_path, journey_example(listing))
-        print(f"PASS: wrote documented journey example {journey_path}")
-    adb = adb_path()
-    if not adb:
-        blocked_capture("adb was not found on PATH or under ANDROID_HOME/platform-tools")
-        return False
-    devices = subprocess.run([adb, "devices"], capture_output=True, text=True, check=False)
-    serials = []
-    if devices.returncode == 0:
-        serials = [line.split()[0] for line in devices.stdout.splitlines()[1:] if line.strip().endswith("\tdevice")]
-    if not serials:
-        blocked_capture("adb found no attached device in 'device' state")
-        return False
-    serial = serials[0]
-    journey = json.loads(read_text(journey_path))
-    shots = journey.get("shots", [])
-    if not isinstance(shots, list) or len(shots) < 6:
-        raise StoreKitError(f"{journey_path} must define at least 6 shots")
-    raw_dir = store / "captures" / "raw"
-    raw_dir.mkdir(parents=True, exist_ok=True)
-    run_adb(adb, serial, ["shell", "monkey", "-p", listing["applicationId"], "-c", "android.intent.category.LAUNCHER", "1"])
-    time.sleep(1)
-    for index, shot in enumerate(shots[:6], 1):
-        for step in shot.get("steps", []):
-            kind = step.get("type")
-            if kind == "tap":
-                run_adb(adb, serial, ["shell", "input", "tap", str(step["x"]), str(step["y"])])
-            elif kind == "swipe":
-                run_adb(adb, serial, ["shell", "input", "swipe", str(step["x1"]), str(step["y1"]), str(step["x2"]), str(step["y2"]), str(step.get("durationMs", 350))])
-            elif kind == "wait":
-                time.sleep(max(0, int(step.get("ms", 0))) / 1000)
-            elif kind == "text":
-                value = str(step.get("value", "")).replace(" ", "%s")
-                run_adb(adb, serial, ["shell", "input", "text", value])
-            elif kind == "back":
-                run_adb(adb, serial, ["shell", "input", "keyevent", "4"])
-            else:
-                raise StoreKitError(f"unsupported journey step type: {kind!r}")
-        payload = run_adb(adb, serial, ["exec-out", "screencap", "-p"], binary=True)
-        assert isinstance(payload, bytes)
-        (raw_dir / f"{index:02d}.png").write_bytes(payload)
-        print(f"PASS: captured raw screenshot {index:02d} from {serial}")
-    return True
+    """Refuse: this used to be a second, unverified capture path.
+
+    It drove the device itself and wrote straight into `captures/raw/` with no `pm clear`, no IME
+    handling, no `clear` step support, and - decisively - no verification of what it had
+    photographed, after which `main` rendered the pack from those captures unconditionally. That
+    made it possible to ship a store pack built from a screen nobody had checked, which is the
+    exact failure `scripts/media-capture.mjs` exists to prevent. Two implementations of one
+    journey meant the verified one could be bypassed, so this one is gone.
+    """
+    raise StoreKitError(
+        "--capture is retired: it photographed the device without verifying the result. Use "
+        f"'node scripts/media-capture.mjs --slot {listing.get('slug', '<slug>')}', which asserts "
+        "each shot's expected readings before capturing and refuses to re-render the assets when "
+        "a shot does not match."
+    )
+    return False  # unreachable; keeps the historic signature honest
 
 
 def render_all(store: Path, listing: dict[str, Any], locales: list[str], meta: dict[str, str]) -> None:

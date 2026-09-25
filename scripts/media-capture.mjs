@@ -2,7 +2,7 @@
 /** Capture a six-step store journey with ADB, then delegate framing to store-kit.py. */
 
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 
@@ -237,12 +237,13 @@ function assertReadings(texts, expected, label) {
  * Replay the journey from a wiped, keyboard-free state and verify every screen before it is
  * photographed. Throws on the first screen that does not show what its shot claims to show.
  */
-function replayJourney({ adbPath, serial, journey, rawDir, listing }) {
+function replayJourney({ adbPath, serial, journey, stageDir, listing }) {
   // Enforce the preconditions the journey documents but the tool used to leave to the operator.
   adb(adbPath, serial, ['shell', 'pm', 'clear', listing.applicationId])
   if (!disableImes(adbPath, serial)) {
     throw new Error('a soft keyboard is still enabled; it autocorrects typed values and rescrolls the form')
   }
+  verifyInstalledBuild(adbPath, serial, listing.applicationId, stageDir)
   adb(adbPath, serial, ['shell', 'monkey', '-p', listing.applicationId, '-c', 'android.intent.category.LAUNCHER', '1'])
   sleep(1000)
   journey.shots.slice(0, 6).forEach((shot, index) => {
@@ -250,20 +251,71 @@ function replayJourney({ adbPath, serial, journey, rawDir, listing }) {
     shot.steps.forEach((step) => executeStep(adbPath, serial, step))
     const ordinal = String(index + 1).padStart(2, '0')
     // Read the screen back before photographing it: the capture on its own proves nothing.
-    const texts = dumpScreen(adbPath, serial, rawDir, `shot-${ordinal}-window`)
+    const texts = dumpScreen(adbPath, serial, stageDir, `shot-${ordinal}-window`)
     assertReadings(texts, expectedReadings(shot), `${shot.name} (${shot.title})`)
     const png = adb(adbPath, serial, ['exec-out', 'screencap', '-p'], { binary: true })
-    const target = path.join(rawDir, `${ordinal}.png`)
+    const target = path.join(stageDir, `${ordinal}.png`)
     writeFileSync(target, png)
-    console.log(`PASS capture — ${target}`)
+    console.log(`PASS capture — ${path.basename(target)}`)
   })
   // Whole-journey checksum: the last screen echoes every value entered along the way, so this
   // fails if any single step was dropped or rewritten even though each tap reported success.
   assertReadings(
-    dumpScreen(adbPath, serial, rawDir, 'final-window'),
+    dumpScreen(adbPath, serial, stageDir, 'final-window'),
     expectedReadings(journey),
     'the completed journey'
   )
+}
+
+/**
+ * Confirm the package about to be photographed is the signed release build, and record what it was.
+ *
+ * The debug variant carries a `.debug` applicationId suffix, so launching the bare applicationId
+ * already targets the release package - but a debug-signed build of the same id would slip through,
+ * and a screenshot of a debuggable build is a screenshot of something that never ships. This is the
+ * only place that can tell them apart, so it asserts rather than assumes, and writes the observed
+ * version and flags next to the captures as provenance.
+ */
+function verifyInstalledBuild(adbPath, serial, applicationId, stageDir) {
+  const dump = String(adb(adbPath, serial, ['shell', 'dumpsys', 'package', applicationId]))
+  if (!dump.trim() || /Unable to find package/i.test(dump)) {
+    throw new Error(
+      `package ${applicationId} is not installed; install the signed release APK first ` +
+      '(adb install -r app/build/outputs/apk/release/app-release.apk)'
+    )
+  }
+  const flags = (dump.match(/pkgFlags=\[([^\]]*)\]/) || [])[1] || ''
+  const versionName = (dump.match(/\bversionName=(\S+)/) || [])[1] || 'unknown'
+  const versionCode = (dump.match(/\bversionCode=(\S+)/) || [])[1] || 'unknown'
+  writeFileSync(
+    path.join(stageDir, 'installed-build.json'),
+    `${JSON.stringify({ applicationId, versionName, versionCode, pkgFlags: flags }, null, 2)}\n`,
+    'utf8'
+  )
+  if (/DEBUGGABLE/i.test(flags)) {
+    throw new Error(
+      `${applicationId} is installed as a DEBUGGABLE build (pkgFlags=${flags}); a capture of a ` +
+      'debug build would photograph a package that never ships. Install the release APK.'
+    )
+  }
+  console.log(`PASS installed build - ${applicationId} ${versionName} (${versionCode}), not debuggable`)
+}
+
+/**
+ * Move verified captures into place. Nothing is written to `captures/raw/` until the whole journey
+ * has verified, so the directory always holds either the previous complete good set or the new
+ * complete verified set - never a mixture of the two. Before this, each shot was written as it was
+ * taken, so a run that failed at shot five left shots one to four overwritten by unverified
+ * captures, and the next render would compose the pack from that half-state.
+ */
+function publishCaptures(stageDir, rawDir) {
+  mkdirSync(rawDir, { recursive: true })
+  let published = 0
+  for (const name of readdirSync(stageDir)) {
+    renameSync(path.join(stageDir, name), path.join(rawDir, name))
+    published += 1
+  }
+  return published
 }
 
 function findPython() {
@@ -319,12 +371,17 @@ function main() {
   if (!devices.includes(serial)) block(`requested device '${serial}' is not attached in 'device' state`)
 
   const rawDir = path.join(store, 'captures', 'raw')
+  const stageDir = path.join(store, 'captures', 'staging')
   mkdirSync(rawDir, { recursive: true })
   let lastError = null
   for (let attempt = 1; attempt <= options.attempts; attempt += 1) {
     if (attempt > 1) console.log(`RETRY - replaying the journey (attempt ${attempt} of ${options.attempts})`)
+    // Each attempt starts from an empty staging area, so a retry cannot inherit the previous
+    // attempt's files and publish a mixture of the two.
+    rmSync(stageDir, { recursive: true, force: true })
+    mkdirSync(stageDir, { recursive: true })
     try {
-      replayJourney({ adbPath, serial, journey, rawDir, listing })
+      replayJourney({ adbPath, serial, journey, stageDir, listing })
       lastError = null
       break
     } catch (error) {
@@ -333,10 +390,13 @@ function main() {
     }
   }
   if (lastError) {
-    // Fail closed: the framed assets are only rendered after every screen has been verified, so a
-    // run that cannot prove what it photographed leaves the last good pack untouched.
+    // Fail closed: nothing is published to captures/raw/ and the assets are not re-rendered, so the
+    // last good pack survives a failed run untouched.
     block(`the journey did not produce a verifiable result in ${options.attempts} attempt(s): ${lastError.message}`)
   }
+  const published = publishCaptures(stageDir, rawDir)
+  rmSync(stageDir, { recursive: true, force: true })
+  console.log(`PASS publish - ${published} verified capture(s) moved into ${path.relative(ROOT, rawDir)}`)
 
   const python = findPython()
   if (!python) block('Python was not found; set PYTHON or add python to PATH')

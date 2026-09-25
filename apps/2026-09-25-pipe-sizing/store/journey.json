@@ -3,7 +3,7 @@
   "_comment": "Six-step journey for the Gas Pipe Sizing Workbook store screenshots, replayed by scripts/media-capture.mjs and framed by scripts/store-kit.py. Every coordinate was measured from the live view hierarchy (uiautomator dump) of the signed release build on the Medium_Phone AVD at 1080x2400 / 420dpi, not guessed.",
   "_why_the_waits": "Each step is executed back to back with no settling time, and the runner waits only one second after launching the app. Compose needs longer than that to draw the form, and needs a moment between focusing a field and receiving text, or the entry lands in the wrong field or is dropped entirely. The waits below are load-bearing, not padding: without the leading one the material field silently stays empty.",
   "_why_the_clears": "The app persists the entered case across process death on purpose, so a field can already hold text when a run starts. Typing into a non-empty field appends: this is exactly how a stray '2' became the leading character of the material field ('2Schedule 40 steel') in one run. Each clear step puts the caret at the end and deletes what is there, which makes every entry idempotent instead of a function of the previous run.",
-  "_why_the_expects": "A screenshot is a claim about the product. Each shot declares the readings that must be on screen for it to be honest, and media-capture dumps the live view hierarchy and asserts them BEFORE taking the picture. This is the only check in the pipeline that reads the artifact back: verify-slot --strict-store only proves a PNG exists at the right size, which is how six captures of IME autocorrect gibberish once passed as this app's entire store presence. The journey-level 'expect' is the whole-journey checksum - its readings echo every value typed across all six shots, so it fails if any single step was dropped even though each tap reported success.",
+  "_why_the_expects": "A screenshot is a claim about the product. Each shot declares the readings that must be on screen for it to be honest, and media-capture dumps the live view hierarchy and asserts them BEFORE taking the picture. This is the only check in the pipeline that reads the artifact back: verify-slot --strict-store only proves a PNG exists at the right size, which is how six captures of IME autocorrect gibberish once passed as this app's entire store presence. Only VALUE-BEARING readings are listed. Field captions ('Material or system', 'Developed length (ft)') are deliberately excluded: they render on the screen regardless of what was entered, so asserting them would look like verification while being incapable of failing. The journey-level 'expect' is the whole-journey checksum - it echoes every value typed across all six shots, including the citation, so it fails if any single step was dropped even though each tap reported success.",
   "_preconditions": [
     "Target the release build. The debug variant carries a .debug applicationId suffix, so capturing it would photograph a package that never ships: ./gradlew :app:assembleRelease && adb install -r app/build/outputs/apk/release/app-release.apk",
     "Measured on the Medium_Phone AVD at 1080x2400 / 420dpi. Screens are captured at 1080x2400, so the phone assets are framed from a 2400px-tall source rather than 1920.",
@@ -14,14 +14,15 @@
     "Case: Schedule 40 steel at 0.5 psig",
     "Compared capacity: 120.00 MBH",
     "100.00 MBH required",
-    "60.00 ft total run"
+    "60.00 ft total run",
+    "Capacity provenance: CodeCitation(codeAndEdition=2024, table=A, row=2)"
   ],
   "shots": [
     {
       "name": "shot-01",
       "title": "Enter the sizing inputs",
       "body": "Type the material and pressure class for the run being sized.",
-      "expect": ["Schedule 40 steel", "0.5 psig", "Material or system", "Pressure class"],
+      "expect": ["Schedule 40 steel", "0.5 psig"],
       "steps": [
         { "type": "wait", "ms": 5000 },
         { "type": "tap", "x": 540, "y": 1159 },
@@ -40,7 +41,7 @@
       "name": "shot-02",
       "title": "Add loads and lengths",
       "body": "Enter the load, developed length, and fitting allowance.",
-      "expect": ["Total load (MBH)", "Developed length (ft)", "100", "40", "4", "5"],
+      "expect": ["100", "40", "4", "5"],
       "steps": [
         { "type": "tap", "x": 540, "y": 1559 },
         { "type": "wait", "ms": 600 },
@@ -68,7 +69,7 @@
       "name": "shot-03",
       "title": "Record the source citation",
       "body": "Read the capacity from your own code book and record where it came from.",
-      "expect": ["Code and edition", "2024", "Table", "A", "Row", "2"],
+      "expect": ["2024", "A", "2"],
       "steps": [
         { "type": "swipe", "x1": 540, "y1": 1800, "x2": 540, "y2": 600, "durationMs": 200 },
         { "type": "swipe", "x1": 540, "y1": 1800, "x2": 540, "y2": 600, "durationMs": 200 },
@@ -107,7 +108,7 @@
       "name": "shot-04",
       "title": "Convert units both ways",
       "body": "Switch to metric: the same readings, re-expressed rather than reinterpreted.",
-      "expect": ["Total load (kW)", "29.3071", "Developed length (m)", "12.192"],
+      "expect": ["29.3071", "12.192"],
       "steps": [
         { "type": "swipe", "x1": 540, "y1": 600, "x2": 540, "y2": 1800, "durationMs": 200 },
         { "type": "swipe", "x1": 540, "y1": 600, "x2": 540, "y2": 1800, "durationMs": 200 },
@@ -126,7 +127,7 @@
       "name": "shot-05",
       "title": "Review missing-input guidance",
       "body": "An unconfirmed capacity is refused by name instead of being assumed.",
-      "expect": ["Enter user-confirmed capacity.", "User-confirmed capacity (MBH)"],
+      "expect": ["Enter user-confirmed capacity."],
       "steps": [
         { "type": "swipe", "x1": 540, "y1": 600, "x2": 540, "y2": 1800, "durationMs": 200 },
         { "type": "swipe", "x1": 540, "y1": 600, "x2": 540, "y2": 1800, "durationMs": 200 },

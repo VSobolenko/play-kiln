@@ -1,12 +1,13 @@
 {
   "schemaVersion": 1,
   "_comment": "Copy for the composed store assets rendered by scripts/store-studio.py. Headlines are benefit-led and kept to 3-5 words so they stay readable at thumbnail size; the bodies come from journey.json so the shot copy and the shot's verification stay in one place.",
+  "_claim_bounds": "Every headline must be true of the bounded app. It performs sizing ARITHMETIC on readings the user supplies; it ships no code-table data, does not determine the pipe size itself, and does not determine compliance. So 'Size any gas run' was wrong (it implies the app owns the sizing data) and absolute guarantees like 'Nothing gets assumed' were wrong (the app trusts the user's confirmed capacity). Each headline below names something the app verifiably does. Reviewed against an independent evaluator finding: unbounded store claims exceed the implemented behaviour.",
   "headlines": [
-    "Size any gas run",
-    "Enter load and length",
-    "Cite the exact table",
+    "Enter the run details",
+    "Loads and lengths in",
+    "Cite your own table",
     "Switch to metric",
-    "Nothing gets assumed",
+    "Missing inputs are named",
     "See the arithmetic"
   ],
   "kickers": [
@@ -17,6 +18,6 @@
     "GUARDRAILS",
     "RESULT"
   ],
-  "featureTagline": "Size fuel gas runs from your own code readings. Offline, and it never hides an assumption.",
+  "featureTagline": "Run the sizing arithmetic on your own code readings. Offline, and it never invents a capacity.",
   "featurePill": "OFFLINE  ·  NO CODE TABLES"
 }
