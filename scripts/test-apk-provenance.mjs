@@ -14,7 +14,7 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 
-import { appSourcesUnchangedBetween, ProvenanceError, verifyArtifactChain } from './lib/apk-provenance.mjs'
+import { buildInputsUnchangedBetween, ProvenanceError, verifyArtifactChain } from './lib/apk-provenance.mjs'
 
 let failures = 0
 let checks = 0
@@ -155,51 +155,105 @@ refuses(
   'the app sources differ'
 )
 
-/* 14-18. The commit-gap relaxation, against a real temporary repository. The dangerous case is a
- *        pathspec that matches nothing: `git diff --quiet` exits 0 for it, which would read as "the
- *        app sources never changed" and license exactly the staleness the link exists to reject. */
+/* 14-21. The commit-gap relaxation, against a real temporary repository. The relaxation is an
+ *        allowlist: only paths that cannot change the built APK may differ. Defaulting to "rebuild"
+ *        for anything unlisted is what keeps a new build input from being silently ignorable. */
 {
-  const repo = mkdtempSync(path.join(tmpdir(), 'kiln-appsrc-'))
+  const repo = mkdtempSync(path.join(tmpdir(), 'kiln-buildin-'))
   const git = (...args) => spawnSync('git', args, { cwd: repo, encoding: 'utf8' })
   git('init', '-q')
   git('config', 'user.email', 'test@example.invalid')
   git('config', 'user.name', 'test')
 
-  const appDir = path.join(repo, 'slot', 'app')
+  const slot = path.join(repo, 'apps', 'slot')
+  const appDir = path.join(slot, 'app')
+  const storeDir = path.join(slot, 'store')
   mkdirSync(appDir, { recursive: true })
+  mkdirSync(storeDir, { recursive: true })
+  mkdirSync(path.join(repo, 'capabilities', 'billing'), { recursive: true })
   writeFileSync(path.join(appDir, 'Main.kt'), 'version 1\n', 'utf8')
+  writeFileSync(path.join(repo, 'capabilities', 'billing', 'Wallet.kt'), 'version 1\n', 'utf8')
   git('add', '-A')
   git('commit', '-q', '-m', 'one')
   const first = String(git('rev-parse', 'HEAD').stdout).trim()
 
-  check('identical commits are unchanged', appSourcesUnchangedBetween(first, first, appDir, repo) === true)
+  check('identical commits are unchanged', buildInputsUnchangedBetween(first, first, slot, repo) === true)
 
-  writeFileSync(path.join(repo, 'slot', 'notes.txt'), 'unrelated\n', 'utf8')
-  git('add', '-A')
-  git('commit', '-q', '-m', 'two')
-  const second = String(git('rev-parse', 'HEAD').stdout).trim()
+  // Each case compares the commit immediately before its own change, so one case's edit cannot leak
+  // into another's diff and make a passing case look like a failing one.
+  const around = (message, mutate) => {
+    const before = String(git('rev-parse', 'HEAD').stdout).trim()
+    mutate()
+    git('add', '-A')
+    git('commit', '-q', '-m', message)
+    const after = String(git('rev-parse', 'HEAD').stdout).trim()
+    return buildInputsUnchangedBetween(before, after, slot, repo)
+  }
 
+  // Copy and media are not build inputs, so committing a capture must not demand a rebuild.
   check(
-    'a change outside app/ leaves the sources unchanged',
-    appSourcesUnchangedBetween(first, second, appDir, repo) === true
+    'a store-only change does not demand a rebuild',
+    around('store only', () => {
+      writeFileSync(path.join(storeDir, 'provenance.json'), '{}\n', 'utf8')
+      writeFileSync(path.join(storeDir, 'listing.md'), 'copy\n', 'utf8')
+    }) === true
   )
 
-  writeFileSync(path.join(appDir, 'Main.kt'), 'version 2\n', 'utf8')
-  git('add', '-A')
-  git('commit', '-q', '-m', 'three')
-  const third = String(git('rev-parse', 'HEAD').stdout).trim()
+  // The evaluator's case: a shared capability module the slot includes, outside the slot's app/.
+  check(
+    'a shared capability change demands a rebuild',
+    around('capability change', () => {
+      writeFileSync(path.join(repo, 'capabilities', 'billing', 'Wallet.kt'), 'version 2\n', 'utf8')
+    }) === false
+  )
+
+  // The slot's own gradle configuration is a build input that app/ does not cover.
+  check(
+    'a slot build.gradle.kts change demands a rebuild',
+    around('slot gradle', () => {
+      writeFileSync(path.join(slot, 'build.gradle.kts'), 'plugins {}\n', 'utf8')
+    }) === false
+  )
+
+  // The version catalog is another build input outside app/.
+  check(
+    'a gradle/libs.versions.toml change demands a rebuild',
+    around('version catalog', () => {
+      mkdirSync(path.join(slot, 'gradle'), { recursive: true })
+      writeFileSync(path.join(slot, 'gradle', 'libs.versions.toml'), '[versions]\n', 'utf8')
+    }) === false
+  )
+
+  // Tooling cannot change the APK, so it must not demand one.
+  check(
+    'a change under scripts/ does not demand a rebuild',
+    around('script change', () => {
+      mkdirSync(path.join(repo, 'scripts'), { recursive: true })
+      writeFileSync(path.join(repo, 'scripts', 'tool.mjs'), 'tooling\n', 'utf8')
+    }) === true
+  )
 
   check(
-    'a change inside app/ is reported as changed',
-    appSourcesUnchangedBetween(first, third, appDir, repo) === false
+    'an app/ change demands a rebuild',
+    around('app change', () => {
+      writeFileSync(path.join(appDir, 'Main.kt'), 'version 2\n', 'utf8')
+    }) === false
   )
-  check(
-    'a pathspec matching nothing is not mistaken for unchanged',
-    appSourcesUnchangedBetween(first, third, path.join(repo, 'slot', 'not-a-real-dir'), repo) === false
-  )
+
+  const finalHead = String(git('rev-parse', 'HEAD').stdout).trim()
   check(
     'a missing commit is not mistaken for unchanged',
-    appSourcesUnchangedBetween('', third, appDir, repo) === false
+    buildInputsUnchangedBetween('', finalHead, slot, repo) === false
+  )
+  check(
+    'a nonexistent commit is not mistaken for unchanged',
+    buildInputsUnchangedBetween('0'.repeat(40), finalHead, slot, repo) === false
+  )
+  check(
+    'an unreadable slot path does not read as unchanged',
+    around('unreadable slot', () => {
+      writeFileSync(path.join(repo, 'capabilities', 'billing', 'Wallet.kt'), 'version 3\n', 'utf8')
+    }) === false
   )
 
   rmSync(repo, { recursive: true, force: true })

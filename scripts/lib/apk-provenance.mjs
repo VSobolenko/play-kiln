@@ -21,32 +21,74 @@
  */
 
 import { spawnSync } from 'node:child_process'
+import path from 'node:path'
 import process from 'node:process'
 
 /** Thrown for any unproven identity. Publication must not continue. */
 export class ProvenanceError extends Error {}
 
 /**
+ * Paths that cannot change the bytes of a built APK.
+ *
+ * The commit-gap relaxation asks whether HEAD would still produce the recorded artifact. Answering that
+ * with a pathspec over `<slot>/app` was too narrow: it misses the slot's `build.gradle.kts`,
+ * `settings.gradle.kts`, `gradle.properties`, `gradle/libs.versions.toml`, the wrapper, and any shared
+ * capability module the slot includes - all of which can change the built bytes while `app/` stays
+ * untouched. An allowlist inverts the default: a change anywhere not listed here forces a rebuild, so a
+ * new build input is conservative by default instead of silently ignorable.
+ *
+ * `capabilities/` and `scaffold/` are deliberately absent. A slot can include a shared capability
+ * module, and while `scaffold/` is only a template that existing slots do not read, leaving both out
+ * costs a rebuild rather than risking a false attestation.
+ */
+const NON_BUILD_PATHS = [
+  'docs/',
+  'harness/',
+  'openspec/',
+  '.cursor/',
+  '.kiln/',
+  '.github/',
+  'scripts/',
+  'AGENTS.md',
+  'README.md',
+  'MISSION.md',
+  'package.json',
+  'package-lock.json',
+  '.gitignore',
+  '.gitattributes'
+]
+
+/** Paths inside a slot that are outputs or copy rather than build inputs. */
+function slotNonBuildPaths(slotDir, cwd) {
+  // git reports paths relative to the repository root, so the slot must be expressed the same way.
+  const base = path.relative(cwd, slotDir).split(path.sep).join('/')
+  return ['store/', 'dist/', '.kiln/', 'build/', 'README.md'].map((part) => `${base}/${part}`)
+}
+
+/**
  * True when `head` would still build the artifact recorded at `gitCommit`.
  *
  * Comparing commits for exact equality is wrong for this purpose: committing the captures advances
  * HEAD past the build they record, so the claim would fail the moment it was written down. What the
- * link actually needs to express is "HEAD would still produce this APK", so compare the app sources.
+ * link actually needs to express is "HEAD would still produce this APK", so compare what changed and
+ * refuse unless every changed path is known not to affect the build.
  *
- * The `ls-files` probe is not decoration. `git diff --quiet <a> <b> -- <path>` exits **0 when the
- * pathspec matches nothing**, so a renamed, absent, or misspelled app directory reads as "no changes"
- * and licenses precisely the staleness this exists to catch. Require tracked files to exist under the
- * path before trusting a clean diff.
+ * No pathspec is used, so there is no "pathspec matched nothing" case to misread: an empty diff and a
+ * diff of only allowlisted paths are the two ways to pass, and a failed `git` invocation is neither.
  */
-export function appSourcesUnchangedBetween(gitCommit, head, appDir, cwd = process.cwd()) {
+export function buildInputsUnchangedBetween(gitCommit, head, slotDir, cwd = process.cwd()) {
   if (!gitCommit || !head) return false
   if (String(gitCommit) === String(head)) return true
-  const tracked = spawnSync('git', ['ls-files', '--', appDir], { cwd, encoding: 'utf8' })
-  if (tracked.status !== 0 || !String(tracked.stdout || '').trim()) return false
-  const diff = spawnSync('git', ['diff', '--quiet', String(gitCommit), String(head), '--', appDir], {
+  const changed = spawnSync('git', ['diff', '--name-only', String(gitCommit), String(head)], {
     cwd, encoding: 'utf8'
   })
-  return diff.status === 0
+  if (changed.status !== 0) return false
+  const allowed = [...NON_BUILD_PATHS, ...slotNonBuildPaths(slotDir, cwd)]
+  return String(changed.stdout || '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .every((file) => allowed.some((prefix) => file === prefix || file.startsWith(prefix)))
 }
 
 /**

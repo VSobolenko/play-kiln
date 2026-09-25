@@ -8,7 +8,7 @@ import path from 'node:path'
 import process from 'node:process'
 
 import { publishCaptures, recoverInterruptedPublish } from './lib/capture-publish.mjs'
-import { appSourcesUnchangedBetween, verifyArtifactChain } from './lib/apk-provenance.mjs'
+import { buildInputsUnchangedBetween, verifyArtifactChain } from './lib/apk-provenance.mjs'
 
 const ROOT = process.cwd()
 
@@ -429,9 +429,7 @@ function verifyArtifactIdentity(adbPath, serial, applicationId, slotDir, stageDi
   // whether HEAD would still build this same APK, so compare the app sources between the two commits.
   let appSourcesUnchanged = false
   if (manifest?.gitCommit && String(manifest.gitCommit) !== head) {
-    appSourcesUnchanged = appSourcesUnchangedBetween(
-      String(manifest.gitCommit), head, path.join(slotDir, 'app'), ROOT
-    )
+    appSourcesUnchanged = buildInputsUnchangedBetween(String(manifest.gitCommit), head, slotDir, ROOT)
   }
   let artifactPath = null
   let artifactHash = null
@@ -560,17 +558,23 @@ function main() {
   if (!python) block('Python was not found; set PYTHON or add python to PATH')
   // `--skip-provenance` because the record on disk during this render describes the *previous* run's
   // captures by construction: this run replaces them, and the record naming the new ones is written
-  // below. The check runs for real in the confirmation pass at the end of this function.
+  // below. store-kit answers that flag with UNVERIFIED and exit 2 rather than `STORE-KIT: OK`, so this
+  // deferred state cannot be mistaken for a pass - including here, where it is the only accepted
+  // non-zero status and every other one still blocks.
   const render = spawnSync(python, ['scripts/store-kit.py', '--slot', options.slot, '--skip-provenance'], {
     cwd: ROOT,
     encoding: 'utf8',
     stdio: 'inherit'
   })
-  if (render.error || render.status !== 0) block(`store-kit framing failed with exit code ${render.status ?? 'unknown'}`)
+  if (render.error) block(`store-kit framing failed to run: ${render.error.message}`)
+  if (render.status !== 0 && render.status !== 2) {
+    block(`store-kit framing failed with exit code ${render.status ?? 'unknown'}`)
+  }
   const observed = loadJson(path.join(rawDir, 'installed-build.json'), 'installed build')
   writeProvenance(store, slotDir, options.slot, listing, observed)
   // Confirm the pack now describes itself: this is the pass that checks the hashes written above
   // against the assets on disk, so a render that did not produce what the record claims stops here.
+  // No deferral is accepted at this point, and the record must be present, not merely tolerated.
   const confirm = spawnSync(python, ['scripts/store-kit.py', '--slot', options.slot, '--validate-only'], {
     cwd: ROOT,
     encoding: 'utf8',

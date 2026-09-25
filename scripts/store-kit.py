@@ -1373,7 +1373,15 @@ def inspect_image(
     return failures
 
 
-def validate_provenance(store: Path) -> list[str]:
+PROVENANCE_DEFERRED_NOTE = (
+    "UNVERIFIED provenance — this run skipped the provenance check, so the assets are NOT attested "
+    "here and this is not a passing result. scripts/media-capture.mjs passes --skip-provenance because "
+    "the record on disk describes the run it is about to replace, and it follows with a real "
+    "--validate-only pass. Invoking the flag directly leaves the pack unverified."
+)
+
+
+def validate_provenance(store: Path, required: bool = False) -> list[str]:
     """Verify the committed screenshots still match the record of the build they came from.
 
     `store/provenance.json` is the only durable link between the committed images and the release APK,
@@ -1381,16 +1389,22 @@ def validate_provenance(store: Path) -> list[str]:
     turns that link into something falsifiable: an image edited, replaced, or re-rendered without a
     fresh capture no longer matches, instead of silently keeping the previous claim.
 
-    Absence is reported, not failed: a pack with no captures has nothing to attest to, and `graphics.md`
-    states that an absent record means the images are unattested.
+    `required` is set for slots that compose their media (`store/studio.json`), which are exactly the
+    slots whose inventory claims captured screenshots. For those, an absent record is a failure rather
+    than a note: the pack asserts something about a build and has nothing to show for it. A slot with
+    no captures is not required to have a record.
     """
     path = store / "provenance.json"
     if not path.is_file():
-        print(
-            "NOTE provenance.json - absent, so these assets are not attested to any release build; "
+        if not required:
+            print("NOTE provenance.json — absent; this pack makes no capture-attestation claim")
+            return []
+        message = (
+            "provenance.json is absent, so these composed assets are not attested to any release build; "
             "run node scripts/media-capture.mjs --slot <slug> against a built release"
         )
-        return []
+        print(f"FAIL provenance.json — {message}")
+        return [message]
     try:
         record = json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError) as error:
@@ -1480,7 +1494,7 @@ def validate_store(
             size_bytes = path.stat().st_size
             print(f"PASS {relative} — {dimensions[0]}x{dimensions[1]} {mode}, {size_bytes} bytes")
     if not skip_provenance:
-        failures.extend(validate_provenance(store))
+        failures.extend(validate_provenance(store, required=(store / "studio.json").is_file()))
     return not failures
 
 
@@ -1539,10 +1553,13 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.validate_only:
         ok = validate_store(store, listing, locales, skip_provenance=args.skip_provenance)
-        if ok:
-            print(summary(slot, locales))
-            return 0
-        return 1
+        if not ok:
+            return 1
+        if args.skip_provenance:
+            print(PROVENANCE_DEFERRED_NOTE)
+            return 2
+        print(summary(slot, locales))
+        return 0
 
     if args.capture:
         capture_with_adb(store, listing)
@@ -1550,6 +1567,9 @@ def main(argv: list[str] | None = None) -> int:
     ok = validate_store(store, listing, locales, skip_provenance=args.skip_provenance)
     if not ok:
         return 1
+    if args.skip_provenance:
+        print(PROVENANCE_DEFERRED_NOTE)
+        return 2
     print(summary(slot, locales))
     return 0
 
