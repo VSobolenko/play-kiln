@@ -26,7 +26,12 @@ See `store/` for the Play listing, privacy and data-safety declarations, reviewe
 and the graphics inventory.
 
 The phone screenshots are real captures of the signed release build, driven by `store/journey.json`
-on a `Medium_Phone` AVD and framed by `scripts/store-kit.py`. The tablet screenshots are that same
-phone capture framed at tablet dimensions, **not** captures taken on a tablet device or emulator -
-no tablet AVD was available here. Replace them with genuine large-screen captures before relying on
-the large-screen eligibility they are meant to support.
+on a `Medium_Phone` AVD and composed into marketing images by `scripts/store-studio.py`. The tablet
+screenshots are that same phone capture framed at tablet dimensions, **not** captures taken on a
+tablet device or emulator - no tablet AVD was available here. Replace them with genuine large-screen
+captures before relying on the large-screen eligibility they are meant to support.
+
+Run it with `python scripts/store-studio.py --slot pipe-sizing --preview-circle`. The studio owns the
+icon, the feature graphic, the screenshots, and the adaptive-icon vector resources under
+`app/src/main/res/drawable/`, so the launcher artwork and the store artwork cannot drift apart;
+re-run it after changing the palette in `ui/theme/Color.kt`.

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "_comment": "Copy for the composed store assets rendered by scripts/store-studio.py. Headlines are benefit-led and kept to 3-5 words so they stay readable at thumbnail size; the bodies come from journey.json so the shot copy and the shot's verification stay in one place.",
+  "headlines": [
+    "Size any gas run",
+    "Enter load and length",
+    "Cite the exact table",
+    "Switch to metric",
+    "Nothing gets assumed",
+    "See the arithmetic"
+  ],
+  "kickers": [
+    "INPUTS",
+    "LOAD & LENGTH",
+    "PROVENANCE",
+    "UNITS",
+    "GUARDRAILS",
+    "RESULT"
+  ],
+  "featureTagline": "Size fuel gas runs from your own code readings. Offline, and it never hides an assumption.",
+  "featurePill": "OFFLINE  ·  NO CODE TABLES"
+}

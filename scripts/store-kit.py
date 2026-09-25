@@ -20,7 +20,7 @@ import subprocess
 import sys
 import textwrap
 import time
-from typing import Any
+from typing import Any, Callable
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -1234,6 +1234,15 @@ def capture_with_adb(store: Path, listing: dict[str, Any]) -> bool:
 
 
 def render_all(store: Path, listing: dict[str, Any], locales: list[str], meta: dict[str, str]) -> None:
+    # A slot can opt into the composed visual identity by adding store/studio.json. The generic
+    # renderer below stays the default so the other slots keep working unchanged, and it stays in
+    # place as the fallback because media-capture re-renders through this function after every
+    # capture run - a fresh capture must still produce fresh assets.
+    studio = load_studio_renderer(store)
+    if studio is not None:
+        studio(store)
+        write_documents(store, listing, locales, False, meta)
+        return
     assets = store / "assets"
     icon = assets / "icon-512.png"
     feature = assets / "feature-graphic-1024x500.png"
@@ -1246,6 +1255,26 @@ def render_all(store: Path, listing: dict[str, Any], locales: list[str], meta: d
         render_feature(locale_dir / feature.name, listing, locale)
     synthetic = render_screenshots(store, listing, locales)
     write_documents(store, listing, locales, synthetic, meta)
+
+
+def load_studio_renderer(store: Path) -> Callable[[Path], None] | None:
+    """Return the studio's slot renderer when this slot opted in, else ``None``.
+
+    Import failures are reported rather than swallowed: a slot that asked for the composed
+    identity and silently got the plain renderer back would be a claim rendered untrue.
+    """
+    if not (store / "studio.json").is_file():
+        return None
+    try:
+        import store_studio  # type: ignore[import-not-found]
+    except ImportError as error:
+        print(f"WARN: {store.name} declares studio.json but store-studio.py is not importable ({error})")
+        return None
+
+    def render(slot_dir: Path) -> None:
+        store_studio.render_slot(slot_dir)
+
+    return render
 
 
 def screenshot_rule_failures(kind: str, size: tuple[int, int]) -> list[str]:

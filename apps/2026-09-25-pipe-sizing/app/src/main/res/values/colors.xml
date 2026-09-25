@@ -2,8 +2,10 @@
 <resources>
     <!-- Seed/brand colors are used only by the launcher artwork and the pre-Compose window
          background. Runtime UI colors always come from MaterialTheme.colorScheme. -->
-    <color name="playkiln_seed">#006C4C</color>
-    <color name="playkiln_seed_dark">#63DBA6</color>
+    <!-- Retained for scaffold compatibility. The live palette is in ui/theme/Color.kt, and the
+         launcher artwork draws its own navy gradient; nothing reads these two values. -->
+    <color name="playkiln_seed">#0F2A45</color>
+    <color name="playkiln_seed_dark">#9CCBFF</color>
 
     <!-- Window background shown for the few milliseconds before Compose draws its first frame.
          Keeping it neutral prevents a white flash in dark mode. -->

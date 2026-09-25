@@ -11,14 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val LightColorScheme = lightColorScheme(
-    primary = Green40,
+    primary = Navy40,
     onPrimary = Neutral99,
-    primaryContainer = Green90,
-    onPrimaryContainer = Green10,
-    secondary = Teal40,
+    primaryContainer = Navy90,
+    onPrimaryContainer = Navy10,
+    secondary = Slate40,
     onSecondary = Neutral99,
-    secondaryContainer = Teal90,
-    onSecondaryContainer = Teal20,
+    secondaryContainer = Slate90,
+    onSecondaryContainer = Slate20,
     tertiary = Amber40,
     onTertiary = Neutral99,
     tertiaryContainer = Amber90,
@@ -34,14 +34,14 @@ private val LightColorScheme = lightColorScheme(
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Green80,
-    onPrimary = Green20,
-    primaryContainer = Green30,
-    onPrimaryContainer = Green90,
-    secondary = Teal80,
-    onSecondary = Teal20,
-    secondaryContainer = Teal30,
-    onSecondaryContainer = Teal90,
+    primary = Navy80,
+    onPrimary = Navy20,
+    primaryContainer = Navy30,
+    onPrimaryContainer = Navy90,
+    secondary = Slate80,
+    onSecondary = Slate20,
+    secondaryContainer = Slate30,
+    onSecondaryContainer = Slate90,
     tertiary = Amber80,
     onTertiary = Amber30,
     tertiaryContainer = Amber30,
@@ -59,7 +59,11 @@ private val DarkColorScheme = darkColorScheme(
 @Composable
 fun PlayKilnTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
+    // Off by default, deliberately. Dynamic colour hands the app's palette to the device
+    // wallpaper, which is pleasant for a general-purpose app and wrong for a paid specialist tool:
+    // the branded navy/amber scheme is part of what the user is buying, and it has to match the
+    // launcher icon and the store listing. Callers can still opt in explicitly.
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
