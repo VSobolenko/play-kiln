@@ -591,8 +591,11 @@ def render_slot(slot: Path, *, preview_circle: bool = False) -> None:
     icon_targets = [assets / "icon-512.png", assets / "en-US" / "icon-512.png"]
     for target in icon_targets:
         target.parent.mkdir(parents=True, exist_ok=True)
-        icon.save(target, format="PNG", optimize=True, compress_level=9)
-        print(f"PASS studio - {target.relative_to(slot)} (512x512)")
+        # Saved as RGBA to match the mode store-kit validates and Play's expectation. The icon is
+        # full-bleed, so every pixel is opaque and the alpha channel is uniform - it carries no
+        # transparency, it just declares the channel.
+        icon.convert("RGBA").save(target, format="PNG", optimize=True, compress_level=9)
+        print(f"PASS studio - {target.relative_to(slot)} (512x512 RGBA)")
 
     sources = [load_raw(store, index) for index in range(1, 7)]
     feature_source = next((source for source in sources if source is not None), None)

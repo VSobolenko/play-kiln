@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import html
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -1090,20 +1091,47 @@ Version reviewed: `{meta['version_name']}` (code `{meta['version_code'] or 'not 
     write_preserving(store / "review-notes.md", review, REVIEW_NOTES_MARKER)
 
     status = "synthetic — replace with real captures before publish" if synthetic else "framed from real device captures"
+    # A slot with store/studio.json has its media rendered by scripts/store-studio.py, which
+    # composes marketing images rather than pasting the capture into a rounded rectangle. The
+    # generic inventory below would describe a pack that no longer exists - it was describing
+    # RGBA-vs-RGB and "framed captures" for an asset set that is composed - so the inventory is
+    # written by the same condition that decides which renderer runs.
+    studio_rendered = (store / "studio.json").is_file()
+    if studio_rendered:
+        status = "real device captures, composed by `scripts/store-studio.py`"
+        provenance = f"""## How these are produced
+
+`scripts/store-studio.py` renders all of them. The screen inside every mock-up is a real capture of
+the signed release build, taken by `scripts/media-capture.mjs` from `journey.json` and stored under
+`captures/raw/`; the studio adds the branded field, the device bezel, and the headline. It invents no
+UI and never redraws the captured screen. Re-run it after changing the palette, or after a new
+capture: `python scripts/store-studio.py --slot {listing['slug']}`.
+
+## Large-screen assets are framed phone captures
+
+The tablet assets are framed from the **phone** captures rather than captured on a tablet device: no
+tablet AVD exists on this machine. Play treats large-screen assets as a claim about the large-screen
+experience, so the distinction is stated here rather than passed off as a tablet capture.
+
+The tablet sizes are 5:8, which is neither Play's 16:9 nor 9:16 large-screen aspect recommendation.
+That is a known factory-size choice, recorded in `AGENTS.md`.
+"""
+    else:
+        provenance = """Every locale folder also contains its own icon and feature graphic. The feature graphic keeps titles and taglines inside a generous safe area because Play may crop edges on some surfaces.
+"""
     graphics = f"""# Graphics inventory — {listing['appName']}
 
 Screenshot source status: **{status}**.
 
 | Asset | Dimensions | Format / purpose |
 |---|---:|---|
-| `assets/icon-512.png` | 512×512 | RGBA Play store icon; rectangular source artwork with nontransparent corners |
+| `assets/icon-512.png` | 512×512 | RGBA Play store icon; full-bleed and opaque, no transparent padding |
 | `assets/feature-graphic-1024x500.png` | 1024×500 | RGB feature graphic |
 | `assets/<locale>/phone-01..06.png` | 1080×1920 | RGB phone screenshots |
 | `assets/<locale>/tablet-7-01..04.png` | 1200×1920 | RGB 7-inch tablet screenshots |
 | `assets/<locale>/tablet-10-01..04.png` | 1600×2560 | RGB 10-inch tablet screenshots |
 
-Every locale folder also contains its own icon and feature graphic. The feature graphic keeps titles and taglines inside a generous safe area because Play may crop edges on some surfaces.
-
+{provenance}
 Four screenshots are supplied for both tablet formats. This satisfies the large-format eligibility asset count; eligibility also depends on the app's actual large-screen quality and Play requirements at submission time.
 """
     (store / "graphics.md").write_text(graphics, encoding="utf-8")
@@ -1240,7 +1268,9 @@ def render_all(store: Path, listing: dict[str, Any], locales: list[str], meta: d
     # capture run - a fresh capture must still produce fresh assets.
     studio = load_studio_renderer(store)
     if studio is not None:
-        studio(store)
+        # The studio takes the slot directory (it also writes the app's adaptive-icon vectors),
+        # while render_all is handed the store directory.
+        studio(store.parent)
         write_documents(store, listing, locales, False, meta)
         return
     assets = store / "assets"
@@ -1260,19 +1290,28 @@ def render_all(store: Path, listing: dict[str, Any], locales: list[str], meta: d
 def load_studio_renderer(store: Path) -> Callable[[Path], None] | None:
     """Return the studio's slot renderer when this slot opted in, else ``None``.
 
-    Import failures are reported rather than swallowed: a slot that asked for the composed
-    identity and silently got the plain renderer back would be a claim rendered untrue.
+    The studio lives in `scripts/store-studio.py`, whose hyphen makes it un-importable by name, so
+    it is loaded from its path. A failure here is raised rather than reported: a slot that declares
+    `studio.json` and silently got the generic renderer back would get generic assets while its
+    `graphics.md` describes composed ones, which is a claim rendered untrue. Failing closed leaves
+    the previous assets in place instead.
     """
     if not (store / "studio.json").is_file():
         return None
+    studio_path = Path(__file__).resolve().parent / "store-studio.py"
+    if not studio_path.is_file():
+        raise StoreKitError(f"{store / 'studio.json'} is declared but {studio_path} does not exist")
+    spec = importlib.util.spec_from_file_location("store_studio", studio_path)
+    if spec is None or spec.loader is None:
+        raise StoreKitError(f"cannot load {studio_path}")
+    module = importlib.util.module_from_spec(spec)
     try:
-        import store_studio  # type: ignore[import-not-found]
-    except ImportError as error:
-        print(f"WARN: {store.name} declares studio.json but store-studio.py is not importable ({error})")
-        return None
+        spec.loader.exec_module(module)
+    except Exception as error:  # noqa: BLE001 - any load failure must stop the render
+        raise StoreKitError(f"{studio_path} failed to load: {error!r}") from error
 
     def render(slot_dir: Path) -> None:
-        store_studio.render_slot(slot_dir)
+        module.render_slot(slot_dir)
 
     return render
 
