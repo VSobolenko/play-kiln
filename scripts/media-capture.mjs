@@ -8,6 +8,7 @@ import path from 'node:path'
 import process from 'node:process'
 
 import { publishCaptures, recoverInterruptedPublish } from './lib/capture-publish.mjs'
+import { verifyArtifactChain } from './lib/apk-provenance.mjs'
 
 const ROOT = process.cwd()
 
@@ -70,13 +71,27 @@ function findAdb() {
   return null
 }
 
-function block(reason) {
+/**
+ * Stop without touching the assets.
+ *
+ * `hint` exists because the emulator instructions were previously printed for every failure, including
+ * a release-hash mismatch and a missing `listing.json`, where they send the operator looking for a
+ * device that is already attached and working. Advice attached to the wrong cause costs more than no
+ * advice.
+ */
+function block(reason, hint) {
   console.error(`BLOCKED: ${reason}`)
-  console.error('BLOCKED: start an emulator with:')
-  console.error('  $ANDROID_HOME/emulator/emulator -list-avds')
-  console.error('  $ANDROID_HOME/emulator/emulator -avd <AVD_NAME>')
-  console.error('  adb wait-for-device')
+  if (hint) for (const line of hint) console.error(line)
   process.exit(2)
+}
+
+function emulatorHint() {
+  return [
+    'BLOCKED: start an emulator with:',
+    '  $ANDROID_HOME/emulator/emulator -list-avds',
+    '  $ANDROID_HOME/emulator/emulator -avd <AVD_NAME>',
+    '  adb wait-for-device'
+  ]
 }
 
 function run(command, args, options = {}) {
@@ -402,81 +417,56 @@ function writeProvenance(store, slotDir, slot, listing, observed) {
  */
 function verifyArtifactIdentity(adbPath, serial, applicationId, slotDir, stageDir, observed) {
   const manifestPath = path.join(slotDir, 'dist', 'release-manifest.json')
-  const manifestLabel = path.relative(ROOT, manifestPath)
-  if (!existsSync(manifestPath)) {
-    throw new Error(
-      `${manifestLabel} is absent, so the installed APK cannot be tied to a signed artifact. Build the ` +
-      'release first (node scripts/prepare-release.mjs --slot <slug>): publishing a capture of an ' +
-      'unidentified build would commit screenshots the documentation calls the release build.'
-    )
-  }
-  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
-  const entry = (manifest.artifacts || []).find((item) => String(item.path || '').endsWith('release.apk'))
-  if (!entry?.sha256) {
-    throw new Error(`${manifestLabel} records no release-APK sha256, so identity cannot be checked`)
-  }
-  const recorded = String(entry.sha256).toLowerCase()
-
+  // Forward slashes so the committed record reads the same on every platform.
+  const manifestLabel = path.relative(ROOT, manifestPath).split(path.sep).join('/')
+  // The chain itself lives in `scripts/lib/apk-provenance.mjs` so its failure paths can be driven with
+  // fakes; this function only supplies the I/O it reads.
+  const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : null
   const head = String(run('git', ['rev-parse', 'HEAD'])).trim()
-  if (!manifest.gitCommit) {
-    throw new Error(`${manifestLabel} records no gitCommit, so it cannot be tied to the current sources`)
+  // A commit mismatch is only fatal if the app sources moved. Committing the captures and the
+  // provenance record necessarily advances HEAD past the commit the APK was built from, and treating
+  // that as staleness would make the claim unverifiable the moment it was recorded. What matters is
+  // whether HEAD would still build this same APK, so compare the app sources between the two commits.
+  let appSourcesUnchanged = false
+  if (manifest?.gitCommit && String(manifest.gitCommit) !== head) {
+    const diff = spawnSync('git', ['diff', '--quiet', String(manifest.gitCommit), head, '--', path.join(slotDir, 'app')], {
+      cwd: ROOT, encoding: 'utf8'
+    })
+    appSourcesUnchanged = diff.status === 0
   }
-  if (String(manifest.gitCommit) !== head) {
-    throw new Error(
-      `${manifestLabel} was built from commit ${String(manifest.gitCommit).slice(0, 12)} but HEAD is ` +
-      `${head.slice(0, 12)}. Rebuild the release so the manifest describes the sources being shipped, ` +
-      'otherwise the capture would attest to a build the current tree does not produce.'
-    )
+  let artifactPath = null
+  let artifactHash = null
+  if (manifest) {
+    const entry = (manifest.artifacts || []).find((item) => String(item.path || '').endsWith('release.apk'))
+    // Manifest artifact paths are slot-relative, as `prepare-release.mjs` writes them.
+    if (entry?.path) {
+      const resolved = path.join(slotDir, entry.path)
+      if (existsSync(resolved)) {
+        artifactPath = resolved
+        artifactHash = sha256(readFileSync(resolved))
+      }
+    }
   }
-
-  // Manifest artifact paths are slot-relative, as `prepare-release.mjs` writes them.
-  const artifactPath = entry.path ? path.join(slotDir, entry.path) : null
-  if (!artifactPath || !existsSync(artifactPath)) {
-    throw new Error(
-      `${manifestLabel} names ${entry.path}, which does not exist, so the artifact cannot be hashed. ` +
-      'Comparing only the recorded hash string would let a stale manifest pass.'
-    )
+  let installedHash = null
+  let installedApkPath = null
+  if (manifest) {
+    const pmPath = String(adb(adbPath, serial, ['shell', 'pm', 'path', applicationId]))
+    const apk = (pmPath.match(/package:(\S+base\.apk)/) || [])[1]
+    if (apk) {
+      installedApkPath = apk
+      installedHash = sha256(adb(adbPath, serial, ['exec-out', 'cat', apk], { binary: true }))
+    }
   }
-  const artifactHash = sha256(readFileSync(artifactPath))
-  if (artifactHash !== recorded) {
-    throw new Error(
-      `the release artifact does not match its own manifest: ${entry.path} hashes to ` +
-      `${artifactHash.slice(0, 12)}… but ${manifestLabel} records ${recorded.slice(0, 12)}…. Rebuild ` +
-      'the release.'
-    )
-  }
-
-  const pmPath = String(adb(adbPath, serial, ['shell', 'pm', 'path', applicationId]))
-  const apk = (pmPath.match(/package:(\S+base\.apk)/) || [])[1]
-  if (!apk) {
-    throw new Error(
-      `could not locate the installed base.apk for ${applicationId} via 'pm path', so the installed ` +
-      'APK cannot be hashed against the artifact'
-    )
-  }
-  const installedHash = sha256(adb(adbPath, serial, ['exec-out', 'cat', apk], { binary: true }))
-  if (installedHash !== artifactHash) {
-    throw new Error(
-      `the installed APK does not match the signed artifact. installed sha256=${installedHash} but ` +
-      `${entry.path} is ${artifactHash}. Re-install the current release APK (adb install -r ` +
-      'app/build/outputs/apk/release/app-release.apk), because a capture of a stale build would ' +
-      'photograph a package that is not the one being uploaded.'
-    )
-  }
+  const record = verifyArtifactChain({
+    manifestLabel, manifest, head, artifactPath, artifactHash, installedHash, installedApkPath,
+    appSourcesUnchanged
+  })
   console.log(
-    `PASS installed build - HEAD ${head.slice(0, 12)} -> ${manifestLabel} -> ${path.basename(entry.path)} ` +
-    `sha256 ${artifactHash.slice(0, 12)}… -> installed base.apk is byte-identical`
+    `PASS installed build - HEAD ${record.gitCommit.slice(0, 12)} -> ${manifestLabel} -> ` +
+    `${path.basename(record.artifactPath)} sha256 ${record.artifactSha256.slice(0, 12)}… -> ` +
+    'installed base.apk is byte-identical'
   )
-  return {
-    ...observed,
-    artifactMatch: 'exact',
-    gitCommit: head,
-    manifestPath: path.relative(ROOT, manifestPath),
-    artifactPath: entry.path,
-    artifactSha256: artifactHash,
-    installedSha256: installedHash,
-    installedApkPath: apk
-  }
+  return { ...observed, ...record }
 }
 
 function findPython() {
@@ -521,14 +511,14 @@ function main() {
   }
 
   const adbPath = findAdb()
-  if (!adbPath) block('adb was not found on PATH or under ANDROID_HOME/platform-tools')
+  if (!adbPath) block('adb was not found on PATH or under ANDROID_HOME/platform-tools', emulatorHint())
   const deviceOutput = String(run(adbPath, ['devices']))
   const devices = deviceOutput.split(/\r?\n/).slice(1)
     .map((line) => line.trim().split(/\s+/))
     .filter((parts) => parts.length >= 2 && parts[1] === 'device')
     .map((parts) => parts[0])
   const serial = options.serial || devices[0]
-  if (!serial) block("adb found no attached device in 'device' state")
+  if (!serial) block("adb found no attached device in 'device' state", emulatorHint())
   if (!devices.includes(serial)) block(`requested device '${serial}' is not attached in 'device' state`)
 
   const rawDir = path.join(store, 'captures', 'raw')
@@ -577,7 +567,7 @@ function main() {
   if (render.error || render.status !== 0) block(`store-kit framing failed with exit code ${render.status ?? 'unknown'}`)
   const observed = loadJson(path.join(rawDir, 'installed-build.json'), 'installed build')
   writeProvenance(store, slotDir, options.slot, listing, observed)
-  console.log(`PASS media-capture — ${published} raw captures from ${serial} framed for ${options.slot}`)
+  console.log(`PASS media-capture — ${published.published} raw captures from ${serial} framed for ${options.slot}`)
 }
 
 main()

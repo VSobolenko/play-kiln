@@ -271,6 +271,7 @@ node scripts/verify-slot.mjs --base main
 node scripts/verify-slot.mjs --no-selftest        # skip the self-test (rare)
 node scripts/kiln-status.mjs
 node scripts/test-capture-publish.mjs             # capture-publish failure injection (offline, fast)
+node scripts/test-apk-provenance.mjs              # APK provenance failure injection (offline, fast)
 node scripts/test-play-reviews.mjs                # review-sensor unit tests (offline, fast)
 node scripts/verify-reviews-sensor.mjs            # review sensor vs live Play pages
 ```
@@ -286,6 +287,11 @@ artifact. It walks HEAD → `dist/release-manifest.json` → the recorded sha256
 on disk → the installed `base.apk`, and a missing or mismatched link is fatal. It then writes
 `store/provenance.json`, which is committed beside the assets because `captures/` and `dist/` are
 not, and is the only durable record tying the committed images to a build.
+
+`scripts/test-apk-provenance.mjs` covers that chain offline. Its first case is the false pass that
+motivated it: a stale manifest and the matching stale installed APK agree with each other about a
+build that is neither of them, which a hash-string-only comparison cannot see. Both suites are
+expected to fail against the implementation they replaced.
 
 `--build` compiles the slot. Without it the gate reports `UNVERIFIED` (exit 2), not
 PASS, because source-only evidence cannot prove the app builds; never cite a
