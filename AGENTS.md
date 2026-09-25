@@ -92,6 +92,47 @@ life.
 
 Operator details: [`harness/codex-workers.md`](harness/codex-workers.md).
 
+### The worker loop is the default, not an optimisation
+
+Serial solo work is the exception and needs a reason. The default mode for any task bigger than a
+one-line edit is to split it into bounded roles and run them as workers, because a single agent
+working one step at a time is the slowest possible configuration of this factory and it is also the
+least verified one: the same head that just wrote the code is the one judging it.
+
+The standing loop, for any slot or harness change:
+
+| Role | Owns | Must not |
+|---|---|---|
+| **Implementer** | the change, its tests, the diff | verify its own work |
+| **Bug hunter** | adversarial search for defects in the implementer's artifacts | fix anything; report only |
+| **Verifier** | independent reproduction of the claim from the artifact on disk | accept any self-report |
+| **Fixer** | the defects the two above actually reproduced | close a finding it cannot reproduce |
+
+Then run the loop again on what the fixer produced. One worker is the **standing critic**: it runs
+continuously against whatever landed most recently, hunting defects, and it stays a separate context
+from whoever produced that work. Keep the roles' file lists disjoint, or give them separate
+worktrees, so the loop cannot corrupt itself mid-flight.
+
+Rules that earn that loop its cost:
+
+- **Dispatch first, then work.** If a task has more than one independent part, start the workers
+  before touching the first part by hand. Waiting to "do the quick part myself" is how the loop
+  never starts.
+- **A worker must produce an artifact, not a plan.** A Codex worker handed a design brief will
+  often answer with a proposed design and a request for approval, then exit — it looks like a
+  worker failure but it is a prompt failure. Say explicitly in the prompt that approval is not
+  being sought, that the worker is already authorised, and that it must run its commands and report
+  observed output. Check the deliverable on disk before recording the verdict.
+- **A verifier must be able to fail the thing it verifies.** State a falsifiable consequence: which
+  observation would flip the verdict, and the exact command that produces it. A verdict that no
+  evidence could contradict is not a verdict. See "2026-09-25 - the checksum that gated the capture
+  existed only in the lesson that described it" in `harness/lessons.md`.
+- **Bug hunting and verification are different jobs.** The hunter looks for defects nobody has
+  claimed; the verifier tests claims that someone has. Both are needed; collapsing them into one
+  pass loses the first.
+- **Report conflicts, do not average them.** When the hunter and the verifier disagree, the
+  orchestrator adjudicates against the artifact, never by splitting the difference.
+
 ## Store-pack contract
 
 Every publishable slot contains this complete, truthful pack:

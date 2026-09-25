@@ -9,8 +9,9 @@ import process from 'node:process'
 const ROOT = process.cwd()
 
 function usage() {
-  console.log('Usage: node scripts/media-capture.mjs --slot <slug> [--serial <device>]')
-  console.log('Captures store/journey.json with ADB, saves store/captures/raw/, then frames assets.')
+  console.log('Usage: node scripts/media-capture.mjs --slot <slug> [--serial <device>] [--attempts N]')
+  console.log('Captures store/journey.json with ADB, verifies each screen, saves store/captures/raw/, then frames assets.')
+  console.log('A run that cannot prove what it photographed is retried, then fails closed without touching the assets.')
 }
 
 function parseArgs(argv) {
@@ -18,8 +19,8 @@ function parseArgs(argv) {
     usage()
     process.exit(0)
   }
-  const allowed = new Set(['--slot', '--serial'])
-  const result = { slot: null, serial: null }
+  const allowed = new Set(['--slot', '--serial', '--attempts'])
+  const result = { slot: null, serial: null, attempts: 3 }
   for (let i = 0; i < argv.length; i += 2) {
     const flag = argv[i]
     const value = argv[i + 1]
@@ -28,6 +29,11 @@ function parseArgs(argv) {
     }
     if (flag === '--slot') result.slot = value
     if (flag === '--serial') result.serial = value
+    if (flag === '--attempts') {
+      const attempts = Number(value)
+      if (!Number.isInteger(attempts) || attempts < 1) throw new Error('--attempts must be a positive whole number')
+      result.attempts = attempts
+    }
   }
   if (!result.slot) throw new Error('--slot <slug> is required')
   return result
@@ -118,6 +124,7 @@ function defaultJourney() {
       swipe: { x1: 540, y1: 1500, x2: 540, y2: 500, durationMs: 350 },
       wait: { ms: 750 },
       text: { value: 'example text' },
+      clear: { count: 40 },
       back: {}
     }
   }
@@ -152,12 +159,111 @@ function executeStep(adbPath, serial, step) {
     case 'text':
       adb(adbPath, serial, ['shell', 'input', 'text', String(step.value ?? '').replaceAll(' ', '%s')])
       break
+    case 'clear':
+      // Move to the end, then delete. Without this, typing into a field that already holds the
+      // persisted case *appends* to it: the app deliberately restores the entered case across
+      // process death, so a run that starts from a non-empty field silently corrupts the capture.
+      adb(adbPath, serial, ['shell', 'input', 'keyevent', '123'])
+      for (let index = 0; index < Number(step.count ?? 40); index += 1) {
+        adb(adbPath, serial, ['shell', 'input', 'keyevent', '67'])
+      }
+      break
     case 'back':
       adb(adbPath, serial, ['shell', 'input', 'keyevent', '4'])
       break
     default:
       throw new Error(`unsupported journey step type: ${JSON.stringify(step.type)}`)
   }
+}
+
+/**
+ * Disable every enabled IME, retrying until the enabled list is actually empty.
+ * `ime disable` races the IME service restarting, so a single call is a no-op often enough
+ * to matter, and a live keyboard both autocorrects typed values and rescrolls the form.
+ */
+function disableImes(adbPath, serial) {
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    const enabled = String(adb(adbPath, serial, ['shell', 'ime', 'list', '-s']))
+      .split(/\r?\n/).map((line) => line.trim()).filter(Boolean)
+    if (enabled.length === 0) return true
+    for (const id of enabled) {
+      try { adb(adbPath, serial, ['shell', 'ime', 'disable', id]) } catch { /* retried below */ }
+    }
+    sleep(500)
+  }
+  return String(adb(adbPath, serial, ['shell', 'ime', 'list', '-s'])).trim() === ''
+}
+
+/** Dump the live view hierarchy, keep it beside the capture it describes, return its text nodes. */
+function dumpScreen(adbPath, serial, rawDir, name) {
+  const xml = String(adb(adbPath, serial, ['exec-out', 'uiautomator', 'dump', '/dev/tty']))
+  writeFileSync(path.join(rawDir, `${name}.xml`), xml, 'utf8')
+  return [...xml.matchAll(/\btext="([^"]*)"/g)]
+    .map((match) => match[1])
+    .filter((value) => value && value !== 'null')
+}
+
+function expectedReadings(source) {
+  return Array.isArray(source?.expect)
+    ? source.expect.filter((entry) => typeof entry === 'string' && entry.trim())
+    : []
+}
+
+/**
+ * Assert that a screen really shows what the shot claims to show. A screenshot is a claim about
+ * the product, and this is the only thing in the pipeline that reads one back: every other check
+ * proves a PNG exists at the right size, which is how six captures of IME autocorrect gibberish
+ * ('0.5 Paige 100y40v4 5 to the ...') once passed as this app's entire store presence.
+ */
+function assertReadings(texts, expected, label) {
+  if (expected.length === 0) {
+    console.log(`WARN verify - ${label} declares no 'expect' entries; screen read:`)
+    console.log(`  ${texts.join(' \u00b7 ')}`)
+    return
+  }
+  const missing = expected.filter((entry) => !texts.includes(entry))
+  if (missing.length > 0) {
+    console.error(`  screen read: ${texts.join(' \u00b7 ')}`)
+    throw new Error(
+      `${label} does not show what it claims to show; ` +
+      `${missing.length} of ${expected.length} expected readings are absent: ` +
+      `${missing.map((entry) => JSON.stringify(entry)).join(', ')}`
+    )
+  }
+  console.log(`PASS verify - ${label} shows all ${expected.length} expected readings`)
+}
+
+/**
+ * Replay the journey from a wiped, keyboard-free state and verify every screen before it is
+ * photographed. Throws on the first screen that does not show what its shot claims to show.
+ */
+function replayJourney({ adbPath, serial, journey, rawDir, listing }) {
+  // Enforce the preconditions the journey documents but the tool used to leave to the operator.
+  adb(adbPath, serial, ['shell', 'pm', 'clear', listing.applicationId])
+  if (!disableImes(adbPath, serial)) {
+    throw new Error('a soft keyboard is still enabled; it autocorrects typed values and rescrolls the form')
+  }
+  adb(adbPath, serial, ['shell', 'monkey', '-p', listing.applicationId, '-c', 'android.intent.category.LAUNCHER', '1'])
+  sleep(1000)
+  journey.shots.slice(0, 6).forEach((shot, index) => {
+    if (!Array.isArray(shot.steps)) throw new Error(`shot ${index + 1} steps must be an array`)
+    shot.steps.forEach((step) => executeStep(adbPath, serial, step))
+    const ordinal = String(index + 1).padStart(2, '0')
+    // Read the screen back before photographing it: the capture on its own proves nothing.
+    const texts = dumpScreen(adbPath, serial, rawDir, `shot-${ordinal}-window`)
+    assertReadings(texts, expectedReadings(shot), `${shot.name} (${shot.title})`)
+    const png = adb(adbPath, serial, ['exec-out', 'screencap', '-p'], { binary: true })
+    const target = path.join(rawDir, `${ordinal}.png`)
+    writeFileSync(target, png)
+    console.log(`PASS capture — ${target}`)
+  })
+  // Whole-journey checksum: the last screen echoes every value entered along the way, so this
+  // fails if any single step was dropped or rewritten even though each tap reported success.
+  assertReadings(
+    dumpScreen(adbPath, serial, rawDir, 'final-window'),
+    expectedReadings(journey),
+    'the completed journey'
+  )
 }
 
 function findPython() {
@@ -214,19 +320,22 @@ function main() {
 
   const rawDir = path.join(store, 'captures', 'raw')
   mkdirSync(rawDir, { recursive: true })
-  try {
-    adb(adbPath, serial, ['shell', 'monkey', '-p', listing.applicationId, '-c', 'android.intent.category.LAUNCHER', '1'])
-    sleep(1000)
-    journey.shots.slice(0, 6).forEach((shot, index) => {
-      if (!Array.isArray(shot.steps)) throw new Error(`shot ${index + 1} steps must be an array`)
-      shot.steps.forEach((step) => executeStep(adbPath, serial, step))
-      const png = adb(adbPath, serial, ['exec-out', 'screencap', '-p'], { binary: true })
-      const target = path.join(rawDir, `${String(index + 1).padStart(2, '0')}.png`)
-      writeFileSync(target, png)
-      console.log(`PASS capture — ${target}`)
-    })
-  } catch (error) {
-    block(error.message)
+  let lastError = null
+  for (let attempt = 1; attempt <= options.attempts; attempt += 1) {
+    if (attempt > 1) console.log(`RETRY - replaying the journey (attempt ${attempt} of ${options.attempts})`)
+    try {
+      replayJourney({ adbPath, serial, journey, rawDir, listing })
+      lastError = null
+      break
+    } catch (error) {
+      lastError = error
+      console.error(`FAIL verify - ${error.message}`)
+    }
+  }
+  if (lastError) {
+    // Fail closed: the framed assets are only rendered after every screen has been verified, so a
+    // run that cannot prove what it photographed leaves the last good pack untouched.
+    block(`the journey did not produce a verifiable result in ${options.attempts} attempt(s): ${lastError.message}`)
   }
 
   const python = findPython()

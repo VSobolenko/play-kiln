@@ -22,3 +22,5 @@ Thumbs.db
 *.ap_
 *.dex
 .tmp-android-skills/
+__pycache__/
+*.pyc

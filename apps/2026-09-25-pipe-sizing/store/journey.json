@@ -2,26 +2,36 @@
   "schemaVersion": 1,
   "_comment": "Six-step journey for the Gas Pipe Sizing Workbook store screenshots, replayed by scripts/media-capture.mjs and framed by scripts/store-kit.py. Every coordinate was measured from the live view hierarchy (uiautomator dump) of the signed release build on the Medium_Phone AVD at 1080x2400 / 420dpi, not guessed.",
   "_why_the_waits": "Each step is executed back to back with no settling time, and the runner waits only one second after launching the app. Compose needs longer than that to draw the form, and needs a moment between focusing a field and receiving text, or the entry lands in the wrong field or is dropped entirely. The waits below are load-bearing, not padding: without the leading one the material field silently stays empty.",
+  "_why_the_clears": "The app persists the entered case across process death on purpose, so a field can already hold text when a run starts. Typing into a non-empty field appends: this is exactly how a stray '2' became the leading character of the material field ('2Schedule 40 steel') in one run. Each clear step puts the caret at the end and deletes what is there, which makes every entry idempotent instead of a function of the previous run.",
+  "_why_the_expects": "A screenshot is a claim about the product. Each shot declares the readings that must be on screen for it to be honest, and media-capture dumps the live view hierarchy and asserts them BEFORE taking the picture. This is the only check in the pipeline that reads the artifact back: verify-slot --strict-store only proves a PNG exists at the right size, which is how six captures of IME autocorrect gibberish once passed as this app's entire store presence. The journey-level 'expect' is the whole-journey checksum - its readings echo every value typed across all six shots, so it fails if any single step was dropped even though each tap reported success.",
   "_preconditions": [
     "Target the release build. The debug variant carries a .debug applicationId suffix, so capturing it would photograph a package that never ships: ./gradlew :app:assembleRelease && adb install -r app/build/outputs/apk/release/app-release.apk",
-    "Clear the stored case first, or the first shot inherits the previous run's entries and every 'text' step appends to them: adb shell pm clear com.gexetr.pipesizing",
-    "Disable the soft keyboard. Its autocorrect rewrites typed values ('psig' became 'Paige' and '100' became '100y40v4 5'), and it scrolls the form as fields are focused, which moves the coordinates this file depends on. It also has no business appearing in a store screenshot: adb shell ime list -s, then adb shell ime disable <id> for each. Disabling races with the IME service restarting, so retry until adb shell ime list -s prints nothing.",
-    "Screens are captured at 1080x2400, so the phone assets are framed from a 2400px-tall source rather than 1920.",
-    "After capturing, confirm the journey worked rather than trusting the PNGs: dump the view hierarchy and check the final screen still reads 'Case: Schedule 40 steel at 0.5 psig', '100.00 MBH required', '60.00 ft total run' and 'Compared capacity: 120.00 MBH'. Every value typed above feeds that result, so it is a whole-journey checksum - a keyboard that rewrote one field shows up here even though each individual tap appeared to succeed."
+    "Measured on the Medium_Phone AVD at 1080x2400 / 420dpi. Screens are captured at 1080x2400, so the phone assets are framed from a 2400px-tall source rather than 1920.",
+    "media-capture enforces the rest itself now: it runs 'pm clear' so the first shot cannot inherit the previous run's case, and it retries 'ime disable' until the enabled list is actually empty, because a live keyboard autocorrects typed values ('psig' became 'Paige') and rescrolls the form out from under these coordinates.",
+    "The tablet assets are framed from these same phone captures rather than captured on a tablet device; no tablet AVD exists on this machine. Play treats large-screen assets as a claim about the large-screen experience, so this is disclosed in store/review-notes.md and the slot README instead of being passed off as a tablet capture."
+  ],
+  "expect": [
+    "Case: Schedule 40 steel at 0.5 psig",
+    "Compared capacity: 120.00 MBH",
+    "100.00 MBH required",
+    "60.00 ft total run"
   ],
   "shots": [
     {
       "name": "shot-01",
       "title": "Enter the sizing inputs",
       "body": "Type the material and pressure class for the run being sized.",
+      "expect": ["Schedule 40 steel", "0.5 psig", "Material or system", "Pressure class"],
       "steps": [
         { "type": "wait", "ms": 5000 },
         { "type": "tap", "x": 540, "y": 1159 },
         { "type": "wait", "ms": 600 },
+        { "type": "clear" },
         { "type": "text", "value": "Schedule 40 steel" },
         { "type": "wait", "ms": 600 },
         { "type": "tap", "x": 540, "y": 1359 },
         { "type": "wait", "ms": 600 },
+        { "type": "clear" },
         { "type": "text", "value": "0.5 psig" },
         { "type": "wait", "ms": 600 }
       ]
@@ -30,21 +40,26 @@
       "name": "shot-02",
       "title": "Add loads and lengths",
       "body": "Enter the load, developed length, and fitting allowance.",
+      "expect": ["Total load (MBH)", "Developed length (ft)", "100", "40", "4", "5"],
       "steps": [
         { "type": "tap", "x": 540, "y": 1559 },
         { "type": "wait", "ms": 600 },
+        { "type": "clear" },
         { "type": "text", "value": "100" },
         { "type": "wait", "ms": 600 },
         { "type": "tap", "x": 540, "y": 1759 },
         { "type": "wait", "ms": 600 },
+        { "type": "clear" },
         { "type": "text", "value": "40" },
         { "type": "wait", "ms": 600 },
         { "type": "tap", "x": 540, "y": 2040 },
         { "type": "wait", "ms": 600 },
+        { "type": "clear" },
         { "type": "text", "value": "4" },
         { "type": "wait", "ms": 600 },
         { "type": "tap", "x": 540, "y": 2240 },
         { "type": "wait", "ms": 600 },
+        { "type": "clear" },
         { "type": "text", "value": "5" },
         { "type": "wait", "ms": 600 }
       ]
@@ -53,6 +68,7 @@
       "name": "shot-03",
       "title": "Record the source citation",
       "body": "Read the capacity from your own code book and record where it came from.",
+      "expect": ["Code and edition", "2024", "Table", "A", "Row", "2"],
       "steps": [
         { "type": "swipe", "x1": 540, "y1": 1800, "x2": 540, "y2": 600, "durationMs": 200 },
         { "type": "swipe", "x1": 540, "y1": 1800, "x2": 540, "y2": 600, "durationMs": 200 },
@@ -72,14 +88,17 @@
         { "type": "wait", "ms": 800 },
         { "type": "tap", "x": 540, "y": 1642 },
         { "type": "wait", "ms": 600 },
+        { "type": "clear" },
         { "type": "text", "value": "2024" },
         { "type": "wait", "ms": 600 },
         { "type": "tap", "x": 540, "y": 1842 },
         { "type": "wait", "ms": 600 },
+        { "type": "clear" },
         { "type": "text", "value": "A" },
         { "type": "wait", "ms": 600 },
         { "type": "tap", "x": 540, "y": 2042 },
         { "type": "wait", "ms": 600 },
+        { "type": "clear" },
         { "type": "text", "value": "2" },
         { "type": "wait", "ms": 800 }
       ]
@@ -88,6 +107,7 @@
       "name": "shot-04",
       "title": "Convert units both ways",
       "body": "Switch to metric: the same readings, re-expressed rather than reinterpreted.",
+      "expect": ["Total load (kW)", "29.3071", "Developed length (m)", "12.192"],
       "steps": [
         { "type": "swipe", "x1": 540, "y1": 600, "x2": 540, "y2": 1800, "durationMs": 200 },
         { "type": "swipe", "x1": 540, "y1": 600, "x2": 540, "y2": 1800, "durationMs": 200 },
@@ -106,6 +126,7 @@
       "name": "shot-05",
       "title": "Review missing-input guidance",
       "body": "An unconfirmed capacity is refused by name instead of being assumed.",
+      "expect": ["Enter user-confirmed capacity.", "User-confirmed capacity (MBH)"],
       "steps": [
         { "type": "swipe", "x1": 540, "y1": 600, "x2": 540, "y2": 1800, "durationMs": 200 },
         { "type": "swipe", "x1": 540, "y1": 600, "x2": 540, "y2": 1800, "durationMs": 200 },
@@ -138,9 +159,11 @@
       "name": "shot-06",
       "title": "Inspect the arithmetic result",
       "body": "Confirm the capacity to see the sums, the comparison, and the recorded source.",
+      "expect": ["Case: Schedule 40 steel at 0.5 psig", "Compared capacity: 120.00 MBH", "100.00 MBH required"],
       "steps": [
         { "type": "tap", "x": 540, "y": 964 },
         { "type": "wait", "ms": 600 },
+        { "type": "clear" },
         { "type": "text", "value": "120" },
         { "type": "wait", "ms": 800 },
         { "type": "swipe", "x1": 540, "y1": 1800, "x2": 540, "y2": 600, "durationMs": 200 },
