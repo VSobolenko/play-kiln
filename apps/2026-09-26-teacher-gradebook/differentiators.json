@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "slot": "teacher-gradebook",
+  "reconRef": "docs/ideation/2026-09-26-teacher-gradebook.md#4",
+  "claims": [
+    {
+      "id": "edit-every-record",
+      "weight": "core",
+      "promise": "Every class, student, category, assignment, mark, attendance record, note, contact and seat can be created, edited and deleted, instead of the incumbent's name-only editing.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-09-26-teacher-gradebook-evidence.md#2.3",
+        "finding": "A 1-star review on the 100K+ app com.apps.ips.teacheraidepro3 names the gap verbatim: in the manage students and classes section the only editing you can do for classes is change the name, with no option to add or delete classes."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/teachergradebook/domain/RecordBookEditor.kt",
+        "symbol": "deleteAssignment",
+        "assertion": "Open RecordBookEditor.kt and count the mutations: the file declares add, update and delete for classes, students, categories, assignments, notes and contacts, plus setGrade, clearGrade, setAttendance and seat editing. Deleting deleteAssignment fails this gate."
+      }
+    },
+    {
+      "id": "deletion-sticks",
+      "weight": "core",
+      "promise": "A deleted class, subject or mark stays deleted and takes its dependents with it, instead of reappearing after the next look.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-09-26-teacher-gradebook-evidence.md#2.3",
+        "finding": "me.yanu.gradebook is rated 3.3 over 21 reviews and a 3-star review states the defect plainly: cannot delete subject or grades, says deleted but reappeared."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "test",
+        "ref": "app/src/test/java/com/gexetr/teachergradebook/domain/RecordBookEditorTest.kt",
+        "symbol": "deleting a class removes it and does not bring it back",
+        "assertion": "Run the slot unit tests: deleting a class removes it and does not bring it back asserts the class is absent from the returned book, and deleting a category removes its assignments and their grades asserts the dependents go too."
+      }
+    },
+    {
+      "id": "durable-daily-use",
+      "weight": "supporting",
+      "promise": "The record survives daily use: a damaged file is preserved rather than overwritten, and a write that failed is reported instead of being claimed as saved.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-09-26-teacher-gradebook-evidence.md#2.3",
+        "finding": "The 500K+ leader com.apolosoft.cuadernoprofesor is rated 3.6 and a 3-star review reports it is one error after the other with sometimes a forced close too, not for daily use."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "test",
+        "ref": "app/src/test/java/com/gexetr/teachergradebook/data/FileRecordBookRepositoryTest.kt",
+        "symbol": "a damaged file is preserved rather than overwritten",
+        "assertion": "Run the slot unit tests: a damaged file is preserved rather than overwritten keeps the unreadable bytes on disk, a file that cannot be written reports failure instead of claiming success returns a failure, and saving leaves no temporary file behind."
+      }
+    },
+    {
+      "id": "one-time-unlock",
+      "weight": "core",
+      "promise": "Bought once and owned: a single non-consumable purchase removes the free limits, with no subscription to renew or cancel.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-09-26-teacher-gradebook-evidence.md#2.3",
+        "finding": "A 1-star review on the 500K+ app com.apolosoft.cuadernoprofesor says if anything add one time purchase, and its developer replied in the same thread that one time lifetime payment for apps is reaching the end of life."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "resource",
+        "ref": "app/src/main/res/values/strings_misc.xml",
+        "symbol": "unlock_one_time_purchase",
+        "assertion": "Open values/strings_misc.xml: unlock_one_time_purchase reads one payment, this is not a subscription, and the same file states there is no subscription to renew or cancel. Removing the key fails this gate."
+      }
+    },
+    {
+      "id": "owns-the-record-file",
+      "weight": "core",
+      "promise": "The whole record is a file the teacher holds, and restoring a backup brings back a class that was deleted after it was written.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-09-26-teacher-gradebook-evidence.md#2.3",
+        "finding": "A 3-star review on the 100K+ app com.apps.ips.teacheraidepro3 says the reviewer bought it in the Amazon app store in 2014 and is scared to uninstall and reinstall from Play because the paid version would be lost."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "test",
+        "ref": "app/src/test/java/com/gexetr/teachergradebook/domain/BackupCodecTest.kt",
+        "symbol": "a backup restores a class that was deleted after the backup",
+        "assertion": "Run the slot unit tests: a full record round-trips through the backup format proves the JSON file is the whole record, and a backup restores a class that was deleted after the backup proves the file is a real restore rather than a one-way export."
+      }
+    },
+    {
+      "id": "purchase-restorable",
+      "weight": "supporting",
+      "promise": "The unlock is recoverable through Google Play on a new device instead of being stranded in the store it was bought from.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-09-26-teacher-gradebook-evidence.md#2.3",
+        "finding": "The same 3-star review on com.apps.ips.teacheraidepro3 records the loss the reviewer fears after buying in a store that no longer ships on Android, which is a 100K+ app with 896 reviews."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/teachergradebook/monetization/EntitlementController.kt",
+        "symbol": "billing.restore()",
+        "assertion": "Open EntitlementController.kt: restore calls billing.restore and re-reads the entitlement so an owned unlock is reclaimed after a reinstall. Deleting the restore path fails this gate."
+      }
+    },
+    {
+      "id": "no-account-no-server",
+      "weight": "core",
+      "promise": "No account is created and no server of ours holds the teacher's data: the record never leaves the device unless the teacher exports it.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-09-26-teacher-gradebook-evidence.md#2.2",
+        "finding": "The 500K+ leader com.apolosoft.cuadernoprofesor sells exactly this positioning in its own store description, private, offline and under your control, with student information not stored on the developer's servers."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/AndroidManifest.xml",
+        "symbol": "android:networkSecurityConfig",
+        "assertion": "Read the manifest and the merged permission list: the app declares no account and no server, cleartext is forbidden through network_security_config, and the only network permission present is the one Play Billing's transport library adds for purchase traffic, which store/data-safety.md discloses rather than hides."
+      }
+    }
+  ]
+}
