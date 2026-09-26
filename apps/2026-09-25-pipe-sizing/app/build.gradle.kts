@@ -28,13 +28,35 @@ android {
         applicationId = "com.gexetr.pipesizing"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // Ad and billing identifiers. Google's public test identifiers are the default so a
+        // debug build serves test inventory and never a live ad; a release supplies the real
+        // per-app identifiers as Gradle properties (see .env.example) and they are never
+        // committed. The AdMob application ID is a manifest placeholder because the Ads SDK
+        // reads it from AndroidManifest metadata, not from code.
+        val admobAppId = (findProperty("playkiln.admobAppId") as String?)
+            ?: "ca-app-pub-3940256099942544~3347511713"
+        val admobInterstitialUnitId = (findProperty("playkiln.admobInterstitialUnitId") as String?)
+            ?: "ca-app-pub-3940256099942544/1033173712"
+        val admobRewardedUnitId = (findProperty("playkiln.admobRewardedUnitId") as String?)
+            ?: "ca-app-pub-3940256099942544/5224354917"
+        // Declared because the ads capability's contract requires a banner unit, not because this
+        // slot shows a banner; its public API exposes interstitial and rewarded formats only.
+        val admobBannerUnitId = (findProperty("playkiln.admobBannerUnitId") as String?)
+            ?: "ca-app-pub-3940256099942544/6300978111"
+
+        manifestPlaceholders["admobApplicationId"] = admobAppId
+        buildConfigField("String", "ADMOB_APP_ID", "\"$admobAppId\"")
+        buildConfigField("String", "ADMOB_INTERSTITIAL_UNIT_ID", "\"$admobInterstitialUnitId\"")
+        buildConfigField("String", "ADMOB_REWARDED_UNIT_ID", "\"$admobRewardedUnitId\"")
+        buildConfigField("String", "ADMOB_BANNER_UNIT_ID", "\"$admobBannerUnitId\"")
     }
 
     signingConfigs {
@@ -124,10 +146,14 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.profileinstaller)
+    implementation(libs.capability.core)
+    implementation(libs.capability.ads)
+    implementation(libs.capability.billing)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

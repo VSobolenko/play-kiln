@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+      The languages the interface is actually translated into. Every locale named here has a complete
+      `values-<locale>/` translation of the UI strings, because declaring a language whose resources do
+      not exist offers a per-app language setting that changes nothing - the app would sit in the
+      picker and stay English. An earlier revision of this file named English alone for that reason;
+      the translations now exist, so the list is real rather than aspirational.
+
+      Adding a locale here without adding its `values-<locale>/` directory is the defect this comment
+      exists to prevent. `scripts/verify-slot.mjs` checks the two agree.
+
+      Translation is not a fallback chain: a string missing from one locale falls back to English
+      per-string, so a partial translation degrades to English words rather than to a blank or a crash.
+      That is why every locale below is complete rather than best-effort.
+
+      Languages deliberately not offered yet, in the order they would be added next: Arabic (needs a
+      right-to-left layout pass, not just strings), Hindi, Indonesian, Vietnamese, Korean, Thai.
+    -->
+    <locale android:name="en" />
+    <locale android:name="ru" />
+    <locale android:name="de" />
+    <locale android:name="fr" />
+    <locale android:name="es" />
+    <locale android:name="pt" />
+    <locale android:name="it" />
+    <locale android:name="nl" />
+    <locale android:name="pl" />
+    <locale android:name="tr" />
+    <locale android:name="ja" />
+    <locale android:name="zh-CN" />
+</locale-config>

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A licensed amateur radio operator who logs contacts on a phone at a field site, a park activation, or a contest station and has to hand that log to another program afterwards.",
+  "paidUnit": "A one-time unlock of unlimited contact logging plus working ADIF 3.1.4 import and export, offline, with no account and no cloud sync.",
+  "priceUsd": 4.99,
+  "momentOfPayment": "After the operator has logged the first ten contacts for free and taps Export, which opens the unlock sheet instead of a file picker.",
+  "distinctnessSentence": "It writes an ADIF file that other logging programs actually import and it never asks for an account, where the measured 10K+ incumbent is ad-supported and its export complaint is answered with silence.",
+  "evidenceRef": "docs/ideation/2026-09-26-five-recipes.md#31-recipe-1--amateur-radio-logbook-amateur-radio-logbook",
+  "day1RevenuePath": "A free tier that logs ten contacts, then a one-time in-app unlock of export and unlimited logging; the first dollar is the first export tap.",
+  "killCriteria": {
+    "windowDays": 60,
+    "minInstalls": 300,
+    "minRevenueUsd": 50
+  },
+  "assumptionsUnverified": [
+    "That amateur operators will pay a one-time fee instead of using the free HAMRS logger, which is rated 4.3 and already declares in-app purchases.",
+    "That ADIF interoperability is the purchase trigger, because the export complaint was two reviews of one 10K+ app rather than a measured pattern across the shelf.",
+    "That the shelf's 10K+ install ceiling is a market the factory can enter at all rather than its total size."
+  ]
+}

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="limit_second_class" translatable="true">A versão gratuita permite uma turma. Um único desbloqueio remove este limite e todos os outros: turmas ilimitadas, alunos ilimitados, categorias com peso, exportação e cópia de segurança.</string>
+    <plurals name="limit_student_cap" translatable="true">
+        <item quantity="one">A versão gratuita permite até %1$d aluno por turma. Um único desbloqueio remove este limite e todos os outros: turmas ilimitadas, alunos ilimitados, categorias com peso, exportação e cópia de segurança.</item>
+        <item quantity="other">A versão gratuita permite até %1$d alunos por turma. Um único desbloqueio remove este limite e todos os outros: turmas ilimitadas, alunos ilimitados, categorias com peso, exportação e cópia de segurança.</item>
+    </plurals>
+    <string name="limit_single_category" translatable="true">A versão gratuita usa uma única categoria, portanto a média é uma média simples. Um único desbloqueio remove este limite e todos os outros: turmas ilimitadas, alunos ilimitados, categorias com peso, exportação e cópia de segurança.</string>
+    <string name="limit_export" translatable="true">Exportar o diário de notas ou um relatório imprimível faz parte do desbloqueio único, que remove todos os limites gratuitos: turmas ilimitadas, alunos ilimitados e categorias com peso.</string>
+    <string name="limit_backup" translatable="true">A cópia de segurança e a restauração fazem parte do desbloqueio único, que remove todos os limites gratuitos: turmas ilimitadas, alunos ilimitados e categorias com peso.</string>
+
+    <plurals name="import_imported" translatable="true">
+        <item quantity="one">Foi importado %1$d aluno.</item>
+        <item quantity="other">Foram importados %1$d alunos.</item>
+    </plurals>
+    <plurals name="import_already_on_roster" translatable="true">
+        <item quantity="one">%1$d linha já estava na lista de alunos, então nada foi adicionado em duplicado.</item>
+        <item quantity="other">%1$d linhas já estavam na lista de alunos, então nada foi adicionado em duplicado.</item>
+    </plurals>
+    <plurals name="import_skipped" translatable="true">
+        <item quantity="one">%1$d linha foi ignorada: %2$s</item>
+        <item quantity="other">%1$d linhas foram ignoradas: %2$s</item>
+    </plurals>
+    <string name="import_skipped_line" translatable="true">linha %1$d — %2$s</string>
+    <plurals name="import_blocked_by_limit" translatable="true">
+        <item quantity="one">%1$d aluno não coube: a versão gratuita permite %2$d alunos por turma.</item>
+        <item quantity="other">%1$d alunos não couberam: a versão gratuita permite %2$d alunos por turma.</item>
+    </plurals>
+
+    <plurals name="restore_restored" translatable="true">
+        <item quantity="one">Restaurada %1$d turma.</item>
+        <item quantity="other">Restauradas %1$d turmas.</item>
+    </plurals>
+
+    <string name="storage_write_failed" translatable="true">Essa alteração aparece na tela, mas não foi possível gravá-la no armazenamento deste dispositivo.</string>
+
+    <string name="report_student_column" translatable="true">Aluno</string>
+    <string name="report_overall_column" translatable="true">Geral</string>
+    <string name="report_class_average" translatable="true">Média da turma: %1$s</string>
+    <string name="report_column_key" translatable="true">Legenda das colunas: M = não entregue, E = dispensado, %1$s = nada registrado.</string>
+    <string name="report_footer" translatable="true">%1$s · página %2$d · um registro local privado, não um histórico escolar oficial</string>
+    <string name="report_student_gone" translatable="true">Esse aluno não está mais nesta lista de alunos.</string>
+    <string name="report_school_id" translatable="true">Identificador escolar: %1$s</string>
+    <string name="report_overall" translatable="true">Geral: %1$s</string>
+    <string name="report_period" translatable="true">Aula %1$s</string>
+    <string name="report_averages_rule" translatable="true">Médias %1$s; trabalhos não entregues contam como %2$s.</string>
+    <string name="report_missing_counts_zero" translatable="true">zero</string>
+    <string name="report_missing_counts_excluded" translatable="true">excluídos</string>
+    <string name="report_printed" translatable="true">Impresso %1$s · registro privado, mantido neste dispositivo</string>
+    <string name="report_categories" translatable="true">Categorias</string>
+    <string name="report_excluded_no_grade" translatable="true">excluído (ainda sem nota)</string>
+    <string name="report_dropped_lowest" translatable="true">, descarta as %1$d menores notas</string>
+    <string name="report_missing_count" translatable="true">, %1$d não entregues</string>
+    <string name="report_exempt_count" translatable="true">, %1$d dispensados</string>
+    <string name="report_grades" translatable="true">Notas</string>
+    <string name="report_missing" translatable="true">não entregue</string>
+    <string name="report_exempt" translatable="true">dispensado</string>
+    <string name="report_attendance" translatable="true">Presença</string>
+    <string name="report_notes" translatable="true">Observações</string>
+    <string name="report_parent_contacts" translatable="true">Contatos com os responsáveis</string>
+    <string name="report_follow_up" translatable="true"> (acompanhamento %1$s)</string>
+</resources>

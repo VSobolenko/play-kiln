@@ -11,6 +11,15 @@ The **Evaluator** does not write product code. It grades artifacts against a fix
 rubric in a fresh mindset (prefer a different peer than who Built: Codex if Cursor
 built, or bugbot+security-review).
 
+It runs twice in a slot's life, against different evidence:
+
+- **Phase 1 (`/ship`)** — source-level grading: the app builds as a debug APK, the code and
+  tests are honest, the store *drafts* match the app. Signed artifacts, rendered assets and
+  screenshots do not exist yet, so their absence is not a finding.
+- **Phase 2 (`/release`)** — the same rubric against the release evidence: signed APK and AAB,
+  release manifest, strict store-pack PASS, rendered assets and screenshots
+  (`verify-slot --slot <slug> --strict-store --build`).
+
 ## Rubric (score each 0–5; ship bar = all ≥ 4)
 
 1. **Builds** — `verify-slot` PASS; `assembleDebug` evidence or BLOCKED with cause

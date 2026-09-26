@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unlock_title">Снять ограничения</string>
+    <string name="unlock_benefit_heading">Преподавайте без ограничений бесплатной версии</string>
+    <string name="unlock_benefit_classes">Неограниченное число классов</string>
+    <string name="unlock_benefit_students">Неограниченное число учеников в каждом классе</string>
+    <string name="unlock_benefit_categories">Взвешенные категории и отбрасывание низших оценок</string>
+    <string name="unlock_benefit_csv">Экспорт журнала в CSV</string>
+    <string name="unlock_benefit_pdf">Печатные PDF-отчёты по классу и ученикам</string>
+    <string name="unlock_benefit_backup">Резервное копирование и восстановление всех данных</string>
+    <string name="unlock_price_loading">Google Play покажет цену перед подтверждением</string>
+    <string name="unlock_one_time_purchase">Один платёж. Это не подписка.</string>
+    <string name="unlock_google_play_notice">Google Play проводит покупку и перед подтверждением показывает точную цену в вашей валюте. Постоянную разблокировку можно восстановить после переустановки или переноса на новое устройство; после восстановления она работает без интернета.</string>
+    <string name="unlock_billing_unavailable_title">Сейчас Google Play недоступен</string>
+    <string name="unlock_billing_unavailable_body">Для покупки и восстановления нужно подключение к Google Play. Ваши данные в безопасности и остаются доступными.</string>
+    <string name="unlock_purchase_button">Перейти в Google Play</string>
+    <string name="unlock_restore_button">Восстановить покупку</string>
+    <string name="unlock_dismiss_button">Не сейчас</string>
+    <string name="about_title">О приложении</string>
+    <string name="about_hero_eyebrow">Личный журнал учителя</string>
+    <string name="about_hero_purpose">Классы, оценки, посещаемость и заметки в одном журнале под вашим контролем.</string>
+    <string name="about_what_title">Что такое Mark Book</string>
+    <string name="about_what_body">Личный журнал для записей, которые вы ведёте наряду со школьной системой. Списки учеников, оценки, посещаемость, заметки об участии, связь с родителями и рассадка хранятся вместе.</string>
+    <string name="about_privacy_title">Конфиденциальность по умолчанию</string>
+    <string name="about_privacy_body">Приложение работает без интернета и записывает данные в закрытое хранилище этого устройства. Здесь нет учётной записи, входа, аналитики, рекламы или сервера разработчика. Файлы покидают устройство, только когда вы экспортируете их или создаёте резервную копию через системное окно выбора файлов. Если включено резервное копирование устройства, Android Auto Backup также может скопировать данные в вашу учётную запись Google.</string>
+    <string name="about_privacy_billing">Платёжный сервис Google Play обрабатывает покупку и хранит её историю. Через это приложение он никогда не получает данные вашего класса.</string>
+    <string name="about_averages_title">Понятный расчёт среднего балла</string>
+    <string name="about_averages_body">Каждый средний балл учитывает заданные вами категории, веса, округление и правило для несданных работ. Пустые ячейки и освобождения не превращаются в ноль без предупреждения, а категории без подходящих оценок явно называются и исключаются.</string>
+    <string name="about_purchase_title">Одна постоянная разблокировка</string>
+    <string name="about_purchase_unlocked">Разблокировка действует на этом устройстве. Подписки, которую нужно продлевать или отменять, нет.</string>
+    <string name="about_purchase_free">В бесплатной версии доступен один класс до 20 учеников и одна категория. Однократная покупка снимает эти ограничения и добавляет взвешенные категории, экспорт, PDF-отчёты, резервное копирование и восстановление.</string>
+    <string name="about_purchase_action">Что входит в разблокировку</string>
+    <string name="about_version_title">Версия</string>
+    <string name="about_version_value">%1$s</string>
+    <string name="about_support_title">Поддержка</string>
+    <string name="about_leaving_title">Ваши данные и уход</string>
+    <string name="about_leaving_body">Можно удалить отдельные записи, очистить хранилище приложения или удалить само приложение. При удалении приложения стираются данные на устройстве; экспортированные копии и резервные копии Android остаются под вашим контролем.</string>
+    <string name="average_not_enough_title">Пока недостаточно данных</string>
+    <string name="average_not_enough_body">Пока нет оценок, учитываемых в среднем балле. Это не ноль.</string>
+    <string name="average_percent_value">%1$s%%</string>
+    <string name="average_overall_caption">Общий средний балл</string>
+    <string name="average_rule_missing_zero">%1$s; несданная работа считается нулём</string>
+    <string name="average_rule_missing_excluded">%1$s; несданная работа исключается</string>
+    <string name="average_rule_unweighted">Ни у одной категории нет веса, поэтому средние баллы категорий учитываются поровну.</string>
+    <string name="average_meaning">Сравните результат с проходным баллом класса. Откройте расчёт, чтобы увидеть, какая категория снижает результат или отклоняется.</string>
+    <string name="average_hide_working">Скрыть расчёт</string>
+    <string name="average_show_working">Показать расчёт</string>
+    <string name="average_no_categories">В этом классе пока нет категорий, поэтому учитывать веса нечему.</string>
+    <string name="average_category_weight">%1$s · вес %2$s</string>
+    <string name="average_category_excluded">Исключено из среднего балла: в этой категории пока нет учитываемых оценок.</string>
+    <plurals name="average_category_grade_count"><item quantity="one">Средний балл %1$s по %2$d оценке</item><item quantity="few">Средний балл %1$s по %2$d оценкам</item><item quantity="many">Средний балл %1$s по %2$d оценкам</item><item quantity="other">Средний балл %1$s по %2$d оценки</item></plurals>
+    <plurals name="average_dropped_count"><item quantity="one">Отброшена %1$d низшая оценка</item><item quantity="few">Отброшены %1$d низшие оценки</item><item quantity="many">Отброшено %1$d низших оценок</item><item quantity="other">Отброшено %1$d низшей оценки</item></plurals>
+    <plurals name="average_missing_count"><item quantity="one">%1$d несданная работа</item><item quantity="few">%1$d несданные работы</item><item quantity="many">%1$d несданных работ</item><item quantity="other">%1$d несданной работы</item></plurals>
+    <plurals name="average_exempt_count"><item quantity="one">%1$d освобождение</item><item quantity="few">%1$d освобождения</item><item quantity="many">%1$d освобождений</item><item quantity="other">%1$d освобождения</item></plurals>
+    <string name="average_score_value">%1$s/%2$s</string>
+    <string name="average_missing">Не сдано</string>
+    <string name="average_exempt">Освобождён</string>
+    <string name="average_empty_mark">—</string>
+    <string name="average_score_description">%1$s из %2$s</string>
+    <string name="average_missing_description">Отмечено как «не сдано»</string>
+    <string name="average_exempt_description">Отмечено как «освобождён»</string>
+    <string name="average_empty_description">Ничего не записано</string>
+    <string name="average_assignment_points">Максимум: %1$s.</string>
+    <string name="average_score">Оценка</string>
+    <string name="average_record_score_description">Поставить оценку</string>
+    <string name="average_points_earned">Набранные баллы</string>
+    <string name="average_points_too_high">Это больше максимума работы — %1$s.</string>
+    <string name="average_missing_rule_help">Несданные работы обрабатываются по правилу этого класса.</string>
+    <string name="average_exempt_rule_help">Работа с освобождением полностью исключается из среднего балла — это не ноль.</string>
+    <string name="average_save">Сохранить</string>
+    <string name="average_clear">Очистить</string>
+    <string name="average_cancel">Отмена</string>
+</resources>

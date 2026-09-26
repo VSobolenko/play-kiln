@@ -8,12 +8,13 @@
  * directly, including the one a test cannot normally reach - a process killed between the two renames,
  * simulated by leaving the directory in exactly the state that interruption produces.
  */
+import { spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 
-import { publishCaptures, recoverInterruptedPublish } from './lib/capture-publish.mjs'
+import { acquireCaptureLock, publishCaptures, recoverInterruptedPublish } from './lib/capture-publish.mjs'
 
 let failures = 0
 let checks = 0
@@ -44,6 +45,31 @@ function sameSet(a, b) {
 
 function sandbox() {
   return mkdtempSync(path.join(tmpdir(), 'kiln-publish-'))
+}
+
+/** A pid that is not alive: a child that has already exited and been reaped by `spawnSync`. */
+function deadPid() {
+  return spawnSync(process.execPath, ['-e', '0']).pid
+}
+
+/** Mirrors the lock's liveness rule so a test can assert its own stale-lock precondition. */
+function pidAlive(pid) {
+  try {
+    process.kill(pid, 0)
+    return true
+  } catch (error) {
+    return error.code !== 'ESRCH'
+  }
+}
+
+/** Acquire and immediately release, to prove a slot is free again without holding it. */
+function canAcquire(lockPath, slot) {
+  try {
+    acquireCaptureLock(lockPath, { slot }).release()
+    return true
+  } catch {
+    return false
+  }
 }
 
 const oldSet = ['01.png', '02.png', '03.png', '04.png', '05.png', '06.png', 'old-07.png']
@@ -151,6 +177,125 @@ const newSet = ['01.png', '02.png', '03.png', '04.png', '05.png', '06.png']
   check('a first run with no previous set publishes', sameSet(contents(raw), newSet), JSON.stringify(contents(raw)))
   check('a first run reports no recovery', result.recovered === false)
   check('a first run leaves no backup', !existsSync(`${raw}.previous`))
+  rmSync(root, { recursive: true, force: true })
+}
+
+/* 8. A second acquire on a held lock is refused, and the refusal names the holder. */
+{
+  const root = sandbox()
+  const lockPath = path.join(root, 'captures', 'capture.lock')
+  const first = acquireCaptureLock(lockPath, { slot: 'test-slot' })
+  let refusal = null
+  try {
+    acquireCaptureLock(lockPath, { slot: 'test-slot' })
+  } catch (error) {
+    refusal = error
+  }
+  check('a second acquire while the first is held is refused', refusal !== null, 'the second acquire succeeded')
+  check('the refusal names the holding pid', refusal !== null && refusal.message.includes(`pid ${process.pid}`), refusal?.message)
+  first.release()
+  check('releasing the first lock frees the slot', canAcquire(lockPath, 'test-slot'))
+  rmSync(root, { recursive: true, force: true })
+}
+
+/* 9. The lock is released after a successful publish, so the next run can acquire it. */
+{
+  const root = sandbox()
+  const raw = path.join(root, 'raw')
+  const staging = path.join(root, 'staging')
+  const lockPath = path.join(root, 'captures', 'capture.lock')
+  seed(staging, newSet)
+  let lock = null
+  try {
+    lock = acquireCaptureLock(lockPath, { slot: 'test-slot' })
+    publishCaptures(staging, raw)
+  } finally {
+    lock?.release()
+  }
+  check('the lock file is gone after a successful publish', !existsSync(lockPath))
+  check('the slot can be acquired again after a successful publish', canAcquire(lockPath, 'test-slot'))
+  rmSync(root, { recursive: true, force: true })
+}
+
+/* 10. A publish that throws mid-swap still releases the lock on the way out. */
+{
+  const root = sandbox()
+  const raw = path.join(root, 'raw')
+  // The same injected failure as case 6: a missing staging path makes the swap throw.
+  const staging = path.join(root, 'staging-does-not-exist')
+  const lockPath = path.join(root, 'captures', 'capture.lock')
+  seed(raw, oldSet)
+  let lock = null
+  let threw = false
+  try {
+    lock = acquireCaptureLock(lockPath, { slot: 'test-slot' })
+    try {
+      publishCaptures(staging, raw)
+    } catch {
+      threw = true
+    }
+  } finally {
+    lock?.release()
+  }
+  check('a thrown publish error still reaches the release', threw)
+  check('the lock file is gone after a thrown publish', !existsSync(lockPath))
+  check('the slot can be acquired again after a thrown publish', canAcquire(lockPath, 'test-slot'))
+  rmSync(root, { recursive: true, force: true })
+}
+
+/* 11. A lock left by a killed process (dead pid, old timestamp) is reclaimed, not deadlocked. */
+{
+  const root = sandbox()
+  const lockPath = path.join(root, 'captures', 'capture.lock')
+  mkdirSync(path.dirname(lockPath), { recursive: true })
+  const pid = deadPid()
+  check('precondition: the stale lock records a pid that is not alive', !pidAlive(pid), `pid ${pid} is alive`)
+  writeFileSync(lockPath, `${JSON.stringify({ pid, startedAt: Date.now() - 60 * 60 * 1000, slot: 'test-slot' })}\n`, 'utf8')
+  let lock = null
+  let error = null
+  try {
+    lock = acquireCaptureLock(lockPath, { slot: 'test-slot' })
+  } catch (caught) {
+    error = caught
+  }
+  check('an old lock held by a dead pid is reclaimed rather than deadlocking', lock !== null, error?.message)
+  check('the reclaimed lock now names this process', lock !== null && lock.pid === process.pid)
+  lock?.release()
+  rmSync(root, { recursive: true, force: true })
+}
+
+/* 12. An old lock whose pid is alive is NOT reclaimed, however old it is. */
+{
+  const root = sandbox()
+  const lockPath = path.join(root, 'captures', 'capture.lock')
+  mkdirSync(path.dirname(lockPath), { recursive: true })
+  writeFileSync(lockPath, `${JSON.stringify({ pid: process.pid, startedAt: Date.now() - 60 * 60 * 1000, slot: 'test-slot' })}\n`, 'utf8')
+  let refusal = null
+  try {
+    acquireCaptureLock(lockPath, { slot: 'test-slot' })
+  } catch (error) {
+    refusal = error
+  }
+  check('a lock whose pid is alive is not reclaimed, however old', refusal !== null, 'the live lock was stolen')
+  check('the refusal names the live holder', refusal !== null && refusal.message.includes(`pid ${process.pid}`), refusal?.message)
+  rmSync(root, { recursive: true, force: true })
+}
+
+/* 13. Release tolerates a lock file that is already gone, and is idempotent. */
+{
+  const root = sandbox()
+  const lockPath = path.join(root, 'captures', 'capture.lock')
+  const lock = acquireCaptureLock(lockPath, { slot: 'test-slot' })
+  rmSync(lockPath, { force: true })
+  let error = null
+  try {
+    lock.release()
+    lock.release()
+  } catch (caught) {
+    error = caught
+  }
+  check('release tolerates the lock file already being gone', error === null, error?.message)
+  check('a double release leaves no lock behind', !existsSync(lockPath))
   rmSync(root, { recursive: true, force: true })
 }
 

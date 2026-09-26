@@ -19,6 +19,10 @@ dist/
 *.keystore
 keystore.properties
 
+# The owner's release approval for this slot. Machine-local state bound to a source digest:
+# committing it would let an approval outlive the revision it approved.
+release-approval.json
+
 # Local environment and service credentials.
 .env
 .env.*
@@ -29,3 +33,8 @@ play-service-account.json
 # IDE-local files.
 .idea/
 *.iml
+
+# Worker logs. `scripts/codex-run.mjs` writes a run's stdout beside its durable
+# ledger under `.kiln/`, and a run started with the slot as its working directory
+# leaves that output in the slot root instead. They are build logs, not sources.
+.kiln-*.log

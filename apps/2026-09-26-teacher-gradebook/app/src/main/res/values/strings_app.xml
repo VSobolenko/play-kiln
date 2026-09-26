@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Strings produced by the navigation shell: the file-picker outcomes, the reasons the paywall opens,
+  and the result of a purchase or a restore.
+
+  These are here rather than in the screen files because they are raised from callbacks that outlive
+  the screen that started them - a document is written after the teacher has left the sheet - so the
+  screen is not the right owner. They are resolved with `Context.getString` rather than
+  `stringResource`, because a coroutine or an effect block cannot read a composition local.
+
+  One consequence worth stating: everything a teacher can be told about a purchase lives here, and the
+  wording is deliberate. Each message says what was and was not charged, because the failure modes of
+  a billing flow are exactly where a vague sentence costs a refund.
+-->
+<resources>
+    <!-- A substitute for a platform error message we do not have, never a stand-alone sentence. -->
+    <string name="app_error_unknown_reason" translatable="true">unknown reason</string>
+
+    <string name="app_nothing_written" translatable="true">Nothing was written.</string>
+    <string name="app_write_failed" translatable="true">That file could not be written: %1$s</string>
+    <string name="app_read_failed" translatable="true">That file could not be read: %1$s</string>
+    <string name="nav_back" translatable="true">Back</string>
+    <string name="document_could_not_open" translatable="true">The file could not be opened.</string>
+    <string name="document_could_not_open_for_writing" translatable="true">The file could not be opened for writing.</string>
+    <string name="document_chosen_file" translatable="true">the chosen file</string>
+    <string name="backup_empty" translatable="true">That file is empty, so nothing was restored.</string>
+    <string name="backup_not_mark_book" translatable="true">That file is not a Mark Book backup, so nothing was restored.</string>
+    <string name="backup_missing_schema" translatable="true">That file has no readable schema version, so nothing was restored.</string>
+    <string name="backup_unsupported_version" translatable="true">That backup was written by a different version of the app (format %1$d; this app reads format %2$d). Nothing was changed.</string>
+    <string name="backup_damaged" translatable="true">That backup is damaged and could not be read, so nothing was restored: %1$s</string>
+    <string name="app_no_file_chosen" translatable="true">No file was chosen.</string>
+    <string name="app_class_gone" translatable="true">That class no longer exists.</string>
+    <string name="app_record_loading" translatable="true">The record is still loading.</string>
+    <string name="app_wrote_csv" translatable="true">Wrote %1$s, one row per student.</string>
+    <string name="app_wrote_file" translatable="true">Wrote %1$s.</string>
+    <string name="app_backed_up" translatable="true">Backed up to %1$s. Keep it somewhere you trust.</string>
+
+    <!-- Why the paywall opened. Shown at the top of the unlock sheet. -->
+    <string name="app_unlock_reason_classes" translatable="true">The free version keeps one class. The unlock lifts the limit.</string>
+    <string name="app_unlock_reason_about" translatable="true">About the unlock</string>
+
+    <!-- Purchase and restore outcomes. Each one states what happened to the teacher's money. -->
+    <string name="app_unlock_purchased" translatable="true">Unlocked. Every limit is lifted on this device.</string>
+    <string name="app_unlock_restored" translatable="true">Restored. Your unlock is active again.</string>
+    <string name="app_unlock_nothing_to_restore" translatable="true">Play reports no purchase for this account, so nothing changed. If you paid with another account, sign in with it and try again.</string>
+    <string name="app_unlock_pending" translatable="true">Play is still processing that payment. Nothing is unlocked until it completes, and nothing has been charged twice.</string>
+    <string name="app_unlock_unavailable" translatable="true">Google Play cannot take this purchase on this device right now. Your work, and the unlock if you already have it, are untouched.</string>
+    <string name="app_unlock_not_completed" translatable="true">No purchase was completed, so nothing was charged. Everything you have recorded is still here.</string>
+    <string name="app_unlock_offline" translatable="true">Google Play could not be reached, so nothing was attempted. The app keeps working offline; the unlock itself needs a connection.</string>
+
+    <!-- The file-name fallback for a class the teacher has not named. Also the guard for a name written
+         entirely in a script this app has no ASCII for, which would otherwise leave an empty prefix. -->
+    <string name="app_unnamed_class_file" translatable="true">Class</string>
+</resources>

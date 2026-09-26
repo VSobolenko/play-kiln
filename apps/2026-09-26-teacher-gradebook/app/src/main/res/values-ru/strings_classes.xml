@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="classes_title_unlocked">Ваши классы</string>
+    <string name="classes_title_free">Ваш класс</string>
+    <string name="classes_about">О приложении</string>
+    <string name="classes_new_class">Новый класс</string>
+    <string name="classes_hero_eyebrow">Обзор классов</string>
+    <string name="classes_hero_headline">Всё о каждом классе</string>
+    <string name="classes_hero_supporting">Откройте класс, чтобы вести список учеников, оценки и ежедневные записи.</string>
+    <string name="classes_stat_classes">Классы</string>
+    <string name="classes_stat_students">Ученики</string>
+    <string name="classes_stat_overall_average">Общий средний балл</string>
+    <string name="classes_not_enough_data">пока недостаточно данных</string>
+    <string name="classes_percent_format">%1$s%%</string>
+    <string name="classes_empty_title">Классов пока нет</string>
+    <string name="classes_empty_body">Создайте первый класс, чтобы записывать оценки, посещаемость и заметки. Всё хранится на этом устройстве — без учётной записи и интернета.</string>
+    <string name="classes_period_format">Урок %1$s</string>
+    <plurals name="classes_student_count"><item quantity="one">%1$d ученик</item><item quantity="few">%1$d ученика</item><item quantity="many">%1$d учеников</item><item quantity="other">%1$d ученика</item></plurals>
+    <plurals name="classes_assignment_count"><item quantity="one">%1$d работа</item><item quantity="few">%1$d работы</item><item quantity="many">%1$d работ</item><item quantity="other">%1$d работы</item></plurals>
+    <string name="classes_average_value">Средний балл класса: %1$s</string>
+    <string name="classes_options">Параметры</string>
+    <string name="classes_rename">Переименовать</string>
+    <string name="classes_delete">Удалить</string>
+    <string name="classes_hint">Нажмите на класс, чтобы открыть список учеников, оценки, посещаемость, заметки, рассадку и отчёты.</string>
+    <string name="classes_create">Создать</string>
+    <string name="classes_name_label">Название класса</string>
+    <plurals name="classes_free_add_warning"><item quantity="one">В бесплатной версии доступен %1$d класс. Для создания ещё одного нужна разблокировка.</item><item quantity="few">В бесплатной версии доступны %1$d класса. Для создания ещё одного нужна разблокировка.</item><item quantity="many">В бесплатной версии доступны %1$d классов. Для создания ещё одного нужна разблокировка.</item><item quantity="other">В бесплатной версии доступно %1$d класса. Для создания ещё одного нужна разблокировка.</item></plurals>
+    <string name="classes_rename_title">Переименовать класс</string>
+    <string name="classes_save">Сохранить</string>
+    <string name="classes_delete_title">Удалить %1$s?</string>
+    <plurals name="classes_grade_count"><item quantity="one">%1$d оценка</item><item quantity="few">%1$d оценки</item><item quantity="many">%1$d оценок</item><item quantity="other">%1$d оценки</item></plurals>
+    <plurals name="classes_attendance_count"><item quantity="one">%1$d запись о посещаемости</item><item quantity="few">%1$d записи о посещаемости</item><item quantity="many">%1$d записей о посещаемости</item><item quantity="other">%1$d записи о посещаемости</item></plurals>
+    <plurals name="classes_note_count"><item quantity="one">%1$d заметка</item><item quantity="few">%1$d заметки</item><item quantity="many">%1$d заметок</item><item quantity="other">%1$d заметки</item></plurals>
+    <plurals name="classes_contact_count"><item quantity="one">%1$d запись о связи</item><item quantity="few">%1$d записи о связи</item><item quantity="many">%1$d записей о связи</item><item quantity="other">%1$d записи о связи</item></plurals>
+    <string name="classes_delete_body">Будет удалён класс и всё, что в нём записано: %1$s, %2$s, %3$s, %4$s, %5$s, %6$s и рассадка.\n\nЭто действие нельзя отменить. Если вы не уверены, сначала создайте резервную копию.</string>
+    <string name="classes_delete_confirm">Удалить класс</string>
+    <string name="classes_free_title">Бесплатная версия</string>
+    <plurals name="classes_free_allowance"><item quantity="one">Один класс</item><item quantity="few">%1$d класса</item><item quantity="many">%1$d классов</item><item quantity="other">%1$d класса</item></plurals>
+    <string name="classes_free_allowance_label">Бесплатный лимит</string>
+    <plurals name="classes_free_roster"><item quantity="one">до %1$d ученика</item><item quantity="few">до %1$d учеников</item><item quantity="many">до %1$d учеников</item><item quantity="other">до %1$d ученика</item></plurals>
+    <plurals name="classes_free_roster_tile"><item quantity="one">До %1$d ученика</item><item quantity="few">До %1$d учеников</item><item quantity="many">До %1$d учеников</item><item quantity="other">До %1$d ученика</item></plurals>
+    <string name="classes_free_roster_label">Учеников в классе</string>
+    <string name="classes_free_available">%1$s с %2$s, неограниченным числом оценок, записей о посещаемости, заметок и мест в рассадке. Неограниченные классы, экспорт и резервное копирование входят в однократную разблокировку.</string>
+    <string name="classes_free_spent">%1$s с %2$s, неограниченным числом оценок, записей о посещаемости, заметок и мест в рассадке. Класс уже создан, поэтому для второго нужна разблокировка.</string>
+    <string name="classes_unlock_title">Разблокировать всё навсегда</string>
+    <string name="classes_unlock_body">Одна покупка без подписки. Перед подтверждением Google Play покажет точную цену в вашей валюте. Покупку можно восстановить на новом устройстве.</string>
+    <string name="classes_unlock_action">Что входит в разблокировку</string>
+</resources>

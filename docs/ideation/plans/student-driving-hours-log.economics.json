@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "archetype": "ads_led_utility",
+  "payingUser": "A parent of a learner driver who has to certify supervised day and night driving hours to a state licensing office.",
+  "paidUnit": "A one-time remove-ads and export unlock that produces a printable, per-drive hour summary the parent can hand to a licensing office.",
+  "priceUsd": 2.99,
+  "momentOfPayment": "When the parent taps Export to prepare the licensing-office summary, and again after the fifth logged drive when the next banner asks to remove ads.",
+  "distinctnessSentence": "It exports a printable day and night hour summary without crashing and keeps the hours on the phone instead of behind a state or DMV login, where the measured incumbent crashes on export and the shelf leaders are classroom test-prep apps.",
+  "evidenceRef": "docs/ideation/2026-09-26-five-recipes.md#34-recipe-4--supervised-driving-hours-log-student-driving-hours-log",
+  "day1RevenuePath": "Free and ad-supported from the first logged drive; the first dollar is an export unlock bought by a parent who needs the summary for a licensing appointment.",
+  "killCriteria": {
+    "windowDays": 45,
+    "minInstalls": 1000,
+    "minRevenueUsd": 30
+  },
+  "assumptionsUnverified": [
+    "That parents will pay to remove ads or unlock export at all, because the measured category norm is a free app with ads and the 4.2-star incumbent's own review calls the absence of ads a positive.",
+    "That the day and night hour rules of each state can be encoded as data without the app becoming legal advice, and that those rules are stable enough to hardcode.",
+    "That a seasonal 30-day-use utility can hold enough daily users for ads to pay anything, which the factory's own ad arithmetic says needs 2,000 to 6,000 DAU."
+  ]
+}

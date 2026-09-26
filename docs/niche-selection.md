@@ -4,6 +4,17 @@ Purpose: the repeatable procedure for deciding whether an idea earns a slot, and
 gathered so far. Monetization is covered in `docs/monetization-strategy.md`; this document is
 about **whether anyone wants the app at all**.
 
+**Read this before using the procedure (added 2026-09-26).** Wanting is necessary and not
+sufficient. A screened idea still needs a validated economics plan before it can become a slot,
+and `scripts/new-slot.mjs` enforces that (`docs/slot-economics.md`). Two further rules bind:
+
+- **An example is a shape, not a topic.** The factory's first real slot failed because a
+  calculator offered as an illustration of a small offline tool became the strategy. See
+  `.cursor/rules/ideation-gate.mdc` and `docs/reviews/2026-09-26-slot-1-economics-postmortem.md`.
+- **A `candidate` verdict here is a spot check, not a measurement.** §2 and
+  `docs/research/2026-09-24-market-decision.md` §2.1 both record the relevance guard passing a
+  shelf that does not answer the query. Hand-classify the titles before believing a verdict.
+
 The factory's bottleneck is not building apps, it is picking the right ones. A slot costs days;
 picking wrong costs the same days plus the policy exposure of a dead app in the catalog. Every
 idea therefore passes this screen *before* `scripts/new-slot.mjs` runs.
@@ -107,6 +118,14 @@ The fortresses and the openings separate along one line that is not obvious:
 where proven demand and weak supply coexist, which is the only combination worth a slot.
 
 ### Candidate A — specialised calculation tools for a trade or profession
+
+> **Status, 2026-09-26: BURNED as a factory direction.** The first real slot was chosen out of
+> this candidate and failed commercially — the shipped app had no revenue mechanism at all. The
+> measurements below are kept because they are evidence about one shelf, and the *pattern* they
+> illustrate (a job whose users would never build the app) is still the useful part. What is
+> closed is the topic: calculators, converters, and generic arithmetic tools are not to be
+> proposed again. See `.cursor/rules/ideation-gate.mdc` and
+> `docs/reviews/2026-09-26-slot-1-economics-postmortem.md`.
 
 - The leader — `Electrical Calculations` (Ettore Gallina) — shows **5M+ installs, 49K reviews,
   4.5★, "Contains ads · In-app purchases"**. Free-with-ads-plus-IAP is exactly the hybrid model

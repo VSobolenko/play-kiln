@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unlock_title">Rimuovi i limiti</string>
+    <string name="unlock_benefit_heading">Insegnare senza i limiti della versione gratuita</string>
+    <string name="unlock_benefit_classes">Classi illimitate</string>
+    <string name="unlock_benefit_students">Studenti illimitati in ogni classe</string>
+    <string name="unlock_benefit_categories">Categorie ponderate e regole di scarto del voto più basso</string>
+    <string name="unlock_benefit_csv">Esportazione del registro dei voti in CSV</string>
+    <string name="unlock_benefit_pdf">Report stampabili in PDF per classe e studente</string>
+    <string name="unlock_benefit_backup">Copia di sicurezza e ripristino dell\'intero registro</string>
+    <string name="unlock_price_loading">Prezzo mostrato da Google Play prima della conferma</string>
+    <string name="unlock_one_time_purchase">Un unico pagamento. Non è un abbonamento.</string>
+    <string name="unlock_google_play_notice">Google Play gestisce l\'acquisto e mostra il prezzo esatto nella valuta locale prima della conferma. Lo sblocco permanente può essere ripristinato dopo la reinstallazione o il passaggio a un nuovo dispositivo e funziona offline una volta ripristinato.</string>
+    <string name="unlock_billing_unavailable_title">Google Play non è disponibile al momento</string>
+    <string name="unlock_billing_unavailable_body">Per acquistare e ripristinare serve una connessione a Google Play. Il registro esistente è al sicuro e continua a funzionare.</string>
+    <string name="unlock_purchase_button">Continua su Google Play</string>
+    <string name="unlock_restore_button">Ripristina acquisto</string>
+    <string name="unlock_dismiss_button">Non ora</string>
+
+    <string name="about_title">Informazioni sull\'app</string>
+    <string name="about_hero_eyebrow">Registro privato dell\'insegnante</string>
+    <string name="about_hero_purpose">Classi, voti, presenze e annotazioni in un unico registro che controlla lei.</string>
+    <string name="about_what_title">Che cos\'è Mark Book</string>
+    <string name="about_what_body">Un registro dei voti privato, per il registro che tiene accanto al sistema scolastico. Riunisce elenchi studenti, voti, presenze, annotazioni sulla partecipazione, contatti con i genitori e piantine dei posti.</string>
+    <string name="about_privacy_title">Privato per progettazione</string>
+    <string name="about_privacy_body">L\'app funziona offline e scrive il registro nella memoria privata di questo dispositivo. Non ci sono account, accessi, analisi, pubblicità né server dello sviluppatore. I file escono solo quando esporta o salva una copia di sicurezza tramite il selettore di sistema; il backup automatico di Android può anche copiare il registro sul suo account Google, se il backup del dispositivo è attivo.</string>
+    <string name="about_privacy_billing">Google Play Billing gestisce il traffico di acquisto e la cronologia degli acquisti. Non riceve mai il registro delle classi tramite questa app.</string>
+    <string name="about_averages_title">Le medie spiegano il proprio calcolo</string>
+    <string name="about_averages_body">Ogni media segue le categorie, i pesi, l\'arrotondamento e la regola sui compiti non consegnati che ha impostato. Il lavoro vuoto o esonerato non diventa mai zero di nascosto, e le categorie senza voti utilizzabili vengono indicate ed escluse.</string>
+    <string name="about_purchase_title">Un unico sblocco permanente</string>
+    <string name="about_purchase_unlocked">Lo sblocco è attivo su questo dispositivo. Non c\'è alcun abbonamento da rinnovare o disdire.</string>
+    <string name="about_purchase_free">La versione gratuita conserva una classe, fino a 20 studenti e una categoria. Un unico acquisto rimuove questi limiti e aggiunge categorie ponderate, esportazione, report PDF, copia di sicurezza e ripristino.</string>
+    <string name="about_purchase_action">Scopra cosa include lo sblocco</string>
+    <string name="about_version_title">Versione</string>
+    <string name="about_version_value">%1$s</string>
+    <string name="about_support_title">Assistenza</string>
+    <string name="about_leaving_title">I suoi dati e come uscire</string>
+    <string name="about_leaving_body">Può eliminare singoli dati, cancellare la memoria dell\'app o disinstallarla. La disinstallazione elimina il registro sul dispositivo; le copie esportate o salvate dal backup di Android restano sotto il suo controllo.</string>
+
+    <string name="average_not_enough_title">Dati ancora insufficienti</string>
+    <string name="average_not_enough_body">Nessun voto registrato conta ancora per questa media. Non è uno zero.</string>
+    <string name="average_percent_value">%1$s%%</string>
+    <string name="average_overall_caption">Media complessiva</string>
+    <string name="average_rule_missing_zero">%1$s; i compiti non consegnati contano come zero</string>
+    <string name="average_rule_missing_excluded">%1$s; i compiti non consegnati sono esclusi</string>
+    <string name="average_rule_unweighted">Nessuna categoria ha un peso, quindi le medie delle categorie contano in modo uguale.</string>
+    <string name="average_meaning">Confronti questo risultato con la sufficienza della classe. Apra il calcolo per vedere quale categoria abbassa il risultato o sta cambiando.</string>
+    <string name="average_hide_working">Nascondi il calcolo</string>
+    <string name="average_show_working">Mostra il calcolo</string>
+    <string name="average_no_categories">Questa classe non ha ancora categorie, quindi non c\'è nulla da pesare.</string>
+    <string name="average_category_weight">%1$s · peso %2$s</string>
+    <string name="average_category_excluded">Esclusa dalla media: in questa categoria non conta ancora alcun voto.</string>
+    <plurals name="average_category_grade_count">
+        <item quantity="one">Media %1$s su %2$d voto</item>
+        <item quantity="other">Media %1$s su %2$d voti</item>
+    </plurals>
+    <plurals name="average_dropped_count">
+        <item quantity="one">Scartato il voto più basso (%1$d)</item>
+        <item quantity="other">Scartati i %1$d voti più bassi</item>
+    </plurals>
+    <plurals name="average_missing_count">
+        <item quantity="one">%1$d voto mancante</item>
+        <item quantity="other">%1$d voti mancanti</item>
+    </plurals>
+    <plurals name="average_exempt_count">
+        <item quantity="one">%1$d voto esonerato</item>
+        <item quantity="other">%1$d voti esonerati</item>
+    </plurals>
+    <string name="average_score_value">%1$s/%2$s</string>
+    <string name="average_missing">Non consegnato</string>
+    <string name="average_exempt">Esonerato</string>
+    <string name="average_empty_mark">—</string>
+    <string name="average_score_description">%1$s di %2$s</string>
+    <string name="average_missing_description">Segnato come non consegnato</string>
+    <string name="average_exempt_description">Segnato come esonerato</string>
+    <string name="average_empty_description">Nulla registrato</string>
+    <string name="average_assignment_points">Vale %1$s punti.</string>
+    <string name="average_score">Punteggio</string>
+    <string name="average_record_score_description">Registra un punteggio</string>
+    <string name="average_points_earned">Punti ottenuti</string>
+    <string name="average_points_too_high">Il valore supera i %1$s punti che vale il compito.</string>
+    <string name="average_missing_rule_help">I compiti non consegnati sono gestiti dalla regola di questa classe sui compiti non consegnati.</string>
+    <string name="average_exempt_rule_help">Il lavoro esonerato è completamente escluso dalla media: non è uno zero.</string>
+    <string name="average_save">Salva</string>
+    <string name="average_clear">Cancella</string>
+    <string name="average_cancel">Annulla</string>
+</resources>

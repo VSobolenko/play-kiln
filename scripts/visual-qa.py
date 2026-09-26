@@ -132,6 +132,30 @@ def load_rgb(path: Path) -> np.ndarray:
         return np.asarray(image.convert("RGB"), dtype=np.uint8)
 
 
+def theme_dir(slot: Path) -> Path:
+    """The slot's own ui/theme directory, discovered instead of assumed.
+
+    This path used to be written out as app/src/main/java/com/gexetr/pipesizing/ui/theme - the
+    first slot's namespace, baked into the tool. Every later slot therefore died with a
+    FileNotFoundError inside the palette section rather than being measured, so the rule telling
+    an operator to run this gate could not be obeyed by any slot but the one it was written for.
+    A slot names its own package (`.cursor/rules/project-conventions.mdc`), so the file is found
+    by looking for it. Exactly one match is required: two would mean the measurement could grade
+    a theme the app does not use, and that is a failure, not a coin toss.
+    """
+    source_root = slot / "app" / "src" / "main"
+    patterns = ("java/**/ui/theme/Color.kt", "kotlin/**/ui/theme/Color.kt")
+    matches = sorted(path for pattern in patterns for path in source_root.glob(pattern))
+    if len(matches) != 1:
+        raise SystemExit(
+            "BLOCKED: expected exactly one Color.kt under app/src/main/{java,kotlin}/**/ui/theme "
+            "under " + str(slot) + ", "
+            "found " + str(len(matches)) + ": "
+            + str([p.relative_to(slot).as_posix() for p in matches])
+            + " - the palette measurement needs the slot's own theme, so name it unambiguously.")
+    return matches[0].parent
+
+
 # ----------------------------------------------------------------------------- rules
 
 def input_files(root: Path, slot: Path) -> list[Path]:
@@ -142,7 +166,7 @@ def input_files(root: Path, slot: Path) -> list[Path]:
              store / "studio.json", store / "journey.json", store / "listing.json"]
     files += sorted((store / "captures" / "raw").glob("*.png"))
     files += sorted((store / "assets").rglob("*.png"))
-    theme = slot / "app" / "src" / "main" / "java" / "com" / "gexetr" / "pipesizing" / "ui" / "theme"
+    theme = theme_dir(slot)
     files += sorted(theme.glob("*.kt"))
     files += sorted((slot / "app" / "src" / "main" / "res" / "drawable").glob("ic_launcher_*.xml"))
     return [p for p in files if p.is_file()]
@@ -1116,19 +1140,137 @@ def section_contrast(kit, studio, slot: Path, out: dict) -> dict:
 
 # ----------------------------------------------------------------------------- palette
 
-KOTLIN_COLOR = re.compile(r"internal val (\w+) = Color\(0x([0-9A-Fa-f]{8})\)")
+# `val NAME = Color(0xAARRGGBB)`, with any visibility and any indentation: the first slot declared
+# these at file scope as `internal val`, and a slot that groups them in an `internal object Chalk`
+# with plain `val` (the shape `.cursor/rules/visual-identity.mdc` asks for - one named palette
+# object) matched nothing, which emptied the table and crashed the report. Kotlin's own style also
+# allows `private val` inside a composable, so the visibility prefix is optional rather than fixed.
+_KOTLIN_COLOR_PATTERN = re.compile(r"\bval (\w+)\s*=\s*Color\(0x([0-9A-Fa-f]{8})\)")
+_KOTLIN_COLOR_DECLARATION = re.compile(
+    r"(?m)^\s*(?:(?:public|private|internal|protected)\s+)?(?:val|var)\s+\w+\s*=\s*Color\([^\n]*"
+)
+
+
+def strip_kotlin_non_code(source: str) -> str:
+    """Replace Kotlin comments and literals with spaces while preserving lines and offsets."""
+    chars = list(source)
+    i = 0
+    state = "code"
+    block_depth = 0
+    while i < len(source):
+        if state == "code":
+            if source.startswith("//", i):
+                chars[i] = chars[i + 1] = " "
+                i += 2
+                state = "line_comment"
+            elif source.startswith("/*", i):
+                chars[i] = chars[i + 1] = " "
+                i += 2
+                block_depth = 1
+                state = "block_comment"
+            elif source.startswith('\"\"\"', i):
+                chars[i:i + 3] = "   "
+                i += 3
+                state = "raw_string"
+            elif source[i] == '"':
+                chars[i] = " "
+                i += 1
+                state = "string"
+            elif source[i] == "'":
+                chars[i] = " "
+                i += 1
+                state = "char"
+            else:
+                i += 1
+        elif state == "line_comment":
+            if source[i] == "\n":
+                state = "code"
+            else:
+                chars[i] = " "
+            i += 1
+        elif state == "block_comment":
+            if source.startswith("/*", i):
+                chars[i] = chars[i + 1] = " "
+                block_depth += 1
+                i += 2
+            elif source.startswith("*/", i):
+                chars[i] = chars[i + 1] = " "
+                block_depth -= 1
+                i += 2
+                if block_depth == 0:
+                    state = "code"
+            else:
+                if source[i] != "\n":
+                    chars[i] = " "
+                i += 1
+        elif state == "raw_string":
+            if source.startswith('\"\"\"', i):
+                chars[i:i + 3] = "   "
+                i += 3
+                state = "code"
+            else:
+                if source[i] != "\n":
+                    chars[i] = " "
+                i += 1
+        else:
+            if source[i] == "\\":
+                chars[i] = " "
+                if i + 1 < len(source):
+                    if source[i + 1] != "\n":
+                        chars[i + 1] = " "
+                    i += 2
+                else:
+                    i += 1
+            elif (state == "string" and source[i] == '"') or (state == "char" and source[i] == "'"):
+                chars[i] = " "
+                i += 1
+                state = "code"
+            else:
+                if source[i] != "\n":
+                    chars[i] = " "
+                i += 1
+    return "".join(chars)
+
+
+class _KotlinColorMatcher:
+    def finditer(self, source: str):
+        return _KOTLIN_COLOR_PATTERN.finditer(strip_kotlin_non_code(source))
+
+
+KOTLIN_COLOR = _KotlinColorMatcher()
+
+
+def unparsed_kotlin_color_declarations(source: str) -> list[dict]:
+    clean_source = strip_kotlin_non_code(source)
+    parsed_starts = {match.start() for match in KOTLIN_COLOR.finditer(source)}
+    unreadable = []
+    for declaration in _KOTLIN_COLOR_DECLARATION.finditer(clean_source):
+        if not any(declaration.start() <= start < declaration.end() for start in parsed_starts):
+            unreadable.append({
+                "line": clean_source.count("\n", 0, declaration.start()) + 1,
+                "declaration": declaration.group(0).strip(),
+            })
+    return unreadable
 
 
 def section_palette(kit, studio, slot: Path, out: dict) -> dict:
-    color_kt = (slot / "app" / "src" / "main" / "java" / "com" / "gexetr" / "pipesizing"
-                / "ui" / "theme" / "Color.kt")
+    color_kt = theme_dir(slot) / "Color.kt"
     theme_kt = color_kt.with_name("Theme.kt")
+    source = color_kt.read_text(encoding="utf-8")
+    matches = list(KOTLIN_COLOR.finditer(source))
+    unreadable = unparsed_kotlin_color_declarations(source)
     kotlin = {}
-    for match in KOTLIN_COLOR.finditer(color_kt.read_text(encoding="utf-8")):
+    for match in matches:
         value = int(match.group(2), 16)
         kotlin[match.group(1)] = {"hex": "#%02X%02X%02X" % ((value >> 16) & 255, (value >> 8) & 255, value & 255),
                                   "rgb": [(value >> 16) & 255, (value >> 8) & 255, value & 255]}
     theme_text = theme_kt.read_text(encoding="utf-8")
+    if not kotlin:
+        raise SystemExit(
+            "BLOCKED: no 'val NAME = Color(0xAARRGGBB)' declaration was found in "
+            + (theme_dir(slot) / "Color.kt").relative_to(slot).as_posix()
+            + " - this section compares the shipped pixels against the app's own Kotlin palette, so "
+            "an unreadable palette is a failure, not an empty comparison.")
     scheme = {}
     for match in re.finditer(r"^\s*(\w+) = (\w+),", theme_text, flags=re.MULTILINE):
         scheme.setdefault(match.group(1), []).append(match.group(2))
@@ -1186,6 +1328,7 @@ def section_palette(kit, studio, slot: Path, out: dict) -> dict:
                                    for i in order],
         }
     out["palette"] = {
+        "unparsed_color_declarations": unreadable,
         "kotlin_color_kt": kotlin,
         "kotlin_theme_mapping": scheme,
         "studio_tokens": {k: {"hex": hex_of(v), "rgb": list(v)} for k, v in studio_tokens.items()},
@@ -1199,6 +1342,10 @@ def section_palette(kit, studio, slot: Path, out: dict) -> dict:
 # ----------------------------------------------------------------------------- icon
 
 def section_icon(kit, studio, slot: Path, out: dict) -> dict:
+    studio_config = json.loads((slot / "store" / "studio.json").read_text(encoding="utf-8"))
+    mark_name = studio_config.get("mark", "pipe")
+    definition = studio.MARK_REGISTRY[mark_name]
+    shape = definition["shape"]
     path = slot / "store" / "assets" / "icon-512.png"
     with Image.open(path) as image:
         icon = image.convert("RGBA")
@@ -1257,24 +1404,43 @@ def section_icon(kit, studio, slot: Path, out: dict) -> dict:
 
     # The mark's own dp geometry, so the raster and the adaptive-icon vector can be compared.
     geometry = {
+        "mark": mark_name,
         "mark_bbox_px": mark_bbox,
         "mark_halfwidth_px": round(max(center - mark_bbox[0], mark_bbox[2] - 1 - center), 1),
         "mark_halfwidth_dp": dp(max(center - mark_bbox[0], mark_bbox[2] - 1 - center)),
         "mark_halfheight_dp": dp(max(center - mark_bbox[1], mark_bbox[3] - 1 - center)),
-        "ring_outer_radius_dp": dp(0.205 * canvas + 0.108 * canvas / 2),
-        "ring_inner_radius_dp": dp(0.205 * canvas - 0.108 * canvas / 2),
-        "caliper_halfspan_dp": dp(0.335 * canvas + 0.023 * canvas),
-        "caliper_line_width_dp": dp(0.023 * canvas),
-        "vector_ring_outer_dp": 25.5,
-        "vector_ring_inner_dp": 15.0,
-        "vector_caliper_halfspan_dp": 40.6,
-        "vector_line_width_dp": 2.6,
-        "vector_safe_zone_radius_dp": 33.0,
+        "raster_reach_dp": round(definition["reach_fraction"] *
+                                 definition["raster_half_extent_fraction"] * 108, 3),
+        "vector_reach_dp": round(definition["reach_fraction"] * studio.MARK_FIT_DP, 3),
+        "vector_safe_zone_radius_dp": studio.ADAPTIVE_SAFE_RADIUS_DP,
     }
-    geometry["raster_minus_vector_ring_outer_dp"] = round(
-        geometry["ring_outer_radius_dp"] - geometry["vector_ring_outer_dp"], 3)
-    geometry["raster_minus_vector_caliper_halfspan_dp"] = round(
-        geometry["caliper_halfspan_dp"] - geometry["vector_caliper_halfspan_dp"], 3)
+    if mark_name == "pipe":
+        raster_unit = definition["raster_half_extent_fraction"] * canvas
+        geometry.update({
+            "ring_outer_radius_dp": dp((shape["ring_radius"] + shape["ring_width"] / 2) * raster_unit),
+            "ring_inner_radius_dp": dp((shape["ring_radius"] - shape["ring_width"] / 2) * raster_unit),
+            "caliper_halfspan_dp": dp((shape["span"] + shape["line_width"]) * raster_unit),
+            "caliper_line_width_dp": dp(shape["line_width"] * raster_unit),
+            "vector_ring_outer_dp": round((shape["ring_radius"] + shape["ring_width"] / 2) * studio.MARK_FIT_DP, 1),
+            "vector_ring_inner_dp": round((shape["ring_radius"] - shape["ring_width"] / 2) * studio.MARK_FIT_DP, 1),
+            "vector_caliper_halfspan_dp": round((shape["span"] + shape["line_width"]) * studio.MARK_FIT_DP, 1),
+            "vector_line_width_dp": round(shape["line_width"] * studio.MARK_FIT_DP, 1),
+        })
+        geometry["raster_minus_vector_ring_outer_dp"] = round(
+            geometry["ring_outer_radius_dp"] - geometry["vector_ring_outer_dp"], 3)
+        geometry["raster_minus_vector_caliper_halfspan_dp"] = round(
+            geometry["caliper_halfspan_dp"] - geometry["vector_caliper_halfspan_dp"], 3)
+    else:
+        geometry.update({
+            "page_half_width_dp": round(shape["page_half_width"] * definition["raster_half_extent_fraction"] * 108, 3),
+            "page_half_height_dp": round(shape["page_half_height"] * definition["raster_half_extent_fraction"] * 108, 3),
+            "binding_radius_dp": round(shape["binding_radius"] * definition["raster_half_extent_fraction"] * 108, 3),
+            "check_stroke_width_dp": round(shape["check_width"] * definition["raster_half_extent_fraction"] * 108, 3),
+            "vector_page_half_width_dp": round(shape["page_half_width"] * studio.MARK_FIT_DP, 3),
+            "vector_page_half_height_dp": round(shape["page_half_height"] * studio.MARK_FIT_DP, 3),
+            "vector_binding_radius_dp": round(shape["binding_radius"] * studio.MARK_FIT_DP, 3),
+            "vector_check_stroke_width_dp": round(shape["check_width"] * studio.MARK_FIT_DP, 3),
+        })
 
     small = {}
     for target in (48, 96):
@@ -1297,14 +1463,7 @@ def section_icon(kit, studio, slot: Path, out: dict) -> dict:
             "field_corner_median_lumas": corner_medians,
             "field_median_luma": round(field, 1),
             "peak_minus_field": round(float(np.percentile(band, 99.5)) - field, 1),
-            "ring_stroke_px": round(0.108 * target, 2),
-            "ring_stroke_dp": round(0.108 * 108, 2),
-            "caliper_line_px": round(0.023 * target, 2),
-            "tick_full_height_px": round(0.164 * target, 2),
-            "arrowhead_length_px": round(0.023 * 3.6 * target, 2),
-            "arrowhead_width_px": round(0.164 * 0.72 * target, 2),
-            "ring_outer_radius_px": round(0.259 * target, 2),
-            "ring_inner_radius_px": round(0.151 * target, 2),
+            "mark_reach_px": round(definition["reach_fraction"] * definition["raster_half_extent_fraction"] * target, 2),
         }
     out["icon"] = {
         "path": path.relative_to(slot).as_posix(),
@@ -1477,6 +1636,10 @@ def main() -> int:
     if "palette" in wanted:
         palette = section_palette(kit, studio, slot, result)
         print("\n-- palette --")
+        for item in palette["unparsed_color_declarations"]:
+            color_path = (theme_dir(slot) / "Color.kt").relative_to(slot).as_posix()
+            print(f"NOTE palette - unparsed Color declaration at {color_path}:{item['line']}: "
+                  f"{item['declaration']}")
         for key, data in palette["listing_graphics_source"].items():
             print(f"listing {key} {data['hex']} exact_kotlin={data['exact_kotlin_match']} "
                   f"nearest={data['nearest_kotlin']['name']} {data['nearest_kotlin']['hex']} "

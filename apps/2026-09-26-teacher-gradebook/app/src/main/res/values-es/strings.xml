@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">Mark Book for Teachers</string>
+    <string name="app_idea" translatable="true">Un cuaderno de notas privado y sin conexión que pertenece al docente: cree, edite y elimine cada clase, alumno, categoría, tarea, nota, registro de asistencia, observación de participación, contacto con las familias y puesto sin cuentas ni servidores. Consulte una media actualizada y comprensible que indica la regla de redondeo, la regla de trabajos no entregados y cada categoría excluida; exporte archivos CSV y PDF y conserve una copia de seguridad restaurable. Gratis para una clase de hasta 20 alumnos; se desbloquea con un único pago, no con una suscripción.</string>
+</resources>

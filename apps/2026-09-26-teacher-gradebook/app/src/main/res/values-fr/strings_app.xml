@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_error_unknown_reason" translatable="true">raison inconnue</string>
+    <string name="app_nothing_written" translatable="true">Aucune donnée n’a été écrite.</string>
+    <string name="app_write_failed" translatable="true">Impossible d’écrire ce fichier : %1$s</string>
+    <string name="app_read_failed" translatable="true">Impossible de lire ce fichier : %1$s</string>
+    <string name="app_no_file_chosen" translatable="true">Aucun fichier choisi.</string>
+    <string name="app_class_gone" translatable="true">Cette classe n’existe plus.</string>
+    <string name="app_record_loading" translatable="true">Le dossier est encore en cours de chargement.</string>
+    <string name="app_wrote_csv" translatable="true">%1$s écrit, une ligne par élève.</string>
+    <string name="app_wrote_file" translatable="true">%1$s écrit.</string>
+    <string name="app_backed_up" translatable="true">Sauvegarde créée dans %1$s. Conservez-la en lieu sûr.</string>
+    <string name="app_unlock_reason_classes" translatable="true">La version gratuite conserve une classe. Le déblocage supprime cette limite.</string>
+    <string name="app_unlock_reason_about" translatable="true">À propos du déblocage</string>
+    <string name="app_unlock_purchased" translatable="true">Déblocage effectué. Toutes les limites sont supprimées sur cet appareil.</string>
+    <string name="app_unlock_restored" translatable="true">Restauration effectuée. Votre déblocage est de nouveau actif.</string>
+    <string name="app_unlock_nothing_to_restore" translatable="true">Play ne signale aucun achat pour ce compte : rien n’a changé. Si vous avez payé avec un autre compte, connectez-vous avec celui-ci et réessayez.</string>
+    <string name="app_unlock_pending" translatable="true">Play traite encore ce paiement. Rien ne sera débloqué avant sa validation et aucun double débit n’a eu lieu.</string>
+    <string name="app_unlock_unavailable" translatable="true">Google Play ne peut pas traiter cet achat sur cet appareil pour le moment. Votre travail et votre éventuel déblocage restent intacts.</string>
+    <string name="app_unlock_not_completed" translatable="true">Aucun achat n’a abouti : rien n’a été débité. Toutes vos données sont toujours là.</string>
+    <string name="app_unlock_offline" translatable="true">Impossible de joindre Google Play : aucune opération n’a été tentée. L’application fonctionne hors ligne, mais le déblocage nécessite une connexion.</string>
+    <string name="app_unnamed_class_file" translatable="true">Classe</string>
+    <string name="nav_back" translatable="true">Retour</string>
+    <string name="document_could_not_open" translatable="true">Le fichier n’a pas pu être ouvert.</string>
+    <string name="document_could_not_open_for_writing" translatable="true">Le fichier n’a pas pu être ouvert en écriture.</string>
+    <string name="document_chosen_file" translatable="true">le fichier choisi</string>
+    <string name="backup_empty" translatable="true">Ce fichier est vide, aucune donnée n’a donc été restaurée.</string>
+    <string name="backup_not_mark_book" translatable="true">Ce fichier n’est pas une sauvegarde de Mark Book, aucune donnée n’a donc été restaurée.</string>
+    <string name="backup_missing_schema" translatable="true">Ce fichier ne contient aucune version de schéma lisible, aucune donnée n’a donc été restaurée.</string>
+    <string name="backup_unsupported_version" translatable="true">Cette sauvegarde a été créée par une autre version de l’application (format %1$d ; cette application lit le format %2$d). Rien n’a été modifié.</string>
+    <string name="backup_damaged" translatable="true">Cette sauvegarde est endommagée et n’a pas pu être lue, aucune donnée n’a donc été restaurée : %1$s</string>
+</resources>

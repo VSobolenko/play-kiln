@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">Mark Book for Teachers</string>
+    <string name="app_idea" translatable="true">一款完全属于教师本人的私密离线成绩册：无需账号、无需服务器，即可创建、编辑和删除每个班级、学生、类别、作业、成绩、考勤记录、课堂表现备注、家长联系和座位。可查看可解释的动态平均分，其中会注明取整规则、未交作业规则以及被排除的每个类别；可导出 CSV 和 PDF，并保留可恢复的备份文件。免费版支持一个班级、最多 20 名学生；一次解锁，永久使用，无需订阅。</string>
+</resources>

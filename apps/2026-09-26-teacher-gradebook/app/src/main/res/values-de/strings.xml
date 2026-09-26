@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">Mark Book for Teachers</string>
+    <string name="app_idea" translatable="true">Ein privates Offline-Notenbuch, das Ihnen vollständig gehört: Erstellen, bearbeiten und löschen Sie jede Klasse, jeden Schüler, jede Kategorie, Arbeit, Note, jeden Anwesenheitseintrag, jede Beteiligungsnotiz, jeden Elternkontakt und jeden Sitzplatz – ohne Konto oder Server. Sehen Sie einen nachvollziehbaren laufenden Durchschnitt mit Rundungsregel, Regel für fehlende Arbeiten und allen ausgeschlossenen Kategorien, exportieren Sie CSV und PDF und bewahren Sie eine wiederherstellbare Sicherungsdatei auf. Kostenlos für eine Klasse mit bis zu 20 Schülern; einmal freigeschaltet, nicht gemietet.</string>
+</resources>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_cancel">Annulla</string>
+    <string name="common_keep_it">Mantieni</string>
+    <string name="common_date">Data</string>
+    <string name="common_today">Oggi</string>
+    <string name="common_name">Nome</string>
+
+    <string name="grades_assignment">Compito</string>
+    <string name="grades_assignment_gone">Questo compito non esiste più.</string>
+    <string name="grades_assignment_gone_body">È stato eliminato insieme ai voti registrati.</string>
+    <string name="grades_entry_eyebrow">Inserimento voti</string>
+    <string name="grades_points_max">Vale %1$s punti</string>
+    <string name="grades_assignment_context">%1$s · peso %2$s%%</string>
+    <string name="grades_no_category">Nessuna categoria</string>
+    <string name="grades_marked">Registrato</string>
+    <string name="grades_unmarked">Non valutato</string>
+    <string name="grades_everyone">Tutti</string>
+    <string name="grades_still_to_mark">Da valutare</string>
+    <string name="grades_no_students">Questa classe non ha ancora studenti. Li aggiunga nella scheda Elenco.</string>
+    <string name="grades_all_recorded">Per ogni studente è stato registrato un risultato per questo compito.</string>
+    <string name="grades_entry_help">Tocchi uno studente per registrare un punteggio oppure indichi il compito come non consegnato o esonerato. Una cella non valutata non è uno zero.</string>
+
+    <string name="student_fallback_title">Studente</string>
+    <string name="student_report">Report</string>
+    <string name="student_missing_title">Questo studente non è più presente.</string>
+    <string name="student_missing_body">È stato rimosso dall\'elenco studenti, con voti, presenze, annotazioni e contatti.</string>
+    <string name="student_overview">Scheda dello studente</string>
+    <string name="student_average_unavailable">Media non disponibile</string>
+    <string name="student_average_unavailable_caption">Non c\'è ancora alcun voto registrato che conti; non è uno zero.</string>
+    <plurals name="student_average_item_count">
+        <item quantity="one">Calcolata su %1$d elemento valutato</item>
+        <item quantity="other">Calcolata su %1$d elementi valutati</item>
+    </plurals>
+    <string name="student_attendance_rate">Presenze</string>
+    <string name="student_graded">Valutati</string>
+    <string name="student_ungraded">Non valutati</string>
+    <string name="student_marks">Cronologia dei compiti</string>
+    <string name="student_no_assignments">Questa classe non ha ancora compiti. Li aggiunga nella scheda Voti.</string>
+    <string name="student_no_category">Nessuna categoria</string>
+    <string name="student_score_format">%1$s / %2$s</string>
+    <string name="student_percent_format">%1$s%%</string>
+    <string name="student_missing">Non consegnato</string>
+    <string name="student_exempt">Esonerato</string>
+    <string name="student_unmarked">Non valutato</string>
+    <string name="student_attendance">Presenze</string>
+    <string name="student_present">Presente</string>
+    <string name="student_late">In ritardo</string>
+    <string name="student_absent">Assente</string>
+    <string name="student_attendance_exempt">Assenza giustificata</string>
+    <string name="student_no_attendance">Non è stata registrata alcuna presenza per questo studente.</string>
+    <string name="student_notes">Annotazioni</string>
+    <string name="student_no_notes">Non è stato ancora scritto nulla. Qui compariranno annotazioni su partecipazione, comportamento, compiti non consegnati e di carattere generale.</string>
+    <string name="student_note_participation">Partecipazione</string>
+    <string name="student_note_behaviour">Comportamento</string>
+    <string name="student_note_missing_work">Compito non consegnato</string>
+    <string name="student_note_general">Generale</string>
+    <string name="student_contacts">Contatti con i genitori</string>
+    <string name="student_no_contacts">Non è stato registrato alcun contatto con i genitori per questo studente.</string>
+    <string name="student_dated_kind">%1$s · %2$s</string>
+    <string name="student_follow_up">Ricontatto il %1$s</string>
+    <string name="student_remove_section">Rimuovi dall\'elenco studenti</string>
+    <string name="student_remove_explanation">Rimuovere uno studente elimina anche voti, presenze, annotazioni e contatti. Impostarlo come inattivo conserva invece la cronologia senza conteggiarlo nella media della classe.</string>
+    <string name="student_remove_action">Rimuovi %1$s</string>
+    <string name="student_remove_title">Rimuovere %1$s?</string>
+    <plurals name="student_remove_body">
+        <item quantity="one">Lo studente verrà rimosso insieme a %1$d voto, alle sue presenze, annotazioni, contatti e al suo posto nella piantina. L\'operazione non può essere annullata.</item>
+        <item quantity="other">Lo studente verrà rimosso insieme a %1$d voti, alle sue presenze, annotazioni, contatti e al suo posto nella piantina. L\'operazione non può essere annullata.</item>
+    </plurals>
+    <string name="student_remove_confirm">Rimuovi lo studente</string>
+</resources>

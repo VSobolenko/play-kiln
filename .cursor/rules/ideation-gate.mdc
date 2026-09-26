@@ -1,0 +1,91 @@
+---
+description: Always load PlayKiln ideation gate - the example is not the topic, and a slot needs a revenue mechanism
+alwaysApply: true
+---
+
+# The example is not the topic
+
+When the owner gives an example, it illustrates a **shape** — how big, how simple, how offline, how
+fast to build. It is never a statement of what to build. Treating an example as a strategy is the
+factory's first commercial failure.
+
+The record: `docs/reviews/2026-09-26-slot-1-economics-postmortem.md`. The owner once said a
+calculator would be a fine small offline tool. The factory turned that into an
+"occupational calculation tools" archetype, selected a niche on it, and shipped
+`apps/2026-09-25-pipe-sizing` — a gas pipe sizing workbook with `capabilities.json` of
+`{"schemaVersion": 1, "enabled": []}`, meaning **no billing, no ads, and no way to earn anything**.
+Every gate passed. The owner's problem with it was not the code quality; it was that there was no
+money in it.
+
+## Rules
+
+- **Never carry an example forward as a topic.** Extract the constraint the owner was describing
+  (small, offline, no backend, quick) and pick the topic separately, from measured demand.
+- **Do not propose calculators, unit converters, generic arithmetic tools, or another app built
+  around summing or converting numbers a user types in.** This category is explicitly burned. The
+  only exception is a direct instruction from the owner naming that specific app.
+- **Do not propose the same job twice.** Google Play's Repetitive Content policy can terminate an
+  account and remove every app in the catalogue; see `docs/monetization-strategy.md` §1.2. Two
+  recipes that can be described with one sentence are one recipe.
+- **Do not propose anything already killed with a recorded reason.** The binding list is
+  `docs/research/2026-09-24-market-decision.md` §3 plus the dead zones in `docs/niche-selection.md`.
+  Re-proposing a killed idea is not a fresh idea.
+- **Demand must be measured, not asserted.** A `candidate` verdict from the relevance guard is not
+  evidence on its own — the guard is blind to homonym collisions and has called a shelf of
+  utility-billing apps `ok` for a pipe-sizing query. Hand-classify the titles with
+  `scripts/scan-titles.mjs`, and treat an unrated competitor as evidence of failure rather than
+  vacancy. Label every claim MEASURED / ON RECORD / INFERRED / UNVERIFIED.
+
+# Money is a stage of the pipeline, not a document
+
+`docs/monetization-strategy.md` §3.6 already required a monetization archetype before UI design, and
+§5 already required numeric kill criteria before shipping. Both were prose that no program read, so
+the first real slot shipped with none of it. They are now enforced:
+
+- `node scripts/check-economics.mjs --slot <slug>` reads the slot's `economics.json` and fails closed.
+- `scripts/new-slot.mjs` **requires `--economics <path>`**; a slot cannot be scaffolded without a
+  validated plan, so the archetype is decided before the first line of UI exists.
+- The contract is in `docs/slot-economics.md`.
+
+An archetype needs its capability enabled on the slot. A purchase-led or subscription slot without
+the `billing` capability enabled, or an ads-led slot without `ads`, is a plan that cannot be honoured
+by the build, and the gate reports it as such. Do not write a monetization plan the shipped app
+cannot implement — that gap is exactly what happened last time.
+
+**A paid app with nothing to sell is not monetized.** Setting a price in Play Console is a weak
+lever with no discovery; `docs/monetization-strategy.md` §4 records it as effectively dead outside
+ad-hostile audiences. If the plan's honest answer to "what does the user buy?" is "nothing, they just
+pay up front", say so out loud and justify it against that.
+
+# Budget: about one hour, not eight
+
+The owner's limit is roughly **one hour of agent wall-clock per slot**. The first slot consumed
+about eight hours, mostly on evidence infrastructure for an app that had no market. This changes
+what a good idea is:
+
+- **Buildability is a first-class criterion.** An idea with a strong market and a 20-hour build is a
+  worse recipe than a good market with a 3-hour build. Score it explicitly.
+- **Prefer the cheapest shape that can still earn**: no server, no account, no dangerous permission,
+  no camera, no ML, offline by construction.
+- **A server is a cost to state, not a detail to discover.** If a plan sells credit that costs real
+  money to serve, `docs/monetization-strategy.md` §3.7 makes a server-side `PurchaseAuthority`
+  mandatory, which makes the slot a server project. Say so before the idea is approved, not after.
+- **Do not build evidence infrastructure for an unvalidated idea.** Prove there is a market first;
+  provenance chains and capture pipelines only matter once something is worth shipping.
+
+# Authorization
+
+`git commit`, `git push`, `git tag`, branch creation and other ref-moving commands require an
+explicit instruction in the current conversation. Read-only git inspection is always allowed and
+encouraged. Generating or rotating signing keys is never automatic — `scripts/sign-release.mjs
+--generate` and `keytool -genkeypair` both need the owner's explicit permission, because a signing
+key is the app's permanent identity and its password must be chosen and stored by the owner. Never
+print key material or `keystore.properties` contents. The full rule is
+`.cursor/rules/authorization.mdc`.
+
+# How an idea reaches the owner
+
+An idea is proposed, not started. A proposal lives in `docs/ideation/` and must state the category,
+the job, the paying user, what is bought, the price, the demand evidence with its strength, the build
+estimate, and the kill criteria — in a form the owner can accept or reject without reading code. Only
+after the owner picks it does `new-slot.mjs` run. See `docs/ideation/README.md`.

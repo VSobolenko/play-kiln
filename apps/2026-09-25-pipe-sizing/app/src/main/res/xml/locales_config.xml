@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <locale-config xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Drives per-app language settings; keep this list aligned with store-pack locales. -->
+    <!-- This slot ships en only: store/listing.json declares en-US alone and res/ has no
+         values-<lang> directory. Declaring a language with no resources behind it makes Android 13's
+         per-app picker offer a choice that changes nothing, which is a false claim rather than a
+         convenience. scripts/check-locales.mjs fails the slot for exactly that, and it caught this
+         entry the first time any gate invoked it. Add a <locale> here in the same change that adds
+         its res/values-<lang>/ directory, never before. -->
     <locale android:name="en" />
-    <locale android:name="ru" />
 </locale-config>

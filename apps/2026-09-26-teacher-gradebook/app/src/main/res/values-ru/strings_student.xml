@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_cancel">Отмена</string>
+    <string name="common_keep_it">Оставить</string>
+    <string name="common_date">Дата</string>
+    <string name="common_today">Сегодня</string>
+    <string name="common_name">Имя</string>
+    <string name="grades_assignment">Работа</string>
+    <string name="grades_assignment_gone">Этой работы больше нет.</string>
+    <string name="grades_assignment_gone_body">Она удалена вместе с выставленными за неё оценками.</string>
+    <string name="grades_entry_eyebrow">Выставление оценок</string>
+    <string name="grades_points_max">Максимум: %1$s</string>
+    <string name="grades_assignment_context">%1$s · вес %2$s%%</string>
+    <string name="grades_no_category">Без категории</string>
+    <string name="grades_marked">Отмечено</string>
+    <string name="grades_unmarked">Не отмечено</string>
+    <string name="grades_everyone">Все</string>
+    <string name="grades_still_to_mark">Осталось отметить</string>
+    <string name="grades_no_students">В этом классе пока нет учеников. Добавьте их на вкладке «Ученики».</string>
+    <string name="grades_all_recorded">Для этой работы у каждого ученика есть запись.</string>
+    <string name="grades_entry_help">Нажмите на ученика, чтобы поставить оценку или отметить работу как несданную либо освобождение. Ячейка «не отмечено» не равна нулю.</string>
+    <string name="student_fallback_title">Ученик</string>
+    <string name="student_report">Отчёт</string>
+    <string name="student_missing_title">Этого ученика больше нет.</string>
+    <string name="student_missing_body">Он удалён из списка учеников вместе с оценками, посещаемостью, заметками и сведениями о связи с родителями.</string>
+    <string name="student_overview">Карточка ученика</string>
+    <string name="student_average_unavailable">Средний балл недоступен</string>
+    <string name="student_average_unavailable_caption">Пока нет учитываемых оценок; это не ноль.</string>
+    <plurals name="student_average_item_count"><item quantity="one">Рассчитано по %1$d оценённой работе</item><item quantity="few">Рассчитано по %1$d оценённым работам</item><item quantity="many">Рассчитано по %1$d оценённым работам</item><item quantity="other">Рассчитано по %1$d оценённой работы</item></plurals>
+    <string name="student_attendance_rate">Посещаемость</string>
+    <string name="student_graded">Оценено</string>
+    <string name="student_ungraded">Не оценено</string>
+    <string name="student_marks">История работ</string>
+    <string name="student_no_assignments">В этом классе пока нет работ. Добавьте их на вкладке «Журнал».</string>
+    <string name="student_no_category">Без категории</string>
+    <string name="student_score_format">%1$s / %2$s</string>
+    <string name="student_percent_format">%1$s%%</string>
+    <string name="student_missing">Не сдано</string>
+    <string name="student_exempt">Освобождён</string>
+    <string name="student_unmarked">Не отмечено</string>
+    <string name="student_attendance">Посещаемость</string>
+    <string name="student_present">Присутствует</string>
+    <string name="student_late">Опоздал</string>
+    <string name="student_absent">Отсутствует</string>
+    <string name="student_attendance_exempt">Уважительная причина</string>
+    <string name="student_no_attendance">Посещаемость этого ученика ещё не отмечалась.</string>
+    <string name="student_notes">Заметки</string>
+    <string name="student_no_notes">Пока ничего не записано. Здесь появятся заметки об участии, поведении, несданных работах и общие заметки.</string>
+    <string name="student_note_participation">Участие</string>
+    <string name="student_note_behaviour">Поведение</string>
+    <string name="student_note_missing_work">Не сдано</string>
+    <string name="student_note_general">Общее</string>
+    <string name="student_contacts">Связь с родителями</string>
+    <string name="student_no_contacts">Для этого ученика ещё нет записей о связи с родителями.</string>
+    <string name="student_dated_kind">%1$s · %2$s</string>
+    <string name="student_follow_up">Вернуться к вопросу %1$s</string>
+    <string name="student_remove_section">Удаление из списка</string>
+    <string name="student_remove_explanation">При удалении ученика также удаляются его оценки, посещаемость, заметки и сведения о связи с родителями. Если сделать ученика неактивным, история сохранится, но он не будет учитываться в среднем балле класса.</string>
+    <string name="student_remove_action">Удалить %1$s</string>
+    <string name="student_remove_title">Удалить %1$s?</string>
+    <plurals name="student_remove_body"><item quantity="one">Ученик будет удалён вместе с %1$d оценкой, посещаемостью, заметками, сведениями о связи с родителями и местом в рассадке. Это действие нельзя отменить.</item><item quantity="few">Ученик будет удалён вместе с %1$d оценками, посещаемостью, заметками, сведениями о связи с родителями и местом в рассадке. Это действие нельзя отменить.</item><item quantity="many">Ученик будет удалён вместе с %1$d оценками, посещаемостью, заметками, сведениями о связи с родителями и местом в рассадке. Это действие нельзя отменить.</item><item quantity="other">Ученик будет удалён вместе с %1$d оценки, посещаемостью, заметками, сведениями о связи с родителями и местом в рассадке. Это действие нельзя отменить.</item></plurals>
+    <string name="student_remove_confirm">Удалить ученика</string>
+</resources>

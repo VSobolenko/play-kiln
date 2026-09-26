@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_error_unknown_reason" translatable="true">不明な理由</string>
+
+    <string name="app_nothing_written" translatable="true">何も書き込まれませんでした。</string>
+    <string name="app_write_failed" translatable="true">そのファイルに書き込めませんでした：%1$s</string>
+    <string name="app_read_failed" translatable="true">そのファイルを読み込めませんでした：%1$s</string>
+    <string name="app_no_file_chosen" translatable="true">ファイルが選択されませんでした。</string>
+    <string name="app_class_gone" translatable="true">そのクラスはもう存在しません。</string>
+    <string name="app_record_loading" translatable="true">記録を読み込んでいます。</string>
+    <string name="app_wrote_csv" translatable="true">%1$s に書き込みました。1行が生徒1名分です。</string>
+    <string name="app_wrote_file" translatable="true">%1$s に書き込みました。</string>
+    <string name="app_backed_up" translatable="true">%1$s にバックアップしました。信頼できる場所に保管してください。</string>
+
+    <string name="app_unlock_reason_classes" translatable="true">無料版で保持できるクラスは1つです。アンロックするとこの制限が解除されます。</string>
+    <string name="app_unlock_reason_about" translatable="true">アンロックについて</string>
+
+    <string name="app_unlock_purchased" translatable="true">アンロックしました。この端末ではすべての制限が解除されます。</string>
+    <string name="app_unlock_restored" translatable="true">復元しました。アンロックが再び有効です。</string>
+    <string name="app_unlock_nothing_to_restore" translatable="true">このアカウントには Play の購入記録がないため、何も変更されませんでした。別のアカウントで支払った場合は、そのアカウントでサインインして再試行してください。</string>
+    <string name="app_unlock_pending" translatable="true">Play が支払いを処理しています。完了するまでアンロックされず、二重に請求されることもありません。</string>
+    <string name="app_unlock_unavailable" translatable="true">現在この端末では Google Play がこの購入を処理できません。あなたの記録と、すでに取得済みのアンロックはそのままです。</string>
+    <string name="app_unlock_not_completed" translatable="true">購入は完了しなかったため、請求はありませんでした。記録した内容はすべてそのまま残っています。</string>
+    <string name="app_unlock_offline" translatable="true">Google Play に接続できなかったため、何も試行しませんでした。アプリはオフラインでも動作し続けますが、アンロック自体には接続が必要です。</string>
+
+    <string name="app_unnamed_class_file" translatable="true">クラス</string>
+    <string name="nav_back">戻る</string>
+    <string name="document_could_not_open">ファイルを開けませんでした。</string>
+    <string name="document_could_not_open_for_writing">書き込み用にファイルを開けませんでした。</string>
+    <string name="document_chosen_file">選択したファイル</string>
+    <string name="backup_empty">そのファイルは空のため、何も復元されませんでした。</string>
+    <string name="backup_not_mark_book">そのファイルは Mark Book のバックアップではないため、何も復元されませんでした。</string>
+    <string name="backup_missing_schema">そのファイルには読み取り可能なスキーマ バージョンがないため、何も復元されませんでした。</string>
+    <string name="backup_unsupported_version">このバックアップは別のアプリ バージョンで作成されました（形式 %1$d。このアプリで読み取れる形式は %2$d です）。何も変更されませんでした。</string>
+    <string name="backup_damaged">このバックアップは破損していて読み取れないため、何も復元されませんでした: %1$s</string>
+</resources>

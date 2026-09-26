@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="records_add_note">Aggiungi annotazione</string>
+    <string name="records_add_note_title">Aggiungi un\'annotazione sullo studente</string>
+    <string name="records_edit_note_title">Modifica questa annotazione</string>
+    <string name="records_student">Studente</string>
+    <string name="records_note_kind">Tipo di annotazione</string>
+    <string name="records_note_text">Annotazione</string>
+    <string name="records_note_change_help">Salvando vengono registrati lo studente selezionato, il tipo, la data e il testo dell\'annotazione.</string>
+    <string name="records_save_note">Salva annotazione</string>
+    <string name="records_add_contact">Registra contatto con i genitori</string>
+    <string name="records_add_contact_title">Registra un contatto con i genitori</string>
+    <string name="records_edit_contact_title">Modifica questo contatto</string>
+    <string name="records_contact_date">Data del contatto</string>
+    <string name="records_contact_method">Metodo o canale</string>
+    <string name="records_contact_summary">Di cosa ha parlato</string>
+    <string name="records_follow_up_date">Data di ricontatto (facoltativa)</string>
+    <string name="records_contact_change_help">Salvando vengono registrati lo studente selezionato, la data del contatto, il metodo, il riepilogo e l\'eventuale data di ricontatto.</string>
+    <string name="records_save_contact">Salva contatto</string>
+    <string name="records_edit">Modifica</string>
+    <string name="records_edit_student">Modifica studente</string>
+    <string name="records_edit_student_title">Modifica la scheda dello studente</string>
+    <string name="records_first_name">Nome</string>
+    <string name="records_last_name">Cognome</string>
+    <string name="records_external_id">Identificativo scolastico (facoltativo)</string>
+    <string name="records_active_student">Studente attivo</string>
+    <string name="records_active_help">Gli studenti inattivi conservano la cronologia ma sono esclusi dalla media della classe.</string>
+    <string name="records_student_change_help">Salvando cambiano il nome dello studente, l\'identificativo scolastico e lo stato attivo.</string>
+    <string name="records_save_student">Salva studente</string>
+    <string name="records_status_active">Attivo</string>
+    <string name="records_status_inactive">Inattivo</string>
+</resources>

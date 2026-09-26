@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">Mark Book for Teachers</string>
+    <!--
+      Factory contract: `app_idea` is the slot's own one-paragraph statement of what it is, and
+      `scripts/store-kit.py` reads it as the source of truth for the idea behind the store copy.
+    -->
+    <string name="app_idea" translatable="true">A private, offline gradebook a teacher owns outright: create, edit and delete every class, student, category, assignment, mark, attendance record, participation note, parent contact and seating position without an account or a server. See an explainable running average that names the rounding rule, the missing-work rule and every category it excluded, export CSV and PDF, and keep a restorable backup file. Free for one class up to 20 students; unlocked once, not rented.</string>
+</resources>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_keep_it">Keep it</string>
+    <string name="common_date">Date</string>
+    <string name="common_date_placeholder" translatable="false">YYYY-MM-DD</string>
+    <string name="common_today">Today</string>
+    <string name="common_name">Name</string>
+
+    <string name="grades_assignment">Assignment</string>
+    <string name="grades_assignment_gone">That assignment is no longer here.</string>
+    <string name="grades_assignment_gone_body">It was deleted, along with the marks recorded against it.</string>
+    <string name="grades_entry_eyebrow">Grade entry</string>
+    <string name="grades_points_max">Worth %1$s points</string>
+    <string name="grades_assignment_context">%1$s · %2$s%% weight</string>
+    <string name="grades_no_category">No category</string>
+    <string name="grades_marked">Recorded</string>
+    <string name="grades_unmarked">Unmarked</string>
+    <string name="grades_everyone">Everyone</string>
+    <string name="grades_still_to_mark">Still to mark</string>
+    <string name="grades_no_students">This class has no students yet. Add them on the Roster tab.</string>
+    <string name="grades_all_recorded">Every student has something recorded for this assignment.</string>
+    <string name="grades_entry_help">Tap a student to record a score, or mark the work missing or exempt. An unmarked cell is not a zero.</string>
+
+    <string name="student_fallback_title">Student</string>
+    <string name="student_report">Report</string>
+    <string name="student_missing_title">That student is no longer here.</string>
+    <string name="student_missing_body">They were removed from the roster, which also removed their marks, attendance, notes and contacts.</string>
+    <string name="student_overview">Student record</string>
+    <string name="student_average_unavailable">Average unavailable</string>
+    <string name="student_average_unavailable_caption">No recorded grade counts yet; this is not a zero.</string>
+    <plurals name="student_average_item_count"><item quantity="one">Computed over %1$d graded item</item><item quantity="other">Computed over %1$d graded items</item></plurals>
+    <string name="student_attendance_rate">Attendance</string>
+    <string name="student_graded">Graded</string>
+    <string name="student_ungraded">Ungraded</string>
+    <string name="student_marks">Assignment history</string>
+    <string name="student_no_assignments">This class has no assignments yet. Add them on the Grades tab.</string>
+    <string name="student_no_category">No category</string>
+    <string name="student_score_format">%1$s / %2$s</string>
+    <string name="student_percent_format">%1$s%%</string>
+    <string name="student_missing">Missing</string>
+    <string name="student_exempt">Exempt</string>
+    <string name="student_unmarked">Unmarked</string>
+    <string name="student_attendance">Attendance</string>
+    <string name="student_present">Present</string>
+    <string name="student_late">Late</string>
+    <string name="student_absent">Absent</string>
+    <string name="student_attendance_exempt">Exempt</string>
+    <string name="student_no_attendance">No attendance has been recorded for this student.</string>
+    <string name="student_notes">Notes</string>
+    <string name="student_no_notes">Nothing written yet. Participation, behaviour, missing work and general notes will appear here.</string>
+    <string name="student_note_participation">Participation</string>
+    <string name="student_note_behaviour">Behaviour</string>
+    <string name="student_note_missing_work">Missing work</string>
+    <string name="student_note_general">General</string>
+    <string name="student_contacts">Parent contacts</string>
+    <string name="student_no_contacts">No parent contact has been logged for this student.</string>
+    <string name="student_dated_kind">%1$s · %2$s</string>
+    <string name="student_follow_up">Follow up on %1$s</string>
+    <string name="student_remove_section">Remove from the roster</string>
+    <string name="student_remove_explanation">Removing a student also removes their marks, attendance, notes and contacts. Marking them inactive instead keeps the history without counting them in the class average.</string>
+    <string name="student_remove_action">Remove %1$s</string>
+    <string name="student_remove_title">Remove %1$s?</string>
+    <plurals name="student_remove_body"><item quantity="one">This removes the student together with %1$d mark, their attendance, notes, contacts and their place in the seating plan. This cannot be undone.</item><item quantity="other">This removes the student together with %1$d marks, their attendance, notes, contacts and their place in the seating plan. This cannot be undone.</item></plurals>
+    <string name="student_remove_confirm">Remove the student</string>
+</resources>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unlock_title">Znieś limity</string>
+    <string name="unlock_benefit_heading">Ucz bez limitów wersji bezpłatnej</string>
+    <string name="unlock_benefit_classes">Nielimitowane klasy</string>
+    <string name="unlock_benefit_students">Nielimitowana liczba uczniów w każdej klasie</string>
+    <string name="unlock_benefit_categories">Kategorie z wagami i odrzucanie najniższej oceny</string>
+    <string name="unlock_benefit_csv">Eksport dziennika do CSV</string>
+    <string name="unlock_benefit_pdf">Raporty klasy i uczniów do wydruku w PDF</string>
+    <string name="unlock_benefit_backup">Kopia zapasowa i przywracanie całego dziennika</string>
+    <string name="unlock_price_loading">Cenę pokaże Google Play przed potwierdzeniem</string>
+    <string name="unlock_one_time_purchase">Jedna płatność. To nie jest abonament.</string>
+    <string name="unlock_google_play_notice">Zakup obsługuje Google Play i pokazuje dokładną cenę w Twojej walucie przed potwierdzeniem. Twoje stałe odblokowanie można przywrócić po ponownej instalacji lub na nowym urządzeniu, a po przywróceniu działa offline.</string>
+    <string name="unlock_billing_unavailable_title">Google Play jest teraz niedostępny</string>
+    <string name="unlock_billing_unavailable_body">Zakup i przywracanie wymagają połączenia z Google Play. Twój dotychczasowy dziennik jest bezpieczny i działa dalej.</string>
+    <string name="unlock_purchase_button">Przejdź do Google Play</string>
+    <string name="unlock_restore_button">Przywróć zakup</string>
+    <string name="unlock_dismiss_button">Nie teraz</string>
+
+    <string name="about_title">O tej aplikacji</string>
+    <string name="about_hero_eyebrow">Prywatny dziennik nauczyciela</string>
+    <string name="about_hero_purpose">Klasy, oceny, frekwencja i notatki w jednym dzienniku, który kontrolujesz.</string>
+    <string name="about_what_title">Czym jest Mark Book</string>
+    <string name="about_what_body">Prywatny dziennik ocen do dokumentacji, którą prowadzisz obok systemu szkolnego. Zbiera razem listy uczniów, oceny, frekwencję, notatki o uczestnictwie, kontakty z rodzicami i plany sali.</string>
+    <string name="about_privacy_title">Prywatność z założenia</string>
+    <string name="about_privacy_body">Aplikacja działa offline i zapisuje dziennik w prywatnej pamięci tego urządzenia. Nie ma konta, logowania, analityki, reklam ani serwera dewelopera. Pliki opuszczają urządzenie tylko wtedy, gdy je wyeksportujesz lub zrobisz kopię zapasową przez systemowe okno wyboru; Android Auto Backup może również skopiować dziennik na Twoje konto Google, jeśli kopie zapasowe urządzenia są włączone.</string>
+    <string name="about_privacy_billing">Płatności i historię zakupów obsługuje Google Play Billing. Nigdy nie otrzymuje Twojego dziennika klasowego przez tę aplikację.</string>
+    <string name="about_averages_title">Średnie wyjaśniają swoje obliczenia</string>
+    <string name="about_averages_body">Każda średnia działa według ustawionych kategorii, wag, zaokrąglania i reguły nieoddanych prac. Puste i zwolnione prace nigdy nie stają się po cichu zerem, a kategorie bez użytecznych ocen są nazwane i pomijane.</string>
+    <string name="about_purchase_title">Jedno stałe odblokowanie</string>
+    <string name="about_purchase_unlocked">Odblokowanie działa na tym urządzeniu. Nie ma abonamentu do odnowienia ani anulowania.</string>
+    <string name="about_purchase_free">Wersja bezpłatna obejmuje jedną klasę, do 20 uczniów i jedną kategorię. Jednorazowy zakup znosi te limity i dodaje kategorie z wagami, eksport, raporty PDF oraz kopię zapasową i przywracanie.</string>
+    <string name="about_purchase_action">Zobacz, co obejmuje odblokowanie</string>
+    <string name="about_version_title">Wersja</string>
+    <string name="about_version_value">%1$s</string>
+    <string name="about_support_title">Pomoc</string>
+    <string name="about_leaving_title">Twoje dane i rezygnacja</string>
+    <string name="about_leaving_body">Możesz usuwać pojedyncze wpisy, wyczyścić pamięć aplikacji lub ją odinstalować. Odinstalowanie usuwa dziennik z urządzenia; kopie, które wyeksportowano, lub te zapisane przez Androida, pozostają pod Twoją kontrolą.</string>
+
+    <string name="average_not_enough_title">Za mało danych</string>
+    <string name="average_not_enough_body">Żadna zapisana ocena nie liczy się jeszcze do tej średniej. To nie jest zero.</string>
+    <string name="average_percent_value">%1$s%%</string>
+    <string name="average_overall_caption">Średnia ogólna</string>
+    <string name="average_rule_missing_zero">%1$s; nieoddane prace liczą się jako zero</string>
+    <string name="average_rule_missing_excluded">%1$s; nieoddane prace są pomijane</string>
+    <string name="average_rule_unweighted">Żadna kategoria nie ma wagi, więc średnie kategorii liczą się jednakowo.</string>
+    <string name="average_meaning">Porównaj ten wynik z progiem zaliczenia klasy. Otwórz obliczenia, aby zobaczyć, która kategoria ciągnie wynik w dół albo się zmienia.</string>
+    <string name="average_hide_working">Ukryj obliczenia</string>
+    <string name="average_show_working">Pokaż obliczenia</string>
+    <string name="average_no_categories">Ta klasa nie ma jeszcze kategorii, więc nie ma czego ważyć.</string>
+    <string name="average_category_weight">%1$s · waga %2$s</string>
+    <string name="average_category_excluded">Pominięta w średniej: żadna ocena w tej kategorii jeszcze się nie liczy.</string>
+    <plurals name="average_category_grade_count">
+        <item quantity="one">Średnia %1$s z %2$d oceny</item>
+        <item quantity="few">Średnia %1$s z %2$d ocen</item>
+        <item quantity="many">Średnia %1$s z %2$d ocen</item>
+        <item quantity="other">Średnia %1$s z %2$d oceny</item>
+    </plurals>
+    <plurals name="average_dropped_count">
+        <item quantity="one">Odrzucono %1$d najniższą ocenę</item>
+        <item quantity="few">Odrzucono %1$d najniższe oceny</item>
+        <item quantity="many">Odrzucono %1$d najniższych ocen</item>
+        <item quantity="other">Odrzucono %1$d najniższej oceny</item>
+    </plurals>
+    <plurals name="average_missing_count">
+        <item quantity="one">%1$d nieoddana ocena</item>
+        <item quantity="few">%1$d nieoddane oceny</item>
+        <item quantity="many">%1$d nieoddanych ocen</item>
+        <item quantity="other">%1$d nieoddanej oceny</item>
+    </plurals>
+    <plurals name="average_exempt_count">
+        <item quantity="one">%1$d zwolniona ocena</item>
+        <item quantity="few">%1$d zwolnione oceny</item>
+        <item quantity="many">%1$d zwolnionych ocen</item>
+        <item quantity="other">%1$d zwolnionej oceny</item>
+    </plurals>
+    <string name="average_score_value">%1$s/%2$s</string>
+    <string name="average_missing">Nieoddane</string>
+    <string name="average_exempt">Zwolnione</string>
+    <string name="average_empty_mark">—</string>
+    <string name="average_score_description">%1$s z %2$s</string>
+    <string name="average_missing_description">Oznaczone jako nieoddane</string>
+    <string name="average_exempt_description">Oznaczone jako zwolnione</string>
+    <string name="average_empty_description">Nic nie zapisano</string>
+    <string name="average_assignment_points">Warto %1$s pkt.</string>
+    <string name="average_score">Wynik</string>
+    <string name="average_record_score_description">Zapisz ocenę</string>
+    <string name="average_points_earned">Zdobyte punkty</string>
+    <string name="average_points_too_high">Ta liczba przekracza %1$s pkt, które jest warta ta praca.</string>
+    <string name="average_missing_rule_help">Nieoddane prace są obsługiwane zgodnie z regułą nieoddanych prac tej klasy.</string>
+    <string name="average_exempt_rule_help">Zwolnione prace są całkowicie pomijane w średniej — to nie jest zero.</string>
+    <string name="average_save">Zapisz</string>
+    <string name="average_clear">Wyczyść</string>
+    <string name="average_cancel">Anuluj</string>
+</resources>

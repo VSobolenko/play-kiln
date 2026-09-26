@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "An independent hair colourist or salon owner who mixes colour for regular clients and keeps the formula on paper or in a phone note.",
+  "paidUnit": "A one-time unlock of unlimited client formula cards with before and after photos, per-client history, and a printable formula card.",
+  "priceUsd": 7.99,
+  "momentOfPayment": "When the colourist tries to save the third client formula card, after the first two are stored for free.",
+  "distinctnessSentence": "It keeps a photo, a measured formula, and the processing time on one card per client and works offline, where the measured salon shelf is a booking fortress and the two formula apps found are unrated or subscription-priced.",
+  "evidenceRef": "docs/ideation/2026-09-26-five-recipes.md#33-recipe-3--hair-colour-formula-vault-hair-color-formula-vault",
+  "day1RevenuePath": "Free for two client cards; the first dollar is the third saved formula card, which in a working salon column happens inside the first week.",
+  "killCriteria": {
+    "windowDays": 45,
+    "minInstalls": 200,
+    "minRevenueUsd": 100
+  },
+  "assumptionsUnverified": [
+    "That colourists will pay to store formulas on a phone rather than in a notebook, because the one rated formula app measured returned zero critical reviews in a three-review sample.",
+    "That the job has demand at all, since a hand classification of the 'hair color formula' shelf found nine of twelve results are photo-editing apps and only two serve the formula job.",
+    "That a salon professional installs apps from a store search rather than from a distributor or a trade group."
+  ]
+}

@@ -1,9 +1,13 @@
 ---
 name: play-store-listing
-description: Produce Google Play listing assets and copy for a PlayKiln slot (title, descriptions, privacy, icons, screenshots). Use during /ship Store role or when preparing publish.
+description: Produce Google Play listing assets and copy for a PlayKiln slot (title, descriptions, privacy, icons, screenshots). Use in the /release phase, after the owner has approved the revision.
 ---
 
 # Play Store listing pack
+
+Release-phase work. Rendering assets and capturing screenshots requires the owner's recorded
+approval (`.cursor/rules/release-gate.mdc`); drafting copy with `store-kit.py --init` and
+validating an existing pack with `--validate-only` are safe during development.
 
 Create `apps/<slot>/store/`:
 

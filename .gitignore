@@ -2,6 +2,10 @@ node_modules/
 .superpowers/
 # Codex worker logs, prompts and ledgers (orchestration state, not source)
 .kiln/
+.kiln-shots/
+# The owner's per-slot release approval is machine-local state bound to a source digest;
+# it is never committed, so a stale record cannot travel with the repo.
+release-approval.json
 .env
 .env.*
 !.env.example
@@ -21,6 +25,10 @@ Thumbs.db
 *.aab
 *.ap_
 *.dex
+# JVM crash dumps land in the project root, not in build/, so they need their own rule:
+# an out-of-memory Gradle daemon writes hs_err_pid<pid>.log beside the build files.
+hs_err_pid*.log
+replay_pid*.log
 .tmp-android-skills/
 __pycache__/
 *.pyc

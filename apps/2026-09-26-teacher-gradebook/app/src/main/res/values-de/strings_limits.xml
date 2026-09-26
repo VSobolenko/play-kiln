@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="limit_second_class">Die kostenlose Version speichert eine Klasse. Eine Freischaltung hebt dieses und jedes andere Limit auf: unbegrenzte Klassen, unbegrenzte Schüler, gewichtete Kategorien, Export und Sicherung.</string>
+    <plurals name="limit_student_cap">
+        <item quantity="one">Die kostenlose Version speichert bis zu %1$d Schüler in einer Klasse. Eine Freischaltung hebt dieses und jedes andere Limit auf: unbegrenzte Klassen, unbegrenzte Schüler, gewichtete Kategorien, Export und Sicherung.</item>
+        <item quantity="other">Die kostenlose Version speichert bis zu %1$d Schüler in einer Klasse. Eine Freischaltung hebt dieses und jedes andere Limit auf: unbegrenzte Klassen, unbegrenzte Schüler, gewichtete Kategorien, Export und Sicherung.</item>
+    </plurals>
+    <string name="limit_single_category">Die kostenlose Version verwendet eine einzige Kategorie, daher ist der Durchschnitt das rechnerische Mittel. Eine Freischaltung hebt dieses und jedes andere Limit auf: unbegrenzte Klassen, unbegrenzte Schüler, gewichtete Kategorien, Export und Sicherung.</string>
+    <string name="limit_export">Der Export der Notenübersicht oder eines druckbaren Berichts ist Teil der einmaligen Freischaltung, die jedes kostenlose Limit aufhebt: unbegrenzte Klassen, unbegrenzte Schüler und gewichtete Kategorien.</string>
+    <string name="limit_backup">Sicherung und Wiederherstellung sind Teil der einmaligen Freischaltung, die jedes kostenlose Limit aufhebt: unbegrenzte Klassen, unbegrenzte Schüler und gewichtete Kategorien.</string>
+
+    <plurals name="import_imported">
+        <item quantity="one">%1$d Schüler wurde importiert.</item>
+        <item quantity="other">%1$d Schüler wurden importiert.</item>
+    </plurals>
+    <plurals name="import_already_on_roster">
+        <item quantity="one">%1$d Zeile stand bereits auf der Schülerliste, daher wurde nichts doppelt hinzugefügt.</item>
+        <item quantity="other">%1$d Zeilen standen bereits auf der Schülerliste, daher wurde nichts doppelt hinzugefügt.</item>
+    </plurals>
+    <plurals name="import_skipped">
+        <item quantity="one">%1$d Zeile wurde übersprungen: %2$s</item>
+        <item quantity="other">%1$d Zeilen wurden übersprungen: %2$s</item>
+    </plurals>
+    <string name="import_skipped_line">Zeile %1$d — %2$s</string>
+    <plurals name="import_blocked_by_limit">
+        <item quantity="one">Für %1$d weiteren Schüler war kein Platz mehr: Die kostenlose Version speichert %2$d Schüler pro Klasse.</item>
+        <item quantity="other">Für %1$d weitere Schüler war kein Platz mehr: Die kostenlose Version speichert %2$d Schüler pro Klasse.</item>
+    </plurals>
+
+    <plurals name="restore_restored">
+        <item quantity="one">%1$d Klasse wiederhergestellt.</item>
+        <item quantity="other">%1$d Klassen wiederhergestellt.</item>
+    </plurals>
+
+    <string name="storage_write_failed">Die Änderung ist auf dem Bildschirm sichtbar, wurde aber nicht im Speicher dieses Geräts gesichert.</string>
+
+    <string name="report_student_column">Schüler</string>
+    <string name="report_overall_column">Gesamt</string>
+    <string name="report_class_average">Klassendurchschnitt: %1$s</string>
+    <string name="report_column_key">Spaltenschlüssel: M = fehlt, E = befreit, %1$s = nichts erfasst.</string>
+    <string name="report_footer">%1$s · Seite %2$d · ein privater lokaler Datensatz, kein offizielles Zeugnis</string>
+    <string name="report_student_gone">Dieser Schüler steht nicht mehr auf dieser Schülerliste.</string>
+    <string name="report_school_id">Schul-ID: %1$s</string>
+    <string name="report_overall">Gesamt: %1$s</string>
+    <string name="report_period">Stunde %1$s</string>
+    <string name="report_averages_rule">Durchschnitte %1$s; fehlende Arbeiten: %2$s.</string>
+    <string name="report_missing_counts_zero">null</string>
+    <string name="report_missing_counts_excluded">ausgeschlossen</string>
+    <string name="report_printed">Gedruckt %1$s · privater Datensatz, auf diesem Gerät gespeichert</string>
+    <string name="report_categories">Kategorien</string>
+    <string name="report_excluded_no_grade">ausgeschlossen (noch keine Note)</string>
+    <string name="report_dropped_lowest">, schlechteste %1$d gestrichen</string>
+    <string name="report_missing_count">, %1$d fehlend</string>
+    <string name="report_exempt_count">, %1$d befreit</string>
+    <string name="report_grades">Noten</string>
+    <string name="report_missing">Fehlt</string>
+    <string name="report_exempt">Befreit</string>
+    <string name="report_attendance">Anwesenheit</string>
+    <string name="report_notes">Notizen</string>
+    <string name="report_parent_contacts">Elternkontakte</string>
+    <string name="report_follow_up"> (nachfassen am %1$s)</string>
+</resources>

@@ -14,6 +14,16 @@ alwaysApply: true
     a slot that has shipped.
   - The rule lives in `scripts/lib/namespaces.mjs`; import it, do not restate it.
 - Stack: **Kotlin + Jetpack Compose + Material 3 + Gradle KTS**.
+- The developer account's public contact address is **`v.sobolenko.vs@gmail.com`**. It is defined
+  once in `scripts/store-kit.py` (`DEFAULT_CONTACT_EMAIL`) and is the default every new
+  `store/listing.json` receives, so no slot ships the generator's `support@example.com`
+  placeholder. It is a **public support address, not a secret** — Play publishes it on the listing,
+  so it does not belong in `.env`; that rule governs credentials. A slot may override it, and a
+  hand-authored value is never rewritten.
+- A store pack must not carry a reserved-host placeholder into a listing. `scripts/store-kit.py`
+  reports `contactEmail` / `privacyPolicyUrl` values on `example.com` (and `localhost`, and a
+  non-HTTPS scheme) as unfinished in the generated human-checks list; the privacy policy URL has no
+  default, because it has to be hosted somewhere the owner controls.
 - Do **not** copy `.cursor/`, `.agents/`, or OpenSpec factory config into a slot.
 - Do **not** use Flutter, React Native, Expo, or Next.js for new slots.
 - Improve the root harness when the same mistake repeats across apps.

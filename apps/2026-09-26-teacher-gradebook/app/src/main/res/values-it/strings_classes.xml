@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="classes_title_unlocked">Le sue classi</string>
+    <string name="classes_title_free">La sua classe</string>
+    <string name="classes_about">Informazioni</string>
+    <string name="classes_new_class">Nuova classe</string>
+    <string name="classes_hero_eyebrow">Panoramica delle classi</string>
+    <string name="classes_hero_headline">La situazione di ogni classe</string>
+    <string name="classes_hero_supporting">Apra una classe per gestire elenco studenti, voti e registrazioni giornaliere.</string>
+    <string name="classes_stat_classes">Classi</string>
+    <string name="classes_stat_students">Studenti</string>
+    <string name="classes_stat_overall_average">Media complessiva</string>
+    <string name="classes_not_enough_data">dati ancora insufficienti</string>
+    <string name="classes_percent_format">%1$s%%</string>
+    <string name="classes_empty_title">Ancora nessuna classe</string>
+    <string name="classes_empty_body">Crei la prima classe per iniziare a registrare voti, presenze e annotazioni. Tutto resta su questo dispositivo: nessun account, nessuna connessione Internet.</string>
+    <string name="classes_period_format">Ora di lezione %1$s</string>
+    <plurals name="classes_student_count">
+        <item quantity="one">%1$d studente</item>
+        <item quantity="other">%1$d studenti</item>
+    </plurals>
+    <plurals name="classes_assignment_count">
+        <item quantity="one">%1$d compito</item>
+        <item quantity="other">%1$d compiti</item>
+    </plurals>
+    <string name="classes_average_value">Media della classe: %1$s</string>
+    <string name="classes_options">Opzioni</string>
+    <string name="classes_rename">Rinomina</string>
+    <string name="classes_delete">Elimina</string>
+    <string name="classes_hint">Tocchi una classe per aprire elenco studenti, voti, appello, annotazioni, piantina dei posti e report.</string>
+    <string name="classes_create">Crea</string>
+    <string name="classes_name_label">Nome della classe</string>
+    <plurals name="classes_free_add_warning">
+        <item quantity="one">La versione gratuita conserva %1$d classe. Per crearne un\'altra serve lo sblocco.</item>
+        <item quantity="other">La versione gratuita conserva %1$d classi. Per crearne un\'altra serve lo sblocco.</item>
+    </plurals>
+    <string name="classes_rename_title">Rinomina classe</string>
+    <string name="classes_save">Salva</string>
+    <string name="classes_delete_title">Eliminare %1$s?</string>
+    <plurals name="classes_grade_count">
+        <item quantity="one">%1$d voto</item>
+        <item quantity="other">%1$d voti</item>
+    </plurals>
+    <plurals name="classes_attendance_count">
+        <item quantity="one">%1$d registrazione di presenza</item>
+        <item quantity="other">%1$d registrazioni di presenza</item>
+    </plurals>
+    <plurals name="classes_note_count">
+        <item quantity="one">%1$d annotazione</item>
+        <item quantity="other">%1$d annotazioni</item>
+    </plurals>
+    <plurals name="classes_contact_count">
+        <item quantity="one">%1$d contatto</item>
+        <item quantity="other">%1$d contatti</item>
+    </plurals>
+    <string name="classes_delete_body">La classe verrà eliminata insieme a tutto ciò che contiene: %1$s, %2$s, %3$s, %4$s, %5$s, %6$s e la relativa piantina dei posti.\n\nL\'operazione non può essere annullata. In caso di dubbio, salvi prima una copia di sicurezza del registro.</string>
+    <string name="classes_delete_confirm">Elimina la classe</string>
+    <string name="classes_free_title">Versione gratuita</string>
+    <plurals name="classes_free_allowance">
+        <item quantity="one">Una classe</item>
+        <item quantity="other">%1$d classi</item>
+    </plurals>
+    <string name="classes_free_allowance_label">Limite gratuito</string>
+    <plurals name="classes_free_roster">
+        <item quantity="one">fino a %1$d studente</item>
+        <item quantity="other">fino a %1$d studenti</item>
+    </plurals>
+    <plurals name="classes_free_roster_tile">
+        <item quantity="one">Fino a %1$d studente</item>
+        <item quantity="other">Fino a %1$d studenti</item>
+    </plurals>
+    <string name="classes_free_roster_label">Studenti per classe</string>
+    <string name="classes_free_available">%1$s, %2$s, con voti, presenze, annotazioni e posti senza limiti. Classi illimitate, esportazione e copia di sicurezza fanno parte dello sblocco una tantum.</string>
+    <string name="classes_free_spent">%1$s, %2$s, con voti, presenze, annotazioni e posti senza limiti. La classe disponibile è già in uso, quindi per una seconda classe serve lo sblocco.</string>
+    <string name="classes_unlock_title">Sblocchi tutto una sola volta</string>
+    <string name="classes_unlock_body">Un unico acquisto, senza abbonamento. Google Play mostra il prezzo esatto nella valuta locale prima della conferma e l\'acquisto può essere ripristinato su un nuovo dispositivo.</string>
+    <string name="classes_unlock_action">Scopra cosa include lo sblocco</string>
+</resources>

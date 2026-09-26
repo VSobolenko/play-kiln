@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unlock_title">Elimine los límites</string>
+    <string name="unlock_benefit_heading">Siga enseñando sin los límites de la versión gratuita</string>
+    <string name="unlock_benefit_classes">Clases ilimitadas</string>
+    <string name="unlock_benefit_students">Alumnos ilimitados en cada clase</string>
+    <string name="unlock_benefit_categories">Categorías con ponderación y reglas para descartar la nota más baja</string>
+    <string name="unlock_benefit_csv">Exportación del cuaderno de notas a CSV</string>
+    <string name="unlock_benefit_pdf">Informes de clase y de alumno imprimibles en PDF</string>
+    <string name="unlock_benefit_backup">Copia de seguridad y restauración de todo el registro</string>
+    <string name="unlock_price_loading">Precio mostrado por Google Play antes de confirmar</string>
+    <string name="unlock_one_time_purchase">Un solo pago. No es una suscripción.</string>
+    <string name="unlock_google_play_notice">Google Play gestiona la compra y muestra el precio exacto en su moneda antes de confirmar. Su desbloqueo permanente se puede restaurar tras reinstalar o cambiar a un dispositivo nuevo, y funciona sin conexión una vez restaurado.</string>
+    <string name="unlock_billing_unavailable_title">Google Play no está disponible ahora mismo</string>
+    <string name="unlock_billing_unavailable_body">Comprar y restaurar necesitan conexión con Google Play. Su registro actual está a salvo y sigue funcionando.</string>
+    <string name="unlock_purchase_button">Continuar en Google Play</string>
+    <string name="unlock_restore_button">Restaurar compra</string>
+    <string name="unlock_dismiss_button">Ahora no</string>
+
+    <string name="about_title">Acerca de esta aplicación</string>
+    <string name="about_hero_eyebrow">Registro docente privado</string>
+    <string name="about_hero_purpose">Clases, notas, asistencia y observaciones en un único registro que usted controla.</string>
+    <string name="about_what_title">Qué es Mark Book</string>
+    <string name="about_what_body">Un cuaderno de notas privado para el registro que lleva junto al sistema del centro. Reúne listas de alumnos, notas, asistencia, observaciones de participación, contactos con las familias y planos de asientos.</string>
+    <string name="about_privacy_title">Privado por diseño</string>
+    <string name="about_privacy_body">La aplicación funciona sin conexión y guarda su registro en el almacenamiento privado de este dispositivo. No hay cuenta, inicio de sesión, analíticas, publicidad ni servidor del desarrollador. Los archivos solo salen cuando usted exporta o hace una copia de seguridad mediante el selector del sistema; la Copia de seguridad de Android también puede copiar el registro a su propia cuenta de Google si la copia de seguridad del dispositivo está activada.</string>
+    <string name="about_privacy_billing">Google Play Billing gestiona el tráfico de compras y el historial de compras. Nunca recibe el registro de su clase a través de esta aplicación.</string>
+    <string name="about_averages_title">Las medias explican sus cálculos</string>
+    <string name="about_averages_body">Cada media sigue las categorías, las ponderaciones, el redondeo y la regla de trabajos no entregados que usted haya definido. El trabajo sin calificar o exento nunca se convierte en cero de forma silenciosa, y las categorías sin notas utilizables se indican y se excluyen.</string>
+    <string name="about_purchase_title">Un desbloqueo permanente</string>
+    <string name="about_purchase_unlocked">El desbloqueo está activo en este dispositivo. No hay ninguna suscripción que renovar ni cancelar.</string>
+    <string name="about_purchase_free">La versión gratuita admite una clase, hasta 20 alumnos y una categoría. Un único pago elimina esos límites y añade categorías con ponderación, exportación, informes en PDF, copia de seguridad y restauración.</string>
+    <string name="about_purchase_action">Ver qué incluye el desbloqueo</string>
+    <string name="about_version_title">Versión</string>
+    <string name="about_version_value">%1$s</string>
+    <string name="about_support_title">Asistencia técnica</string>
+    <string name="about_leaving_title">Sus datos y cómo irse</string>
+    <string name="about_leaving_body">Puede eliminar registros individuales, borrar el almacenamiento de la aplicación o desinstalarla. Al desinstalar se elimina el registro del dispositivo; las copias que haya exportado o que Android haya guardado siguen bajo su control.</string>
+
+    <string name="average_not_enough_title">Aún no hay datos suficientes</string>
+    <string name="average_not_enough_body">Todavía no cuenta ninguna nota registrada para esta media. Esto no es un cero.</string>
+    <string name="average_percent_value">%1$s%%</string>
+    <string name="average_overall_caption">Media general</string>
+    <string name="average_rule_missing_zero">%1$s; el trabajo no entregado cuenta como cero</string>
+    <string name="average_rule_missing_excluded">%1$s; el trabajo no entregado se excluye</string>
+    <string name="average_rule_unweighted">Ninguna categoría tiene ponderación, así que las medias de las categorías cuentan por igual.</string>
+    <string name="average_meaning">Compare este resultado con la nota de aprobado de la clase. Abra el cálculo para ver qué categoría está bajando el resultado o desviándolo.</string>
+    <string name="average_hide_working">Ocultar el cálculo</string>
+    <string name="average_show_working">Mostrar el cálculo</string>
+    <string name="average_no_categories">Esta clase todavía no tiene categorías, así que no hay nada que ponderar.</string>
+    <string name="average_category_weight">%1$s · ponderación %2$s</string>
+    <string name="average_category_excluded">Excluida de la media: todavía no cuenta ninguna nota en esta categoría.</string>
+    <plurals name="average_category_grade_count">
+        <item quantity="one">Media %1$s con %2$d nota</item>
+        <item quantity="other">Media %1$s con %2$d notas</item>
+    </plurals>
+    <plurals name="average_dropped_count">
+        <item quantity="one">Se descartó la %1$d nota más baja</item>
+        <item quantity="other">Se descartaron las %1$d notas más bajas</item>
+    </plurals>
+    <plurals name="average_missing_count">
+        <item quantity="one">%1$d nota no entregada</item>
+        <item quantity="other">%1$d notas no entregadas</item>
+    </plurals>
+    <plurals name="average_exempt_count">
+        <item quantity="one">%1$d nota exenta</item>
+        <item quantity="other">%1$d notas exentas</item>
+    </plurals>
+    <string name="average_score_value">%1$s/%2$s</string>
+    <string name="average_missing">No entregado</string>
+    <string name="average_exempt">Exento</string>
+    <string name="average_empty_mark">—</string>
+    <string name="average_score_description">%1$s de %2$s</string>
+    <string name="average_missing_description">Marcado como no entregado</string>
+    <string name="average_exempt_description">Marcado como exento</string>
+    <string name="average_empty_description">Nada registrado</string>
+    <string name="average_assignment_points">Vale %1$s puntos.</string>
+    <string name="average_score">Nota</string>
+    <string name="average_record_score_description">Registrar una nota</string>
+    <string name="average_points_earned">Puntos obtenidos</string>
+    <string name="average_points_too_high">Eso es más que los %1$s puntos que vale la tarea.</string>
+    <string name="average_missing_rule_help">El trabajo no entregado se rige por la regla de trabajos no entregados de esta clase.</string>
+    <string name="average_exempt_rule_help">El trabajo exento se queda fuera de la media por completo: no es un cero.</string>
+    <string name="average_save">Guardar</string>
+    <string name="average_clear">Borrar</string>
+    <string name="average_cancel">Cancelar</string>
+</resources>

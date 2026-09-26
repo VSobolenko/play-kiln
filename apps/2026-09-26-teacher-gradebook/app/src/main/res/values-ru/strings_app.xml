@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_error_unknown_reason" translatable="true">неизвестная причина</string>
+    <string name="app_nothing_written" translatable="true">Ничего не записано.</string>
+    <string name="app_write_failed" translatable="true">Не удалось записать файл: %1$s</string>
+    <string name="app_read_failed" translatable="true">Не удалось прочитать файл: %1$s</string>
+    <string name="app_no_file_chosen" translatable="true">Файл не выбран.</string>
+    <string name="app_class_gone" translatable="true">Этого класса больше нет.</string>
+    <string name="app_record_loading" translatable="true">Данные ещё загружаются.</string>
+    <string name="app_wrote_csv" translatable="true">Файл %1$s записан: по одной строке на ученика.</string>
+    <string name="app_wrote_file" translatable="true">Файл %1$s записан.</string>
+    <string name="app_backed_up" translatable="true">Резервная копия сохранена в %1$s. Храните её в надёжном месте.</string>
+    <string name="app_unlock_reason_classes" translatable="true">В бесплатной версии доступен один класс. Разблокировка снимает ограничение.</string>
+    <string name="app_unlock_reason_about" translatable="true">О разблокировке</string>
+    <string name="app_unlock_purchased" translatable="true">Разблокировано. На этом устройстве сняты все ограничения.</string>
+    <string name="app_unlock_restored" translatable="true">Восстановлено. Разблокировка снова активна.</string>
+    <string name="app_unlock_nothing_to_restore" translatable="true">По данным Play, для этой учётной записи покупок нет, поэтому ничего не изменилось. Если вы платили с другой учётной записи, войдите в неё и повторите попытку.</string>
+    <string name="app_unlock_pending" translatable="true">Play ещё обрабатывает платёж. До его завершения разблокировка не действует; повторно деньги не списывались.</string>
+    <string name="app_unlock_unavailable" translatable="true">Сейчас Google Play не может провести покупку на этом устройстве. Ваши данные и уже приобретённая разблокировка не изменены.</string>
+    <string name="app_unlock_not_completed" translatable="true">Покупка не завершена, поэтому деньги не списаны. Все внесённые данные остались на месте.</string>
+    <string name="app_unlock_offline" translatable="true">Связаться с Google Play не удалось, поэтому операция не выполнялась. Приложение работает без интернета, но для самой разблокировки нужно подключение.</string>
+    <string name="app_unnamed_class_file" translatable="true">Класс</string>
+    <string name="nav_back" translatable="true">Назад</string>
+    <string name="document_could_not_open" translatable="true">Не удалось открыть файл.</string>
+    <string name="document_could_not_open_for_writing" translatable="true">Не удалось открыть файл для записи.</string>
+    <string name="document_chosen_file" translatable="true">выбранный файл</string>
+    <string name="backup_empty" translatable="true">Этот файл пуст, поэтому ничего не восстановлено.</string>
+    <string name="backup_not_mark_book" translatable="true">Этот файл не является резервной копией Mark Book, поэтому ничего не восстановлено.</string>
+    <string name="backup_missing_schema" translatable="true">В этом файле нет читаемой версии схемы, поэтому ничего не восстановлено.</string>
+    <string name="backup_unsupported_version" translatable="true">Эта резервная копия создана другой версией приложения (формат %1$d; это приложение читает формат %2$d). Ничего не изменено.</string>
+    <string name="backup_damaged" translatable="true">Эта резервная копия повреждена и не может быть прочитана, поэтому ничего не восстановлено: %1$s</string>
+</resources>

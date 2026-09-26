@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "_comment": "The composed visual identity for this slot, read by scripts/store-studio.py. Everything the studio draws - the launcher icon, the adaptive-icon vectors in app/src/main/res/drawable, the feature graphic and the screenshot compositions - is derived from `mark` and `palette` here, so this file is the one place the store presence is decided. It is not optional: the studio refuses to render without it, because falling back to the generic renderer changes the whole pack while store/graphics.md keeps describing the composed one.",
+  "_mark": "`mark` selects the glyph. It was a hardcoded pipe caliper, which is why this slot shipped an icon that had nothing to do with a grade book. `mark-book` is a spiral-bound page with a marked check: the page says book, the check says marked, and the binding says a record rather than a note. Three shapes, no letters and no numerals, so it reads at 48dp and survives translation.",
+  "_palette": "One deliberate identity, shared with the app's own theme (app/src/main/java/com/gexetr/teachergradebook/ui/theme/Color.kt): a deep indigo field, and amber reserved for work that needs attention. Roles the studio draws with: `ink`/`ink_soft`/`ink_lift` are the three ends of the background gradient, `amber` is the mark's check on its paper, `amber_deep` and `amber_pale` are its darker and lighter accents, `accent_deep` is the cool glow that gives the field depth, `paper` is the page and the display text, `muted` is secondary text, and `bezel`/`bezel_rim` are the device mock-up frame.",
+  "_claim_bounds": "Every headline must be true of the shipped build. It records marks, attendance, notes, contacts and seating for work the user supplies; it does not sync, does not share with the school system except by a file the teacher exports, and does not compute anything a school's official record cannot also see. So 'Syncs with your school' is false, and 'Never lose a mark' is a guarantee the app cannot make. Each headline below names something the app verifiably does, and the shot behind it is asserted by store/journey.json.",
+  "_headlines": "One headline per journey shot, in journey order, kept to 3-5 words so it stays readable at thumbnail size. The studio falls back to the shot title when this list is short, so a short list would silently change the pack.",
+  "mark": "mark-book",
+  "palette": {
+    "ink": "#1E1B4B",
+    "ink_soft": "#2A2568",
+    "ink_lift": "#3730A3",
+    "amber": "#D97706",
+    "amber_deep": "#92400E",
+    "amber_pale": "#FDE68A",
+    "accent_deep": "#6366F1",
+    "paper": "#FFFFFF",
+    "muted": "#C7D2FE",
+    "bezel": "#101118",
+    "bezel_rim": "#9CA0B0"
+  },
+  "headlines": [
+    "Your classes, on your device",
+    "Mark a whole class at once",
+    "Every average shows its working",
+    "A register in one tap",
+    "Seating plans you do not redraw",
+    "CSV, PDF and a backup you keep"
+  ],
+  "kickers": [
+    "CLASSES",
+    "MARKS",
+    "AVERAGES",
+    "ATTENDANCE",
+    "SEATING",
+    "EXPORT"
+  ],
+  "featureTagline": "Your own mark book, kept on your device. No account, no ads, bought once.",
+  "featurePill": "OFFLINE  \u00b7  NO ACCOUNT"
+}

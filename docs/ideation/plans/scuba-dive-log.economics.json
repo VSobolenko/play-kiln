@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A certified recreational diver who logs dives by hand and owns a dive computer from a brand whose own companion app is rated below two stars.",
+  "paidUnit": "A one-time unlock of unlimited dive logging, CSV and PDF export, and a gear and weight log, with no account and no cloud sync.",
+  "priceUsd": 5.99,
+  "momentOfPayment": "At the end of the first dive day, when the diver tries to export the log or adds the eleventh dive and the export screen offers the unlock.",
+  "distinctnessSentence": "It keeps the logbook as a file the diver owns and can export every dive from, where the measured incumbents lose logs, demand a second login, or paywall the export.",
+  "evidenceRef": "docs/ideation/2026-09-26-five-recipes.md#32-recipe-2--scuba-dive-logbook-scuba-dive-log",
+  "day1RevenuePath": "Free for the first ten dives, with the unlock offered at the first export or the eleventh dive, so the first dollar follows the first real dive day.",
+  "killCriteria": {
+    "windowDays": 60,
+    "minInstalls": 300,
+    "minRevenueUsd": 60
+  },
+  "assumptionsUnverified": [
+    "That divers will keep a manual logbook instead of importing from a computer over Bluetooth, which is the feature the 1.9-star incumbent is criticised for losing.",
+    "That the 1.9-star and 1.7-star hardware-companion apps indicate an opening rather than a segment that only trusts its hardware vendor.",
+    "That a diver who already logs in PADI or Garmin, both rated 4.7 and above, will install a third logbook at all."
+  ]
+}

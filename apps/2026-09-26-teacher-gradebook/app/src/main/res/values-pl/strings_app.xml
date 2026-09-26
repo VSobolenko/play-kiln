@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_error_unknown_reason" translatable="true">nieznany powód</string>
+
+    <string name="app_nothing_written" translatable="true">Nic nie zostało zapisane.</string>
+    <string name="app_write_failed" translatable="true">Nie udało się zapisać tego pliku: %1$s</string>
+    <string name="app_read_failed" translatable="true">Nie udało się odczytać tego pliku: %1$s</string>
+    <string name="app_no_file_chosen" translatable="true">Nie wybrano żadnego pliku.</string>
+    <string name="app_class_gone" translatable="true">Ta klasa już nie istnieje.</string>
+    <string name="app_record_loading" translatable="true">Dziennik wciąż się wczytuje.</string>
+    <string name="app_wrote_csv" translatable="true">Zapisano %1$s, jeden wiersz na ucznia.</string>
+    <string name="app_wrote_file" translatable="true">Zapisano %1$s.</string>
+    <string name="app_backed_up" translatable="true">Kopia zapasowa w %1$s. Trzymaj ją w zaufanym miejscu.</string>
+
+    <string name="app_unlock_reason_classes" translatable="true">Wersja bezpłatna obejmuje jedną klasę. Odblokowanie znosi ten limit.</string>
+    <string name="app_unlock_reason_about" translatable="true">O odblokowaniu</string>
+
+    <string name="app_unlock_purchased" translatable="true">Odblokowano. Wszystkie limity na tym urządzeniu zostały zniesione.</string>
+    <string name="app_unlock_restored" translatable="true">Przywrócono. Twoje odblokowanie znów działa.</string>
+    <string name="app_unlock_nothing_to_restore" translatable="true">Google Play nie zgłasza zakupu dla tego konta, więc nic się nie zmieniło. Jeśli płatność została wykonana z innego konta, zaloguj się na nie i spróbuj ponownie.</string>
+    <string name="app_unlock_pending" translatable="true">Google Play wciąż przetwarza tę płatność. Nic nie zostanie odblokowane, dopóki się nie zakończy, i nic nie zostało pobrane dwa razy.</string>
+    <string name="app_unlock_unavailable" translatable="true">Google Play nie może teraz zrealizować tego zakupu na tym urządzeniu. Twoja praca, a także odblokowanie, jeśli już je masz, pozostają nietknięte.</string>
+    <string name="app_unlock_not_completed" translatable="true">Nie dokończono żadnego zakupu, więc nic nie zostało pobrane. Wszystko, co zapisano, wciąż tu jest.</string>
+    <string name="app_unlock_offline" translatable="true">Nie udało się połączyć z Google Play, więc nie podjęto żadnej próby. Aplikacja działa dalej offline; samo odblokowanie wymaga połączenia.</string>
+
+    <string name="app_unnamed_class_file" translatable="true">Klasa</string>
+    <string name="nav_back" translatable="true">Wstecz</string>
+    <string name="document_could_not_open" translatable="true">Nie udało się otworzyć pliku.</string>
+    <string name="document_could_not_open_for_writing" translatable="true">Nie udało się otworzyć pliku do zapisu.</string>
+    <string name="document_chosen_file" translatable="true">wybrany plik</string>
+    <string name="backup_empty" translatable="true">Ten plik jest pusty, więc niczego nie przywrócono.</string>
+    <string name="backup_not_mark_book" translatable="true">Ten plik nie jest kopią zapasową Mark Book, więc niczego nie przywrócono.</string>
+    <string name="backup_missing_schema" translatable="true">Ten plik nie ma czytelnej wersji schematu, więc niczego nie przywrócono.</string>
+    <string name="backup_unsupported_version" translatable="true">Ta kopia zapasowa została utworzona przez inną wersję aplikacji (format %1$d; ta aplikacja odczytuje format %2$d). Nic nie zostało zmienione.</string>
+    <string name="backup_damaged" translatable="true">Ta kopia zapasowa jest uszkodzona i nie udało się jej odczytać, więc niczego nie przywrócono: %1$s</string>
+</resources>

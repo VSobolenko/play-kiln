@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_error_unknown_reason" translatable="true">motivo desconhecido</string>
+    <string name="app_nothing_written" translatable="true">Nada foi gravado.</string>
+    <string name="app_write_failed" translatable="true">Não foi possível gravar esse arquivo: %1$s</string>
+    <string name="app_read_failed" translatable="true">Não foi possível ler esse arquivo: %1$s</string>
+    <string name="app_no_file_chosen" translatable="true">Nenhum arquivo foi escolhido.</string>
+    <string name="app_class_gone" translatable="true">Essa turma não existe mais.</string>
+    <string name="app_record_loading" translatable="true">O registro ainda está sendo carregado.</string>
+    <string name="app_wrote_csv" translatable="true">%1$s foi gravado, com uma linha por aluno.</string>
+    <string name="app_wrote_file" translatable="true">%1$s foi gravado.</string>
+    <string name="app_backed_up" translatable="true">Cópia de segurança salva em %1$s. Guarde-a em um local confiável.</string>
+    <string name="app_unlock_reason_classes" translatable="true">A versão gratuita permite uma turma. O desbloqueio remove esse limite.</string>
+    <string name="app_unlock_reason_about" translatable="true">Sobre o desbloqueio</string>
+    <string name="app_unlock_purchased" translatable="true">Desbloqueado. Todos os limites foram removidos neste dispositivo.</string>
+    <string name="app_unlock_restored" translatable="true">Restaurado. Seu desbloqueio está ativo novamente.</string>
+    <string name="app_unlock_nothing_to_restore" translatable="true">O Play não encontrou nenhuma compra nesta conta, então nada mudou. Se você pagou com outra conta, entre nela e tente novamente.</string>
+    <string name="app_unlock_pending" translatable="true">O Play ainda está processando o pagamento. Nada será desbloqueado até a conclusão, e nenhuma cobrança foi feita duas vezes.</string>
+    <string name="app_unlock_unavailable" translatable="true">O Google Play não pode concluir esta compra neste dispositivo agora. Seu trabalho e o desbloqueio, caso já o tenha, não foram alterados.</string>
+    <string name="app_unlock_not_completed" translatable="true">Nenhuma compra foi concluída, portanto nada foi cobrado. Tudo o que você registrou continua aqui.</string>
+    <string name="app_unlock_offline" translatable="true">Não foi possível acessar o Google Play, então nenhuma tentativa foi feita. O app continua funcionando offline; apenas o desbloqueio precisa de conexão.</string>
+    <string name="app_unnamed_class_file" translatable="true">Turma</string>
+    <string name="nav_back" translatable="true">Voltar</string>
+    <string name="document_could_not_open" translatable="true">Não foi possível abrir o arquivo.</string>
+    <string name="document_could_not_open_for_writing" translatable="true">Não foi possível abrir o arquivo para gravação.</string>
+    <string name="document_chosen_file" translatable="true">o arquivo escolhido</string>
+    <string name="backup_empty" translatable="true">Esse arquivo está vazio, portanto nada foi restaurado.</string>
+    <string name="backup_not_mark_book" translatable="true">Esse arquivo não é uma cópia de segurança do Mark Book, portanto nada foi restaurado.</string>
+    <string name="backup_missing_schema" translatable="true">Esse arquivo não tem uma versão de esquema legível, portanto nada foi restaurado.</string>
+    <string name="backup_unsupported_version" translatable="true">Essa cópia de segurança foi criada por outra versão do aplicativo (formato %1$d; este aplicativo lê o formato %2$d). Nada foi alterado.</string>
+    <string name="backup_damaged" translatable="true">Essa cópia de segurança está danificada e não pôde ser lida, portanto nada foi restaurado: %1$s</string>
+</resources>

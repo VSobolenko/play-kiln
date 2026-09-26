@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="classroom_class_title">Classe</string>
+    <string name="classroom_back">Indietro</string>
+    <string name="classroom_back_to_classes">Torna alle sue classi</string>
+    <string name="classroom_missing_title">Questa classe non è più qui.</string>
+    <string name="classroom_missing_body">È stata eliminata. Se ha salvato una copia di sicurezza del registro, ripristinandola torneranno la classe e tutto ciò che contiene.</string>
+
+    <string name="classroom_tab_roster">Elenco</string>
+    <string name="classroom_tab_grades">Voti</string>
+    <string name="classroom_tab_attendance">Presenze</string>
+    <string name="classroom_tab_notes">Annotazioni</string>
+    <string name="classroom_tab_seating">Posti</string>
+    <string name="classroom_tab_reports">Report</string>
+    <string name="classroom_tab_setup">Impostazioni</string>
+
+    <string name="classroom_roster_eyebrow">Elenco studenti</string>
+    <string name="classroom_roster_headline">Tutti gli studenti della classe</string>
+    <string name="classroom_roster_supporting">Apra uno studente per vedere voti, presenze, annotazioni e contatti.</string>
+    <string name="classroom_students_label">Studenti</string>
+    <string name="classroom_active_label">Attivi</string>
+    <string name="classroom_add_student">Aggiungi studente</string>
+    <string name="classroom_import_csv">Importa da CSV</string>
+    <string name="classroom_roster_limit_title">Limite dell\'elenco</string>
+    <string name="classroom_roster_limit_body">La versione gratuita contiene %1$d studenti per classe. Lo sblocco elimina il limite e include esportazione e copia di sicurezza.</string>
+    <string name="classroom_roster_empty">Ancora nessuno studente. Li aggiunga uno alla volta oppure importi un CSV in cui la prima colonna contiene il nome. L\'importazione non sovrascrive mai uno studente già presente nell\'elenco.</string>
+    <string name="classroom_student_inactive">%1$s (inattivo)</string>
+    <string name="classroom_school_id">ID scolastico %1$s</string>
+    <string name="classroom_average_with_letter">%1$s (%2$s)</string>
+    <string name="classroom_no_average">ancora nulla da mediare</string>
+    <string name="classroom_no_average_short">Nessun voto</string>
+    <string name="classroom_student_summary">Media: %1$s</string>
+    <string name="classroom_student_summary_with_attendance">Media: %1$s · %2$s</string>
+    <plurals name="classroom_attendance_marks">
+        <item quantity="one">%1$d presenza registrata</item>
+        <item quantity="other">%1$d presenze registrate</item>
+    </plurals>
+    <string name="classroom_open">Apri</string>
+    <string name="classroom_add">Aggiungi</string>
+    <string name="classroom_first_name">Nome</string>
+    <string name="classroom_last_name">Cognome</string>
+    <string name="classroom_name_supporting">Basta uno dei due nomi.</string>
+
+    <string name="classroom_grades_headline">Valutazioni a colpo d\'occhio</string>
+    <string name="classroom_class_average">Media della classe</string>
+    <string name="classroom_unmarked_cells">Celle non valutate</string>
+    <string name="classroom_unmarked">Non valutato</string>
+    <string name="classroom_unmarked_legend">Non è stato registrato alcun punteggio, compito non consegnato o esonero.</string>
+    <string name="classroom_add_category">Aggiungi categoria</string>
+    <string name="classroom_categories_empty">Una categoria è un tipo di lavoro — verifiche, compiti in classe — e ha il peso che le spetta nel voto finale. Senza una categoria non c\'è nulla con cui pesare i voti.</string>
+    <string name="classroom_grades_no_students">Aggiunga prima gli studenti nella scheda Elenco, così c\'è qualcuno da valutare.</string>
+    <string name="classroom_assignments_empty">Ancora nessun compito in %1$s.</string>
+    <string name="classroom_grades_help">Tocchi un compito per valutare l\'intera classe. Non consegnato ed esonerato sono distinti da un punteggio, perché una cella non valutata non è uno zero.</string>
+    <string name="classroom_category_name">Nome della categoria</string>
+    <string name="classroom_weight_percent">Peso (%)</string>
+    <string name="classroom_category_free_limit">La versione gratuita usa una sola categoria. Le categorie ponderate fanno parte dello sblocco.</string>
+    <string name="classroom_weight_help">I pesi sono relativi: 60 e 40 equivalgono a 6 e 4.</string>
+    <string name="classroom_edit_named">Modifica %1$s</string>
+    <string name="classroom_save">Salva</string>
+    <string name="classroom_new_assignment_in">Nuovo compito in %1$s</string>
+    <string name="classroom_assignment_name">Nome del compito</string>
+    <string name="classroom_points_worth">Punti assegnati</string>
+    <string name="classroom_points_positive">I punti devono essere maggiori di zero.</string>
+    <string name="classroom_points_change_warning">Modificare i punti cambia tutte le percentuali di questo compito.</string>
+    <string name="classroom_delete_named">Eliminare %1$s?</string>
+    <string name="classroom_delete_category">Elimina la categoria</string>
+    <string name="classroom_delete_assignment">Elimina il compito</string>
+    <plurals name="classroom_delete_category_body">
+        <item quantity="one">Verranno rimossi la categoria, il suo %1$d compito e ogni voto registrato. Le altre categorie restano invariate.</item>
+        <item quantity="other">Verranno rimossi la categoria, i suoi %1$d compiti e ogni voto registrato. Le altre categorie restano invariate.</item>
+    </plurals>
+    <plurals name="classroom_delete_assignment_body">
+        <item quantity="one">Verranno rimossi il compito e il %1$d voto registrato.</item>
+        <item quantity="other">Verranno rimossi il compito e i %1$d voti registrati.</item>
+    </plurals>
+    <string name="classroom_category_weight">Peso %1$s%%</string>
+    <string name="classroom_category_weight_drop">Peso %1$s%% · scarta i %2$d voti più bassi</string>
+    <string name="classroom_up">Su</string>
+    <string name="classroom_down">Giù</string>
+    <string name="classroom_options">Opzioni</string>
+    <string name="classroom_add_assignment">Aggiungi compito</string>
+    <string name="classroom_edit_name_weight">Modifica nome e peso</string>
+    <string name="classroom_delete">Elimina</string>
+    <string name="classroom_assignment_points">Vale %1$s punti</string>
+    <string name="classroom_mark_class">Valuta la classe</string>
+    <string name="classroom_edit">Modifica</string>
+    <plurals name="classroom_marked_count">
+        <item quantity="one">%1$d di %2$d valutato</item>
+        <item quantity="other">%1$d di %2$d valutati</item>
+    </plurals>
+    <plurals name="classroom_missing_count">
+        <item quantity="one">%1$d non consegnato</item>
+        <item quantity="other">%1$d non consegnati</item>
+    </plurals>
+    <plurals name="classroom_exempt_count">
+        <item quantity="one">%1$d esonerato</item>
+        <item quantity="other">%1$d esonerati</item>
+    </plurals>
+
+    <string name="classroom_attendance_headline">Appello di oggi</string>
+    <string name="classroom_attendance_present">Presente</string>
+    <string name="classroom_attendance_late">In ritardo</string>
+    <string name="classroom_attendance_excused">Giustificato</string>
+    <string name="classroom_attendance_absent">Assente</string>
+    <string name="classroom_register_for">Appello per</string>
+    <string name="classroom_date_help">Inserisca la data nel formato AAAA-MM-GG, ad esempio %1$s.</string>
+    <string name="classroom_everyone_present">Tutti presenti</string>
+    <string name="classroom_attendance_recorded">%1$d di %2$d registrati</string>
+    <string name="classroom_add_roster_first">Aggiunga prima gli studenti nella scheda Elenco.</string>
+    <string name="classroom_attendance_unrecorded">Non registrato</string>
+
+    <string name="classroom_notes_eyebrow">Cronologia della classe</string>
+    <string name="classroom_notes_headline">Annotazioni e contatti con le famiglie</string>
+    <string name="classroom_notes_supporting">Veda cosa è successo di recente e quali conversazioni richiedono un seguito.</string>
+    <string name="classroom_notes_label">Annotazioni</string>
+    <string name="classroom_contacts_label">Contatti</string>
+    <string name="classroom_followups_label">Ricontatti</string>
+    <string name="classroom_followups_title">Ricontatti</string>
+    <string name="classroom_followups_empty">Non è stata impostata alcuna data di ricontatto. Aggiungendone una a un contatto con i genitori, comparirà qui.</string>
+    <string name="classroom_followup_summary">%1$s · %2$s · %3$s: %4$s</string>
+    <string name="classroom_former_student">un ex studente</string>
+    <string name="classroom_parent_contacts">Contatti con i genitori</string>
+    <string name="classroom_contacts_empty">Non è stato registrato alcun contatto con i genitori. I contatti si aggiungono dalla scheda di uno studente.</string>
+    <string name="classroom_contact_with_followup">%1$s · %2$s · %3$s · ricontatto %4$s</string>
+    <string name="classroom_contact_summary">%1$s · %2$s · %3$s</string>
+    <string name="classroom_notes_empty">Ancora nessuna annotazione. Le annotazioni si aggiungono dalla scheda di uno studente.</string>
+    <string name="classroom_note_summary">%1$s · %2$s · %3$s</string>
+    <string name="classroom_note_participation">Partecipazione</string>
+    <string name="classroom_note_behaviour">Comportamento</string>
+    <string name="classroom_note_missing_work">Compito non consegnato</string>
+    <string name="classroom_note_general">Generale</string>
+    <string name="classroom_delete_note_title">Eliminare questa annotazione?</string>
+    <string name="classroom_delete_note_body">“%1$s” di %2$s verrà rimossa dalla cronologia dello studente.</string>
+    <string name="classroom_delete_note">Elimina l\'annotazione</string>
+    <string name="classroom_delete_contact_title">Eliminare questo contatto?</string>
+    <string name="classroom_delete_contact_body">Il contatto %1$s %2$s verrà rimosso.</string>
+    <string name="classroom_delete_contact">Elimina il contatto</string>
+
+    <string name="classroom_seating_eyebrow">Piantina dell\'aula</string>
+    <string name="classroom_seating_headline">Tenga tutti gli studenti sott\'occhio</string>
+    <string name="classroom_seating_supporting">Tocchi un posto per assegnarlo a uno studente o spostarlo.</string>
+    <string name="classroom_desks_label">Posti</string>
+    <string name="classroom_seated_label">Assegnati</string>
+    <string name="classroom_unseated_label">Non assegnati</string>
+    <string name="classroom_seating_none">Ancora nessuna griglia dei posti.</string>
+    <string name="classroom_seating_summary">%1$d righe × %2$d colonne · %3$d di %4$d posti occupati</string>
+    <string name="classroom_set_up">Configura</string>
+    <string name="classroom_resize">Ridimensiona</string>
+    <string name="classroom_seating_empty">Imposti una griglia di posti, poi tocchi un posto per collocarvi uno studente. Gli insegnanti che tengono qui la piantina sono quelli che non la ridisegnano su carta ogni quadrimestre.</string>
+    <string name="classroom_empty_desk">Vuoto</string>
+    <string name="classroom_not_seated">Ancora senza posto</string>
+    <string name="classroom_next_free_desk">Prossimo posto libero</string>
+    <string name="classroom_seating_grid">Griglia dei posti</string>
+    <string name="classroom_apply">Applica</string>
+    <string name="classroom_rows">Righe</string>
+    <string name="classroom_columns">Colonne</string>
+    <string name="classroom_desk_number">Posto %1$d</string>
+    <string name="classroom_seat">Posto</string>
+    <string name="classroom_move_here">Sposta qui</string>
+    <string name="classroom_student_name">Nome dello studente</string>
+    <string name="classroom_seat_help">Digiti un nome presente nell\'elenco. Lasci vuoto per liberare questo posto.</string>
+    <string name="classroom_student_not_found">Nessuno studente in questo elenco si chiama “%1$s”.</string>
+
+    <string name="classroom_reports_eyebrow">Pronto da condividere</string>
+    <string name="classroom_reports_headline">Esporta questa classe</string>
+    <string name="classroom_reports_ready">Registro dei voti, report stampabile e copia di sicurezza sono pronti.</string>
+    <string name="classroom_reports_locked">I suoi dati restano leggibili; sblocchi la versione per esportarli o salvarne una copia.</string>
+    <string name="classroom_csv_rows">Righe CSV</string>
+    <string name="classroom_assignments_label">Compiti</string>
+    <string name="classroom_backups_label">Copia di sicurezza pronta</string>
+    <string name="classroom_csv_title">Foglio di calcolo (CSV)</string>
+    <string name="classroom_csv_body">Una riga per studente, una colonna per compito, poi la media di ogni categoria e quella complessiva. Viene scritto solo ciò che ha registrato: una cella non valutata resta vuota e un nome che contiene una virgola o una virgoletta viene racchiuso tra virgolette, così il file si apre comunque.</string>
+    <string name="classroom_export_grade_sheet">Esporta il registro dei voti</string>
+    <string name="classroom_pdf_title">Report stampabile (PDF)</string>
+    <string name="classroom_pdf_body">L\'intera classe su un unico foglio, con la regola di arrotondamento e quella dei compiti non consegnati stampate sopra, così un report consegnato si spiega da sé. Ogni studente ha anche il proprio report.</string>
+    <string name="classroom_export_class_report">Esporta il report della classe</string>
+    <string name="classroom_backup_title">Copia di sicurezza e ripristino</string>
+    <string name="classroom_backup_body">Una copia di sicurezza è un unico file che contiene ogni classe, studente, voto, presenza, annotazione, contatto e piantina dei posti. Il ripristino sostituisce ciò che è sul dispositivo con il contenuto del file e rifiuta un file che non riconosce, invece di modificare qualcosa.</string>
+    <string name="classroom_backup">Salva copia</string>
+    <string name="classroom_restore">Ripristina</string>
+    <string name="classroom_export_locked">Esportazione e copia di sicurezza fanno parte dello sblocco una tantum. Tutto ciò che ha registrato resta leggibile in ogni caso.</string>
+    <string name="classroom_inventory_title">Questa classe contiene</string>
+    <plurals name="classroom_students_count">
+        <item quantity="one">%1$d studente</item>
+        <item quantity="other">%1$d studenti</item>
+    </plurals>
+    <plurals name="classroom_assignments_count">
+        <item quantity="one">%1$d compito</item>
+        <item quantity="other">%1$d compiti</item>
+    </plurals>
+    <plurals name="classroom_marks_count">
+        <item quantity="one">%1$d voto</item>
+        <item quantity="other">%1$d voti</item>
+    </plurals>
+    <plurals name="classroom_attendance_records_count">
+        <item quantity="one">%1$d presenza registrata</item>
+        <item quantity="other">%1$d presenze registrate</item>
+    </plurals>
+    <plurals name="classroom_notes_count">
+        <item quantity="one">%1$d annotazione</item>
+        <item quantity="other">%1$d annotazioni</item>
+    </plurals>
+    <plurals name="classroom_contacts_count">
+        <item quantity="one">%1$d contatto con i genitori</item>
+        <item quantity="other">%1$d contatti con i genitori</item>
+    </plurals>
+
+    <string name="classroom_setup_eyebrow">Regole della classe</string>
+    <string name="classroom_setup_headline">Come questa classe calcola i voti</string>
+    <string name="classroom_setup_supporting">Tenga espliciti i dettagli della classe, l\'arrotondamento, la regola dei compiti non consegnati e le fasce dei giudizi.</string>
+    <string name="classroom_categories_label">Categorie</string>
+    <string name="classroom_grade_bands_label">Fasce dei voti</string>
+    <string name="classroom_class_details">Dettagli della classe</string>
+    <string name="classroom_no_subject">Nessuna materia impostata</string>
+    <string name="classroom_period_value">Ora di lezione %1$s</string>
+    <string name="classroom_no_term">Nessun quadrimestre impostato</string>
+    <string name="classroom_separator"> · </string>
+    <string name="classroom_rounding">Arrotondamento</string>
+    <string name="classroom_round_half_up">Da 0,5 in su</string>
+    <string name="classroom_round_half_even">Al pari</string>
+    <string name="classroom_round_floor">Troncamento</string>
+    <plurals name="classroom_decimals">
+        <item quantity="one">%1$d decimale</item>
+        <item quantity="other">%1$d decimali</item>
+    </plurals>
+    <string name="classroom_rounding_help">Mostrato accanto a ogni media, perché gli stessi voti danno un numero diverso con una regola diversa.</string>
+    <string name="classroom_missing_work_title">Compiti non consegnati</string>
+    <string name="classroom_missing_counts_zero">Un voto mancante conta come zero</string>
+    <string name="classroom_missing_excluded">Un voto mancante è escluso dalla media</string>
+    <string name="classroom_exempt_help">Il lavoro esonerato è sempre escluso. Una cella non valutata non conta in nessuno dei due modi.</string>
+    <string name="classroom_letter_grades">Giudizi in lettere</string>
+    <string name="classroom_letter_grades_empty">Non è impostata alcuna scala di lettere, quindi vengono mostrate solo le percentuali. Aggiunga una fascia per trasformare una percentuale nella lettera usata dalla scuola.</string>
+    <string name="classroom_grade_band">%1$s da %2$s%%</string>
+    <string name="classroom_remove">Rimuovi</string>
+    <string name="classroom_add_band">Aggiungi una fascia</string>
+    <string name="classroom_delete_class_title">Elimina questa classe</string>
+    <string name="classroom_delete_class_warning">L\'eliminazione rimuove la classe e tutto ciò che vi è registrato. Salvi prima una copia di sicurezza del registro se c\'è anche solo la possibilità che le serva.</string>
+    <string name="classroom_delete_named_action">Elimina %1$s</string>
+    <string name="classroom_class_name">Nome della classe</string>
+    <string name="classroom_subject">Materia</string>
+    <string name="classroom_period">Ora di lezione</string>
+    <string name="classroom_term">Quadrimestre</string>
+    <string name="classroom_add_letter_band">Aggiungi una fascia di lettere</string>
+    <string name="classroom_letter">Lettera</string>
+    <string name="classroom_letter_example">Ad esempio A, B+ o 4</string>
+    <string name="classroom_from_percent">Da questa percentuale</string>
+    <string name="classroom_band_invalid">Una fascia richiede una lettera e una percentuale.</string>
+    <string name="classroom_delete_class">Elimina la classe</string>
+    <plurals name="classroom_delete_class_body">
+        <item quantity="one">Verranno rimossi %1$d studente e tutto ciò che è registrato su di lui: voti, presenze, annotazioni, contatti e piantina dei posti. L\'operazione non può essere annullata.</item>
+        <item quantity="other">Verranno rimossi %1$d studenti e tutto ciò che è registrato su di loro: voti, presenze, annotazioni, contatti e piantina dei posti. L\'operazione non può essere annullata.</item>
+    </plurals>
+    <plurals name="rounding_half_up"><item quantity="one">arrotondato per eccesso a %1$d decimale</item><item quantity="other">arrotondato per eccesso a %1$d decimali</item></plurals><plurals name="rounding_half_even"><item quantity="one">arrotondato al pari a %1$d decimale</item><item quantity="other">arrotondato al pari a %1$d decimali</item></plurals><plurals name="rounding_floor"><item quantity="one">troncato a %1$d decimale</item><item quantity="other">troncato a %1$d decimali</item></plurals>
+    <string name="edit_class_needs_name">Una classe deve avere un nome.</string><string name="edit_class_gone">Questa classe non esiste più.</string><string name="edit_student_needs_name">Uno studente deve avere un nome.</string><string name="edit_student_gone">Questo studente non è più in questo elenco.</string><string name="edit_category_needs_name">Una categoria deve avere un nome.</string><string name="edit_category_weight_not_positive">Il peso di una categoria deve essere maggiore di zero.</string><string name="edit_drop_lowest_negative">Il numero di voti più bassi da scartare non può essere negativo.</string><string name="edit_category_gone">Questa categoria non esiste più.</string><string name="edit_category_already_at_end">Questa categoria è già alla fine dell’elenco.</string><string name="edit_assignment_needs_name">Un compito deve avere un nome.</string><string name="edit_assignment_points_not_positive">I punti di un compito devono essere maggiori di zero.</string><string name="edit_assignment_gone">Questo compito non esiste più.</string><string name="edit_earned_points_negative">I punti ottenuti non possono essere negativi.</string><string name="edit_earned_points_above_maximum">I punti ottenuti non possono superare i %1$s punti del compito.</string><string name="edit_note_needs_text">Un’annotazione deve contenere del testo.</string><string name="edit_note_gone">Questa annotazione non esiste più.</string><string name="edit_contact_needs_channel">Un contatto deve avere un canale.</string><string name="edit_contact_needs_summary">Un contatto deve avere un riepilogo.</string><string name="edit_contact_gone">Questo contatto non esiste più.</string><string name="edit_seating_grid_negative">Una griglia dei posti non può essere negativa.</string><string name="edit_seating_grid_too_large">Una griglia dei posti è limitata a 20 per 20 posti.</string><string name="edit_desk_outside_grid">Questo posto non fa parte della griglia.</string><string name="edit_seating_grid_full">Tutti i posti della griglia sono occupati.</string><string name="csv_student">Studente</string><string name="csv_external_id">ID esterno</string><string name="csv_overall_percent">% complessiva</string><string name="csv_letter">Lettera</string><string name="csv_missing_counted_as_zero">Non consegnato conteggiato come zero</string><string name="csv_rounding">Arrotondamento</string><string name="csv_missing">Non consegnato</string><string name="csv_exempt">Esente</string><string name="csv_yes">sì</string><string name="csv_no">no</string><string name="import_no_name_first_column">nessun nome nella prima colonna</string><string name="report_attendance_present">presente</string><string name="report_attendance_tardy">in ritardo</string><string name="report_attendance_absent_excused">assenza giustificata</string><string name="report_attendance_absent_unexcused">assenza non giustificata</string><string name="report_note_participation">partecipazione</string><string name="report_note_behaviour">comportamento</string><string name="report_note_missing_work">compito non consegnato</string><string name="report_note_general">generale</string>
+</resources>

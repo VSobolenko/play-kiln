@@ -38,7 +38,8 @@ Grow into feature modules only when the OpenSpec design says so.
 - `dataExtractionRules` + backup XML; `enableEdgeToEdge`
 - Theme via `MaterialTheme`; dynamic color optional
 - Previews for non-trivial composables
-- `assembleDebug` before claiming UI works; `bundleRelease` before Play
+- `assembleDebug` before claiming UI works; `bundleRelease` happens in `/release` after the
+  owner's approval, via `scripts/prepare-release.mjs`
 - Run `.cursor/skills/play-compliance/` before status `ready`
 
 ## Don't

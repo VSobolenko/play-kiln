@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "archetype": "ads_led_utility",
+  "payingUser": "A gas fitter or plumbing contractor who sizes fuel-gas runs in the field and already pays for trade tools on Google Play.",
+  "paidUnit": "One non-consumable pro_unlock that removes the interstitial and rewarded ad prompts and lifts the saved-case limit from three to unlimited.",
+  "priceUsd": 4.99,
+  "momentOfPayment": "The paywall is offered when the free saved-case limit is reached or when a case report is requested; the third completed evaluation of a session is where an interstitial may be shown, never on launch.",
+  "distinctnessSentence": "The sizing tool that returns a result for long high-demand runs, gives it in the unit system the user chose, leaves every input editable, cites the code edition and table the user read, shows the multipliers rather than an opined one, and puts no ad over an input.",
+  "evidenceRef": "docs/research/2026-09-24-market-decision.md#22-the-us-pocket-filtered-by-hand--demand-proven-and-a-live-monetisation-window",
+  "day1RevenuePath": "A playable free app earns the first dollar either from an interstitial shown after a completed evaluation or from the one-time pro_unlock bought by a fitter who has hit the three-case free limit.",
+  "killCriteria": {
+    "windowDays": 60,
+    "minInstalls": 300,
+    "minRevenueUsd": 30
+  },
+  "assumptionsUnverified": [
+    "That a trade calculator converts at any price point on Play; the store page shows a badge, never a P&L (market decision section 5).",
+    "That an ads-led posture fits a professional audience that the market decision describes as complaining about ads over input fields.",
+    "That the three-case free limit is reached by enough users to make the paywall offer rather than annoy them."
+  ]
+}

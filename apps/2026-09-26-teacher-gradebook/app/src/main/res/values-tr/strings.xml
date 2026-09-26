@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">Mark Book for Teachers</string>
+    <string name="app_idea" translatable="true">Bir öğretmenin tamamen sahip olduğu, gizli ve çevrimdışı bir not defteri: hesap ya da sunucu olmadan her sınıfı, öğrenciyi, kategoriyi, ödevi, notu, yoklama kaydını, katılım gözlem notunu, veli görüşmesini ve oturma yerini oluşturun, düzenleyin ve silin. Yuvarlama kuralını, teslim edilmeyen ödev kuralını ve dışladığı her kategoriyi söyleyen açıklanabilir bir güncel ortalama görün, CSV ve PDF dışa aktarın ve geri yüklenebilir bir yedek dosya tutun. Yirmi öğrenciye kadar tek sınıf için ücretsiz; tek seferlik kilit açma, kiralama değil.</string>
+</resources>

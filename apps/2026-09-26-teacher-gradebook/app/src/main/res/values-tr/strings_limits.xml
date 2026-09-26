@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="limit_second_class" translatable="true">Ücretsiz sürüm tek sınıf tutar. Tek seferlik kilit açma bu sınırı ve diğer tüm sınırları kaldırır: sınırsız sınıf, sınırsız öğrenci, ağırlıklı kategoriler, dışa aktarma ve yedekleme.</string>
+    <plurals name="limit_student_cap" translatable="true">
+        <item quantity="one">Ücretsiz sürüm bir sınıfta en fazla %1$d öğrenci tutar. Tek seferlik kilit açma bu sınırı ve diğer tüm sınırları kaldırır: sınırsız sınıf, sınırsız öğrenci, ağırlıklı kategoriler, dışa aktarma ve yedekleme.</item>
+        <item quantity="other">Ücretsiz sürüm bir sınıfta en fazla %1$d öğrenci tutar. Tek seferlik kilit açma bu sınırı ve diğer tüm sınırları kaldırır: sınırsız sınıf, sınırsız öğrenci, ağırlıklı kategoriler, dışa aktarma ve yedekleme.</item>
+    </plurals>
+    <string name="limit_single_category" translatable="true">Ücretsiz sürüm tek kategori kullanır, bu yüzden ortalama düz aritmetik ortalamadır. Tek seferlik kilit açma bu sınırı ve diğer tüm sınırları kaldırır: sınırsız sınıf, sınırsız öğrenci, ağırlıklı kategoriler, dışa aktarma ve yedekleme.</string>
+    <string name="limit_export" translatable="true">Not çizelgesini ya da yazdırılabilir bir raporu dışa aktarmak tek seferlik kilit açmaya dahildir; bu kilit tüm ücretsiz sınırları kaldırır: sınırsız sınıf, sınırsız öğrenci ve ağırlıklı kategoriler.</string>
+    <string name="limit_backup" translatable="true">Yedekleme ve geri yükleme tek seferlik kilit açmaya dahildir; bu kilit tüm ücretsiz sınırları kaldırır: sınırsız sınıf, sınırsız öğrenci ve ağırlıklı kategoriler.</string>
+
+    <plurals name="import_imported" translatable="true">
+        <item quantity="one">%1$d öğrenci içe aktarıldı.</item>
+        <item quantity="other">%1$d öğrenci içe aktarıldı.</item>
+    </plurals>
+    <plurals name="import_already_on_roster" translatable="true">
+        <item quantity="one">%1$d satır zaten listedeydi, bu yüzden hiçbir şey iki kez eklenmedi.</item>
+        <item quantity="other">%1$d satır zaten listedeydi, bu yüzden hiçbir şey iki kez eklenmedi.</item>
+    </plurals>
+    <plurals name="import_skipped" translatable="true">
+        <item quantity="one">%1$d satır atlandı: %2$s</item>
+        <item quantity="other">%1$d satır atlandı: %2$s</item>
+    </plurals>
+    <string name="import_skipped_line" translatable="true">%1$d. satır — %2$s</string>
+    <plurals name="import_blocked_by_limit" translatable="true">
+        <item quantity="one">%1$d öğrenci daha sığmadı: ücretsiz sürüm bir sınıfta %2$d öğrenci tutar.</item>
+        <item quantity="other">%1$d öğrenci daha sığmadı: ücretsiz sürüm bir sınıfta %2$d öğrenci tutar.</item>
+    </plurals>
+
+    <plurals name="restore_restored" translatable="true">
+        <item quantity="one">%1$d sınıf geri yüklendi.</item>
+        <item quantity="other">%1$d sınıf geri yüklendi.</item>
+    </plurals>
+
+    <string name="storage_write_failed" translatable="true">Bu değişiklik ekranda görünüyor ama bu cihazın depolamasına yazılamadı.</string>
+
+    <string name="report_student_column" translatable="true">Öğrenci</string>
+    <string name="report_overall_column" translatable="true">Genel</string>
+    <string name="report_class_average" translatable="true">Sınıf ortalaması: %1$s</string>
+    <string name="report_column_key" translatable="true">Sütun anahtarı: M = teslim edilmedi, E = muaf, %1$s = kayıt yok.</string>
+    <string name="report_footer" translatable="true">%1$s · sayfa %2$d · yalnızca bu cihazda tutulan özel bir kayıt, resmî bir karne değildir</string>
+    <string name="report_student_gone" translatable="true">Bu öğrenci artık bu listede değil.</string>
+    <string name="report_school_id" translatable="true">Okul no: %1$s</string>
+    <string name="report_overall" translatable="true">Genel: %1$s</string>
+    <string name="report_period" translatable="true">%1$s. ders saati</string>
+    <string name="report_averages_rule" translatable="true">Ortalamalar %1$s; teslim edilmeyen ödev %2$s.</string>
+    <string name="report_missing_counts_zero" translatable="true">sıfır sayılır</string>
+    <string name="report_missing_counts_excluded" translatable="true">dışarıda bırakılır</string>
+    <string name="report_printed" translatable="true">%1$s tarihinde yazdırıldı · yalnızca bu cihazda tutulan özel kayıt</string>
+    <string name="report_categories" translatable="true">Kategoriler</string>
+    <string name="report_excluded_no_grade" translatable="true">dışarıda bırakıldı (henüz not yok)</string>
+    <string name="report_dropped_lowest" translatable="true">, en düşük %1$d not çıkarıldı</string>
+    <string name="report_missing_count" translatable="true">, %1$d teslim edilmedi</string>
+    <string name="report_exempt_count" translatable="true">, %1$d muaf</string>
+    <string name="report_grades" translatable="true">Notlar</string>
+    <string name="report_missing" translatable="true">teslim edilmedi</string>
+    <string name="report_exempt" translatable="true">muaf</string>
+    <string name="report_attendance" translatable="true">Yoklama</string>
+    <string name="report_notes" translatable="true">Gözlem notları</string>
+    <string name="report_parent_contacts" translatable="true">Veli görüşmeleri</string>
+    <string name="report_follow_up" translatable="true"> (takip %1$s)</string>
+</resources>

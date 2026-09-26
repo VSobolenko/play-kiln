@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">Mark Book for Teachers</string>
+    <string name="app_idea" translatable="true">Un carnet de notes privé et hors ligne qui appartient pleinement à l’enseignant : créez, modifiez et supprimez chaque classe, élève, catégorie, devoir, note, relevé de présence, remarque sur la participation, contact avec les parents et place, sans compte ni serveur. Consultez une moyenne actualisée et explicable qui indique la règle d’arrondi, le traitement des travaux non rendus et chaque catégorie exclue, exportez en CSV et PDF, et conservez un fichier de sauvegarde restaurable. Gratuit pour une classe de 20 élèves maximum ; un seul déblocage, sans abonnement.</string>
+</resources>

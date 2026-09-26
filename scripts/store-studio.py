@@ -21,9 +21,10 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 # --------------------------------------------------------------------------------------
 # Design tokens
@@ -46,11 +47,59 @@ MUTED = (170, 188, 210)
 BEZEL = (13, 18, 27)
 BEZEL_RIM = (126, 148, 176)
 
+PALETTE_DEFAULTS = {
+    "ink": INK, "ink_soft": INK_SOFT, "ink_lift": INK_LIFT,
+    "amber": AMBER, "amber_deep": AMBER_DEEP, "amber_pale": AMBER_PALE,
+    "accent_deep": CYAN_DEEP, "paper": PAPER, "muted": MUTED,
+    "bezel": BEZEL, "bezel_rim": BEZEL_RIM,
+}
+
+
+def resolve_palette(values: dict | None) -> dict[str, tuple[int, int, int]]:
+    """Resolve studio palette roles, retaining the historic palette for omitted roles."""
+    resolved = dict(PALETTE_DEFAULTS)
+    for role, value in (values or {}).items():
+        if role not in resolved:
+            continue
+        if not isinstance(value, str) or not re.fullmatch(r"#[0-9A-Fa-f]{6}", value):
+            raise SystemExit(f"BLOCKED: palette role '{role}' must be a #RRGGBB colour, got {value!r}")
+        resolved[role] = tuple(int(value[index:index + 2], 16) for index in (1, 3, 5))
+    return resolved
+
+
+def apply_palette(palette: dict[str, tuple[int, int, int]]) -> None:
+    """Install one slot's resolved palette for the single-process render pipeline."""
+    global INK, INK_SOFT, INK_LIFT, AMBER, AMBER_DEEP, AMBER_PALE
+    global CYAN_DEEP, PAPER, MUTED, BEZEL, BEZEL_RIM
+    INK, INK_SOFT, INK_LIFT = palette["ink"], palette["ink_soft"], palette["ink_lift"]
+    AMBER, AMBER_DEEP, AMBER_PALE = palette["amber"], palette["amber_deep"], palette["amber_pale"]
+    CYAN_DEEP, PAPER, MUTED = palette["accent_deep"], palette["paper"], palette["muted"]
+    BEZEL, BEZEL_RIM = palette["bezel"], palette["bezel_rim"]
+
 SCREEN_TARGETS = {
     "phone": (6, (1080, 1920)),
     "tablet-7": (4, (1200, 1920)),
     "tablet-10": (4, (1600, 2560)),
 }
+
+# One raw capture per journey shot. The studio composes every screenshot target from exactly these,
+# so a missing one is a hard stop rather than a target to skip.
+REQUIRED_RAW_CAPTURES = 6
+# Every file the studio writes into store/assets: 2 icons, 2 feature graphics, and the screenshot
+# targets above. Asserted against what was actually rendered so a partial pack cannot be written.
+EXPECTED_COMPOSED_ASSETS = 4 + sum(count for count, _ in SCREEN_TARGETS.values())
+
+# A capture that is (near) uniform cannot be a photograph of this app's UI. Every gate in the# factory reads dimensions, mode and byte size, which accept a solid colour rectangle of the right
+# size - and one was accepted as `en-US/phone-01.png` by both `store-kit --validate-only` and
+# `verify-slot --strict-store`. The thresholds sit far below any real screen (the six committed
+# captures carry 1101-1395 distinct colours with a luminance spread of 252), so they reject a blank
+# or solid frame without putting a real one at risk.
+MIN_CAPTURE_COLOURS = 64
+MIN_CAPTURE_LUMA_SPREAD = 64
+
+# Play crops the feature graphic's outer 10% on some surfaces, so no important element may sit
+# there. `render_feature` records what it places and `assert_feature_safe_area` enforces it.
+FEATURE_SAFE_FRACTION = 0.10
 
 FONT_CANDIDATES = (
     "C:/Windows/Fonts/segoeuib.ttf",
@@ -218,9 +267,19 @@ MARK_SHAPE = {
 }
 ADAPTIVE_VIEWPORT_DP = 108.0
 ADAPTIVE_SAFE_RADIUS_DP = 33.0
+# The launcher's *visible* mask: 72dp across inside the 108dp viewport. A preview that masks the
+# full 108dp canvas answers a question no launcher asks; see `adaptive_previews()`.
+ADAPTIVE_VISIBLE_RADIUS_DP = 36.0
 # Deliberately inside the safe radius: the caliper tips sit at the mark's half-extent, and some
 # launcher masks follow the safe circle closely, so a tangent mark would be shaved.
 MARK_FIT_DP = 30.0
+BOOK_SHAPE = {
+    "page_half_width": 0.585, "page_half_height": 0.815, "corner_radius": 0.10,
+    "spine_right": -0.285, "binding_x": -0.435, "binding_radius": 0.045,
+    "binding_y": (-0.40, 0.0, 0.40), "check_width": 0.085,
+    "check_points": ((-0.10, 0.02), (0.07, 0.21), (0.46, -0.26)),
+}
+CURRENT_MARK = "pipe"
 
 
 def mark_geometry(canvas: int) -> dict[str, float]:
@@ -229,9 +288,10 @@ def mark_geometry(canvas: int) -> dict[str, float]:
     return {"center": 0.5 * canvas, **{name: value * unit for name, value in MARK_SHAPE.items()}}
 
 
-def adaptive_mark_half_extent_dp() -> float:
+def adaptive_mark_half_extent_dp(mark: str | None = None) -> float:
     """How far the mark reaches from its centre, in adaptive-viewport dp."""
-    return (MARK_SHAPE["span"] + MARK_SHAPE["line_width"]) * MARK_FIT_DP
+    definition = MARK_REGISTRY[mark or CURRENT_MARK]
+    return definition["reach_fraction"] * MARK_FIT_DP
 
 
 def assert_adaptive_mark_fits() -> None:
@@ -245,8 +305,7 @@ def assert_adaptive_mark_fits() -> None:
         )
 
 
-def draw_mark(draw: ImageDraw.ImageDraw, canvas: int, *, ring: tuple[int, int, int],
-              ink: tuple[int, int, int]) -> None:
+def _draw_pipe(draw: ImageDraw.ImageDraw, canvas: int, colors: dict[str, tuple[int, int, int]]) -> None:
     geometry = mark_geometry(canvas)
     center = geometry["center"]
     radius = geometry["ring_radius"]
@@ -255,31 +314,65 @@ def draw_mark(draw: ImageDraw.ImageDraw, canvas: int, *, ring: tuple[int, int, i
     # The annulus. Drawn as a stroked ellipse so the stroke straddles `radius`.
     draw.ellipse(
         (center - radius, center - radius, center + radius, center + radius),
-        outline=ring,
+        outline=colors["amber"],
         width=round(width),
     )
     # A single sheen arc on the upper left reads as a cylindrical surface.
     sheen_radius = radius - width * 0.18
     draw.arc(
         (center - sheen_radius, center - sheen_radius, center + sheen_radius, center + sheen_radius),
-        start=182, end=268, fill=AMBER_PALE, width=max(2, round(width * 0.16)),
+        start=182, end=268, fill=colors["amber_pale"], width=max(2, round(width * 0.16)),
     )
 
     # The caliper: a dimension line through the bore with end ticks and outward arrowheads.
     span = geometry["span"]
     line_width = round(geometry["line_width"])
     tick_half = geometry["tick_half"]
-    draw.line((center - span, center, center + span, center), fill=ink, width=line_width)
+    draw.line((center - span, center, center + span, center), fill=colors["paper"], width=line_width)
     for direction in (-1, 1):
         edge = center + direction * radius - direction * width / 2
-        draw.line((edge, center - tick_half, edge, center + tick_half), fill=ink, width=line_width)
+        draw.line((edge, center - tick_half, edge, center + tick_half), fill=colors["paper"], width=line_width)
         tip = center + direction * (span + line_width)
         base = center + direction * (span - line_width * 2.6)
         half = tick_half * 0.72
         draw.polygon(
             [(tip, center), (base, center - half), (base, center + half)],
-            fill=ink,
+            fill=colors["paper"],
         )
+
+
+def _draw_book(draw: ImageDraw.ImageDraw, canvas: int, colors: dict[str, tuple[int, int, int]]) -> None:
+    center, unit, shape = canvas * 0.5, canvas * 0.44, BOOK_SHAPE
+    def box(left: float, top: float, right: float, bottom: float) -> tuple[float, float, float, float]:
+        return (center + left * unit, center + top * unit, center + right * unit, center + bottom * unit)
+    draw.rounded_rectangle(box(-shape["page_half_width"], -shape["page_half_height"],
+                               shape["page_half_width"], shape["page_half_height"]),
+                           radius=shape["corner_radius"] * unit, fill=colors["paper"])
+    draw.rounded_rectangle(box(-shape["page_half_width"], -shape["page_half_height"],
+                               shape["spine_right"], shape["page_half_height"]),
+                           radius=shape["corner_radius"] * unit, fill=colors["ink_lift"],
+                           corners=(True, False, False, True))
+    radius = shape["binding_radius"] * unit
+    for y in shape["binding_y"]:
+        x0, y0 = center + shape["binding_x"] * unit, center + y * unit
+        draw.ellipse((x0 - radius, y0 - radius, x0 + radius, y0 + radius), fill=colors["paper"])
+    points = [(center + x * unit, center + y * unit) for x, y in shape["check_points"]]
+    stroke = max(1, round(shape["check_width"] * unit))
+    draw.line(points, fill=colors["amber"], width=stroke, joint="curve")
+    cap = stroke / 2
+    for x, y in (points[0], points[-1]):
+        draw.ellipse((x - cap, y - cap, x + cap, y + cap), fill=colors["amber"])
+
+
+def draw_mark(draw: ImageDraw.ImageDraw, canvas: int, *, ring: tuple[int, int, int] | None = None,
+              ink: tuple[int, int, int] | None = None,
+              colors: dict[str, tuple[int, int, int]] | None = None, mark: str | None = None) -> None:
+    palette = dict(PALETTE_DEFAULTS if colors is None else colors)
+    if ring is not None:
+        palette["amber"] = ring
+    if ink is not None:
+        palette["paper"] = ink
+    MARK_REGISTRY[mark or CURRENT_MARK]["draw"](draw, canvas, palette)
 
 
 def render_icon(listing: dict, studio: dict) -> Image.Image:
@@ -292,12 +385,22 @@ def render_icon(listing: dict, studio: dict) -> Image.Image:
                                               canvas * 0.78, AMBER_DEEP, 88))
     image = Image.alpha_composite(image, blueprint_grid((canvas, canvas), 32, 12))
     draw = ImageDraw.Draw(image)
-    draw_mark(draw, canvas, ring=AMBER, ink=PAPER)
+    draw_mark(draw, canvas, colors={
+        "ink": INK, "ink_soft": INK_SOFT, "ink_lift": INK_LIFT, "amber": AMBER,
+        "amber_deep": AMBER_DEEP, "amber_pale": AMBER_PALE, "accent_deep": CYAN_DEEP,
+        "paper": PAPER, "muted": MUTED, "bezel": BEZEL, "bezel_rim": BEZEL_RIM})
     return image
 
 
 def render_feature(listing: dict, studio: dict, source: Image.Image | None) -> Image.Image:
-    """1024x500. No important element inside the outer 10% - Play crops there."""
+    """1024x500. No important element inside the outer 10% - Play crops there.
+
+    The 10% inset is enforced, not merely intended. An adversarial review measured the device
+    mock-up 18px (3.6%) from the bottom edge and the text column 76px (7.4%) from the left, both
+    inside the band this docstring claims to avoid, so a surface that crops the graphic could cut
+    the device. Every element placed below is recorded in `important` and asserted against the safe
+    box after composition, which turns the promise into a check.
+    """
     width, height = 1024, 500
     image = diagonal_gradient((width, height), INK, INK_SOFT, 104).convert("RGBA")
     image = Image.alpha_composite(image, glow((width, height), (width * 0.80, height * 0.42),
@@ -306,30 +409,42 @@ def render_feature(listing: dict, studio: dict, source: Image.Image | None) -> I
                                               width * 0.40, AMBER_DEEP, 70))
     image = Image.alpha_composite(image, blueprint_grid((width, height), 46, 11))
 
+    margin_x = round(width * FEATURE_SAFE_FRACTION)
+    margin_y = round(height * FEATURE_SAFE_FRACTION)
+    important: list[tuple[str, tuple[int, int, int, int]]] = []
+
     # A real screen, not a drawing: the mock-up is the app's own capture.
     device = None
+    device_x = width - margin_x
     if source is not None:
-        device = device_frame(source, 388, radius=40, bezel=13)
-        device_x = width - 66 - device.width
-        device_y = height - device.height - 18
+        device = device_frame(source, height - 2 * margin_y - 10, radius=40, bezel=13)
+        device_x = width - margin_x - device.width
+        device_y = height - margin_y - device.height
         shadow = Image.new("RGBA", (width, height), (0, 0, 0, 0))
         ImageDraw.Draw(shadow).rounded_rectangle(
             (device_x + 12, device_y + 18, device_x + device.width + 12, device_y + device.height + 18),
             radius=44, fill=(0, 0, 0, 130))
         image = Image.alpha_composite(image, shadow.filter(ImageFilter.GaussianBlur(26)))
         image.alpha_composite(device, (device_x, device_y))
+        # The shadow is decoration and may bleed; the device itself may not.
+        important.append(("device", (device_x, device_y, device_x + device.width,
+                                     device_y + device.height)))
 
     draw = ImageDraw.Draw(image)
-    left = 76
+    left = margin_x
     text_width = (device_x - 40 - left) if device else (width - 2 * left)
     icon = render_icon(listing, studio)
-    image.alpha_composite(icon.resize((92, 92), Image.Resampling.LANCZOS).convert("RGBA"), (left, 74))
+    image.alpha_composite(icon.resize((92, 92), Image.Resampling.LANCZOS).convert("RGBA"),
+                          (left, margin_y + 24))
+    important.append(("icon", (left, margin_y + 24, left + 92, margin_y + 24 + 92)))
 
     name = listing.get("appName", "PlayKiln")
     name_face = font(46, bold=True)
-    y = 196
+    y = margin_y + 146
     for line in wrap(draw, name, name_face, text_width)[:2]:
         draw.text((left + 2, y), line, font=name_face, fill=PAPER)
+        important.append(("name", (left + 2, y, left + 2 + round(draw.textlength(line, font=name_face)),
+                                   y + 46)))
         y += 54
 
     tagline = studio.get("featureTagline") or listing["locales"]["en-US"]["shortDescription"]
@@ -337,6 +452,8 @@ def render_feature(listing: dict, studio: dict, source: Image.Image | None) -> I
     y += 6
     for line in wrap(draw, tagline, body_face, text_width)[:2]:
         draw.text((left + 2, y), line, font=body_face, fill=MUTED)
+        important.append(("tagline", (left + 2, y, left + 2 + round(draw.textlength(line, font=body_face)),
+                                      y + 24)))
         y += 34
 
     # A small honest positioning pill: both claims are true of this app.
@@ -347,7 +464,28 @@ def render_feature(listing: dict, studio: dict, source: Image.Image | None) -> I
     draw.rounded_rectangle((left, pill_y, left + pill_width, pill_y + 38), radius=19,
                            fill=(AMBER[0], AMBER[1], AMBER[2], 40), outline=AMBER, width=2)
     draw.text((left + 17, pill_y + 10), pill_text, font=pill_face, fill=AMBER_PALE)
+    important.append(("pill", (left, pill_y, left + pill_width, pill_y + 38)))
+
+    assert_feature_safe_area(image.size, important)
     return image.convert("RGB")
+
+
+def assert_feature_safe_area(
+    size: tuple[int, int], important: list[tuple[str, tuple[int, int, int, int]]]
+) -> None:
+    """Fail if any important element leaves the outer 10% band Play may crop."""
+    width, height = size
+    margin_x = round(width * FEATURE_SAFE_FRACTION)
+    margin_y = round(height * FEATURE_SAFE_FRACTION)
+    for label, (x0, y0, x1, y1) in important:
+        # Rounding to whole pixels means an element may land exactly on the boundary; allow 1px.
+        if x0 < margin_x - 1 or y0 < margin_y - 1 or x1 > width - margin_x + 1 or y1 > height - margin_y + 1:
+            raise SystemExit(
+                f"BLOCKED: the feature graphic's {label} spans x=[{x0}, {x1}] y=[{y0}, {y1}], "
+                f"outside the safe box x=[{margin_x}, {width - margin_x}] "
+                f"y=[{margin_y}, {height - margin_y}]. Play crops the outer "
+                f"{FEATURE_SAFE_FRACTION:.0%} on some surfaces, so this element could be cut."
+            )
 
 
 def device_frame(source: Image.Image, outer_height: int, *, radius: int, bezel: int) -> Image.Image:
@@ -445,14 +583,13 @@ def _ring_path(center: float, outer: float, inner: float) -> str:
     )
 
 
-def lasercut_paths() -> dict[str, str]:
+def _pipe_vector_paths(unit: float, colors: dict | None = None) -> dict[str, str]:
     """Mark paths in the 108dp adaptive viewport, fitting the 66dp safe zone.
 
     Derived from the same `MARK_SHAPE` fractions as the raster icon, so the outline is the same
     shape; only the scale differs, and `assert_adaptive_mark_fits` bounds it.
     """
     center = ADAPTIVE_VIEWPORT_DP / 2
-    unit = MARK_FIT_DP
     ring_radius = MARK_SHAPE["ring_radius"] * unit
     ring_width = MARK_SHAPE["ring_width"] * unit
     ring_outer = ring_radius + ring_width / 2
@@ -484,6 +621,63 @@ def lasercut_paths() -> dict[str, str]:
     return paths
 
 
+def _rounded_rect_path(cx: float, cy: float, half_w: float, half_h: float, radius: float) -> str:
+    return (f"M{cx-half_w+radius:.2f},{cy-half_h:.2f}H{cx+half_w-radius:.2f}"
+            f"A{radius:.2f},{radius:.2f} 0 0,1 {cx+half_w:.2f},{cy-half_h+radius:.2f}"
+            f"V{cy+half_h-radius:.2f}A{radius:.2f},{radius:.2f} 0 0,1 {cx+half_w-radius:.2f},{cy+half_h:.2f}"
+            f"H{cx-half_w+radius:.2f}A{radius:.2f},{radius:.2f} 0 0,1 {cx-half_w:.2f},{cy+half_h-radius:.2f}"
+            f"V{cy-half_h+radius:.2f}A{radius:.2f},{radius:.2f} 0 0,1 {cx-half_w+radius:.2f},{cy-half_h:.2f}Z")
+
+
+def _check_polygon(points: tuple[tuple[float, float], ...], half_width: float) -> list[tuple[float, float]]:
+    def normal(a, b):
+        dx, dy = b[0] - a[0], b[1] - a[1]
+        length = math.hypot(dx, dy)
+        return (-dy / length * half_width, dx / length * half_width)
+    n1, n2 = normal(points[0], points[1]), normal(points[1], points[2])
+    join = ((n1[0] + n2[0]) / 2, (n1[1] + n2[1]) / 2)
+    return [(points[0][0]+n1[0], points[0][1]+n1[1]),
+            (points[1][0]+join[0], points[1][1]+join[1]),
+            (points[2][0]+n2[0], points[2][1]+n2[1]),
+            (points[2][0]-n2[0], points[2][1]-n2[1]),
+            (points[1][0]-join[0], points[1][1]-join[1]),
+            (points[0][0]-n1[0], points[0][1]-n1[1])]
+
+
+def _book_vector_paths(unit: float, colors: dict | None = None) -> dict[str, str]:
+    c, s = ADAPTIVE_VIEWPORT_DP / 2, BOOK_SHAPE
+    page = _rounded_rect_path(c, c, s["page_half_width"]*unit, s["page_half_height"]*unit,
+                              s["corner_radius"]*unit)
+    binding = ""
+    for y in s["binding_y"]:
+        x0, y0, r = c+s["binding_x"]*unit, c+y*unit, s["binding_radius"]*unit
+        circle = (f"M{x0-r:.2f},{y0:.2f}a{r:.2f},{r:.2f} 0 1,0 {2*r:.2f},0"
+                  f"a{r:.2f},{r:.2f} 0 1,0 {-2*r:.2f},0Z")
+        page += circle
+        binding += circle
+    left, right = c-s["page_half_width"]*unit, c+s["spine_right"]*unit
+    top, bottom, r = c-s["page_half_height"]*unit, c+s["page_half_height"]*unit, s["corner_radius"]*unit
+    spine = (f"M{left+r:.2f},{top:.2f}H{right:.2f}V{bottom:.2f}H{left+r:.2f}"
+             f"A{r:.2f},{r:.2f} 0 0,1 {left:.2f},{bottom-r:.2f}V{top+r:.2f}"
+             f"A{r:.2f},{r:.2f} 0 0,1 {left+r:.2f},{top:.2f}Z") + binding
+    scaled = tuple((c+x*unit, c+y*unit) for x, y in s["check_points"])
+    check = "M" + "L".join(f"{x:.2f},{y:.2f}" for x, y in _check_polygon(scaled, s["check_width"]*unit/2)) + "Z"
+    return {"page": page, "spine": spine, "binding": binding, "check": check}
+
+
+MARK_REGISTRY = {
+    "pipe": {"raster_half_extent_fraction": MARK_HALF_EXTENT_FRACTION, "reach_fraction": 1.0,
+             "draw": _draw_pipe, "vector_paths": _pipe_vector_paths, "shape": MARK_SHAPE},
+    "mark-book": {"raster_half_extent_fraction": 0.44,
+                  "reach_fraction": math.hypot(0.585, 0.815),
+                  "draw": _draw_book, "vector_paths": _book_vector_paths, "shape": BOOK_SHAPE},
+}
+
+
+def lasercut_paths(mark: str | None = None) -> dict[str, str]:
+    return MARK_REGISTRY[mark or CURRENT_MARK]["vector_paths"](MARK_FIT_DP, None)
+
+
 def write_vectors(res: Path, colors: dict[str, str]) -> list[Path]:
     assert_adaptive_mark_fits()
     paths = lasercut_paths()
@@ -510,6 +704,29 @@ def write_vectors(res: Path, colors: dict[str, str]) -> list[Path]:
         android:pathData="M0,92L58,34L86,62L108,40V108H0Z" />
 </vector>
 """
+    if CURRENT_MARK == "pipe":
+        foreground_paths = f'''    <path
+        android:fillColor="{colors['amber']}"
+        android:fillType="evenOdd"
+        android:pathData="{paths['ring']}" />
+    <path
+        android:fillColor="{colors['paper']}"
+        android:pathData="{paths['line']}{paths['ticks']}{paths['arrows']}" />'''
+        monochrome_paths = f'''    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="{paths['ring']}" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="{paths['line']}{paths['ticks']}{paths['arrows']}" />'''
+    else:
+        foreground_paths = f'''    <path android:fillColor="{colors['paper']}" android:fillType="evenOdd" android:pathData="{paths['page']}" />
+    <path android:fillColor="{colors['ink_lift']}" android:fillType="evenOdd" android:pathData="{paths['spine']}" />
+    <path android:fillColor="{colors['paper']}" android:pathData="{paths['binding']}" />
+    <path android:fillColor="{colors['amber']}" android:pathData="{paths['check']}" />'''
+        monochrome_paths = f'''    <path android:fillColor="#FFFFFFFF" android:fillType="evenOdd" android:pathData="{paths['page']}" />
+    <path android:fillColor="#FFFFFFFF" android:fillType="evenOdd" android:pathData="{paths['spine']}" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="{paths['check']}" />'''
     foreground = f"""<?xml version="1.0" encoding="utf-8"?>
 <!-- Generated by scripts/store-studio.py. Do not hand-edit: re-run the studio. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -517,13 +734,7 @@ def write_vectors(res: Path, colors: dict[str, str]) -> list[Path]:
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path
-        android:fillColor="{colors['amber']}"
-        android:fillType="evenOdd"
-        android:pathData="{paths['ring']}" />
-    <path
-        android:fillColor="{colors['paper']}"
-        android:pathData="{paths['line']}{paths['ticks']}{paths['arrows']}" />
+{foreground_paths}
 </vector>
 """
     monochrome = f"""<?xml version="1.0" encoding="utf-8"?>
@@ -533,13 +744,7 @@ def write_vectors(res: Path, colors: dict[str, str]) -> list[Path]:
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:fillType="evenOdd"
-        android:pathData="{paths['ring']}" />
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="{paths['line']}{paths['ticks']}{paths['arrows']}" />
+{monochrome_paths}
 </vector>
 """
     written = []
@@ -587,15 +792,48 @@ def load_shots(store: Path) -> list[dict]:
     return journey.get("shots", [])[:6]
 
 
+def assert_capture_is_plausible(path: Path, image: Image.Image) -> None:
+    """Reject a frame that cannot be a screen of this app.
+
+    A PNG that is one flat colour has the right dimensions, the right mode and a plausible byte
+    size, so every gate in the factory accepts it. Composing is the cheapest place to stop it.
+    """
+    colours = image.getcolors(maxcolors=MIN_CAPTURE_COLOURS + 1)
+    distinct = len(colours) if colours is not None else MIN_CAPTURE_COLOURS + 1
+    low, high = image.convert("L").getextrema()
+    spread = high - low
+    if distinct < MIN_CAPTURE_COLOURS or spread < MIN_CAPTURE_LUMA_SPREAD:
+        raise SystemExit(
+            f"BLOCKED: raw capture {path} is (near) uniform - {distinct} distinct colour(s), "
+            f"luminance spread {spread}. A real screen of this app carries at least "
+            f"{MIN_CAPTURE_COLOURS} colours with a spread of at least {MIN_CAPTURE_LUMA_SPREAD}, "
+            "so this file is not a screenshot. Re-run the capture."
+        )
+
+
 def load_raw(store: Path, index: int) -> Image.Image | None:
+    """Load raw capture `index`, or `None` when the file is simply absent.
+
+    An existing-but-unreadable file is fatal rather than skipped. A truncated PNG is the ordinary
+    result of an interrupted copy, and treating it as "missing" is how a pack once got composed
+    from two different capture runs while every gate still reported OK: the skipped target kept the
+    PREVIOUS run's file, and the result passed both `store-kit --validate-only` and
+    `verify-slot --strict-store`.
+    """
     for candidate in (f"{index:02d}.png", f"phone-{index:02d}.png"):
         path = store / "captures" / "raw" / candidate
         if path.is_file():
             try:
                 with Image.open(path) as source:
-                    return source.convert("RGB")
+                    image = source.convert("RGB")
             except OSError as error:
-                print(f"WARN studio - ignoring unreadable capture {path.name}: {error}")
+                raise SystemExit(
+                    f"BLOCKED: raw capture {path} exists but cannot be read ({error}). Delete it "
+                    "and re-run the capture; composing around it would mix two capture runs into "
+                    "one store pack."
+                ) from error
+            assert_capture_is_plausible(path, image)
+            return image
     return None
 
 
@@ -608,13 +846,26 @@ def default_studio(listing: dict) -> dict:
     }
 
 
-def render_slot(slot: Path, *, preview_circle: bool = False) -> None:
+def render_slot(slot: Path, *, preview_circle: bool = False, identity_only: bool = False) -> None:
+    global CURRENT_MARK
     store = slot / "store"
     listing = json.loads((store / "listing.json").read_text(encoding="utf-8"))
     studio_path = store / "studio.json"
+    if not studio_path.is_file():
+        raise SystemExit(
+            f"BLOCKED: {studio_path} is missing. It supplies the headlines, kickers and palette "
+            "every composed asset is built from, so rendering without it silently falls back to "
+            "the journey titles: the whole pack changes while `graphics.md` keeps claiming the "
+            "media is composed to this slot's identity. Restore the file, or move the slot to the "
+            "generic renderer deliberately instead of downgrading it by deletion."
+        )
     studio = default_studio(listing)
-    if studio_path.is_file():
-        studio.update(json.loads(studio_path.read_text(encoding="utf-8")))
+    studio.update(json.loads(studio_path.read_text(encoding="utf-8")))
+    palette = resolve_palette(studio.get("palette"))
+    apply_palette(palette)
+    CURRENT_MARK = studio.get("mark", "pipe")
+    if CURRENT_MARK not in MARK_REGISTRY:
+        raise SystemExit(f"BLOCKED: unknown studio mark {CURRENT_MARK!r}; choose one of {', '.join(MARK_REGISTRY)}")
 
     shots = load_shots(store)
     headlines = studio.get("headlines") or []
@@ -627,77 +878,318 @@ def render_slot(slot: Path, *, preview_circle: bool = False) -> None:
             "kicker": (kickers[index] if index < len(kickers) else ""),
         })
 
+    # Every capture must be present and readable BEFORE anything is written, and the whole set is
+    # rendered in memory before a single file is replaced. The old code wrote each target as it
+    # went and `continue`d past a missing capture, so an incomplete capture set produced a pack
+    # that was half this run and half the previous one - and no gate noticed, because every gate
+    # checks dimensions and mode, not provenance of the pixels.
+    sources = ([] if identity_only else
+               [load_raw(store, index) for index in range(1, REQUIRED_RAW_CAPTURES + 1)])
+    absent = [index for index, source in enumerate(sources, start=1) if source is None]
+    if absent:
+        raise SystemExit(
+            "BLOCKED: no readable raw capture for "
+            + ", ".join(f"{index:02d}.png" for index in absent)
+            + f" under {store / 'captures' / 'raw'}. All "
+            f"{sum(count for count, _ in SCREEN_TARGETS.values())} screenshots are composed from "
+            f"the {REQUIRED_RAW_CAPTURES} captures, so rendering with one missing would ship a "
+            "pack that mixes two capture runs. Re-run the capture first: "
+            "node scripts/media-capture.mjs --slot <slug>"
+        )
+
+    sizes = {source.size for source in sources if source is not None}
+    if len(sizes) > 1:
+        raise SystemExit(
+            "BLOCKED: the raw captures disagree on size ("
+            + ", ".join(f"{w}x{h}" for w, h in sorted(sizes))
+            + "). One journey runs on one device, so a mixed set means these files came from "
+            "different capture runs; re-run the capture to replace the whole set."
+        )
+
     icon = render_icon(listing, studio)
     assets = store / "assets"
     assets.mkdir(parents=True, exist_ok=True)
-
     icon_targets = [assets / "icon-512.png", assets / "en-US" / "icon-512.png"]
+    feature_targets = [assets / "feature-graphic-1024x500.png",
+                       assets / "en-US" / "feature-graphic-1024x500.png"]
+    feature_source = None if identity_only else sources[0]
+    composed_items = [item for item in composed if item["headline"]]
+    # (target, image, label) in write order. Nothing touches disk until the whole list is built.
+    renders: list[tuple[Path, object, str]] = []
     for target in icon_targets:
-        target.parent.mkdir(parents=True, exist_ok=True)
         # Saved as RGBA to match the mode store-kit validates and Play's expectation. The icon is
         # full-bleed, so every pixel is opaque and the alpha channel is uniform - it carries no
         # transparency, it just declares the channel.
-        icon.convert("RGBA").save(target, format="PNG", optimize=True, compress_level=9)
-        print(f"PASS studio - {target.relative_to(slot)} (512x512 RGBA)")
-
-    sources = [load_raw(store, index) for index in range(1, 7)]
-    feature_source = next((source for source in sources if source is not None), None)
-    feature_targets = [assets / "feature-graphic-1024x500.png",
-                       assets / "en-US" / "feature-graphic-1024x500.png"]
+        renders.append((target, icon.convert("RGBA"), "512x512 RGBA"))
     for target in feature_targets:
-        render_feature(listing, studio, feature_source).save(target, format="PNG",
-                                                            optimize=True, compress_level=9)
-        print(f"PASS studio - {target.relative_to(slot)} (1024x500)")
+        renders.append((target, render_feature(listing, studio, feature_source), "1024x500"))
+    if not identity_only:
+        for kind, (count, dimensions) in SCREEN_TARGETS.items():
+            for index in range(1, count + 1):
+                source = sources[(index - 1) % len(sources)]
+                item = composed_items[(index - 1) % len(composed_items)] if composed_items else {
+                    "headline": "", "body": "", "kicker": ""}
+                target = assets / "en-US" / f"{kind}-{index:02d}.png"
+                renders.append(
+                    (target, render_screenshot(dimensions, item, source),
+                     f"{dimensions[0]}x{dimensions[1]}")
+                )
 
-    composed_only = [item for item in composed if item["headline"]]
-    for kind, (count, dimensions) in SCREEN_TARGETS.items():
-        for index in range(1, count + 1):
-            source = sources[(index - 1) % 6] if sources else None
-            if source is None:
-                print(f"WARN studio - no raw capture for {kind}-{index:02d}; skipped")
-                continue
-            item = composed_only[(index - 1) % len(composed_only)] if composed_only else {
-                "headline": "", "body": "", "kicker": ""}
-            target = assets / "en-US" / f"{kind}-{index:02d}.png"
-            render_screenshot(dimensions, item, source).save(target, format="PNG",
-                                                             optimize=True, compress_level=9)
-            print(f"PASS studio - {target.relative_to(slot)} ({dimensions[0]}x{dimensions[1]})")
+    # A pack is all-or-nothing, so the count is asserted before anything is written. A mismatch
+    # means this function and the inventory that describes it have diverged, and shipping the
+    # partial set is exactly the failure mode above.
+    expected = 4 if identity_only else EXPECTED_COMPOSED_ASSETS
+    if len(renders) != expected:
+        raise SystemExit(
+            f"BLOCKED: the studio rendered {len(renders)} assets but the pack must contain "
+            f"{expected}. Refusing to write a partial pack."
+        )
 
-    colors = {
-        "ink": hex_of(INK),
-        "ink_lift": hex_of(INK_LIFT),
-        "amber": hex_of(AMBER),
-        "paper": hex_of(PAPER),
-    }
+    for target, image, label in renders:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        image.save(target, format="PNG", optimize=True, compress_level=9)  # type: ignore[attr-defined]
+        print(f"PASS studio - {target.relative_to(slot)} ({label})")
+
+    colors = {role: hex_of(value) for role, value in palette.items()}
     for path in write_vectors(slot / "app" / "src" / "main" / "res", colors):
         print(f"PASS studio - {path.relative_to(slot)}")
 
     if preview_circle:
         preview_dir = store / "captures" / "preview"
         preview_dir.mkdir(parents=True, exist_ok=True)
-        for name, mask in preview_masks(icon).items():
-            preview = Image.alpha_composite(icon.copy(), mask)
-            preview.convert("RGB").save(preview_dir / f"icon-{name}.png")
-            print(f"PASS studio - preview icon-{name}.png")
+        previews = adaptive_previews()
+        for name, preview in previews.items():
+            preview.save(preview_dir / name, format="PNG", optimize=True)
+            print(f"PASS studio - preview {name}")
+        # `captures/` is gitignored evidence, and a stale preview is worse than none: the previous
+        # misleading `icon-circle.png`/`icon-squircle.png` names must not survive this run and be
+        # read as current.
+        for stale in preview_dir.glob("icon-*.png"):
+            if stale.name not in previews:
+                stale.unlink()
+                print(f"PASS studio - removed stale preview {stale.name}")
+    if identity_only:
+        print("UNVERIFIED studio - screenshot targets were not rendered because --identity-only skips raw captures")
 
 
-def preview_masks(icon: Image.Image) -> dict[str, Image.Image]:
-    """Composite the icon under the two launcher masks, which is how a user actually sees it."""
-    size = icon.size
-    layers: dict[str, Image.Image] = {}
-    shapes = {
-        "circle": lambda draw: draw.ellipse((0, 0, size[0] - 1, size[1] - 1), fill=255),
-        "squircle": lambda draw: draw.rounded_rectangle((0, 0, size[0] - 1, size[1] - 1),
-                                                        radius=size[0] // 4, fill=255),
+# --------------------------------------------------------------------------------------
+# Launcher-mask previews
+#
+# `store/captures/preview/` is evidence for a reviewer, not a Play asset, so it has to show what a
+# launcher actually draws. The shipped icon is the adaptive vector from `lasercut_paths()`, whose
+# foreground is fitted to a 30dp reach, and the real mask is the 72dp circle (36dp radius) inside
+# the 108dp viewport. The previous previews masked the 512px listing raster across the full canvas,
+# which measures 0.358 * 108 = 38.7dp of reach - so they drew a mark a real mask WOULD clip and
+# implied it was safe. These previews rasterise the same path data `write_vectors` writes.
+# --------------------------------------------------------------------------------------
+
+PREVIEW_PX_PER_DP = 10
+PREVIEW_CANVAS_PX = round(ADAPTIVE_VIEWPORT_DP * PREVIEW_PX_PER_DP)  # 1080px for the 108dp canvas
+PREVIEW_OUTSIDE = (12, 14, 18, 255)  # what the launcher shows outside the mask
+PREVIEW_ARC_SAMPLES = 64
+# Mirrors the translucent shape in the background drawable that `write_vectors` emits.
+_PREVIEW_HIGHLIGHT_PATH = "M0,92L58,34L86,62L108,40V108H0Z"
+_PREVIEW_TOKEN = re.compile(r"([MmLlHhVvAaZz])|(-?\d*\.?\d+)")
+
+
+def _preview_arc(
+    x1: float, y1: float, x2: float, y2: float, radius: float, large: float, sweep: float
+) -> list[tuple[float, float]]:
+    """Sample a circular arc. `lasercut_paths()` only emits `a rx,rx`, so ry is `radius`."""
+    mx, my = (x1 + x2) / 2.0, (y1 + y2) / 2.0
+    dxr, dyr = (x1 - x2) / 2.0, (y1 - y2) / 2.0
+    chord = math.hypot(dxr, dyr)
+    h = math.sqrt(max(0.0, radius * radius - chord * chord))
+    if large == sweep:
+        h = -h
+    cx = mx + h * dyr / chord if chord else mx
+    cy = my - h * dxr / chord if chord else my
+    a1 = math.atan2(y1 - cy, x1 - cx)
+    a2 = math.atan2(y2 - cy, x2 - cx)
+    if sweep == 1 and a2 < a1:
+        a2 += 2 * math.pi
+    if sweep == 0 and a2 > a1:
+        a2 -= 2 * math.pi
+    return [
+        (cx + radius * math.cos(a1 + (a2 - a1) * step / PREVIEW_ARC_SAMPLES),
+         cy + radius * math.sin(a1 + (a2 - a1) * step / PREVIEW_ARC_SAMPLES))
+        for step in range(1, PREVIEW_ARC_SAMPLES + 1)
+    ]
+
+
+def _preview_subpaths(path_data: str, scale: float) -> list[list[tuple[float, float]]]:
+    """Turn the studio's own vector path data into closed polygons, in canvas pixels.
+
+    Understands the command subset `lasercut_paths()` emits - `M/m`, `L/l`, `H/h`, `V/v`, `a` and
+    `Z/z` - including relative forms and repeated coordinates, so the preview cannot drift from the
+    XML it mirrors. A non-circular arc raises instead of being drawn as the wrong shape.
+    """
+    tokens: list[str | float] = []
+    for command, number in _PREVIEW_TOKEN.findall(path_data):
+        tokens.append(command if command else float(number))
+
+    subpaths: list[list[tuple[float, float]]] = []
+    current: list[tuple[float, float]] = []
+    x = y = 0.0
+    start = (0.0, 0.0)
+    command = ""
+    i = 0
+    while i < len(tokens):
+        token = tokens[i]
+        if isinstance(token, str):
+            command = token
+            i += 1
+            if command in "Zz":
+                if len(current) >= 3:
+                    current.append(current[0])
+                    subpaths.append(current)
+                current = []
+                x, y = start
+            continue
+        relative = command.islower()
+        kind = command.upper()
+        if kind == "M":
+            nx, ny = float(tokens[i]), float(tokens[i + 1])
+            x, y = (x + nx, y + ny) if relative else (nx, ny)
+            if len(current) >= 3:
+                subpaths.append(current)
+            current = [(x * scale, y * scale)]
+            start = (x, y)
+            i += 2
+            command = "l" if relative else "L"
+            continue
+        if kind == "L":
+            nx, ny = float(tokens[i]), float(tokens[i + 1])
+            x, y = (x + nx, y + ny) if relative else (nx, ny)
+            current.append((x * scale, y * scale))
+            i += 2
+            continue
+        if kind == "H":
+            nx = float(tokens[i])
+            x = x + nx if relative else nx
+            current.append((x * scale, y * scale))
+            i += 1
+            continue
+        if kind == "V":
+            ny = float(tokens[i])
+            y = y + ny if relative else ny
+            current.append((x * scale, y * scale))
+            i += 1
+            continue
+        if kind == "A":
+            rx, ry, _rotation, large, sweep, ax, ay = (float(t) for t in tokens[i : i + 7])
+            i += 7
+            if abs(rx - ry) > 1e-6:
+                raise SystemExit(
+                    f"BLOCKED: the preview cannot draw the elliptical arc rx={rx} ry={ry}; "
+                    "lasercut_paths() only emits circular arcs."
+                )
+            x2, y2 = (x + ax, y + ay) if relative else (ax, ay)
+            current.extend((px * scale, py * scale) for px, py in _preview_arc(x, y, x2, y2, rx, large, sweep))
+            x, y = x2, y2
+            continue
+        i += 1
+    if len(current) >= 3:
+        subpaths.append(current)
+    return subpaths
+
+
+def _preview_mask(size: int, subpaths: list[list[tuple[float, float]]], *, even_odd: bool) -> Image.Image:
+    """Fill subpaths into an 8-bit mask: even-odd (XOR) for the ring, union for the ink group."""
+    mask = Image.new("L", (size, size), 0)
+    for points in subpaths:
+        layer = Image.new("L", (size, size), 0)
+        ImageDraw.Draw(layer).polygon(points, fill=255)
+        mask = ImageChops.difference(mask, layer) if even_odd else ImageChops.lighter(mask, layer)
+    return mask
+
+
+def render_adaptive_icon() -> Image.Image:
+    """The shipped adaptive icon, rasterised from the vectors `write_vectors` writes."""
+    size = PREVIEW_CANVAS_PX
+    scale = size / ADAPTIVE_VIEWPORT_DP
+    image = diagonal_gradient((size, size), INK, INK_LIFT, 304).convert("RGBA")
+    highlight = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    ImageDraw.Draw(highlight).polygon(
+        [(px * scale, py * scale) for px, py in _preview_points(_PREVIEW_HIGHLIGHT_PATH)],
+        fill=(255, 255, 255, round(0.16 * 255)),
+    )
+    image = Image.alpha_composite(image, highlight)
+
+    paths = lasercut_paths()
+    if CURRENT_MARK == "pipe":
+        ring = _preview_mask(size, _preview_subpaths(paths["ring"], scale), even_odd=True)
+        ink = _preview_mask(size, _preview_subpaths(
+            paths["line"] + paths["ticks"] + paths["arrows"], scale), even_odd=False)
+        image.paste(Image.new("RGBA", (size, size), AMBER + (255,)), (0, 0), ring)
+        image.paste(Image.new("RGBA", (size, size), PAPER + (255,)), (0, 0), ink)
+    else:
+        page = _preview_mask(size, _preview_subpaths(paths["page"], scale), even_odd=True)
+        spine = _preview_mask(size, _preview_subpaths(paths["spine"], scale), even_odd=True)
+        binding = _preview_mask(size, _preview_subpaths(paths["binding"], scale), even_odd=False)
+        check = _preview_mask(size, _preview_subpaths(paths["check"], scale), even_odd=False)
+        image.paste(Image.new("RGBA", (size, size), PAPER + (255,)), (0, 0), page)
+        image.paste(Image.new("RGBA", (size, size), INK_LIFT + (255,)), (0, 0), spine)
+        image.paste(Image.new("RGBA", (size, size), PAPER + (255,)), (0, 0), binding)
+        image.paste(Image.new("RGBA", (size, size), AMBER + (255,)), (0, 0), check)
+    return image
+
+
+def _preview_points(path_data: str) -> list[tuple[float, float]]:
+    """Just the corner points of a polyline path (used for the background highlight)."""
+    return [
+        (px, py)
+        for subpath in _preview_subpaths(path_data, 1.0)
+        for px, py in subpath
+    ]
+
+
+def _under_mask(icon: Image.Image, keep: Image.Image) -> Image.Image:
+    layer = Image.new("RGBA", icon.size, PREVIEW_OUTSIDE)
+    layer.paste(icon, (0, 0), keep)
+    return layer.convert("RGB")
+
+
+def adaptive_previews() -> dict[str, Image.Image]:
+    """What a launcher shows, plus the safe zone the checker asserts.
+
+    The mask is the real 72dp circle / 72dp rounded square, not the 108dp canvas, and the mark is
+    the shipped adaptive foreground fitted to its 30dp reach.
+    """
+    size = PREVIEW_CANVAS_PX
+    icon = render_adaptive_icon()
+    half = size / 2
+    visible = ADAPTIVE_VISIBLE_RADIUS_DP * PREVIEW_PX_PER_DP
+
+    circle_keep = Image.new("L", (size, size), 0)
+    ImageDraw.Draw(circle_keep).ellipse(
+        (half - visible, half - visible, half + visible, half + visible), fill=255)
+
+    squircle_keep = Image.new("L", (size, size), 0)
+    ImageDraw.Draw(squircle_keep).rounded_rectangle(
+        (half - visible, half - visible, half + visible, half + visible),
+        radius=round(visible / 2), fill=255)
+
+    # The 66dp safe zone: tint the band between it and the visible mask, so the margin the checker
+    # reports (`furthest reach 30.00dp`, `3.00dp inside the safe zone`) is visible in the image.
+    safe_radius = ADAPTIVE_SAFE_RADIUS_DP * PREVIEW_PX_PER_DP
+    safe_disc = Image.new("L", (size, size), 0)
+    ImageDraw.Draw(safe_disc).ellipse(
+        (half - safe_radius, half - safe_radius, half + safe_radius, half + safe_radius), fill=255)
+    band = ImageChops.difference(circle_keep, safe_disc)
+    safe = _under_mask(icon, circle_keep).convert("RGBA")
+    tint = Image.new("RGBA", (size, size), (255, 96, 96, 0))
+    tint.putalpha(band.point(lambda value: 72 if value else 0))
+    safe = Image.alpha_composite(safe, tint)
+    ImageDraw.Draw(safe).ellipse(
+        (half - safe_radius, half - safe_radius, half + safe_radius, half + safe_radius),
+        outline=CYAN + (255,), width=3)
+
+    return {
+        "icon-visible-72dp-circle.png": _under_mask(icon, circle_keep),
+        "icon-visible-72dp-squircle.png": _under_mask(icon, squircle_keep),
+        "icon-safe-66dp.png": safe.convert("RGB"),
     }
-    for name, shape in shapes.items():
-        keep = Image.new("L", size, 0)
-        shape(ImageDraw.Draw(keep))
-        # Outside the mask the icon is hidden, so a corner that escapes the safe zone is visible.
-        layer = Image.new("RGBA", size, (12, 14, 18, 255))
-        layer.paste(icon, (0, 0), keep)
-        layers[name] = layer
-    return layers
 
 
 def main() -> None:
@@ -705,10 +1197,14 @@ def main() -> None:
     parser.add_argument("--slot", required=True, help="slot slug, e.g. pipe-sizing")
     parser.add_argument("--root", default=".", help="repository root (default: cwd)")
     parser.add_argument("--preview-circle", action="store_true",
-                        help="also render the icon under the circle and squircle launcher masks")
+                        help="also render the 72dp launcher-mask previews and the 66dp safe-zone preview")
+    parser.add_argument("--identity-only", action="store_true",
+                        help="render only icons, feature graphics, and adaptive vectors; skip captures and exit 2")
     options = parser.parse_args()
     slot = resolve_slot(Path(options.root).resolve(), options.slot)
-    render_slot(slot, preview_circle=options.preview_circle)
+    render_slot(slot, preview_circle=options.preview_circle, identity_only=options.identity_only)
+    if options.identity_only:
+        raise SystemExit(2)
     print(f"STUDIO: OK {slot}")
 
 

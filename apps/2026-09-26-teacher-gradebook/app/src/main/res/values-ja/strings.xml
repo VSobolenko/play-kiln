@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">Mark Book for Teachers</string>
+    <string name="app_idea" translatable="true">アカウントもサーバーも不要で、クラス、生徒、カテゴリ、課題、評価、出欠記録、授業参加のメモ、保護者連絡、座席をすべて作成・編集・削除できる、教師が完全に所有する非公開・オフラインの成績簿です。丸め規則、未提出の扱い、除外したカテゴリを明示する、根拠を確認できる累積平均を表示し、CSV と PDF にエクスポートでき、復元可能なバックアップファイルを保管できます。1クラス・生徒20名まで無料。一度アンロックすれば永続的に使え、定期課金はありません。</string>
+</resources>

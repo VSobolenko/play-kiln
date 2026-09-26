@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_cancel">İptal</string>
+    <string name="common_keep_it">Kalsın</string>
+    <string name="common_date">Tarih</string>
+    <string name="common_today">Bugün</string>
+    <string name="common_name">Ad</string>
+
+    <string name="grades_assignment">Ödev</string>
+    <string name="grades_assignment_gone">Bu ödev artık burada değil.</string>
+    <string name="grades_assignment_gone_body">Silindi; ona girilmiş notlar da birlikte silindi.</string>
+    <string name="grades_entry_eyebrow">Not girişi</string>
+    <string name="grades_points_max">%1$s puan değerinde</string>
+    <string name="grades_assignment_context">%1$s · ağırlık %2$s%%</string>
+    <string name="grades_no_category">Kategori yok</string>
+    <string name="grades_marked">Kaydedildi</string>
+    <string name="grades_unmarked">Notlanmamış</string>
+    <string name="grades_everyone">Herkes</string>
+    <string name="grades_still_to_mark">Notlanacaklar</string>
+    <string name="grades_no_students">Bu sınıfta henüz öğrenci yok. Liste sekmesinden ekleyin.</string>
+    <string name="grades_all_recorded">Bu ödev için her öğrencide bir kayıt var.</string>
+    <string name="grades_entry_help">Puan kaydetmek ya da çalışmayı teslim edilmedi veya muaf işaretlemek için bir öğrenciye dokunun. Notlanmamış bir hücre sıfır değildir.</string>
+
+    <string name="student_fallback_title">Öğrenci</string>
+    <string name="student_report">Rapor</string>
+    <string name="student_missing_title">Bu öğrenci artık burada değil.</string>
+    <string name="student_missing_body">Öğrenci listeden çıkarıldı; notları, yoklaması, gözlem notları ve görüşmeleri de kaldırıldı.</string>
+    <string name="student_overview">Öğrenci kaydı</string>
+    <string name="student_average_unavailable">Ortalama yok</string>
+    <string name="student_average_unavailable_caption">Ortalamaya giren kayıtlı not yok; bu sıfır değildir.</string>
+    <plurals name="student_average_item_count">
+        <item quantity="one">%1$d notlanmış ödev üzerinden hesaplandı</item>
+        <item quantity="other">%1$d notlanmış ödev üzerinden hesaplandı</item>
+    </plurals>
+    <string name="student_attendance_rate">Yoklama</string>
+    <string name="student_graded">Notlanmış</string>
+    <string name="student_ungraded">Notlanmamış</string>
+    <string name="student_marks">Ödev geçmişi</string>
+    <string name="student_no_assignments">Bu sınıfta henüz ödev yok. Notlar sekmesinden ekleyin.</string>
+    <string name="student_no_category">Kategori yok</string>
+    <string name="student_score_format">%1$s / %2$s</string>
+    <string name="student_percent_format">%1$s%%</string>
+    <string name="student_missing">Teslim edilmedi</string>
+    <string name="student_exempt">Muaf</string>
+    <string name="student_unmarked">Notlanmamış</string>
+    <string name="student_attendance">Yoklama</string>
+    <string name="student_present">Var</string>
+    <string name="student_late">Geç</string>
+    <string name="student_absent">Gelmedi</string>
+    <string name="student_attendance_exempt">Muaf</string>
+    <string name="student_no_attendance">Bu öğrenci için yoklama kaydedilmedi.</string>
+    <string name="student_notes">Gözlem notları</string>
+    <string name="student_no_notes">Henüz bir şey yazılmadı. Katılım, davranış, teslim edilmeyen ödev ve genel notlar burada görünür.</string>
+    <string name="student_note_participation">Katılım</string>
+    <string name="student_note_behaviour">Davranış</string>
+    <string name="student_note_missing_work">Teslim edilmeyen ödev</string>
+    <string name="student_note_general">Genel</string>
+    <string name="student_contacts">Veli görüşmeleri</string>
+    <string name="student_no_contacts">Bu öğrenci için kayıtlı veli görüşmesi yok.</string>
+    <string name="student_dated_kind">%1$s · %2$s</string>
+    <string name="student_follow_up">%1$s tarihinde takip</string>
+    <string name="student_remove_section">Listeden çıkar</string>
+    <string name="student_remove_explanation">Bir öğrenciyi çıkarmak notlarını, yoklamasını, gözlem notlarını ve görüşmelerini de kaldırır. Bunun yerine etkin değil işaretlemek, geçmişi korur ve öğrenci sınıf ortalamasına katılmaz.</string>
+    <string name="student_remove_action">%1$s çıkar</string>
+    <string name="student_remove_title">%1$s listeden çıkarılsın mı?</string>
+    <plurals name="student_remove_body">
+        <item quantity="one">Bu işlem öğrenciyi, %1$d notuyla, yoklamasıyla, gözlem notlarıyla, görüşmeleriyle ve oturma planındaki yeriyle birlikte kaldırır. Geri alınamaz.</item>
+        <item quantity="other">Bu işlem öğrenciyi, %1$d notuyla, yoklamasıyla, gözlem notlarıyla, görüşmeleriyle ve oturma planındaki yeriyle birlikte kaldırır. Geri alınamaz.</item>
+    </plurals>
+    <string name="student_remove_confirm">Öğrenciyi çıkar</string>
+</resources>

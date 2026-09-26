@@ -487,9 +487,19 @@ revenue by a large multiple for the same user.
 
 ## 5. What this means for the factory
 
-1. **Monetization is a design input and a per-slot decision.** A slot's plan names its
-   archetype (§3.6) and its product list before UI is designed; if it uses ads, it also names
-   the rewarded unlock.
+**Enforcement status, added 2026-09-26.** Items 1, 5, 6 and 7 below were prose only, and the
+factory's first real slot shipped without any of them: a calculator with
+`capabilities.json = {"enabled": []}` passed every gate. They are now executable. Item 1 and
+item 5 are enforced by `scripts/check-economics.mjs` against each slot's `economics.json`, and
+`scripts/new-slot.mjs` refuses to create a slot without a validated plan. The contract is
+`docs/slot-economics.md`; the spec is `openspec/specs/slot-economics/spec.md`; the post-mortem
+is `docs/reviews/2026-09-26-slot-1-economics-postmortem.md`. Where the list below and the
+enforced contract disagree, the contract wins, because it is the thing a program reads.
+
+1. **Monetization is a design input and a per-slot decision** — now enforced before the slot
+   exists rather than asserted after it. A slot's plan names its archetype (§3.6), its price,
+   and its product list before UI is designed; if it uses ads, it also names the rewarded
+   unlock.
 2. **One config-driven façade per stream.** Ads behind something like
    `Monetization.showRewarded("unlock_export")` with placements, formats, and frequency caps
    in one per-slot file; billing behind a per-slot `BillingCatalog` declaring unlocks, packs,
@@ -500,9 +510,11 @@ revenue by a large multiple for the same user.
    measuring and guessing.
 4. **Revenue must be attributed per slot**, or "which app works?" is unanswerable — and with
    purchase-led slots, credited credit versus spent credit must be attributable too.
-5. **Define kill criteria before shipping**, e.g. "if after 30 days past production
-   DAU < N and revenue < $X, the slot is archived." This protects both time and
-   account standing.
+5. **Define kill criteria before shipping** — now enforced: `economics.json` must carry
+   `killCriteria` with a window, an install floor, and a revenue floor, all non-zero, before
+   the slot can be created. The example "if after 30 days past production DAU < N and
+   revenue < $X, the slot is archived" is the shape; the numbers are the plan's. This
+   protects both time and account standing.
 6. **Distinctness is a gate, not a preference**, per §1.2.
 7. **Decide the fulfilment class before the paywall** (§3.7). A `SERVER_COST` pack means a
    server, a Play Developer API confirmation path, and an authoritative balance; the factory

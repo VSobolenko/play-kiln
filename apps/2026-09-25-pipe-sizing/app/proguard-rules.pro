@@ -27,9 +27,21 @@
 #    *;
 #}
 
-# Room (enable when Room is added). This is Room's full-mode-safe constructor
-# rule; its artifact normally contributes the same consumer rule automatically.
-#-keep class * extends androidx.room.RoomDatabase { void <init>(); }
+# Room (room-runtime is on the classpath transitively: the ads capability's SDK pulls in
+# androidx.work, and WorkManager's WorkDatabase is a Room database). Room instantiates the generated
+# `<Name>_Impl` reflectively — `Class.forName(name + "_Impl").getDeclaredConstructor().newInstance()`
+# — so both the name and the no-arg constructor must survive R8.
+#
+# Measured, not assumed: the first release APK of this slot satisfied every gate and every unit test
+# and then died before the first screen with
+#   Unable to get provider androidx.startup.InitializationProvider
+#   Caused by: RuntimeException: Failed to create an instance of androidx.work.impl.WorkDatabase
+# `app/build/outputs/mapping/release/mapping.txt` showed the class with its DAO getters and
+# `createOpenHelper` — and no `void <init>()` line at all, while `MainActivity` in the same file does
+# list `1:4:void <init>():11:11 -> <init>`. The class was kept and its constructor was gone, which is
+# exactly the failure this block predicted. Relying on the library to contribute this rule is what
+# left the hole.
+-keep class * extends androidx.room.RoomDatabase { void <init>(); }
 #-dontwarn androidx.room.paging.**
 #-dontwarn androidx.lifecycle.LiveData
 

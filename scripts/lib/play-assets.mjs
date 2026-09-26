@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
+import { inflateSync } from 'node:zlib'
 
 // Google Play app icon rule: 512x512 32-bit PNG with alpha, at most 1024 KB.
 export const APP_ICON = Object.freeze({ width: 512, height: 512, maxBytes: 1024 * 1024, format: 'png', alpha: true })
@@ -9,8 +10,16 @@ export const APP_ICON = Object.freeze({ width: 512, height: 512, maxBytes: 1024 
 export const FEATURE_GRAPHIC = Object.freeze({ width: 1024, height: 500, formats: Object.freeze(['jpeg', 'png']), alpha: false })
 
 // Google Play phone screenshot rule: 2-8 images, 320-3840px sides, long side no more than twice the short side.
+//
+// `min` is the LOWEST count the factory accepts, not Play's absolute floor of 2.
+// Play's general Requirements section allows as few as 2 phone screenshots, but
+// its large-screen section requires "a minimum of 4 screenshots", and the factory
+// ships 6 (`scripts/store-kit.py` -> `SCREEN_TARGETS["phone"]`). Keeping the
+// weaker reading here while `scripts/verify-slot.mjs` enforced 4 meant the library
+// and the gate disagreed; `scripts/store-kit.py` is authoritative for this rule.
+// Source: https://support.google.com/googleplay/android-developer/answer/9866151?hl=en
 export const PHONE_SCREENSHOTS = Object.freeze({
-  min: 2,
+  min: 4,
   max: 8,
   target: 6,
   minSide: 320,
@@ -19,6 +28,43 @@ export const PHONE_SCREENSHOTS = Object.freeze({
   maxBytes: 8 * 1024 * 1024,
   recommended: Object.freeze({ width: 1080, height: 1920 }),
   largeFormat: Object.freeze({ minCount: 4, minShortSide: 1080 })
+})
+
+// `min` and `largeFormat.minCount` state the same rule twice because
+// `scripts/visual-qa.py` reads `largeFormat.minCount` by name. This assertion
+// makes the duplication impossible to drift: the contradiction it prevents is
+// exactly the defect that let the library say 2 while the gate enforced 4.
+if (PHONE_SCREENSHOTS.largeFormat.minCount !== PHONE_SCREENSHOTS.min) {
+  throw new Error(
+    'play-assets: PHONE_SCREENSHOTS.min and largeFormat.minCount must be equal, ' +
+      `got ${PHONE_SCREENSHOTS.min} and ${PHONE_SCREENSHOTS.largeFormat.minCount}`
+  )
+}
+
+// A real composed marketing frame always has structure — a background gradient,
+// a caption, a device mock-up — so its luminance varies and it carries many
+// colours. A solid fill, a one-colour placeholder, or a frame whose render failed
+// has neither, yet every dimension/mode/format check calls it valid. Both
+// `store-kit --validate-only` and `verify-slot --strict-store` accepted a solid
+// red 1080x1920 PNG as a screenshot because nothing ever looked at a pixel; these
+// floors close that hole.
+//
+// Calibrated on 2026-09-25 against all 86 committed assets under
+// `apps/*/store/assets/*/`: the least-structured real screenshot measured
+// luminance sd 45.15, the fewest-coloured real screenshot measured 114 quantised
+// colours, and the flattest asset of any kind — a real app icon — measured sd
+// 52.00 (its 15 colours are why the colour floor is applied to screenshots only).
+// A solid colour measures sd 0.00 and one colour, so floors of 6 (every asset)
+// and 12 (screenshots) sit ~7x and ~9x clear of real art while a blank frame
+// fails hard.
+export const NON_DEGENERATE = Object.freeze({
+  // Applies to every composed PNG the pack ships, icon and feature graphic
+  // included: a uniform image is a failed render at any size.
+  minLuminanceStdDev: 6,
+  // Applies to screenshots only. A composed marketing frame carries hundreds of
+  // quantised colours, but a legitimate flat app icon can be two-tone, so gating
+  // the icon on colour count would reject valid art rather than a defect.
+  minScreenshotColours: 12
 })
 
 // Google Play 7-inch tablet screenshot rule: 4-8 images, short edge at least 1080px, long edge at most 7680px.
@@ -42,17 +88,22 @@ export const IMAGE_TYPES = Object.freeze({
   icon: 'icon'
 })
 
+const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])
+
 export function pngSize(file) {
   try {
-    const bytes = readFileSync(file)
-    if (bytes.length < 24 || !bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return null
-    if (bytes.toString('ascii', 12, 16) !== 'IHDR') return null
-    const width = bytes.readUInt32BE(16)
-    const height = bytes.readUInt32BE(20)
-    return width > 0 && height > 0 ? { width, height } : null
+    return pngSizeFromBytes(readFileSync(file))
   } catch {
     return null
   }
+}
+
+function pngSizeFromBytes(bytes) {
+  if (bytes.length < 24 || !bytes.subarray(0, 8).equals(PNG_SIGNATURE)) return null
+  if (bytes.toString('ascii', 12, 16) !== 'IHDR') return null
+  const width = bytes.readUInt32BE(16)
+  const height = bytes.readUInt32BE(20)
+  return width > 0 && height > 0 ? { width, height } : null
 }
 
 export function jpegSize(file) {
@@ -100,6 +151,127 @@ export function isValidScreenshot(width, height) {
     longSide <= PHONE_SCREENSHOTS.maxSide &&
     longSide <= shortSide * PHONE_SCREENSHOTS.maxAspectRatio
   )
+}
+
+/**
+ * Measure whether a PNG carries real content, cheaply and without a dependency.
+ *
+ * Returns `{ width, height, luminanceStdDev, distinctColours }`, or `null` when
+ * the bytes are not a non-interlaced 8-bit PNG this can decode. `null` means
+ * "could not check", which the caller must treat as a failure rather than a pass:
+ * a truncated file decodes to nothing and must not slip through looking valid.
+ *
+ * Only `node:zlib` is used on purpose. Shelling out to the pack's Python/Pillow
+ * would make the gate fail wherever Pillow is absent, even though the check
+ * itself needs no Pillow; the factory's own gate must stay dependency-free.
+ */
+export function pngContentStats(file) {
+  try {
+    const bytes = readFileSync(file)
+    const size = pngSizeFromBytes(bytes)
+    if (!size) return null
+    const bitDepth = bytes[24]
+    const colorType = bytes[25]
+    const interlace = bytes[28]
+    const channels = { 0: 1, 2: 3, 4: 2, 6: 4 }[colorType]
+    if (bitDepth !== 8 || interlace !== 0 || !channels) return null
+
+    const idat = []
+    let offset = 8
+    while (offset + 12 <= bytes.length) {
+      const length = bytes.readUInt32BE(offset)
+      const type = bytes.toString('ascii', offset + 4, offset + 8)
+      if (offset + 12 + length > bytes.length) return null
+      if (type === 'IDAT') idat.push(bytes.subarray(offset + 8, offset + 8 + length))
+      offset += 12 + length
+      if (type === 'IEND') break
+    }
+    if (idat.length === 0) return null
+
+    const raw = inflateSync(Buffer.concat(idat))
+    const { width, height } = size
+    const stride = width * channels
+    if (raw.length < height * (stride + 1)) return null
+
+    const previous = Buffer.alloc(stride)
+    const row = Buffer.alloc(stride)
+    // 4 bits per channel keeps the colour histogram at 16^3 slots, small enough
+    // to allocate once and large enough that a photo-like frame fills hundreds.
+    const seen = new Uint8Array(4096)
+    let distinctColours = 0
+    let sum = 0
+    let sumOfSquares = 0
+    let index = 0
+
+    for (let y = 0; y < height; y += 1) {
+      const filter = raw[index]
+      index += 1
+      raw.copy(row, 0, index, index + stride)
+      index += stride
+      unfilterPngRow(filter, row, previous, channels)
+      for (let x = 0; x < stride; x += channels) {
+        const red = row[x]
+        const green = channels >= 3 ? row[x + 1] : red
+        const blue = channels >= 3 ? row[x + 2] : red
+        const luminance = (red * 77 + green * 150 + blue * 29) >> 8
+        sum += luminance
+        sumOfSquares += luminance * luminance
+        const quantised = ((red >> 4) << 8) | ((green >> 4) << 4) | (blue >> 4)
+        if (seen[quantised] === 0) {
+          seen[quantised] = 1
+          distinctColours += 1
+        }
+      }
+      previous.set(row)
+    }
+
+    const pixels = width * height
+    const mean = sum / pixels
+    const variance = Math.max(0, sumOfSquares / pixels - mean * mean)
+    return { width, height, luminanceStdDev: Math.sqrt(variance), distinctColours }
+  } catch {
+    return null
+  }
+}
+
+function unfilterPngRow(filter, row, previous, bytesPerPixel) {
+  const length = row.length
+  if (filter === 0) return
+  if (filter === 1) {
+    for (let i = bytesPerPixel; i < length; i += 1) row[i] = (row[i] + row[i - bytesPerPixel]) & 0xff
+    return
+  }
+  if (filter === 2) {
+    for (let i = 0; i < length; i += 1) row[i] = (row[i] + previous[i]) & 0xff
+    return
+  }
+  if (filter === 3) {
+    for (let i = 0; i < length; i += 1) {
+      const left = i >= bytesPerPixel ? row[i - bytesPerPixel] : 0
+      row[i] = (row[i] + ((left + previous[i]) >> 1)) & 0xff
+    }
+    return
+  }
+  if (filter === 4) {
+    for (let i = 0; i < length; i += 1) {
+      const left = i >= bytesPerPixel ? row[i - bytesPerPixel] : 0
+      const above = previous[i]
+      const upperLeft = i >= bytesPerPixel ? previous[i - bytesPerPixel] : 0
+      row[i] = (row[i] + paethPredictor(left, above, upperLeft)) & 0xff
+    }
+    return
+  }
+  throw new Error(`unsupported PNG filter type ${filter}`)
+}
+
+function paethPredictor(left, above, upperLeft) {
+  const estimate = left + above - upperLeft
+  const leftDistance = Math.abs(estimate - left)
+  const aboveDistance = Math.abs(estimate - above)
+  const upperLeftDistance = Math.abs(estimate - upperLeft)
+  if (leftDistance <= aboveDistance && leftDistance <= upperLeftDistance) return left
+  if (aboveDistance <= upperLeftDistance) return above
+  return upperLeft
 }
 
 export function validateListingText({ title, shortDescription, fullDescription } = {}) {

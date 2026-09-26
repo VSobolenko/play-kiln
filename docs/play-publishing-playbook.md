@@ -19,15 +19,33 @@ state them.
 
 Sources: **NEEDS-VERIFICATION** — `FACTS.md` supplies no official account, verification, or closed-test URLs.
 
-## 2. Ship and verify the slot — Factory, then Human checkpoint
+## 2. Ship and verify the slot — Factory, with two human checkpoints
 
-Run `/ship <idea>`. After plan approval, the factory creates the slot, implements
-it, generates the store pack, signs the releases, verifies the slot, and runs
-`/eval`.
+The slot has two phases and the owner stands between them.
+
+**Phase 1 — `/ship <idea>`.** After plan approval the factory creates the slot, implements it,
+tests it and produces a **debug** build to review. It does **not** sign, render store assets or
+capture screenshots; that work is wasted if you want the app changed.
+
+**Human checkpoint — approve the release.** Install the debug APK
+(`app/build/outputs/apk/debug/app-debug.apk`), check the UI and behaviour yourself, and state
+the approval. Only then is it recorded:
+
+```bash
+node scripts/approve-release.mjs --slot <slug> --note "<your own words>"
+```
+
+The record is bound to a digest of the app's sources, so editing the app after approving it
+invalidates the approval and the release tools refuse until you approve the revision you
+actually reviewed (`.cursor/rules/release-gate.mdc`).
+
+**Phase 2 — `/release <slug>`.** Now the factory signs the releases, composes the store pack,
+captures screenshots, verifies the slot and runs `/eval`.
 
 Required handoff evidence:
 
 ```text
+release-approval.json (the recorded approval this phase ran against)
 dist/<slug>-<version>-<code>-release.apk
 dist/<slug>-<version>-<code>-release.aab
 dist/release-manifest.json
@@ -35,7 +53,7 @@ store/listing.json and listing.md
 store/assets/icon-512.png
 store/assets/feature-graphic-1024x500.png
 6 phone + 4 seven-inch + 4 ten-inch screenshots per locale
-green verify-slot --strict-store
+green verify-slot --strict-store --build
 accepted /eval
 ```
 
@@ -125,8 +143,16 @@ Each slot records shared integrations in `apps/<date>-<slug>/capabilities.json`.
 `enabled` is the explicit list of capability IDs. A billing slot also records its
 consumable fulfilment (`LOCAL` or `SERVER_COST`); every `SERVER_COST` catalog must
 describe `billing.purchaseAuthority`, the server that verifies purchase tokens and
-owns the paid balance. An empty `enabled` list is the explicit declaration that the
-slot uses none of the shared capabilities.
+owns the paid balance.
+
+An empty `enabled` list is the explicit declaration that the slot uses none of the
+shared capabilities — and since 2026-09-26 that is a **claim the economics gate checks**,
+not a neutral default. A slot whose plan declares a purchase-led, subscription, or ads-led
+archetype while `enabled` is empty is a plan the build cannot honour, and
+`node scripts/check-economics.mjs --slot <slug>` reports `BLOCKED`. The failure this rule
+exists to prevent is `apps/2026-09-25-pipe-sizing`, which shipped with `enabled: []`, a
+listing that described a paid app, and no way to take money at all — every gate passed
+(`docs/reviews/2026-09-26-slot-1-economics-postmortem.md`).
 
 `scripts/lib/capabilities.mjs` reads that slot file and the selected
 `capabilities/<id>/capability.json` manifests. It derives the permission and collected

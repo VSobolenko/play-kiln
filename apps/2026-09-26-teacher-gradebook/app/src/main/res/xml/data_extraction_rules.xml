@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <!-- API 31+ separates cloud backup from device transfer, because a user can permit one
+         restoration path without permitting the other. Both are stated explicitly here.
+
+         This app writes exactly two files, and they are the two included below:
+           files/recordbook.json          the teacher's classes, students, grades, attendance,
+                                          notes, contacts and seating
+           sharedpref/billing_state.xml   the unlock they bought, so it survives a reinstall
+         Nothing else is written, so nothing else is included.
+
+         Cloud backup is a deliberate choice, not a scaffold default: a teacher who loses or
+         replaces a phone gets their record back from their own Google account, and losing a
+         term's marks should not depend on having bought the unlock. That choice is why the store
+         listing claims "no account, no ads, nothing sent to us" instead of "no cloud", and why
+         store/privacy.md states plainly that Android Auto Backup uses the teacher's own Drive.
+         See store/data-safety.md for how this is declared to Play.
+
+         The record is other people's children's marks. If this policy ever changes, the listing,
+         the privacy policy and the Data safety form change with it. -->
+    <cloud-backup>
+        <include domain="file" path="recordbook.json" />
+        <!-- The .damaged sibling is a preserved copy of a record that failed to parse. It is a
+             copy of an unreadable document, so it may be the only surviving version of a term. -->
+        <include domain="file" path="recordbook.json.damaged" />
+        <include domain="sharedpref" path="billing_state.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="file" path="recordbook.json" />
+        <include domain="file" path="recordbook.json.damaged" />
+        <include domain="sharedpref" path="billing_state.xml" />
+    </device-transfer>
+</data-extraction-rules>

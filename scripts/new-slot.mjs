@@ -3,7 +3,17 @@
  * Create an isolated Android Compose app slot under apps/.
  *
  * Usage:
- *   node scripts/new-slot.mjs --slug <slug> --name "<Title>" --idea "<one line>" [--date YYYY-MM-DD] [--package com.gexetr.<slug>] [--force]
+ *   node scripts/new-slot.mjs --slug <slug> --name "<Title>" --idea "<one line>" --economics <plan.json> --differentiators <contract.json> [--date YYYY-MM-DD] [--package com.gexetr.<slug>] [--force]
+ *
+ * A slot cannot be scaffolded without a validated `economics.json` plan: the first
+ * slot shipped with no revenue mechanism and every gate still returned PASS, so the
+ * plan is now a precondition rather than a convention.
+ *
+ * It cannot be scaffolded without a `differentiators.json` contract either, and for the
+ * same reason: recon states why the app can win, and a reason list written after the
+ * build only contains what was built. Both files are written before the first line of
+ * UI, and `scripts/check-differentiators.mjs` refuses to call the slot done while any
+ * promise in it is still deferred.
  */
 
 import {
@@ -23,6 +33,8 @@ import {
   applicationIdPattern,
   scaffoldPackage
 } from './lib/namespaces.mjs'
+import { parseEconomics } from './lib/slot-economics.mjs'
+import { parseDifferentiators } from './lib/slot-differentiators.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const scaffold = join(root, 'scaffold', 'android-compose')
@@ -58,15 +70,22 @@ const excludedDirectories = new Set([
 ])
 const excludedFiles = new Set(['local.properties', 'keystore.properties', '.DS_Store'])
 const excludedSuffixes = ['.apk', '.aab', '.ap_', '.jks', '.keystore', '.iml']
+// `scripts/codex-run.mjs` writes a run's stdout beside the durable ledger under `.kiln/`, and a
+// worker started with the slot as its working directory leaves that output in the slot root instead.
+// Two such logs sat in a slot root and were committed by hand, because `.gitignore` covered `dist/`
+// and `build/` but not this. Both the scaffold and the slot ignore them now, and the copy filter
+// refuses them too, so a slot can neither receive one from the scaffold nor be reported clean while
+// carrying one.
+const workerLogSegment = /^\.kiln-.*\.log$/i
 const usage =
-  'node scripts/new-slot.mjs --slug <slug> --name "<Title>" --idea "<one line>" [--date YYYY-MM-DD] [--package com.gexetr.<slug>] [--force]'
+  'node scripts/new-slot.mjs --slug <slug> --name "<Title>" --idea "<one line>" --economics <plan.json> --differentiators <contract.json> [--date YYYY-MM-DD] [--package com.gexetr.<slug>] [--force]'
 
 function line(status, message) {
   console.log(`${status.padEnd(8)} ${message}`)
 }
 
 function parseArgs(argv) {
-  const values = new Set(['--slug', '--name', '--idea', '--date', '--package'])
+  const values = new Set(['--slug', '--name', '--idea', '--date', '--package', '--economics', '--differentiators'])
   const flags = new Set(['--force'])
   const parsed = { force: false }
 
@@ -132,6 +151,7 @@ function isExcludedScaffoldPath(relativePath) {
   const segments = relativePath.split(/[\\/]+/).filter(Boolean)
   return segments.some((segment, index) => {
     if (excludedDirectories.has(segment)) return true
+    if (workerLogSegment.test(segment)) return true
     if (index !== segments.length - 1) return false
     if (excludedFiles.has(segment)) return true
     const lower = segment.toLowerCase()
@@ -247,7 +267,7 @@ function assertApplicationIdIsFree(applicationId, slug) {
   }
 }
 
-function registerSlot({ slug, dirName, name, applicationId, idea, createdAt }) {
+function registerSlot({ slug, dirName, name, applicationId, idea, createdAt, archetype, promises }) {
   const registry = readRegistry()
   const index = registry.apps.findIndex((app) => app?.id === slug)
   const previous = index === -1 ? null : registry.apps[index]
@@ -257,6 +277,8 @@ function registerSlot({ slug, dirName, name, applicationId, idea, createdAt }) {
     name,
     applicationId,
     idea,
+    archetype,
+    promises,
     status: 'scaffolded',
     createdAt: previous?.createdAt || createdAt,
     updatedAt: createdAt
@@ -267,6 +289,74 @@ function registerSlot({ slug, dirName, name, applicationId, idea, createdAt }) {
 
   mkdirSync(dirname(registryPath), { recursive: true })
   writeFileSync(registryPath, `${JSON.stringify(registry, null, 2)}\n`, 'utf8')
+}
+
+/**
+ * Load and validate the required economics plan before anything is written.
+ *
+ * The first slot shipped with `capabilities.json = {"schemaVersion":1,"enabled":[]}`
+ * — no revenue mechanism — and every gate still returned PASS. Refusing here, before
+ * the scaffold is copied, is what makes a planless slot impossible to create rather
+ * than merely discouraged.
+ */
+function loadEconomicsPlan(file) {
+  const absolute = resolve(file)
+  if (!existsSync(absolute)) throw new Error(`Economics plan not found: ${absolute}`)
+  let raw
+  try {
+    raw = readFileSync(absolute, 'utf8')
+  } catch (error) {
+    throw new Error(`Economics plan could not be read: ${absolute} (${error.message})`)
+  }
+  let parsed
+  try {
+    parsed = JSON.parse(raw.replace(/^\uFEFF/, ''))
+  } catch (error) {
+    // Name the file: a JSON typo in a plan passed from the command line otherwise
+    // reports only the parser's position with no clue which file it came from.
+    throw new Error(`Economics plan is not valid JSON: ${absolute} (${error.message})`)
+  }
+  const result = parseEconomics(parsed)
+  if (!result.ok) {
+    for (const problem of result.errors) line('BLOCKED', problem)
+    throw new Error(`Economics plan is invalid: ${absolute}`)
+  }
+  line('PASS', `economics plan valid: archetype ${result.value.archetype}`)
+  return result.value
+}
+
+/**
+ * Load and validate the required differentiator contract before anything is written.
+ *
+ * Every promise in a fresh contract is `deferred`, which is the honest state: nothing
+ * has been built. `scripts/check-differentiators.mjs` accepts that at scaffold time and
+ * refuses it at slot time, so the rows this function validates are the rows the builder
+ * has to answer for before the app can be called done.
+ */
+function loadDifferentiatorsPlan(file) {
+  const absolute = resolve(file)
+  if (!existsSync(absolute)) throw new Error(`Differentiators contract not found: ${absolute}`)
+  let raw
+  try {
+    raw = readFileSync(absolute, 'utf8')
+  } catch (error) {
+    throw new Error(`Differentiators contract could not be read: ${absolute} (${error.message})`)
+  }
+  let parsed
+  try {
+    parsed = JSON.parse(raw.replace(/^\uFEFF/, ''))
+  } catch (error) {
+    throw new Error(`Differentiators contract is not valid JSON: ${absolute} (${error.message})`)
+  }
+  const result = parseDifferentiators(parsed)
+  if (!result.ok) {
+    for (const problem of result.errors) line('BLOCKED', problem)
+    throw new Error(`Differentiators contract is invalid: ${absolute}`)
+  }
+  const claims = result.value.claims.length
+  const core = result.value.claims.filter((claim) => claim.weight === 'core').length
+  line('PASS', `differentiators contract valid: ${claims} promise(s), ${core} core`)
+  return result.value
 }
 
 function main() {
@@ -291,6 +381,14 @@ function main() {
   }
   assertApplicationIdIsFree(applicationId, slug)
   if (!existsSync(scaffold)) throw new Error(`Missing scaffold: ${scaffold}`)
+
+  if (!options.economics) throw new Error(`Missing required --economics <path>\nUsage: ${usage}`)
+  const economics = loadEconomicsPlan(options.economics)
+
+  if (!options.differentiators) {
+    throw new Error(`Missing required --differentiators <path>\nUsage: ${usage}`)
+  }
+  const differentiators = loadDifferentiatorsPlan(options.differentiators)
 
   const dirName = `${date}-${slug}`
   const destination = resolve(appsDir, dirName)
@@ -324,6 +422,20 @@ function main() {
   verifyScaffoldCopy(destination)
 
   mkdirSync(join(destination, 'dist'), { recursive: true })
+  writeFileSync(
+    join(destination, 'economics.json'),
+    `${JSON.stringify(economics, null, 2)}\n`,
+    'utf8'
+  )
+  // Written before the UI exists, like the economics plan. The contract's `slot` field
+  // is forced to this slot rather than trusted from the file: a contract copied from
+  // another slot would otherwise pass schema validation and claim the wrong recon.
+  const contract = { ...differentiators, slot: slug }
+  writeFileSync(
+    join(destination, 'differentiators.json'),
+    `${JSON.stringify(contract, null, 2)}\n`,
+    'utf8'
+  )
   const createdAt = new Date().toISOString()
   const state = {
     slug,
@@ -332,19 +444,42 @@ function main() {
     idea,
     createdAt,
     scaffoldVersion,
-    status: 'scaffolded'
+    status: 'scaffolded',
+    economics: {
+      archetype: economics.archetype,
+      priceUsd: economics.priceUsd
+    },
+    differentiators: {
+      promises: contract.claims.length,
+      core: contract.claims.filter((claim) => claim.weight === 'core').length
+    }
   }
   writeFileSync(join(destination, '.kiln-state.json'), `${JSON.stringify(state, null, 2)}\n`, 'utf8')
-  line('PASS', 'created dist/ and .kiln-state.json')
+  line('PASS', 'created dist/, economics.json, differentiators.json, and .kiln-state.json')
 
-  registerSlot({ slug, dirName, name, applicationId, idea, createdAt })
+  registerSlot({
+    slug,
+    dirName,
+    name,
+    applicationId,
+    idea,
+    createdAt,
+    archetype: economics.archetype,
+    promises: contract.claims.length
+  })
   line('PASS', `registered ${slug} in registry/apps.json`)
   line('INFO', `applicationId: ${applicationId}`)
 
   console.log('\nNext:')
   line('INFO', 'implement the app')
   line('INFO', `python scripts/store-kit.py --slot ${slug}`)
-  line('INFO', `node scripts/sign-release.mjs --slot ${slug} --generate`)
+  line('INFO', `node scripts/check-economics.mjs --slot ${slug}`)
+  line('INFO', `node scripts/check-differentiators.mjs --slot ${slug} --allow-deferred`)
+  line('INFO', 'every promise in differentiators.json starts deferred; the slot is not done until each one is shipped, narrowed or dropped')
+  line(
+    'INFO',
+    'signing requires the owner\'s explicit authorization; never run sign-release.mjs --generate without it'
+  )
   line('INFO', `node scripts/prepare-release.mjs --slot ${slug}`)
   line('INFO', `node scripts/verify-slot.mjs --slot ${slug} --strict-store`)
 }

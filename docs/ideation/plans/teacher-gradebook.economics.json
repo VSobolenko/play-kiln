@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A K-12 or college teacher who already keeps a private paper or spreadsheet gradebook beside the school's official system and funds classroom tools from their own pocket.",
+  "paidUnit": "A one-time unlock of unlimited classes and students, weighted categories, CSV and PDF export, and a restorable backup file the teacher keeps, with no account, no cloud and no ads.",
+  "priceUsd": 6.99,
+  "momentOfPayment": "When the teacher creates a second class or exports the first report, after the free gradebook has already been used for real marking.",
+  "distinctnessSentence": "Every class, student and grade can be added, edited and deleted without a crash, the whole record backs up and restores from the teacher's own storage, and it is bought once instead of rented monthly, which is exactly what the measured incumbent's critics ask for.",
+  "evidenceRef": "docs/research/2026-09-26-teacher-gradebook-evidence.md#2-complaints-verbatim",
+  "day1RevenuePath": "Free install gives a usable single-class gradebook; the first dollar arrives when a real teacher needs a second class or their first export, and the unlock screen appears at that moment.",
+  "killCriteria": {
+    "windowDays": 60,
+    "minInstalls": 1500,
+    "minRevenueUsd": 100
+  },
+  "assumptionsUnverified": [
+    "That a new listing can rank for a query whose first result carries 4510 reviews, which no measurement here can prove.",
+    "That install-to-paid is near the 1.9 percent published median for other developers' apps, because this account has never measured a sale.",
+    "Whether Play treats a local student-name-and-grade record as a child-directed listing and therefore applies the Families Policy Requirements, which must be settled before the store pack is written.",
+    "That the six critical reviews sampled across four apps describe frequent failure modes rather than isolated incidents, since the sample is a vocabulary of complaints and not a frequency ranking."
+  ]
+}

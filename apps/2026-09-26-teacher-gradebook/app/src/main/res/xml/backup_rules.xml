@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- The API 30-and-lower equivalent of data_extraction_rules.xml, and the file this app's
+         minimum SDK actually uses. Keep its scope identical to both sections of that file.
+
+         This is the single most privacy-consequential file in the slot, because API 30 has no
+         separate cloud-backup and device-transfer policy: whatever is listed here may be copied
+         to the teacher's Google Drive. Only the teacher's own record and the entitlement they
+         bought are listed, and nothing else is written by the app, so nothing else can leak.
+
+         See data_extraction_rules.xml for why cloud backup is a deliberate choice here, and
+         store/privacy.md for how it is disclosed. -->
+    <include domain="file" path="recordbook.json" />
+    <!-- A preserved copy of a record that failed to parse: possibly the only surviving version. -->
+    <include domain="file" path="recordbook.json.damaged" />
+    <include domain="sharedpref" path="billing_state.xml" />
+</full-backup-content>

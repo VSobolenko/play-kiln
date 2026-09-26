@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_error_unknown_reason" translatable="true">motivo sconosciuto</string>
+
+    <string name="app_nothing_written" translatable="true">Non è stato scritto nulla.</string>
+    <string name="app_write_failed" translatable="true">Impossibile scrivere il file: %1$s</string>
+    <string name="app_read_failed" translatable="true">Impossibile leggere il file: %1$s</string>
+    <string name="app_no_file_chosen" translatable="true">Non è stato scelto alcun file.</string>
+    <string name="app_class_gone" translatable="true">Questa classe non esiste più.</string>
+    <string name="app_record_loading" translatable="true">Il registro è ancora in fase di caricamento.</string>
+    <string name="app_wrote_csv" translatable="true">Scritto %1$s, una riga per studente.</string>
+    <string name="app_wrote_file" translatable="true">Scritto %1$s.</string>
+    <string name="app_backed_up" translatable="true">Copia di sicurezza salvata in %1$s. La conservi in un luogo sicuro.</string>
+
+    <string name="app_unlock_reason_classes" translatable="true">La versione gratuita conserva una classe. Lo sblocco elimina il limite.</string>
+    <string name="app_unlock_reason_about" translatable="true">Informazioni sullo sblocco</string>
+
+    <string name="app_unlock_purchased" translatable="true">Sblocco completato. Tutti i limiti sono stati rimossi da questo dispositivo.</string>
+    <string name="app_unlock_restored" translatable="true">Ripristino completato. Lo sblocco è di nuovo attivo.</string>
+    <string name="app_unlock_nothing_to_restore" translatable="true">Play non rileva acquisti per questo account, quindi non è cambiato nulla. Se il pagamento è stato effettuato con un altro account, acceda con quello e riprovi.</string>
+    <string name="app_unlock_pending" translatable="true">Play sta ancora elaborando il pagamento. Lo sblocco resterà inattivo fino al completamento e non è stato effettuato alcun doppio addebito.</string>
+    <string name="app_unlock_unavailable" translatable="true">Al momento Google Play non può gestire questo acquisto su questo dispositivo. Il lavoro svolto e l\'eventuale sblocco già attivo restano invariati.</string>
+    <string name="app_unlock_not_completed" translatable="true">L\'acquisto non è stato completato, quindi non è stato addebitato nulla. Tutto ciò che ha registrato è ancora disponibile.</string>
+    <string name="app_unlock_offline" translatable="true">Impossibile raggiungere Google Play, quindi non è stata tentata alcuna operazione. L\'app continua a funzionare offline; per lo sblocco serve una connessione.</string>
+
+    <string name="app_unnamed_class_file" translatable="true">Classe</string>
+    <string name="nav_back" translatable="true">Indietro</string>
+    <string name="document_could_not_open" translatable="true">Non è stato possibile aprire il file.</string>
+    <string name="document_could_not_open_for_writing" translatable="true">Non è stato possibile aprire il file in scrittura.</string>
+    <string name="document_chosen_file" translatable="true">il file scelto</string>
+    <string name="backup_empty" translatable="true">Il file è vuoto, quindi non è stato ripristinato nulla.</string>
+    <string name="backup_not_mark_book" translatable="true">Il file non è una copia di sicurezza di Mark Book, quindi non è stato ripristinato nulla.</string>
+    <string name="backup_missing_schema" translatable="true">Il file non contiene una versione dello schema leggibile, quindi non è stato ripristinato nulla.</string>
+    <string name="backup_unsupported_version" translatable="true">Questa copia di sicurezza è stata creata da un’altra versione dell’app (formato %1$d; questa app legge il formato %2$d). Non è stato modificato nulla.</string>
+    <string name="backup_damaged" translatable="true">Questa copia di sicurezza è danneggiata e non può essere letta, quindi non è stato ripristinato nulla: %1$s</string>
+</resources>

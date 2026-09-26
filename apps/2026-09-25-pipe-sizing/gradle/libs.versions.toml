@@ -13,6 +13,8 @@ junit = "4.13.2"              # local JVM unit-test runner
 androidxJunit = "1.3.0"       # Android instrumentation test integration
 espresso = "3.7.0"            # Android UI test APIs
 benchmarkMacro = "1.4.1"      # macrobenchmark and baseline-profile test APIs
+# Shared capability artifacts, published to mavenLocal from capabilities/ at this version.
+capability = "1.0.0"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -32,6 +34,7 @@ androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling
 androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
+androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
@@ -40,6 +43,11 @@ junit = { module = "junit:junit", version.ref = "junit" }
 androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
 androidx-benchmark-macro-junit4 = { module = "androidx.benchmark:benchmark-macro-junit4", version.ref = "benchmarkMacro" }
+# Capabilities own the ads/billing integration every slot would otherwise re-invent. The slot
+# pins one version; publishing is `cd capabilities && ./gradlew publishToMavenLocal`.
+capability-core = { module = "com.gexetr.capability:core", version.ref = "capability" }
+capability-ads = { module = "com.gexetr.capability:ads", version.ref = "capability" }
+capability-billing = { module = "com.gexetr.capability:billing", version.ref = "capability" }
 
 # How to extend a slot later
 # Room: androidx.room:room-runtime, androidx.room:room-ktx, and androidx.room:room-compiler; plugin com.google.devtools.ksp.

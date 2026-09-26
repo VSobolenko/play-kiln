@@ -1,0 +1,7 @@
+schema: spec-driven
+created: 2026-09-26
+goal: Ship an offline classroom record book a teacher owns outright — classes,
+  students, assignments, grades, attendance, participation, missing work, parent
+  contacts and seating — editable without an account or a server, exported as CSV
+  and PDF, backed up to a file the teacher keeps, and unlocked once instead of
+  rented monthly.

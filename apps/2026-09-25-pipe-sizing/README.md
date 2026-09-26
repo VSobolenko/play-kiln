@@ -2,7 +2,9 @@
 
 **Slug:** `pipe-sizing`  
 **applicationId:** `com.gexetr.pipesizing`  
-**Idea:** A paid-once, offline calculation aid for user-entered gas loads, developed lengths, fitting allowances, unit conversion, and recorded source citations. It performs arithmetic and does not provide code-table data or determine compliance.
+**Idea:** An offline calculation aid for user-entered gas loads, developed lengths, fitting allowances, unit conversion, and recorded source citations. It performs arithmetic and does not provide code-table data or determine compliance.
+
+**Monetization:** free to use, led by ads with one non-consumable in-app purchase (`pro_unlock`). The free tier keeps three saved cases and may show an interstitial after every third completed evaluation; Pro removes the interstitials, lifts the saved-case limit, and unlocks case reports. Ads are requested only after the ad-choices form resolves. The plan, its price and its kill criteria are in `economics.json`; the enabled capabilities are `["ads", "billing"]` in `capabilities.json`.
 
 PlayKiln slot — one isolated Android app. Factory harness lives at the repo root; this slot is
 built and released on its own and shares no code with other slots.

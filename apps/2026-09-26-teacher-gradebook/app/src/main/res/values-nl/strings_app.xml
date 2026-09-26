@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_error_unknown_reason" translatable="true">onbekende reden</string>
+    <string name="app_nothing_written" translatable="true">Er is niets geschreven.</string>
+    <string name="app_write_failed" translatable="true">Dat bestand kon niet worden geschreven: %1$s</string>
+    <string name="app_read_failed" translatable="true">Dat bestand kon niet worden gelezen: %1$s</string>
+    <string name="app_no_file_chosen" translatable="true">Er is geen bestand gekozen.</string>
+    <string name="app_class_gone" translatable="true">Die klas bestaat niet meer.</string>
+    <string name="app_record_loading" translatable="true">De gegevens worden nog geladen.</string>
+    <string name="app_wrote_csv" translatable="true">%1$s is geschreven, één rij per leerling.</string>
+    <string name="app_wrote_file" translatable="true">%1$s is geschreven.</string>
+    <string name="app_backed_up" translatable="true">Back-up gemaakt naar %1$s. Bewaar die op een plek die u vertrouwt.</string>
+    <string name="app_unlock_reason_classes" translatable="true">De gratis versie bevat één klas. De ontgrendeling heft die limiet op.</string>
+    <string name="app_unlock_reason_about" translatable="true">Over de ontgrendeling</string>
+    <string name="app_unlock_purchased" translatable="true">Ontgrendeld. Alle limieten zijn op dit apparaat opgeheven.</string>
+    <string name="app_unlock_restored" translatable="true">Hersteld. Uw ontgrendeling is weer actief.</string>
+    <string name="app_unlock_nothing_to_restore" translatable="true">Play meldt geen aankoop voor dit account, dus er is niets veranderd. Als u met een ander account hebt betaald, log dan daarmee in en probeer opnieuw.</string>
+    <string name="app_unlock_pending" translatable="true">Play verwerkt die betaling nog. Niets wordt ontgrendeld totdat dit klaar is en er is niets dubbel in rekening gebracht.</string>
+    <string name="app_unlock_unavailable" translatable="true">Google Play kan deze aankoop nu niet op dit apparaat verwerken. Uw gegevens, en de ontgrendeling als u die al hebt, blijven onaangetast.</string>
+    <string name="app_unlock_not_completed" translatable="true">Er is geen aankoop voltooid, dus er is niets in rekening gebracht. Alles wat u hebt vastgelegd staat er nog.</string>
+    <string name="app_unlock_offline" translatable="true">Google Play kon niet worden bereikt, dus er is niets geprobeerd. De app blijft offline werken; voor de ontgrendeling zelf is een verbinding nodig.</string>
+    <string name="app_unnamed_class_file" translatable="true">Klas</string>
+    <string name="nav_back" translatable="true">Terug</string>
+    <string name="document_could_not_open" translatable="true">Het bestand kon niet worden geopend.</string>
+    <string name="document_could_not_open_for_writing" translatable="true">Het bestand kon niet worden geopend om te schrijven.</string>
+    <string name="document_chosen_file" translatable="true">het gekozen bestand</string>
+    <string name="backup_empty" translatable="true">Dat bestand is leeg, dus er is niets hersteld.</string>
+    <string name="backup_not_mark_book" translatable="true">Dat bestand is geen back-up van Mark Book, dus er is niets hersteld.</string>
+    <string name="backup_missing_schema" translatable="true">Dat bestand heeft geen leesbare schemaversie, dus er is niets hersteld.</string>
+    <string name="backup_unsupported_version" translatable="true">Die back-up is gemaakt met een andere versie van de app (indeling %1$d; deze app leest indeling %2$d). Er is niets gewijzigd.</string>
+    <string name="backup_damaged" translatable="true">Die back-up is beschadigd en kon niet worden gelezen, dus er is niets hersteld: %1$s</string>
+</resources>

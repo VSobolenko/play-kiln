@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="classroom_class_title">クラス</string>
+    <string name="classroom_back">戻る</string>
+    <string name="classroom_back_to_classes">クラス一覧に戻る</string>
+    <string name="classroom_missing_title">そのクラスはもうここにありません。</string>
+    <string name="classroom_missing_body">削除されました。記録をバックアップしてあれば、バックアップを復元するとクラスと中身がすべて戻ります。</string>
+
+    <string name="classroom_tab_roster">名簿</string>
+    <string name="classroom_tab_grades">成績</string>
+    <string name="classroom_tab_attendance">出欠</string>
+    <string name="classroom_tab_notes">メモ</string>
+    <string name="classroom_tab_seating">座席</string>
+    <string name="classroom_tab_reports">レポート</string>
+    <string name="classroom_tab_setup">設定</string>
+
+    <string name="classroom_roster_eyebrow">生徒名簿</string>
+    <string name="classroom_roster_headline">このクラスの全員</string>
+    <string name="classroom_roster_supporting">生徒を開くと、評価・出欠・メモ・連絡を確認できます。</string>
+    <string name="classroom_students_label">生徒</string>
+    <string name="classroom_active_label">在籍</string>
+    <string name="classroom_add_student">生徒を追加</string>
+    <string name="classroom_import_csv">CSV から取り込む</string>
+    <string name="classroom_roster_limit_title">名簿の上限</string>
+    <string name="classroom_roster_limit_body">無料版では1クラスにつき生徒%1$d名までです。アンロックするとこの上限が解除され、エクスポートとバックアップも使えます。</string>
+    <string name="classroom_roster_empty">生徒がまだいません。1名ずつ追加するか、1列目に名前がある CSV を取り込んでください。取り込みで既存の生徒が上書きされることはありません。</string>
+    <string name="classroom_student_inactive">%1$s（在籍外）</string>
+    <string name="classroom_school_id">学校ID：%1$s</string>
+    <string name="classroom_average_with_letter">%1$s（%2$s）</string>
+    <string name="classroom_no_average">平均を出せるデータがまだありません</string>
+    <string name="classroom_no_average_short">評価なし</string>
+    <string name="classroom_student_summary">平均：%1$s</string>
+    <string name="classroom_student_summary_with_attendance">平均：%1$s・%2$s</string>
+    <plurals name="classroom_attendance_marks">
+        <item quantity="other">出欠%1$d件</item>
+    </plurals>
+    <string name="classroom_open">開く</string>
+    <string name="classroom_add">追加</string>
+    <string name="classroom_first_name">名</string>
+    <string name="classroom_last_name">姓</string>
+    <string name="classroom_name_supporting">姓または名のどちらか一方だけでもかまいません。</string>
+
+    <string name="classroom_grades_headline">評価をひと目で</string>
+    <string name="classroom_class_average">クラス平均</string>
+    <string name="classroom_unmarked_cells">未評価のセル</string>
+    <string name="classroom_unmarked">未評価</string>
+    <string name="classroom_unmarked_legend">点数なし、未提出、免除のいずれも記録されていません。</string>
+    <string name="classroom_add_category">カテゴリを追加</string>
+    <string name="classroom_categories_empty">カテゴリとは課題の種類（授業課題、試験など）で、最終成績における重みを持ちます。カテゴリがないと、評価を重み付けする対象がありません。</string>
+    <string name="classroom_grades_no_students">先に「名簿」タブで生徒を追加してください。評価する相手が必要です。</string>
+    <string name="classroom_assignments_empty">%1$sにはまだ課題がありません。</string>
+    <string name="classroom_grades_help">課題をタップするとクラス全体を評価できます。未提出と免除は点数とは別の扱いです。未評価のセルは0点ではありません。</string>
+    <string name="classroom_category_name">カテゴリ名</string>
+    <string name="classroom_weight_percent">重み（％）</string>
+    <string name="classroom_category_free_limit">無料版で使えるカテゴリは1つです。重み付きカテゴリはアンロックに含まれます。</string>
+    <string name="classroom_weight_help">重みは相対値です。60 と 40 は 6 と 4 と同じ意味です。</string>
+    <string name="classroom_edit_named">%1$sを編集</string>
+    <string name="classroom_save">保存</string>
+    <string name="classroom_new_assignment_in">%1$sに新しい課題</string>
+    <string name="classroom_assignment_name">課題名</string>
+    <string name="classroom_points_worth">配点</string>
+    <string name="classroom_points_positive">配点は0より大きい必要があります。</string>
+    <string name="classroom_points_change_warning">配点を変更すると、この課題のすべてのパーセントが変わります。</string>
+    <string name="classroom_delete_named">%1$sを削除しますか？</string>
+    <string name="classroom_delete_category">カテゴリを削除</string>
+    <string name="classroom_delete_assignment">課題を削除</string>
+    <plurals name="classroom_delete_category_body">
+        <item quantity="other">カテゴリと、それに含まれる課題%1$d件、および記録されたすべての評価を削除します。ほかのカテゴリは変更されません。</item>
+    </plurals>
+    <plurals name="classroom_delete_assignment_body">
+        <item quantity="other">課題と、それに記録された評価%1$d件を削除します。</item>
+    </plurals>
+    <string name="classroom_category_weight">重み %1$s％</string>
+    <string name="classroom_category_weight_drop">重み %1$s％・最低%2$d件を除外</string>
+    <string name="classroom_up">上へ</string>
+    <string name="classroom_down">下へ</string>
+    <string name="classroom_options">オプション</string>
+    <string name="classroom_add_assignment">課題を追加</string>
+    <string name="classroom_edit_name_weight">名前と重みを編集</string>
+    <string name="classroom_delete">削除</string>
+    <string name="classroom_assignment_points">配点 %1$s点</string>
+    <string name="classroom_mark_class">クラスを評価</string>
+    <string name="classroom_edit">編集</string>
+    <plurals name="classroom_marked_count">
+        <item quantity="other">%2$d件中%1$d件を記録</item>
+    </plurals>
+    <plurals name="classroom_missing_count">
+        <item quantity="other">未提出%1$d件</item>
+    </plurals>
+    <plurals name="classroom_exempt_count">
+        <item quantity="other">免除%1$d件</item>
+    </plurals>
+
+    <string name="classroom_attendance_headline">今日の出席簿</string>
+    <string name="classroom_attendance_present">出席</string>
+    <string name="classroom_attendance_late">遅刻</string>
+    <string name="classroom_attendance_excused">公欠</string>
+    <string name="classroom_attendance_absent">欠席</string>
+    <string name="classroom_register_for">対象日</string>
+    <string name="classroom_date_help">日付は YYYY-MM-DD 形式で入力してください（例：%1$s）。</string>
+    <string name="classroom_everyone_present">全員出席</string>
+    <string name="classroom_attendance_recorded">%2$d名中%1$d名を記録</string>
+    <string name="classroom_add_roster_first">先に「名簿」タブで生徒を追加してください。</string>
+    <string name="classroom_attendance_unrecorded">未記録</string>
+
+    <string name="classroom_notes_eyebrow">クラスの履歴</string>
+    <string name="classroom_notes_headline">メモと保護者連絡</string>
+    <string name="classroom_notes_supporting">最近あった出来事と、フォローが必要な連絡を確認できます。</string>
+    <string name="classroom_notes_label">メモ</string>
+    <string name="classroom_contacts_label">連絡</string>
+    <string name="classroom_followups_label">フォロー予定</string>
+    <string name="classroom_followups_title">フォロー予定</string>
+    <string name="classroom_followups_empty">フォロー日が設定されていません。保護者連絡にフォロー日を追加すると、ここに表示されます。</string>
+    <string name="classroom_followup_summary">%1$s・%2$s・%3$s：%4$s</string>
+    <string name="classroom_former_student">元の生徒</string>
+    <string name="classroom_parent_contacts">保護者連絡</string>
+    <string name="classroom_contacts_empty">保護者連絡はまだ記録されていません。連絡は生徒の画面から追加します。</string>
+    <string name="classroom_contact_with_followup">%1$s・%2$s・%3$s・フォロー %4$s</string>
+    <string name="classroom_contact_summary">%1$s・%2$s・%3$s</string>
+    <string name="classroom_notes_empty">メモはまだありません。メモは生徒の画面から追加します。</string>
+    <string name="classroom_note_summary">%1$s・%2$s・%3$s</string>
+    <string name="classroom_note_participation">授業参加</string>
+    <string name="classroom_note_behaviour">行動</string>
+    <string name="classroom_note_missing_work">未提出</string>
+    <string name="classroom_note_general">一般</string>
+    <string name="classroom_delete_note_title">このメモを削除しますか？</string>
+    <string name="classroom_delete_note_body">%2$sの「%1$s」を、生徒の履歴から削除します。</string>
+    <string name="classroom_delete_note">メモを削除</string>
+    <string name="classroom_delete_contact_title">この連絡を削除しますか？</string>
+    <string name="classroom_delete_contact_body">%1$s（%2$s）の記録を削除します。</string>
+    <string name="classroom_delete_contact">連絡を削除</string>
+
+    <string name="classroom_seating_eyebrow">教室レイアウト</string>
+    <string name="classroom_seating_headline">全員の席をひと目で把握</string>
+    <string name="classroom_seating_supporting">席をタップすると、生徒を割り当てたり移動したりできます。</string>
+    <string name="classroom_desks_label">席</string>
+    <string name="classroom_seated_label">着席済み</string>
+    <string name="classroom_unseated_label">未着席</string>
+    <string name="classroom_seating_none">座席表がまだありません。</string>
+    <string name="classroom_seating_summary">%1$d行 × %2$d列・%4$d席中%3$d席が使用中</string>
+    <string name="classroom_set_up">設定</string>
+    <string name="classroom_resize">サイズ変更</string>
+    <string name="classroom_seating_empty">席のグリッドを設定し、席をタップして生徒を配置します。ここで座席表を管理している先生は、学期ごとに紙へ書き直す必要がありません。</string>
+    <string name="classroom_empty_desk">空席</string>
+    <string name="classroom_not_seated">まだ着席していません</string>
+    <string name="classroom_next_free_desk">次の空席</string>
+    <string name="classroom_seating_grid">座席グリッド</string>
+    <string name="classroom_apply">適用</string>
+    <string name="classroom_rows">行</string>
+    <string name="classroom_columns">列</string>
+    <string name="classroom_desk_number">席%1$d</string>
+    <string name="classroom_seat">席</string>
+    <string name="classroom_move_here">ここに移動</string>
+    <string name="classroom_student_name">生徒名</string>
+    <string name="classroom_seat_help">名簿の名前を入力してください。空欄にするとこの席を空けます。</string>
+    <string name="classroom_student_not_found">この名簿に「%1$s」という生徒はいません。</string>
+
+    <string name="classroom_reports_eyebrow">共有の準備</string>
+    <string name="classroom_reports_headline">このクラスをエクスポート</string>
+    <string name="classroom_reports_ready">成績表、印刷用レポート、バックアップの準備ができています。</string>
+    <string name="classroom_reports_locked">記録はいつでも閲覧できます。エクスポートやバックアップにはアンロックが必要です。</string>
+    <string name="classroom_csv_rows">CSV の行数</string>
+    <string name="classroom_assignments_label">課題</string>
+    <string name="classroom_backups_label">バックアップ準備</string>
+    <string name="classroom_csv_title">表計算（CSV）</string>
+    <string name="classroom_csv_body">1行につき1名の生徒、1列につき1つの課題、その後に各カテゴリの平均と総合平均を出力します。保存した内容だけが書き出されます。未評価のセルは空のままで、名前にカンマや引用符が含まれる場合は正しく引用するため、ファイルは問題なく開けます。</string>
+    <string name="classroom_export_grade_sheet">成績表をエクスポート</string>
+    <string name="classroom_pdf_title">印刷用レポート（PDF）</string>
+    <string name="classroom_pdf_body">クラス全体を1枚にまとめ、丸め規則と未提出の扱いを印刷するので、渡したレポートはそれだけで説明がつきます。生徒ごとのレポートも作成できます。</string>
+    <string name="classroom_export_class_report">クラスレポートをエクスポート</string>
+    <string name="classroom_backup_title">バックアップと復元</string>
+    <string name="classroom_backup_body">バックアップは、すべてのクラス・生徒・評価・出欠記録・メモ・連絡・座席表を1つのファイルにまとめたものです。復元すると、この端末の内容がファイルの内容に置き換わります。認識できないファイルは、何も変更せずに拒否します。</string>
+    <string name="classroom_backup">バックアップ</string>
+    <string name="classroom_restore">復元</string>
+    <string name="classroom_export_locked">エクスポートとバックアップは一度きりのアンロックに含まれます。記録した内容はどちらでも引き続き閲覧できます。</string>
+    <string name="classroom_inventory_title">このクラスの内容</string>
+    <plurals name="classroom_students_count">
+        <item quantity="other">生徒%1$d名</item>
+    </plurals>
+    <plurals name="classroom_assignments_count">
+        <item quantity="other">課題%1$d件</item>
+    </plurals>
+    <plurals name="classroom_marks_count">
+        <item quantity="other">評価%1$d件</item>
+    </plurals>
+    <plurals name="classroom_attendance_records_count">
+        <item quantity="other">出欠記録%1$d件</item>
+    </plurals>
+    <plurals name="classroom_notes_count">
+        <item quantity="other">メモ%1$d件</item>
+    </plurals>
+    <plurals name="classroom_contacts_count">
+        <item quantity="other">保護者連絡%1$d件</item>
+    </plurals>
+
+    <string name="classroom_setup_eyebrow">クラスのルール</string>
+    <string name="classroom_setup_headline">このクラスの成績の計算方法</string>
+    <string name="classroom_setup_supporting">クラスの詳細、丸め、未提出の扱い、評定の区分を明示しておきましょう。</string>
+    <string name="classroom_categories_label">カテゴリ</string>
+    <string name="classroom_grade_bands_label">評定の区分</string>
+    <string name="classroom_class_details">クラスの詳細</string>
+    <string name="classroom_no_subject">教科が未設定</string>
+    <string name="classroom_period_value">%1$s限</string>
+    <string name="classroom_no_term">学期が未設定</string>
+    <string name="classroom_separator">・</string>
+    <string name="classroom_rounding">丸め</string>
+    <string name="classroom_round_half_up">四捨五入</string>
+    <string name="classroom_round_half_even">偶数丸め</string>
+    <string name="classroom_round_floor">切り捨て</string>
+    <plurals name="classroom_decimals">
+        <item quantity="other">小数第%1$d位</item>
+    </plurals>
+    <string name="classroom_rounding_help">丸め規則が違えば同じ評価でも数値が変わるため、すべての平均の横に表示されます。</string>
+    <string name="classroom_missing_work_title">未提出</string>
+    <string name="classroom_missing_counts_zero">未提出の評価は0点として計算</string>
+    <string name="classroom_missing_excluded">未提出の評価は平均から除外</string>
+    <string name="classroom_exempt_help">免除された課題は常に除外されます。未評価のセルはどちらにも数えません。</string>
+    <string name="classroom_letter_grades">評定</string>
+    <string name="classroom_letter_grades_empty">評定の基準が未設定のため、パーセントのみ表示されます。区分を追加すると、パーセントを学校で使う評定に変換できます。</string>
+    <string name="classroom_grade_band">%2$s％以上で%1$s</string>
+    <string name="classroom_remove">削除</string>
+    <string name="classroom_add_band">区分を追加</string>
+    <string name="classroom_delete_class_title">このクラスを削除</string>
+    <string name="classroom_delete_class_warning">削除すると、クラスとその中に記録されたすべてが消えます。必要になる可能性が少しでもあるなら、先に記録をバックアップしてください。</string>
+    <string name="classroom_delete_named_action">%1$sを削除</string>
+    <string name="classroom_class_name">クラス名</string>
+    <string name="classroom_subject">教科</string>
+    <string name="classroom_period">時限</string>
+    <string name="classroom_term">学期</string>
+    <string name="classroom_add_letter_band">評定の区分を追加</string>
+    <string name="classroom_letter">評定</string>
+    <string name="classroom_letter_example">例：A、B+、4</string>
+    <string name="classroom_from_percent">このパーセント以上</string>
+    <string name="classroom_band_invalid">区分には評定とパーセントの両方が必要です。</string>
+    <string name="classroom_delete_class">クラスを削除</string>
+    <plurals name="classroom_delete_class_body">
+        <item quantity="other">生徒%1$d名と、その生徒のすべての記録（評価、出欠、メモ、連絡、座席表）を削除します。元に戻すことはできません。</item>
+    </plurals>
+    <plurals name="rounding_half_up"><item quantity="other">小数点以下 %1$d 桁で四捨五入</item></plurals>
+    <plurals name="rounding_half_even"><item quantity="other">小数点以下 %1$d 桁で偶数丸め</item></plurals>
+    <plurals name="rounding_floor"><item quantity="other">小数点以下 %1$d 桁で切り捨て</item></plurals>
+    <string name="edit_class_needs_name">クラスには名前が必要です。</string>
+    <string name="edit_class_gone">そのクラスはもう存在しません。</string>
+    <string name="edit_student_needs_name">生徒には名前が必要です。</string>
+    <string name="edit_student_gone">その生徒はこの名簿にもういません。</string>
+    <string name="edit_category_needs_name">カテゴリには名前が必要です。</string>
+    <string name="edit_category_weight_not_positive">カテゴリの重みは 0 より大きくする必要があります。</string>
+    <string name="edit_drop_lowest_negative">最低点の除外数を負の値にはできません。</string>
+    <string name="edit_category_gone">そのカテゴリはもう存在しません。</string>
+    <string name="edit_category_already_at_end">そのカテゴリはすでにリストの最後にあります。</string>
+    <string name="edit_assignment_needs_name">課題には名前が必要です。</string>
+    <string name="edit_assignment_points_not_positive">課題の配点は 0 より大きくする必要があります。</string>
+    <string name="edit_assignment_gone">その課題はもう存在しません。</string>
+    <string name="edit_earned_points_negative">獲得点を負の値にはできません。</string>
+    <string name="edit_earned_points_above_maximum">獲得点は課題の配点 %1$s を超えることはできません。</string>
+    <string name="edit_note_needs_text">メモには本文が必要です。</string>
+    <string name="edit_note_gone">そのメモはもう存在しません。</string>
+    <string name="edit_contact_needs_channel">連絡には手段が必要です。</string>
+    <string name="edit_contact_needs_summary">連絡には要約が必要です。</string>
+    <string name="edit_contact_gone">その連絡はもう存在しません。</string>
+    <string name="edit_seating_grid_negative">座席表の行数または列数を負の値にはできません。</string>
+    <string name="edit_seating_grid_too_large">座席表は最大 20 × 20 席です。</string>
+    <string name="edit_desk_outside_grid">その机は座席表に含まれていません。</string>
+    <string name="edit_seating_grid_full">座席表のすべての机が使用されています。</string>
+    <string name="csv_student">生徒</string>
+    <string name="csv_external_id">外部 ID</string>
+    <string name="csv_overall_percent">総合 %</string>
+    <string name="csv_letter">評定</string>
+    <string name="csv_missing_counted_as_zero">未提出を 0 点として計算</string>
+    <string name="csv_rounding">丸め</string>
+    <string name="csv_missing">未提出</string>
+    <string name="csv_exempt">免除</string>
+    <string name="csv_yes">はい</string>
+    <string name="csv_no">いいえ</string>
+    <string name="import_no_name_first_column">最初の列に名前がありません</string>
+    <string name="report_attendance_present">出席</string>
+    <string name="report_attendance_tardy">遅刻</string>
+    <string name="report_attendance_absent_excused">欠席（理由あり）</string>
+    <string name="report_attendance_absent_unexcused">欠席（理由なし）</string>
+    <string name="report_note_participation">参加</string>
+    <string name="report_note_behaviour">行動</string>
+    <string name="report_note_missing_work">未提出の課題</string>
+    <string name="report_note_general">一般</string>
+</resources>

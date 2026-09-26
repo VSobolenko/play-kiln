@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_cancel">取消</string>
+    <string name="common_keep_it">保留</string>
+    <string name="common_date">日期</string>
+    <string name="common_today">今天</string>
+    <string name="common_name">姓名</string>
+
+    <string name="grades_assignment">作业</string>
+    <string name="grades_assignment_gone">该作业已不存在。</string>
+    <string name="grades_assignment_gone_body">它已被删除，针对它记录的成绩也随之删除。</string>
+    <string name="grades_entry_eyebrow">成绩录入</string>
+    <string name="grades_points_max">满分 %1$s 分</string>
+    <string name="grades_assignment_context">%1$s · 权重 %2$s%%</string>
+    <string name="grades_no_category">无类别</string>
+    <string name="grades_marked">已记录</string>
+    <string name="grades_unmarked">未评分</string>
+    <string name="grades_everyone">全班</string>
+    <string name="grades_still_to_mark">待评分</string>
+    <string name="grades_no_students">本班还没有学生。请在“名单”标签页添加。</string>
+    <string name="grades_all_recorded">本项作业每名学生都已记录。</string>
+    <string name="grades_entry_help">点按学生即可录入分数，或将作业标为未交或免修。未评分的项不等于零分。</string>
+
+    <string name="student_fallback_title">学生</string>
+    <string name="student_report">报告</string>
+    <string name="student_missing_title">该学生已不存在。</string>
+    <string name="student_missing_body">该学生已从名单中移除，其成绩、考勤、备注和联系记录也一并删除。</string>
+    <string name="student_overview">学生档案</string>
+    <string name="student_average_unavailable">无法计算平均分</string>
+    <string name="student_average_unavailable_caption">尚无已记录的成绩计入；这不等于零分。</string>
+    <plurals name="student_average_item_count"><item quantity="other">根据 %1$d 个已评分项计算</item></plurals>
+    <string name="student_attendance_rate">考勤</string>
+    <string name="student_graded">已评分</string>
+    <string name="student_ungraded">未评分</string>
+    <string name="student_marks">作业记录</string>
+    <string name="student_no_assignments">本班还没有作业。请在“成绩”标签页添加。</string>
+    <string name="student_no_category">无类别</string>
+    <string name="student_score_format">%1$s / %2$s</string>
+    <string name="student_percent_format">%1$s%%</string>
+    <string name="student_missing">未交</string>
+    <string name="student_exempt">免修</string>
+    <string name="student_unmarked">未评分</string>
+    <string name="student_attendance">考勤</string>
+    <string name="student_present">出勤</string>
+    <string name="student_late">迟到</string>
+    <string name="student_absent">缺勤</string>
+    <string name="student_attendance_exempt">免考勤</string>
+    <string name="student_no_attendance">尚未记录该学生的考勤。</string>
+    <string name="student_notes">备注</string>
+    <string name="student_no_notes">还没有内容。课堂表现、行为表现、未交作业和常规备注都会显示在这里。</string>
+    <string name="student_note_participation">课堂表现</string>
+    <string name="student_note_behaviour">行为表现</string>
+    <string name="student_note_missing_work">未交作业</string>
+    <string name="student_note_general">常规</string>
+    <string name="student_contacts">家长联系</string>
+    <string name="student_no_contacts">尚未记录该学生的家长联系。</string>
+    <string name="student_dated_kind">%1$s · %2$s</string>
+    <string name="student_follow_up">跟进日期：%1$s</string>
+    <string name="student_remove_section">从名单中移除</string>
+    <string name="student_remove_explanation">移除学生会同时删除其成绩、考勤、备注和联系记录。改为将其停用，则会保留历史记录，但不计入班级平均分。</string>
+    <string name="student_remove_action">移除%1$s</string>
+    <string name="student_remove_title">移除%1$s？</string>
+    <plurals name="student_remove_body"><item quantity="other">此操作会移除该学生以及 %1$d 个成绩、其考勤、备注、联系记录和座位表中的位置。此操作无法撤销。</item></plurals>
+    <string name="student_remove_confirm">移除学生</string>
+</resources>

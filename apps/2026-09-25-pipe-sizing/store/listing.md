@@ -15,25 +15,38 @@ ads/content-rating declarations, and `graphicsSource`. Each locale contains `tit
 
 Gas Pipe Sizing Workbook
 
-### Short description (72/80)
+### Short description (76/80)
 
-Offline gas pipe sizing arithmetic with user-entered loads and citations
+Offline gas pipe sizing arithmetic, saved cases, and your own code citations
 
-### Full description (891/4000)
+### Full description (1955/4000)
 
-Gas Pipe Sizing Workbook is a paid-once, offline calculation aid for organizing gas pipe sizing inputs and arithmetic.
+Gas Pipe Sizing Workbook is an offline calculation aid for organizing the gas pipe sizing arithmetic you already do on paper, around the readings your own code book gives you.
 
-Enter loads, developed lengths, fitting allowances, units, and user-confirmed capacity-like readings. The app sums loads and lengths, converts imperial and metric units both ways, compares required load with the value you entered, and records your edition, table, and row citation.
+Enter the material or system, the pressure class, the total load, the developed length and the fitting allowance. The app sums the loads and the lengths, converts imperial and metric units in both directions, compares the capacity you confirm against the load you need, and records the edition, table and row each reading came from.
 
-The app provides no code-table data and does not determine compliance, certify work, or endorse a source. It asserts no result when a required input, citation, range, or consistency check is missing; instead, it identifies what to correct.
+Save the cases you work on
+Keep a run as a named case with its readings, method, units and citation. Loading a case replaces the calculator, so a result always belongs to the readings on screen. The free tier keeps three cases; the one-time Pro unlock removes the limit.
 
-Your entries are saved on the device and restored the next time you open the app, including after the process has been killed. No history of previous cases is kept. No account, ads, subscription, in-app purchase, or network connection is required.
+A result is refused rather than guessed
+The app ships no code tables and does not determine compliance. When a reading is missing, unreadable, out of range, or inconsistent with the selected method, it names what to correct instead of showing a partial number.
+
+Share a case report
+A case can be shared as text, with its readings, the sums, the comparison and the recorded citation.
+
+Free tier and Pro
+The free tier shows an interstitial ad between evaluations, can keep three saved cases, and can unlock a case report once by watching a rewarded video. Pro is a single Google Play purchase: it removes the interstitial ads, removes the saved-case limit, and unlocks case reports without watching anything. It is not a subscription and nothing renews. A purchase can be restored on a new device with the same Google account.
+
+Privacy
+Ads are served by Google AdMob and are requested only after your ad choices are resolved; refusing them leaves the app fully usable. Your cases are stored on your device and are never uploaded.
+
+Verify every result against your own applicable code book. This app is not a certification, an endorsement, or a code-compliance determination.
 
 ### Screenshot captions
 
-1. Enter the sizing inputs
-2. Add loads and lengths
-3. Record the source citation
-4. Convert units both ways
+1. Enter the run readings
+2. Cite your own table
+3. Convert units both ways
+4. Save the case
 5. Review missing-input guidance
 6. Inspect the arithmetic result

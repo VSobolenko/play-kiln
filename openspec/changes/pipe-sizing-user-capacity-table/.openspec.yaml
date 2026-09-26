@@ -1,0 +1,5 @@
+schema: spec-driven
+created: 2026-09-26
+goal: Let the user record their own capacity table once and have the app return
+  values and sizes from it, under the code's documented rounding rules, without
+  the app ever supplying, interpolating or verifying a capacity.

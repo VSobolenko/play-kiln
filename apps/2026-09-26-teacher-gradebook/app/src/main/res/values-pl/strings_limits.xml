@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="limit_second_class" translatable="true">Wersja bezpłatna obejmuje jedną klasę. Odblokowanie znosi ten limit i wszystkie inne: nielimitowane klasy, nielimitowaną liczbę uczniów, kategorie z wagami, eksport i kopię zapasową.</string>
+    <plurals name="limit_student_cap" translatable="true">
+        <item quantity="one">Wersja bezpłatna obejmuje %1$d ucznia w klasie. Odblokowanie znosi ten limit i wszystkie inne: nielimitowane klasy, nielimitowaną liczbę uczniów, kategorie z wagami, eksport i kopię zapasową.</item>
+        <item quantity="few">Wersja bezpłatna obejmuje %1$d uczniów w klasie. Odblokowanie znosi ten limit i wszystkie inne: nielimitowane klasy, nielimitowaną liczbę uczniów, kategorie z wagami, eksport i kopię zapasową.</item>
+        <item quantity="many">Wersja bezpłatna obejmuje %1$d uczniów w klasie. Odblokowanie znosi ten limit i wszystkie inne: nielimitowane klasy, nielimitowaną liczbę uczniów, kategorie z wagami, eksport i kopię zapasową.</item>
+        <item quantity="other">Wersja bezpłatna obejmuje %1$d ucznia w klasie. Odblokowanie znosi ten limit i wszystkie inne: nielimitowane klasy, nielimitowaną liczbę uczniów, kategorie z wagami, eksport i kopię zapasową.</item>
+    </plurals>
+    <string name="limit_single_category" translatable="true">Wersja bezpłatna używa jednej kategorii, więc średnia jest zwykłą średnią. Odblokowanie znosi ten limit i wszystkie inne: nielimitowane klasy, nielimitowaną liczbę uczniów, kategorie z wagami, eksport i kopię zapasową.</string>
+    <string name="limit_export" translatable="true">Eksport arkusza ocen lub raportu do wydruku wchodzi w skład jednorazowego odblokowania, które znosi wszystkie limity wersji bezpłatnej: nielimitowane klasy, nielimitowaną liczbę uczniów i kategorie z wagami.</string>
+    <string name="limit_backup" translatable="true">Kopia zapasowa i przywracanie wchodzą w skład jednorazowego odblokowania, które znosi wszystkie limity wersji bezpłatnej: nielimitowane klasy, nielimitowaną liczbę uczniów i kategorie z wagami.</string>
+
+    <plurals name="import_imported" translatable="true">
+        <item quantity="one">Zaimportowano %1$d ucznia.</item>
+        <item quantity="few">Zaimportowano %1$d uczniów.</item>
+        <item quantity="many">Zaimportowano %1$d uczniów.</item>
+        <item quantity="other">Zaimportowano %1$d ucznia.</item>
+    </plurals>
+    <plurals name="import_already_on_roster" translatable="true">
+        <item quantity="one">%1$d wiersz był już na liście uczniów, więc nic nie zostało dodane dwa razy.</item>
+        <item quantity="few">%1$d wiersze były już na liście uczniów, więc nic nie zostało dodane dwa razy.</item>
+        <item quantity="many">%1$d wierszy było już na liście uczniów, więc nic nie zostało dodane dwa razy.</item>
+        <item quantity="other">%1$d wiersza było już na liście uczniów, więc nic nie zostało dodane dwa razy.</item>
+    </plurals>
+    <plurals name="import_skipped" translatable="true">
+        <item quantity="one">%1$d wiersz pominięto: %2$s</item>
+        <item quantity="few">%1$d wiersze pominięto: %2$s</item>
+        <item quantity="many">%1$d wierszy pominięto: %2$s</item>
+        <item quantity="other">%1$d wiersza pominięto: %2$s</item>
+    </plurals>
+    <string name="import_skipped_line" translatable="true">wiersz %1$d — %2$s</string>
+    <plurals name="import_blocked_by_limit" translatable="true">
+        <item quantity="one">%1$d uczeń nie zmieścił się: wersja bezpłatna obejmuje %2$d uczniów w klasie.</item>
+        <item quantity="few">%1$d uczniów nie zmieściło się: wersja bezpłatna obejmuje %2$d uczniów w klasie.</item>
+        <item quantity="many">%1$d uczniów nie zmieściło się: wersja bezpłatna obejmuje %2$d uczniów w klasie.</item>
+        <item quantity="other">%1$d ucznia nie zmieściło się: wersja bezpłatna obejmuje %2$d uczniów w klasie.</item>
+    </plurals>
+
+    <plurals name="restore_restored" translatable="true">
+        <item quantity="one">Przywrócono %1$d klasę.</item>
+        <item quantity="few">Przywrócono %1$d klasy.</item>
+        <item quantity="many">Przywrócono %1$d klas.</item>
+        <item quantity="other">Przywrócono %1$d klasy.</item>
+    </plurals>
+
+    <string name="storage_write_failed" translatable="true">Ta zmiana jest widoczna na ekranie, ale nie udało się jej zapisać w pamięci tego urządzenia.</string>
+
+    <string name="report_student_column" translatable="true">Uczeń</string>
+    <string name="report_overall_column" translatable="true">Średnia ogólna</string>
+    <string name="report_class_average" translatable="true">Średnia klasy: %1$s</string>
+    <string name="report_column_key" translatable="true">Objaśnienia kolumn: M = nieoddane, E = zwolnione, %1$s = nic nie zapisano.</string>
+    <string name="report_footer" translatable="true">%1$s · strona %2$d · prywatny zapis na tym urządzeniu, a nie oficjalny dokument</string>
+    <string name="report_student_gone" translatable="true">Tego ucznia nie ma już na tej liście.</string>
+    <string name="report_school_id" translatable="true">Identyfikator szkolny %1$s</string>
+    <string name="report_overall" translatable="true">Średnia ogólna: %1$s</string>
+    <string name="report_period" translatable="true">Lekcja %1$s</string>
+    <string name="report_averages_rule" translatable="true">Średnie: %1$s; nieoddane prace — %2$s.</string>
+    <string name="report_missing_counts_zero" translatable="true">zero</string>
+    <string name="report_missing_counts_excluded" translatable="true">są pomijane</string>
+    <string name="report_printed" translatable="true">Wydrukowano %1$s · prywatny zapis przechowywany na tym urządzeniu</string>
+    <string name="report_categories" translatable="true">Kategorie</string>
+    <string name="report_excluded_no_grade" translatable="true">pominięta (brak oceny)</string>
+    <string name="report_dropped_lowest" translatable="true">, odrzucono najniższe: %1$d</string>
+    <string name="report_missing_count" translatable="true">, %1$d nieoddane</string>
+    <string name="report_exempt_count" translatable="true">, %1$d zwolnione</string>
+    <string name="report_grades" translatable="true">Oceny</string>
+    <string name="report_missing" translatable="true">nieoddane</string>
+    <string name="report_exempt" translatable="true">zwolnione</string>
+    <string name="report_attendance" translatable="true">Frekwencja</string>
+    <string name="report_notes" translatable="true">Notatki</string>
+    <string name="report_parent_contacts" translatable="true">Kontakty z rodzicami</string>
+    <string name="report_follow_up" translatable="true"> (kontynuacja %1$s)</string>
+</resources>

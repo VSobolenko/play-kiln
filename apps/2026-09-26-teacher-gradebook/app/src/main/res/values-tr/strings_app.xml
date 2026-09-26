@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_error_unknown_reason" translatable="true">bilinmeyen neden</string>
+
+    <string name="app_nothing_written" translatable="true">Hiçbir şey yazılmadı.</string>
+    <string name="app_write_failed" translatable="true">Bu dosya yazılamadı: %1$s</string>
+    <string name="app_read_failed" translatable="true">Bu dosya okunamadı: %1$s</string>
+    <string name="app_no_file_chosen" translatable="true">Dosya seçilmedi.</string>
+    <string name="app_class_gone" translatable="true">Bu sınıf artık yok.</string>
+    <string name="app_record_loading" translatable="true">Kayıt hâlâ yükleniyor.</string>
+    <string name="app_wrote_csv" translatable="true">%1$s yazıldı; her öğrenci için bir satır.</string>
+    <string name="app_wrote_file" translatable="true">%1$s yazıldı.</string>
+    <string name="app_backed_up" translatable="true">%1$s konumuna yedeklendi. Güvendiğiniz bir yerde saklayın.</string>
+
+    <string name="app_unlock_reason_classes" translatable="true">Ücretsiz sürümde tek sınıf tutulur. Kilit açma bu sınırı kaldırır.</string>
+    <string name="app_unlock_reason_about" translatable="true">Kilit açma hakkında</string>
+
+    <string name="app_unlock_purchased" translatable="true">Kilit açıldı. Bu cihazda tüm sınırlar kaldırıldı.</string>
+    <string name="app_unlock_restored" translatable="true">Geri yüklendi. Kilit açmanız yeniden etkin.</string>
+    <string name="app_unlock_nothing_to_restore" translatable="true">Play bu hesap için bir satın alma bildirmiyor, bu yüzden hiçbir şey değişmedi. Başka bir hesapla ödediyseniz o hesapla oturum açıp yeniden deneyin.</string>
+    <string name="app_unlock_pending" translatable="true">Play bu ödemeyi hâlâ işliyor. Tamamlanana kadar hiçbir şey açılmaz ve iki kez ücret alınmaz.</string>
+    <string name="app_unlock_unavailable" translatable="true">Google Play bu cihazda şu anda bu satın almayı gerçekleştiremiyor. Çalışmalarınız ve varsa kilit açmanız etkilenmedi.</string>
+    <string name="app_unlock_not_completed" translatable="true">Hiçbir satın alma tamamlanmadı, bu yüzden ücret alınmadı. Kaydettiğiniz her şey yerinde.</string>
+    <string name="app_unlock_offline" translatable="true">Google Play\'e ulaşılamadı, bu yüzden hiçbir girişimde bulunulmadı. Uygulama çevrimdışı çalışmaya devam eder; kilit açmanın kendisi bağlantı gerektirir.</string>
+
+    <string name="app_unnamed_class_file" translatable="true">Sınıf</string>
+    <string name="nav_back">Geri</string>
+    <string name="document_could_not_open">Dosya açılamadı.</string>
+    <string name="document_could_not_open_for_writing">Dosya yazmak için açılamadı.</string>
+    <string name="document_chosen_file">seçilen dosya</string>
+    <string name="backup_empty">Dosya boş, bu yüzden hiçbir şey geri yüklenmedi.</string>
+    <string name="backup_not_mark_book">Bu dosya bir Mark Book yedeği değil, bu yüzden hiçbir şey geri yüklenmedi.</string>
+    <string name="backup_missing_schema">Bu dosyada okunabilir bir şema sürümü yok, bu yüzden hiçbir şey geri yüklenmedi.</string>
+    <string name="backup_unsupported_version">Bu yedek uygulamanın başka bir sürümüyle yazıldı (biçim %1$d; bu uygulama %2$d biçimini okur). Hiçbir şey değiştirilmedi.</string>
+    <string name="backup_damaged">Bu yedek hasarlı ve okunamadı, bu yüzden hiçbir şey geri yüklenmedi: %1$s</string>
+</resources>

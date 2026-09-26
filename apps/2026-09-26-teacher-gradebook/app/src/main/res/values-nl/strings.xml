@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">Mark Book for Teachers</string>
+    <string name="app_idea" translatable="true">Een privé-cijferboek dat offline werkt en volledig van u is: maak, bewerk en verwijder elke klas, leerling, categorie, opdracht, elk cijfer, aanwezigheidsrecord, participatienotitie, oudercontact en elke plaats zonder account of server. Bekijk een uitlegbaar doorlopend gemiddelde met de afrondingsregel, regel voor niet ingeleverd werk en elke uitgesloten categorie, exporteer CSV en PDF en bewaar een herstelbare back-up. Gratis voor één klas met maximaal 20 leerlingen; eenmalig ontgrendeld, niet gehuurd.</string>
+</resources>

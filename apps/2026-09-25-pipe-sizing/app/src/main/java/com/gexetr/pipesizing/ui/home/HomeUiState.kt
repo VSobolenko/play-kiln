@@ -68,6 +68,12 @@ sealed interface HomeEvent {
     data class UnitChanged(val unitSystem: UnitSystem) : HomeEvent
     data object ConfirmCapacity : HomeEvent
     data object Evaluate : HomeEvent
+
+    /**
+     * Replaces the working case with a stored one. The stored map is the same shape the app already
+     * restores on launch, so a loaded case and a relaunch cannot diverge.
+     */
+    data class CaseLoaded(val values: Map<String, String>) : HomeEvent
 }
 
 enum class HomeField { MATERIAL, PRESSURE, LOAD, LENGTH, FITTING_QUANTITY, FITTING_LENGTH, CAPACITY, EDITION, TABLE, ROW, GAS_SPECIFIC_GRAVITY, PRESSURE_DROP, PIPE_DIAMETER }

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unlock_title">Sınırları kaldır</string>
+    <string name="unlock_benefit_heading">Ücretsiz sürümün sınırları olmadan öğretmeye devam edin</string>
+    <string name="unlock_benefit_classes">Sınırsız sınıf</string>
+    <string name="unlock_benefit_students">Her sınıfta sınırsız öğrenci</string>
+    <string name="unlock_benefit_categories">Ağırlıklı kategoriler ve en düşük notu çıkarma</string>
+    <string name="unlock_benefit_csv">CSV not defteri dışa aktarma</string>
+    <string name="unlock_benefit_pdf">Yazdırılabilir PDF sınıf ve öğrenci raporları</string>
+    <string name="unlock_benefit_backup">Tüm kaydınızı yedekleyin ve geri yükleyin</string>
+    <string name="unlock_price_loading">Fiyat, onaydan önce Google Play tarafından gösterilir</string>
+    <string name="unlock_one_time_purchase">Tek ödeme. Bu bir abonelik değildir.</string>
+    <string name="unlock_google_play_notice">Satın almayı Google Play yürütür ve onaylamadan önce tam fiyatı kendi para biriminizde gösterir. Kalıcı kilit açmanız, yeniden yükledikten ya da yeni bir cihaza geçtikten sonra geri yüklenebilir ve geri yüklendikten sonra çevrimdışı çalışır.</string>
+    <string name="unlock_billing_unavailable_title">Google Play şu anda kullanılamıyor</string>
+    <string name="unlock_billing_unavailable_body">Satın alma ve geri yükleme Google Play bağlantısı gerektirir. Mevcut kaydınız güvende ve çalışmaya devam eder.</string>
+    <string name="unlock_purchase_button">Google Play\'e devam et</string>
+    <string name="unlock_restore_button">Satın almayı geri yükle</string>
+    <string name="unlock_dismiss_button">Şimdi değil</string>
+
+    <string name="about_title">Bu uygulama hakkında</string>
+    <string name="about_hero_eyebrow">Gizli öğretmen kaydı</string>
+    <string name="about_hero_purpose">Sınıflar, notlar, yoklama ve gözlem notları, kontrol ettiğiniz tek bir kayıtta.</string>
+    <string name="about_what_title">Mark Book nedir</string>
+    <string name="about_what_body">Okul sisteminizin yanında tuttuğunuz kayıt için gizli bir not defteri. Öğrenci listelerini, notları, yoklamayı, katılım gözlem notlarını, veli görüşmelerini ve oturma planlarını bir arada tutar.</string>
+    <string name="about_privacy_title">Tasarımı gereği gizli</string>
+    <string name="about_privacy_body">Uygulama çevrimdışı çalışır ve kaydınızı bu cihazdaki özel depolamaya yazar. Hesap, oturum açma, analiz, reklam ya da geliştirici sunucusu yoktur. Dosyalar yalnızca sistem seçicisi üzerinden dışa aktardığınızda ya da yedeklediğinizde cihazdan çıkar; cihaz yedeklemesi açıksa Android Otomatik Yedekleme kaydı kendi Google hesabınıza da kopyalayabilir.</string>
+    <string name="about_privacy_billing">Google Play Faturalandırma satın alma trafiğini ve satın alma geçmişini yürütür. Bu uygulama üzerinden sınıf kaydınızı asla almaz.</string>
+    <string name="about_averages_title">Ortalamalar hesabını açıklar</string>
+    <string name="about_averages_body">Her ortalama, sizin belirlediğiniz kategorilere, ağırlıklara, yuvarlamaya ve teslim edilmeyen ödev kuralına uyar. Boş ve muaf çalışma sessizce sıfıra çevrilmez; kullanılabilir notu olmayan kategoriler adlandırılır ve dışarıda bırakılır.</string>
+    <string name="about_purchase_title">Tek kalıcı kilit açma</string>
+    <string name="about_purchase_unlocked">Kilit açma bu cihazda etkin. Yenilenecek ya da iptal edilecek bir abonelik yok.</string>
+    <string name="about_purchase_free">Ücretsiz sürüm bir sınıf, en fazla 20 öğrenci ve bir kategori tutar. Tek seferlik satın alma bu sınırları kaldırır; ağırlıklı kategorileri, dışa aktarmayı, PDF raporlarını, yedekleme ve geri yüklemeyi ekler.</string>
+    <string name="about_purchase_action">Kilit açmaya nelerin dahil olduğunu görün</string>
+    <string name="about_version_title">Sürüm</string>
+    <string name="about_version_value">%1$s</string>
+    <string name="about_support_title">Destek</string>
+    <string name="about_leaving_title">Verileriniz ve ayrılma</string>
+    <string name="about_leaving_body">Tek tek kayıtları silebilir, uygulama depolamasını temizleyebilir ya da uygulamayı kaldırabilirsiniz. Uygulamayı kaldırmak cihazdaki kaydı siler; dışa aktardığınız ya da Android\'in yedeklediği kopyalar sizin kontrolünüzde kalır.</string>
+
+    <string name="average_not_enough_title">Henüz yeterli veri yok</string>
+    <string name="average_not_enough_body">Bu ortalamaya giren kayıtlı not yok. Bu sıfır değildir.</string>
+    <string name="average_percent_value">%1$s%%</string>
+    <string name="average_overall_caption">Genel ortalama</string>
+    <string name="average_rule_missing_zero">%1$s; teslim edilmeyen ödev sıfır sayılır</string>
+    <string name="average_rule_missing_excluded">%1$s; teslim edilmeyen ödev dışarıda bırakılır</string>
+    <string name="average_rule_unweighted">Hiçbir kategorinin ağırlığı yok, bu yüzden kategori ortalamaları eşit sayılır.</string>
+    <string name="average_meaning">Bu sonucu sınıfın geçme notuyla karşılaştırın. Sonucu aşağı çeken ya da sapan kategoriyi görmek için hesabı açın.</string>
+    <string name="average_hide_working">Hesabı gizle</string>
+    <string name="average_show_working">Hesabı göster</string>
+    <string name="average_no_categories">Bu sınıfta henüz kategori yok, bu yüzden tartılacak bir şey yok.</string>
+    <string name="average_category_weight">%1$s · ağırlık %2$s</string>
+    <string name="average_category_excluded">Ortalamadan çıkarıldı: bu kategoride ortalamaya giren not yok.</string>
+    <plurals name="average_category_grade_count">
+        <item quantity="one">%2$d nottan ortalama %1$s</item>
+        <item quantity="other">%2$d nottan ortalama %1$s</item>
+    </plurals>
+    <plurals name="average_dropped_count">
+        <item quantity="one">En düşük %1$d not çıkarıldı</item>
+        <item quantity="other">En düşük %1$d not çıkarıldı</item>
+    </plurals>
+    <plurals name="average_missing_count">
+        <item quantity="one">%1$d teslim edilmedi</item>
+        <item quantity="other">%1$d teslim edilmedi</item>
+    </plurals>
+    <plurals name="average_exempt_count">
+        <item quantity="one">%1$d muaf</item>
+        <item quantity="other">%1$d muaf</item>
+    </plurals>
+    <string name="average_score_value">%1$s/%2$s</string>
+    <string name="average_missing">Teslim edilmedi</string>
+    <string name="average_exempt">Muaf</string>
+    <string name="average_empty_mark">—</string>
+    <string name="average_score_description">%2$s üzerinden %1$s</string>
+    <string name="average_missing_description">Teslim edilmedi olarak işaretlendi</string>
+    <string name="average_exempt_description">Muaf olarak işaretlendi</string>
+    <string name="average_empty_description">Kayıt yok</string>
+    <string name="average_assignment_points">%1$s puan değerinde.</string>
+    <string name="average_score">Puan</string>
+    <string name="average_record_score_description">Puan kaydet</string>
+    <string name="average_points_earned">Alınan puan</string>
+    <string name="average_points_too_high">Bu, ödevin değeri olan %1$s puandan fazla.</string>
+    <string name="average_missing_rule_help">Teslim edilmeyen ödev, bu sınıfın teslim edilmeyen ödev kuralına göre işlenir.</string>
+    <string name="average_exempt_rule_help">Muaf çalışma ortalamadan tamamen çıkarılır — sıfır değildir.</string>
+    <string name="average_save">Kaydet</string>
+    <string name="average_clear">Temizle</string>
+    <string name="average_cancel">İptal</string>
+</resources>

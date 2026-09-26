@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_error_unknown_reason" translatable="true">未知原因</string>
+
+    <string name="app_nothing_written" translatable="true">未写入任何内容。</string>
+    <string name="app_write_failed" translatable="true">无法写入该文件：%1$s</string>
+    <string name="app_read_failed" translatable="true">无法读取该文件：%1$s</string>
+    <string name="app_no_file_chosen" translatable="true">未选择任何文件。</string>
+    <string name="app_class_gone" translatable="true">该班级已不存在。</string>
+    <string name="app_record_loading" translatable="true">记录仍在加载中。</string>
+    <string name="app_wrote_csv" translatable="true">已写入 %1$s，每名学生一行。</string>
+    <string name="app_wrote_file" translatable="true">已写入 %1$s。</string>
+    <string name="app_backed_up" translatable="true">已备份到 %1$s。请妥善保管。</string>
+
+    <string name="app_unlock_reason_classes" translatable="true">免费版只能保留一个班级。解锁后即可取消该限制。</string>
+    <string name="app_unlock_reason_about" translatable="true">关于解锁</string>
+
+    <string name="app_unlock_purchased" translatable="true">已解锁。本设备上的所有限制均已取消。</string>
+    <string name="app_unlock_restored" translatable="true">已恢复。你的解锁已重新生效。</string>
+    <string name="app_unlock_nothing_to_restore" translatable="true">Play 显示此账号没有购买记录，因此未做任何更改。如果你是用其他账号付款的，请登录该账号后重试。</string>
+    <string name="app_unlock_pending" translatable="true">Play 仍在处理该笔付款。付款完成前不会解锁任何内容，也不会重复扣款。</string>
+    <string name="app_unlock_unavailable" translatable="true">Google Play 目前无法在此设备上完成该购买。你的数据不会受影响；如果你已解锁，解锁状态也保持不变。</string>
+    <string name="app_unlock_not_completed" translatable="true">购买未完成，因此没有扣款。你记录的所有内容都还在。</string>
+    <string name="app_unlock_offline" translatable="true">无法连接 Google Play，因此未进行任何操作。应用可继续离线使用；但解锁本身需要联网。</string>
+
+    <string name="app_unnamed_class_file" translatable="true">班级</string>
+    <string name="nav_back">返回</string>
+    <string name="document_could_not_open">无法打开文件。</string>
+    <string name="document_could_not_open_for_writing">无法以写入方式打开文件。</string>
+    <string name="document_chosen_file">所选文件</string>
+    <string name="backup_empty">该文件为空，因此没有恢复任何内容。</string>
+    <string name="backup_not_mark_book">该文件不是 Mark Book 备份，因此没有恢复任何内容。</string>
+    <string name="backup_missing_schema">该文件没有可读取的架构版本，因此没有恢复任何内容。</string>
+    <string name="backup_unsupported_version">此备份由其他版本的应用写入（格式 %1$d；此应用读取格式 %2$d）。未作任何更改。</string>
+    <string name="backup_damaged">此备份已损坏，无法读取，因此没有恢复任何内容：%1$s</string>
+</resources>

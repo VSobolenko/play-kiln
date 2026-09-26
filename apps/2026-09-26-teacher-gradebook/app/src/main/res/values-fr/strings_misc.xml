@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unlock_title">Supprimer les limites</string>
+    <string name="unlock_benefit_heading">Enseignez sans les limites gratuites</string>
+    <string name="unlock_benefit_classes">Classes illimitées</string>
+    <string name="unlock_benefit_students">Élèves illimités dans chaque classe</string>
+    <string name="unlock_benefit_categories">Catégories pondérées et suppression de la note la plus basse</string>
+    <string name="unlock_benefit_csv">Exportation CSV du carnet de notes</string>
+    <string name="unlock_benefit_pdf">Rapports PDF imprimables pour les classes et les élèves</string>
+    <string name="unlock_benefit_backup">Sauvegarde et restauration de tout votre dossier</string>
+    <string name="unlock_price_loading">Prix affiché par Google Play avant confirmation</string>
+    <string name="unlock_one_time_purchase">Un seul paiement. Sans abonnement.</string>
+    <string name="unlock_google_play_notice">Google Play traite l’achat et affiche le prix exact dans votre devise avant confirmation. Votre déblocage définitif peut être restauré après une réinstallation ou sur un nouvel appareil, puis fonctionne hors ligne.</string>
+    <string name="unlock_billing_unavailable_title">Google Play est indisponible</string>
+    <string name="unlock_billing_unavailable_body">L’achat et la restauration nécessitent une connexion à Google Play. Votre dossier existant reste intact et utilisable.</string>
+    <string name="unlock_purchase_button">Continuer sur Google Play</string>
+    <string name="unlock_restore_button">Restaurer l’achat</string>
+    <string name="unlock_dismiss_button">Plus tard</string>
+    <string name="about_title">À propos de l’application</string>
+    <string name="about_hero_eyebrow">Dossier privé de l’enseignant</string>
+    <string name="about_hero_purpose">Classes, notes, présence et remarques dans un dossier que vous contrôlez.</string>
+    <string name="about_what_title">Qu’est-ce que Mark Book ?</string>
+    <string name="about_what_body">Un carnet de notes privé qui complète le système de votre établissement. Il regroupe listes d’élèves, notes, présence, remarques sur la participation, contacts avec les parents et plans de classe.</string>
+    <string name="about_privacy_title">Privé par conception</string>
+    <string name="about_privacy_body">L’application fonctionne hors ligne et enregistre votre dossier dans le stockage privé de cet appareil. Aucun compte, connexion, outil d’analyse, publicité ou serveur du développeur. Les fichiers ne quittent l’appareil que lors d’une exportation ou sauvegarde via le sélecteur système ; Android Auto Backup peut aussi copier le dossier vers votre compte Google si la sauvegarde de l’appareil est activée.</string>
+    <string name="about_privacy_billing">Google Play Billing traite l’achat et son historique. Il ne reçoit jamais le dossier de votre classe via cette application.</string>
+    <string name="about_averages_title">Des moyennes expliquées</string>
+    <string name="about_averages_body">Chaque moyenne suit les catégories, coefficients, règles d’arrondi et de travaux non rendus que vous définissez. Un devoir vide ou dispensé ne devient jamais silencieusement un zéro, et les catégories sans note exploitable sont nommées puis exclues.</string>
+    <string name="about_purchase_title">Un déblocage définitif</string>
+    <string name="about_purchase_unlocked">Le déblocage est actif sur cet appareil. Aucun abonnement à renouveler ou résilier.</string>
+    <string name="about_purchase_free">La version gratuite conserve une classe, 20 élèves maximum et une catégorie. Un achat unique supprime ces limites et ajoute les catégories pondérées, l’exportation, les rapports PDF, la sauvegarde et la restauration.</string>
+    <string name="about_purchase_action">Voir le contenu du déblocage</string>
+    <string name="about_version_title">Version</string>
+    <string name="about_version_value">%1$s</string>
+    <string name="about_support_title">Assistance</string>
+    <string name="about_leaving_title">Vos données et votre départ</string>
+    <string name="about_leaving_body">Vous pouvez supprimer des éléments, effacer les données de l’application ou la désinstaller. La désinstallation supprime le dossier de l’appareil ; les copies exportées ou sauvegardées par Android restent sous votre contrôle.</string>
+    <string name="average_not_enough_title">Pas encore assez de données</string>
+    <string name="average_not_enough_body">Aucune note saisie ne compte encore dans cette moyenne. Ce n’est pas un zéro.</string>
+    <string name="average_percent_value">%1$s%%</string>
+    <string name="average_overall_caption">Moyenne générale</string>
+    <string name="average_rule_missing_zero">%1$s ; un travail non rendu vaut zéro</string>
+    <string name="average_rule_missing_excluded">%1$s ; les travaux non rendus sont exclus</string>
+    <string name="average_rule_unweighted">Aucune catégorie n’a de coefficient : leurs moyennes comptent donc à parts égales.</string>
+    <string name="average_meaning">Comparez ce résultat au seuil de réussite de la classe. Ouvrez le détail pour voir quelle catégorie fait baisser le résultat ou s’en écarte.</string>
+    <string name="average_hide_working">Masquer le détail</string>
+    <string name="average_show_working">Afficher le détail</string>
+    <string name="average_no_categories">Cette classe n’a pas encore de catégories : rien ne peut être pondéré.</string>
+    <string name="average_category_weight">%1$s · coefficient %2$s</string>
+    <string name="average_category_excluded">Exclue de la moyenne : aucune note ne compte encore dans cette catégorie.</string>
+    <plurals name="average_category_grade_count"><item quantity="one">Moyenne %1$s sur %2$d note</item><item quantity="other">Moyenne %1$s sur %2$d notes</item></plurals>
+    <plurals name="average_dropped_count"><item quantity="one">%1$d note la plus basse supprimée</item><item quantity="other">%1$d notes les plus basses supprimées</item></plurals>
+    <plurals name="average_missing_count"><item quantity="one">%1$d devoir non rendu</item><item quantity="other">%1$d devoirs non rendus</item></plurals>
+    <plurals name="average_exempt_count"><item quantity="one">%1$d devoir dispensé</item><item quantity="other">%1$d devoirs dispensés</item></plurals>
+    <string name="average_score_value">%1$s/%2$s</string>
+    <string name="average_missing">Non rendu</string>
+    <string name="average_exempt">Dispensé</string>
+    <string name="average_empty_mark">—</string>
+    <string name="average_score_description">%1$s sur %2$s</string>
+    <string name="average_missing_description">Marqué non rendu</string>
+    <string name="average_exempt_description">Marqué dispensé</string>
+    <string name="average_empty_description">Aucune saisie</string>
+    <string name="average_assignment_points">Sur %1$s points.</string>
+    <string name="average_score">Note</string>
+    <string name="average_record_score_description">Saisir une note</string>
+    <string name="average_points_earned">Points obtenus</string>
+    <string name="average_points_too_high">Cette valeur dépasse les %1$s points du devoir.</string>
+    <string name="average_missing_rule_help">Les travaux non rendus suivent la règle définie pour cette classe.</string>
+    <string name="average_exempt_rule_help">Un devoir dispensé est entièrement exclu de la moyenne : il ne vaut pas zéro.</string>
+    <string name="average_save">Enregistrer</string>
+    <string name="average_clear">Effacer</string>
+    <string name="average_cancel">Annuler</string>
+</resources>

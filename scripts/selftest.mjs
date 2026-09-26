@@ -97,6 +97,36 @@ function createSandbox() {
     join(ROOT, 'scripts', 'lib', 'namespaces.mjs'),
     join(sandbox, 'scripts', 'lib', 'namespaces.mjs')
   )
+  // `new-slot.mjs` now imports the economics validator, so the sandbox needs the
+  // module beside it or the first scaffold run dies on a missing import.
+  copyFileSync(
+    join(ROOT, 'scripts', 'lib', 'slot-economics.mjs'),
+    join(sandbox, 'scripts', 'lib', 'slot-economics.mjs')
+  )
+  // The promise gate and its module are driven against synthetic slots below, so the
+  // sandbox needs both or the section cannot run. The two recon documents exist because
+  // a promise's evidence and the contract's `reconRef` are resolved on disk: a citation
+  // to a file that is not there is the dangling reference the gate is meant to catch.
+  copyFileSync(
+    join(ROOT, 'scripts', 'check-differentiators.mjs'),
+    join(sandbox, 'scripts', 'check-differentiators.mjs')
+  )
+  copyFileSync(
+    join(ROOT, 'scripts', 'lib', 'slot-differentiators.mjs'),
+    join(sandbox, 'scripts', 'lib', 'slot-differentiators.mjs')
+  )
+  mkdirSync(join(sandbox, 'docs', 'research'), { recursive: true })
+  mkdirSync(join(sandbox, 'docs', 'ideation'), { recursive: true })
+  writeFileSync(
+    join(sandbox, 'docs', 'research', 'selftest-evidence.md'),
+    '# Self-test recon evidence\n\nMeasured for the factory self-test only.\n',
+    'utf8'
+  )
+  writeFileSync(
+    join(sandbox, 'docs', 'ideation', 'selftest-recon.md'),
+    '# Self-test recon\n\nWritten for the factory self-test only.\n',
+    'utf8'
+  )
   cpSync(SCAFFOLD, join(sandbox, 'scaffold'), { recursive: true })
   return sandbox
 }
@@ -151,7 +181,7 @@ check(
 const scaffoldIgnore = existsSync(join(SLOT_SCAFFOLD, '.gitignore'))
   ? readFileSync(join(SLOT_SCAFFOLD, '.gitignore'), 'utf8').split(/\r?\n/).map((item) => item.trim())
   : []
-for (const entry of ['keystore.properties', '*.jks', '*.keystore', '.env', 'local.properties']) {
+for (const entry of ['keystore.properties', '*.jks', '*.keystore', '.env', 'local.properties', 'release-approval.json']) {
   check(scaffoldIgnore.includes(entry), `scaffold .gitignore covers ${entry}`)
 }
 
@@ -281,15 +311,193 @@ const slotDate = '1970-01-01'
 const slotDir = join(sandbox, 'apps', `${slotDate}-selftest`)
 const expectedApplicationId = applicationIdForSlug('selftest')
 
+/**
+ * A complete, valid plan. `new-slot.mjs` must be handed one for every run that is
+ * expected to reach the filesystem. Overrides let a check break exactly one field,
+ * so the failure it observes is attributable to that field and not to the fixture.
+ */
+const ECONOMICS_EVIDENCE_REF = 'docs/research/2026-09-23-plant-vertical-evidence.md'
+
+function validEconomics(overrides = {}) {
+  return {
+    schemaVersion: 1,
+    archetype: 'purchase_led_single_unlock',
+    payingUser: 'A gas fitter who sizes a pipe run on site and needs the result recorded.',
+    paidUnit: 'One permanent unlock of the export and multi-run comparison features.',
+    priceUsd: 4.99,
+    momentOfPayment: 'After the first saved sizing run, when the fitter taps export.',
+    distinctnessSentence: 'It records the code edition and table each reading came from so a result can be re-checked.',
+    evidenceRef: `${ECONOMICS_EVIDENCE_REF}#demand`,
+    day1RevenuePath: 'The first paid unlock arrives from a fitter exporting a run for a permit packet.',
+    killCriteria: { windowDays: 30, minInstalls: 500, minRevenueUsd: 50 },
+    assumptionsUnverified: ['Fitters may prefer a paper form to a phone for permit paperwork.'],
+    ...overrides
+  }
+}
+
+function writeEconomicsFixture(name, overrides) {
+  const file = join(sandbox, name)
+  writeFileSync(file, `${JSON.stringify(validEconomics(overrides), null, 2)}\n`, 'utf8')
+  return file
+}
+
+const validEconomicsFile = writeEconomicsFixture('economics-valid.json')
+
+/**
+ * A valid contract in the state a fresh plan is in: every promise `deferred`. The gate
+ * must accept that at scaffold time, because nothing has been built. That half is asserted
+ * by the dash-slug slot further down; the refusal half is asserted by the `diffdeferred`
+ * leg in the differentiator section, against its own slot.
+ */
+const SELFTEST_EVIDENCE = 'docs/research/selftest-evidence.md'
+
+function deferredClaim(id, weight, promise) {
+  return {
+    id,
+    weight,
+    promise,
+    evidence: {
+      strength: 'MEASURED',
+      source: `${SELFTEST_EVIDENCE}#demand`,
+      finding: '3 of the 5 incumbents refuse this case in their own review replies.'
+    },
+    status: 'deferred',
+    deferredReason: 'Not built yet in the sandbox fixture.'
+  }
+}
+
+function validDifferentiators(overrides = {}) {
+  return {
+    schemaVersion: 1,
+    slot: 'selftest',
+    reconRef: SELFTEST_EVIDENCE,
+    claims: [
+      deferredClaim('refuses-no-case', 'core', 'Returns a result for the cases the incumbents refuse.'),
+      deferredClaim('cites-its-source', 'core', 'Cites the table every printed number came from.'),
+      deferredClaim('no-ad-over-input', 'supporting', 'Never covers an input with an advertisement.')
+    ],
+    ...overrides
+  }
+}
+
+function writeDifferentiatorsFixture(name, overrides) {
+  const file = join(sandbox, name)
+  writeFileSync(file, `${JSON.stringify(validDifferentiators(overrides), null, 2)}\n`, 'utf8')
+  return file
+}
+
+const validDifferentiatorsFile = writeDifferentiatorsFixture('differentiators-valid.json')
+
+/**
+ * The same three promises, fully accounted for, for the slot every later section reads.
+ *
+ * That slot is the fixture the readiness section depends on: it is the slot that has to pass every
+ * check *except* the build, which is what makes "a run without `--build` reports UNVERIFIED and exits
+ * 2" testable at all. Its contract therefore cannot be the deferred one - `verify-slot` fails a slot
+ * whose reason list is unresolved, so the promise gate would answer first and mask the missing-build
+ * verdict the section exists to check. The first version of the gate left this fixture deferred and
+ * those two legs went red for a reason that had nothing to do with what they measure.
+ *
+ * Nothing is lost by resolving it: the deferred fixture is still scaffolded into the dash-slug slot
+ * below, and the refusal half of the rule is asserted by the `diffdeferred` leg in the differentiator
+ * section, against a slot of its own.
+ */
+function resolvedClaim(id, weight, promise, proof) {
+  return {
+    id,
+    weight,
+    promise,
+    evidence: {
+      strength: 'MEASURED',
+      source: `${SELFTEST_EVIDENCE}#demand`,
+      finding: '3 of the 5 incumbents refuse this case in their own review replies.'
+    },
+    status: 'shipped',
+    proof
+  }
+}
+
+function resolvedDifferentiators() {
+  const code = 'app/src/main/java/com/gexetr/selftest'
+  return {
+    schemaVersion: 1,
+    slot: 'selftest',
+    reconRef: SELFTEST_EVIDENCE,
+    claims: [
+      resolvedClaim(
+        'refuses-no-case',
+        'core',
+        'Returns a result for the cases the incumbents refuse.',
+        {
+          type: 'code',
+          ref: `${code}/CaseEditor.kt`,
+          symbol: 'refuseNoCase',
+          assertion: 'The editor rejects the cases the incumbents refuse instead of returning a blank result.'
+        }
+      ),
+      resolvedClaim('cites-its-source', 'core', 'Cites the table every printed number came from.', {
+        type: 'code',
+        ref: `${code}/CaseReport.kt`,
+        symbol: 'citationLine',
+        assertion: 'The report prints the line naming the table each number was read from.'
+      }),
+      resolvedClaim('no-ad-over-input', 'supporting', 'Never covers an input with an advertisement.', {
+        type: 'test',
+        ref: 'app/src/test/java/com/gexetr/selftest/NoAdOverInputTest.kt',
+        symbol: 'holdsThePromise',
+        assertion: 'The test asserts no ad surface is composed above a numeric input.'
+      })
+    ]
+  }
+}
+
+const resolvedDifferentiatorsFile = join(sandbox, 'differentiators-resolved.json')
+writeFileSync(
+  resolvedDifferentiatorsFile,
+  `${JSON.stringify(resolvedDifferentiators(), null, 2)}\n`,
+  'utf8'
+)
+
+/**
+ * The artifacts the resolved contract above points at, written into the scaffolded slot. The gate
+ * reads their text and requires the named symbol to be in the file it names, so these are ordinary
+ * sources rather than stand-ins: removing a symbol is what the regression legs below do.
+ */
+function writeSandboxProofs(dir) {
+  const codeDir = join(dir, 'app', 'src', 'main', 'java', 'com', 'gexetr', 'selftest')
+  const testDir = join(dir, 'app', 'src', 'test', 'java', 'com', 'gexetr', 'selftest')
+  mkdirSync(testDir, { recursive: true })
+  writeFileSync(
+    join(codeDir, 'CaseEditor.kt'),
+    'package com.gexetr.selftest\n\nfun refuseNoCase(): Boolean = true\n',
+    'utf8'
+  )
+  writeFileSync(
+    join(codeDir, 'CaseReport.kt'),
+    'package com.gexetr.selftest\n\nfun citationLine(): String = "from the table"\n',
+    'utf8'
+  )
+  writeFileSync(
+    join(testDir, 'NoAdOverInputTest.kt'),
+    'package com.gexetr.selftest\n\nclass NoAdOverInputTest {\n  fun holdsThePromise() {}\n}\n',
+    'utf8'
+  )
+}
+
 try {
   const created = runNewSlot(sandbox, [
     '--slug', 'selftest',
     '--name', 'Selftest App',
     '--idea', 'sandbox slot for the factory self-test',
-    '--date', slotDate
+    '--date', slotDate,
+    '--economics', validEconomicsFile,
+    '--differentiators', resolvedDifferentiatorsFile
   ])
   const createdOk = check(created.status === 0, `exits 0 (got ${created.status})`)
   if (!createdOk) console.log(created.output.trim().split(/\r?\n/).map((l) => `      ${l}`).join('\n'))
+  // The contract this slot was scaffolded with names artifacts, so they have to exist for the slot
+  // to be the "everything passes except the build" fixture the readiness section reads.
+  if (created.status === 0) writeSandboxProofs(slotDir)
 
   check(existsSync(slotDir), `creates apps/${slotDate}-selftest`)
 
@@ -334,6 +542,52 @@ try {
     )
     check(existsSync(join(slotDir, '.kiln-state.json')), 'writes .kiln-state.json')
     check(existsSync(join(slotDir, 'dist')), 'creates dist/')
+
+    // The whole point of the gate: the validated plan must land in the slot, and the
+    // recorded state must carry it forward, not merely accept it and discard it.
+    const slotEconomicsFile = join(slotDir, 'economics.json')
+    check(existsSync(slotEconomicsFile), 'writes economics.json into the slot root')
+    let slotEconomics = null
+    try {
+      slotEconomics = JSON.parse(readFileSync(slotEconomicsFile, 'utf8'))
+    } catch {
+      slotEconomics = null
+    }
+    check(
+      slotEconomics?.archetype === 'purchase_led_single_unlock',
+      'economics.json keeps the validated archetype'
+    )
+
+    const slotStateFile = join(slotDir, '.kiln-state.json')
+    let slotState = null
+    try {
+      slotState = JSON.parse(readFileSync(slotStateFile, 'utf8'))
+    } catch {
+      slotState = null
+    }
+    check(
+      slotState?.economics?.archetype === 'purchase_led_single_unlock' &&
+        slotState?.economics?.priceUsd === 4.99,
+      '.kiln-state.json carries the economics archetype and priceUsd'
+    )
+
+    // The promise contract must land in the slot before the UI exists, and its `slot`
+    // field is forced to this slot so a plan copied from another slot cannot claim this
+    // slot's recon.
+    const slotContractFile = join(slotDir, 'differentiators.json')
+    check(existsSync(slotContractFile), 'writes differentiators.json into the slot root')
+    let slotContract = null
+    try {
+      slotContract = JSON.parse(readFileSync(slotContractFile, 'utf8'))
+    } catch {
+      slotContract = null
+    }
+    check(slotContract?.slot === 'selftest', 'differentiators.json records this slot rather than the plan author\'s guess')
+    check(slotContract?.claims?.length === 3, 'differentiators.json keeps every promise from the plan')
+    check(
+      slotState?.differentiators?.promises === 3 && slotState?.differentiators?.core === 2,
+      '.kiln-state.json carries the promise and core counts'
+    )
   }
 
   const registryFile = join(sandbox, 'registry', 'apps.json')
@@ -349,6 +603,11 @@ try {
     registered?.applicationId === expectedApplicationId,
     `registry records applicationId ${expectedApplicationId}`
   )
+  check(
+    registered?.archetype === 'purchase_led_single_unlock',
+    'registry records the validated archetype'
+  )
+  check(registered?.promises === 3, 'registry records the promise count')
 
   // ------------------------------------------------------------------------
   // 4. Bad input must be refused, and the message must state the real rule.
@@ -363,6 +622,21 @@ try {
 
   const missingIdea = runNewSlot(sandbox, ['--slug', 'ok', '--name', 'X', '--date', slotDate])
   check(missingIdea.status !== 0, 'rejects a missing --idea')
+
+  // An economics plan alone is no longer enough: recon's reason list is what the app
+  // promises to be, and a slot created without one has nothing to be held to.
+  const planless = runNewSlot(sandbox, [
+    '--slug', 'planless', '--name', 'X', '--idea', 'y', '--date', slotDate,
+    '--economics', validEconomicsFile
+  ])
+  check(
+    planless.status !== 0 && !existsSync(join(sandbox, 'apps', `${slotDate}-planless`)),
+    'refuses a slot with an economics plan but no promise contract, and writes nothing'
+  )
+  check(
+    /--differentiators/.test(planless.output),
+    'the refusal names the missing --differentiators'
+  )
 
   const foreignPackage = runNewSlot(sandbox, [
     '--slug', 'ok', '--name', 'X', '--idea', 'y', '--date', slotDate,
@@ -384,6 +658,61 @@ try {
   )
 
   // ------------------------------------------------------------------------
+  // 4b. A slot cannot exist without a validated economics plan.
+  //
+  // The factory's first real slot shipped with capabilities.json enabled: [] —
+  // no revenue mechanism — and every gate returned PASS. These checks prove a
+  // planless or placeholder plan now creates nothing on disk, instead of being
+  // accepted and discarded.
+  // ------------------------------------------------------------------------
+
+  section('economics plan gate')
+
+  const noPlan = runNewSlot(sandbox, [
+    '--slug', 'no-plan', '--name', 'No Plan', '--idea', 'a slot with no economics plan', '--date', slotDate
+  ])
+  check(noPlan.status !== 0, 'refuses a slot with no --economics plan')
+  check(noPlan.output.includes('--economics'), 'the missing-plan refusal names --economics')
+  check(
+    !existsSync(join(sandbox, 'apps', `${slotDate}-no-plan`)),
+    'a run with no plan creates no slot directory'
+  )
+
+  const zeroPriceFile = writeEconomicsFixture('economics-zero-price.json', { priceUsd: 0 })
+  const zeroPrice = runNewSlot(sandbox, [
+    '--slug', 'zero-price', '--name', 'Zero', '--idea', 'a paid plan priced at zero', '--date', slotDate,
+    '--economics', zeroPriceFile
+  ])
+  check(zeroPrice.status !== 0, 'refuses a paid archetype priced at zero')
+  // The expected text is written out literally, not derived from the validator, so
+  // a message that drifts into vagueness fails this check.
+  check(
+    zeroPrice.output.includes(
+      'priceUsd must be greater than 0 for archetype "purchase_led_single_unlock"; a paid archetype needs a price, because 0 cannot earn'
+    ),
+    'the zero-price refusal states that a paid archetype needs a price'
+  )
+  check(
+    !existsSync(join(sandbox, 'apps', `${slotDate}-zero-price`)),
+    'a zero-price plan creates no slot directory'
+  )
+
+  const placeholderFile = writeEconomicsFixture('economics-placeholder.json', { paidUnit: 'TBD' })
+  const placeholder = runNewSlot(sandbox, [
+    '--slug', 'placeholder', '--name', 'Placeholder', '--idea', 'a plan that was never filled in',
+    '--date', slotDate, '--economics', placeholderFile
+  ])
+  check(placeholder.status !== 0, 'refuses a placeholder paidUnit')
+  check(
+    placeholder.output.includes('paidUnit must be a real plan, not a placeholder'),
+    'the placeholder refusal names the field and the reason'
+  )
+  check(
+    !existsSync(join(sandbox, 'apps', `${slotDate}-placeholder`)),
+    'a placeholder plan creates no slot directory'
+  )
+
+  // ------------------------------------------------------------------------
   // 5. applicationId uniqueness.
   //
   // `applicationIdForSlug` drops dashes, so `my-app` and `myapp` both derive
@@ -395,7 +724,9 @@ try {
   section('applicationId uniqueness')
 
   const firstDashed = runNewSlot(sandbox, [
-    '--slug', 'my-app', '--name', 'Dashed', '--idea', 'dash case', '--date', slotDate
+    '--slug', 'my-app', '--name', 'Dashed', '--idea', 'dash case', '--date', slotDate,
+    '--economics', validEconomicsFile,
+    '--differentiators', validDifferentiatorsFile
   ])
   check(firstDashed.status === 0, 'creates a slot whose slug contains a dash')
 
@@ -538,8 +869,19 @@ try {
 
   // The sandbox only ships the scripts each section needs, so copy the readiness
   // gate and its imports in before driving it.
+  //
+  // Every script `verify-slot.mjs` invokes belongs in this list. Wiring a new gate
+  // into the readiness gate without adding its helper here does not weaken the
+  // sandbox politely: the run reports FAIL for the missing helper, so a build-less
+  // run stops reporting UNVERIFIED and this section's own honesty checks break. That
+  // is how `check-ui-coverage.mjs` was missed when the claimed-feature gate was added.
   for (const relative of [
     'verify-slot.mjs',
+    'check-economics.mjs',
+    'check-ui-coverage.mjs',
+    'check-locales.mjs',
+    'check-adaptive-icon.py',
+    'lib/slot-economics.mjs',
     'lib/play-assets.mjs',
     'lib/capabilities.mjs',
     'lib/gradle.mjs',
@@ -547,6 +889,22 @@ try {
   ]) {
     copyFileSync(join(ROOT, 'scripts', relative), join(sandbox, 'scripts', relative))
   }
+
+  // `verify-slot.mjs` now drives the money gate, which resolves the plan's
+  // evidenceRef against the repo root and pairs the archetype with
+  // capabilities.json. Both must exist in the sandbox, or the readiness run fails
+  // on the money gate instead of the build honesty this section is testing.
+  mkdirSync(join(sandbox, 'docs', 'research'), { recursive: true })
+  copyFileSync(
+    join(ROOT, ...ECONOMICS_EVIDENCE_REF.split('/')),
+    join(sandbox, ...ECONOMICS_EVIDENCE_REF.split('/'))
+  )
+  const readinessCapabilities = join(slotDir, 'capabilities.json')
+  writeFileSync(
+    readinessCapabilities,
+    JSON.stringify({ schemaVersion: 1, enabled: ['billing'] }, null, 2),
+    'utf8'
+  )
 
   function runVerify(args, cwd = sandbox) {
     const started = Date.now()
@@ -573,6 +931,111 @@ try {
     'a run that skips the build reports UNVERIFIED'
   )
   check(noBuildRun.status === 2, `an UNVERIFIED verdict exits 2 (got ${noBuildRun.status})`)
+
+  // Leave no capabilities.json behind: the capability-compliance section asserts that
+  // store-kit bootstraps a registry that explicitly enables none.
+  rmSync(readinessCapabilities, { force: true })
+
+  // ------------------------------------------------------------------------
+  // 7b. Release runs only after the owner's approval, and only for the revision approved.
+  //
+  // The factory used to build, sign, photograph and pack an app in one undivided pass, so
+  // the owner first saw the UI after all of that had been paid for. These checks drive the
+  // real CLI: an unapproved slot is refused, the record must carry the owner's own words,
+  // any edit to a build input voids it, and release *outputs* (store/, dist/) must not —
+  // the release pipeline writes those after approval, so a digest that included them would
+  // void its own approval mid-run.
+  // ------------------------------------------------------------------------
+
+  section('release approval gate')
+
+  const approveScript = join(ROOT, 'scripts', 'approve-release.mjs')
+  const approvalFile = join(slotDir, 'release-approval.json')
+
+  function runApprove(args) {
+    const result = spawnSync(process.execPath, [approveScript, ...args], {
+      cwd: ROOT, encoding: 'utf8', windowsHide: true
+    })
+    return { status: result.status, output: `${result.stdout || ''}${result.stderr || ''}` }
+  }
+
+  function runStoreKitCli(args) {
+    const result = spawnSync(
+      'python',
+      [join(ROOT, 'scripts', 'store-kit.py'), '--slot-dir', slotDir, ...args],
+      { cwd: ROOT, encoding: 'utf8', windowsHide: true }
+    )
+    return { status: result.status, output: `${result.stdout || ''}${result.stderr || ''}` }
+  }
+
+  const { checkReleaseApproval } = await import(
+    pathToFileURL(join(ROOT, 'scripts', 'lib', 'release-approval.mjs')).href
+  )
+
+  const unapproved = runApprove(['--check', '--slot-dir', slotDir])
+  check(unapproved.status === 2, `an unapproved slot does not pass the gate (got ${unapproved.status})`)
+  check(
+    unapproved.output.includes('approve-release.mjs'),
+    'the refusal names the command that records approval'
+  )
+  check(!existsSync(approvalFile), 'checking the gate never writes an approval')
+
+  const noNote = runApprove(['--slot-dir', slotDir])
+  check(noNote.status !== 0, "recording an approval without the owner's words is refused")
+  check(!existsSync(approvalFile), 'a refused approval writes nothing')
+
+  const gatedRender = runStoreKitCli(['--render-only'])
+  check(gatedRender.status !== 0, 'store-kit refuses to render assets before approval')
+  check(
+    gatedRender.output.includes('approve-release.mjs'),
+    'the store-kit refusal comes from the shared check, not a second copy of the rule'
+  )
+
+  const recorded = runApprove([
+    '--slot-dir', slotDir, '--note', 'Owner approved the release after reviewing the UI.'
+  ])
+  check(recorded.status === 0, `recording the owner's approval exits 0 (got ${recorded.status})`)
+  check(existsSync(approvalFile), 'the approval is written into the slot')
+  check(
+    JSON.parse(readFileSync(approvalFile, 'utf8')).note?.includes('Owner approved'),
+    "the record keeps the owner's own words"
+  )
+
+  const granted = checkReleaseApproval(slotDir)
+  check(granted.ok === true, 'a recorded approval opens the gate')
+
+  // The record is bound to the revision, not to the slot name.
+  const contractGradle = join(slotDir, 'app', 'build.gradle.kts')
+  const approvedGradle = readFileSync(contractGradle, 'utf8')
+  writeFileSync(contractGradle, `${approvedGradle}\n// a post-approval edit\n`, 'utf8')
+  const tampered = checkReleaseApproval(slotDir)
+  check(tampered.ok === false, 'an edit to the app voids the approval')
+  check(
+    String(tampered.reason).includes('changed after the owner approved'),
+    'the refusal explains that the approved revision no longer exists'
+  )
+
+  mkdirSync(join(slotDir, 'store'), { recursive: true })
+  writeFileSync(join(slotDir, 'store', 'gate-probe.txt'), 'release output\n', 'utf8')
+  writeFileSync(join(slotDir, 'dist', 'gate-probe.txt'), 'release output\n', 'utf8')
+  check(
+    checkReleaseApproval(slotDir).ok === false,
+    'release outputs do not re-open an approval that a source edit voided'
+  )
+
+  writeFileSync(contractGradle, approvedGradle, 'utf8')
+  const restored = checkReleaseApproval(slotDir)
+  check(
+    restored.ok === true,
+    'restoring the approved bytes re-opens the gate while store/ and dist/ outputs exist'
+  )
+  check(
+    existsSync(join(slotDir, 'store', 'gate-probe.txt')) &&
+      existsSync(join(slotDir, 'dist', 'gate-probe.txt')),
+    'the probe outputs are still on disk, so the previous check is discriminating'
+  )
+  rmSync(join(slotDir, 'store', 'gate-probe.txt'), { force: true })
+  rmSync(join(slotDir, 'dist', 'gate-probe.txt'), { force: true })
 
   // ------------------------------------------------------------------------
   // 8. Capability declarations must drive the slot compliance gate.
@@ -1083,6 +1546,42 @@ try {
     'the refresh never rewrites a non-idea-derived field (contactEmail)'
   )
 
+  // (10) Hand-written policy documents survive a regeneration, and marked ones do not.
+  //
+  // `privacy.md` and `data-safety.md` are the two store documents a human must write
+  // app-specifically: the generator cannot read the merged manifest, so it cannot know which SDK
+  // contributed a permission, and it does not. It used to overwrite them unconditionally while
+  // `verify-slot` passed the resulting stub, so a hand-written policy was silently destroyed and
+  // the pack still reported OK. Generated content now carries a marker comment; content without it
+  // is a human edit and must be kept. The second half of the check matters as much as the first:
+  // if a marked file were also preserved, "delete this line to keep your own wording" would be a
+  // one-way instruction and the generator could never update a policy again.
+  const handWrittenPolicy = '# Privacy policy — hand-written\n\nNothing is collected.\n'
+  const handWrittenSafety = '# Data safety — hand-written\n\n- Does the app collect data? **No**\n'
+  writeFileSync(join(contractStoreDir, 'privacy.md'), handWrittenPolicy, 'utf8')
+  writeFileSync(join(contractStoreDir, 'data-safety.md'), handWrittenSafety, 'utf8')
+  const policyRefresh = runStoreKit(['--render-only'])
+  check(
+    policyRefresh.status === 0 &&
+      policyRefresh.output.includes('PRESERVE privacy.md') &&
+      policyRefresh.output.includes('PRESERVE data-safety.md'),
+    'a regeneration reports that it preserved hand-written privacy.md and data-safety.md'
+  )
+  check(
+    readFileSync(join(contractStoreDir, 'privacy.md'), 'utf8') === handWrittenPolicy &&
+      readFileSync(join(contractStoreDir, 'data-safety.md'), 'utf8') === handWrittenSafety,
+    'hand-written privacy.md and data-safety.md survive a regeneration byte for byte'
+  )
+
+  const markedPolicy = '# Privacy policy — regenerated\n\n<!-- kiln:generated policy - delete this line to keep your own wording -->\n'
+  writeFileSync(join(contractStoreDir, 'privacy.md'), markedPolicy, 'utf8')
+  const markedRefresh = runStoreKit(['--render-only'])
+  check(
+    markedRefresh.status === 0 &&
+      readFileSync(join(contractStoreDir, 'privacy.md'), 'utf8') !== markedPolicy,
+    'a privacy.md that still carries the generator marker is regenerated, not preserved'
+  )
+
   // ------------------------------------------------------------------------
   // 6. Gradle invocation contract.
   //
@@ -1464,6 +1963,73 @@ try {
 }
 
 // --------------------------------------------------------------------------
+// 4c. The capability pairing is the teeth: an archetype that names a way to earn is
+// not credible while the capability that collects the money is disabled.
+//
+// This is a pure check of the shared module, so it needs no sandbox. The expected
+// sentence is written out literally rather than computed by the function under test,
+// because a check that derives its expectation from the code it checks can never
+// disagree with it.
+// --------------------------------------------------------------------------
+
+section('economics capability pairing')
+
+const { parseEconomics, validateEconomicsAgainstCapabilities } = await import(
+  pathToFileURL(join(ROOT, 'scripts', 'lib', 'slot-economics.mjs')).href
+)
+
+const adsLedPlan = { ...validEconomics(), archetype: 'ads_led_utility', priceUsd: 0 }
+const missingAds = validateEconomicsAgainstCapabilities(adsLedPlan, { schemaVersion: 1, enabled: [] })
+check(missingAds.ok === false, 'ads_led_utility with no enabled capability reports an error')
+// Optional chaining keeps a regression (ok: true, no errors) a clean FAIL instead of
+// throwing and aborting every check after it.
+check(
+  missingAds.errors?.includes(
+    'archetype "ads_led_utility" requires the "ads" capability; capabilities.json enables []; add "ads" to capabilities.json or choose another archetype'
+  ),
+  'the pairing error names the archetype, the missing capability, and capabilities.json'
+)
+const withAds = validateEconomicsAgainstCapabilities(adsLedPlan, { schemaVersion: 1, enabled: ['ads'] })
+check(withAds.ok === true, 'ads_led_utility with the ads capability passes')
+const withExtras = validateEconomicsAgainstCapabilities(adsLedPlan, {
+  schemaVersion: 1,
+  enabled: ['ads', 'billing']
+})
+check(withExtras.ok === true, 'extra enabled capabilities do not fail the pairing')
+
+// --------------------------------------------------------------------------
+// 4d. The evidenceRef may point at measured research or at the ideation proposal a
+// plan came from, but not at an arbitrary directory.
+//
+// All five plans in `docs/ideation/2026-09-26-five-recipes.md` originally cited only
+// the *method* record `docs/research/2026-09-24-market-decision.md`, because the
+// pattern accepted `docs/research/` alone. A plan therefore pointed at a file
+// describing how the market was measured rather than what was measured for its own
+// niche. Both roots are legitimate; any other root is not. Deleting the cited file is
+// caught separately: `check-economics.mjs` resolves the reference on disk and BLOCKS
+// when it is gone, so the two checks have to stay in different places on purpose.
+// --------------------------------------------------------------------------
+
+section('economics evidenceRef shape')
+
+check(parseEconomics(validEconomics()).ok === true, 'a docs/research evidenceRef still validates')
+
+check(
+  parseEconomics(validEconomics({ evidenceRef: 'docs/ideation/2026-09-26-five-recipes.md#31-recipe-1' })).ok ===
+    true,
+  'a docs/ideation evidenceRef validates'
+)
+
+// The rejection cases are the reason this test exists: widening the accepted roots
+// must not have widened them to everything, and a bare directory is not a file.
+for (const rejected of ['docs/anything/else.md#1', 'docs/ideation#1', 'docs/ideation/', 'notes.md']) {
+  check(
+    parseEconomics(validEconomics({ evidenceRef: rejected })).ok === false,
+    `evidenceRef "${rejected}" is refused`
+  )
+}
+
+// --------------------------------------------------------------------------
 // 9. The Codex worker ledger must notice a worker that died without reporting.
 //
 // `capability-integration2` recorded `status: running` and pid 10188, then its wrapper
@@ -1639,6 +2205,386 @@ check(
     listingRows.filter((r) => r.ok === false).length === 2,
   'a listing containing a malformed meta does not abort and keeps every worker'
 )
+
+// `scripts/visual-qa.py` measures the shipped pixels for `.cursor/rules/visual-identity.mdc`, and
+// both of its reads of a slot were written against the first slot: a literal
+// `app/src/main/java/com/gexetr/pipesizing/ui/theme` path, and a palette regex that only matched
+// `internal val`. The failure was silent in the worst way - the *palette* section of a later slot
+// died with a traceback before it printed a single measurement, so the verification the rule names
+// could not be run for any slot but the one it was written for, and nothing said so. The check
+// below drives the regression test in `scripts/test-visual-qa-discovery.py`, which builds a
+// synthetic slot whose package and colour declarations are deliberately unlike the reference
+// slot's and is expected to FAIL against the previous implementation.
+section('visual-qa measures the slot it is given')
+const visualQaProbe = spawnSync('python', [join(ROOT, 'scripts', 'test-visual-qa-discovery.py')], {
+  cwd: ROOT,
+  encoding: 'utf8',
+  windowsHide: true
+})
+const visualQaRows = `${visualQaProbe.stdout || ''}${visualQaProbe.stderr || ''}`
+  .split(/\r?\n/)
+  .filter((row) => /^(PASS|FAIL)\s/.test(row))
+if (visualQaRows.length === 0) {
+  check(
+    false,
+    `visual-qa discovery test reported no verdict (exit ${visualQaProbe.status ?? 'unknown'})`
+  )
+} else {
+  for (const row of visualQaRows) {
+    const [status, ...rest] = row.split(/\s+/)
+    line(status === 'PASS' ? 'PASS' : 'FAIL', `visual-qa: ${rest.join(' ').trim()}`)
+  }
+}
+check(visualQaProbe.status === 0, 'visual-qa discovery test exits 0')
+
+// `about_support_email` shipped as `support@example.com` in the default resources and in eight
+// locale directories at once, while `store/listing.json` advertised the developer's real address -
+// and `about_app_name` and `common_date_placeholder` were duplicated the same way. `check-locales`
+// skipped non-translatable keys, so no gate could see any copy of them; the duplication was found
+// only by hand, twice. The check below drives `scripts/test-locale-dedup.mjs`, which is expected to
+// FAIL against the previous implementation: two of its four legs are the defect, and the other two
+// prove the guard can pass and that it keys off the attribute rather than off "the value is the same
+// in two files", which would fire on every legally untranslated string.
+section('a non-translatable key is declared once')
+const localeDedupProbe = spawnSync(process.execPath, [join(ROOT, 'scripts', 'test-locale-dedup.mjs')], {
+  cwd: ROOT,
+  encoding: 'utf8',
+  windowsHide: true
+})
+const localeDedupRows = `${localeDedupProbe.stdout || ''}${localeDedupProbe.stderr || ''}`
+  .split(/\r?\n/)
+  .filter((row) => /^(PASS|FAIL)\s/.test(row))
+if (localeDedupRows.length === 0) {
+  check(
+    false,
+    `locale-dedup test reported no verdict (exit ${localeDedupProbe.status ?? 'unknown'})`
+  )
+} else {
+  for (const row of localeDedupRows) {
+    const [status, ...rest] = row.split(/\s+/)
+    line(status === 'PASS' ? 'PASS' : 'FAIL', `locale-dedup: ${rest.join(' ').trim()}`)
+  }
+}
+check(localeDedupProbe.status === 0, 'locale-dedup test exits 0')
+
+// A journey asserts the literal text of the nodes it photographs, and those strings come from the
+// app's resources, which Android resolves against the *device's* language - not the listing's and
+// not the journey's. That dependency was invisible until a slot gained `values-<locale>/`
+// directories: the journey that had been green while the app was English-only started reading
+// Russian on the Russian A40, and every reading in every shot failed with "not in the field they
+// name", which describes a broken journey rather than a device setting. Diagnosing it cost three
+// device attempts and about twenty minutes. The check below drives `scripts/test-capture-locale.mjs`,
+// which is expected to FAIL against the previous implementation, where no check existed at all, so
+// the defect could only ever surface as a screen-reading error.
+section('the capture journey runs on a device in the language it reads')
+const captureLocaleProbe = spawnSync(process.execPath, [join(ROOT, 'scripts', 'test-capture-locale.mjs')], {
+  cwd: ROOT,
+  encoding: 'utf8',
+  windowsHide: true
+})
+const captureLocaleRows = `${captureLocaleProbe.stdout || ''}${captureLocaleProbe.stderr || ''}`
+  .split(/\r?\n/)
+  .filter((row) => /^(PASS|FAIL)\s/.test(row))
+if (captureLocaleRows.length === 0) {
+  check(
+    false,
+    `capture-locale test reported no verdict (exit ${captureLocaleProbe.status ?? 'unknown'})`
+  )
+} else {
+  for (const row of captureLocaleRows) {
+    const [status, ...rest] = row.split(/\s+/)
+    line(status === 'PASS' ? 'PASS' : 'FAIL', `capture-locale: ${rest.join(' ').trim()}`)
+  }
+}
+check(captureLocaleProbe.status === 0, 'capture-locale test exits 0')
+
+// Recon states why an app can win; implementation loses part of that list, and every other
+// check in the suite measures form — the APK builds, the pack is complete, the money plan
+// parses — so none of them can see a promised feature that quietly did not ship. The legs
+// below drive the real gate: one slot whose promises are all accounted for must pass, and
+// the rest must fail for the reason they exist. The failing legs matter more than the
+// passing one: a gate that cannot fail is not a gate.
+section('differentiator contract (sandbox)')
+
+// This section is sandbox-dependent, and the shared sandbox is deleted in a `finally` far above
+// this point in the file, so it owns one. Sharing the peer's sandbox would have tied these legs
+// to the ordering of a block they do not control.
+const diffSandbox = createSandbox()
+
+function promiseBase(id, weight) {
+  return {
+    id,
+    weight,
+    promise: 'Returns a result for the cases the incumbents refuse, with the working shown.',
+    evidence: {
+      strength: 'MEASURED',
+      source: `${SELFTEST_EVIDENCE}#demand`,
+      finding: '3 of the 5 incumbents refuse this case in their own review replies.'
+    }
+  }
+}
+
+function shippedTest(slug, id, weight, overrides = {}) {
+  return {
+    ...promiseBase(id, weight),
+    status: 'shipped',
+    proof: {
+      type: 'test',
+      ref: `app/src/test/java/com/gexetr/${slug}/ThingTest.kt`,
+      symbol: 'holdsThePromise',
+      assertion: 'The unit test asserts the promise and fails when the behaviour is removed.',
+      ...overrides
+    }
+  }
+}
+
+function shippedCode(slug, id, weight) {
+  return {
+    ...promiseBase(id, weight),
+    status: 'shipped',
+    proof: {
+      type: 'code',
+      ref: `app/src/main/java/com/gexetr/${slug}/Thing.kt`,
+      symbol: 'printsTheWorking',
+      assertion: 'The report shows the multipliers rather than a single opined number.'
+    }
+  }
+}
+
+/**
+ * Write a slot whose contract and artifacts can pass or fail on request. The artifacts are
+ * deliberately trivial files: the gate reads their text, so a file that contains the named
+ * symbol is a valid proof and removing the symbol is a valid regression.
+ */
+function writePromiseSlot(slug, claims) {
+  const dir = join(diffSandbox, 'apps', `${slotDate}-${slug}`)
+  const testDir = join(dir, 'app', 'src', 'test', 'java', 'com', 'gexetr', slug)
+  const codeDir = join(dir, 'app', 'src', 'main', 'java', 'com', 'gexetr', slug)
+  mkdirSync(testDir, { recursive: true })
+  mkdirSync(codeDir, { recursive: true })
+  mkdirSync(join(dir, 'app', 'src', 'main', 'res', 'values'), { recursive: true })
+  mkdirSync(join(dir, 'store', 'assets', 'en-US'), { recursive: true })
+  writeFileSync(
+    join(dir, 'differentiators.json'),
+    `${JSON.stringify({ schemaVersion: 1, slot: slug, reconRef: SELFTEST_EVIDENCE, claims }, null, 2)}\n`,
+    'utf8'
+  )
+  writeFileSync(
+    join(testDir, 'ThingTest.kt'),
+    `package com.gexetr.${slug}\n\nclass ThingTest {\n  fun holdsThePromise() {}\n}\n`,
+    'utf8'
+  )
+  writeFileSync(
+    join(codeDir, 'Thing.kt'),
+    `package com.gexetr.${slug}\n\nfun printsTheWorking(): String = "shown"\n`,
+    'utf8'
+  )
+  writeFileSync(
+    join(dir, 'app', 'src', 'main', 'res', 'values', 'strings.xml'),
+    '<resources>\n  <string name="result_citation">from the table</string>\n</resources>\n',
+    'utf8'
+  )
+  writeFileSync(join(dir, 'store', 'assets', 'en-US', 'phone-04.png'), 'not a real png', 'utf8')
+  return dir
+}
+
+function runDiffCheck(slug, extraArgs = []) {
+  const result = spawnSync(
+    process.execPath,
+    [join(diffSandbox, 'scripts', 'check-differentiators.mjs'), '--slot', slug, ...extraArgs],
+    { cwd: diffSandbox, encoding: 'utf8', windowsHide: true }
+  )
+  return { status: result.status, output: `${result.stdout || ''}${result.stderr || ''}` }
+}
+
+/** Every promise accounted for, one of each proof type, and one core promise narrowed. */
+function resolvedClaims(slug) {
+  return [
+    shippedTest(slug, 'refuses-no-case', 'core'),
+    {
+      ...promiseBase('cites-its-source', 'core'),
+      status: 'narrowed',
+      narrowedTo: 'Cites the table name in the case report, but not the row number.',
+      lostCoverage: 'The exact row within the table is not printed.',
+      ownerDecision: {
+        words: 'Ладно, пока пусть будет без номера строки.',
+        recordedAt: '2026-09-26T19:00:00.000Z'
+      },
+      proof: {
+        type: 'resource',
+        ref: 'app/src/main/res/values/strings.xml',
+        symbol: 'result_citation',
+        assertion: 'The case report renders the citation line.'
+      }
+    },
+    {
+      ...promiseBase('keeps-working-visible', 'supporting'),
+      status: 'shipped',
+      proof: {
+        type: 'code',
+        ref: `app/src/main/java/com/gexetr/${slug}/Thing.kt`,
+        symbol: 'printsTheWorking',
+        assertion: 'The report shows the multipliers rather than a single opined number.'
+      }
+    },
+    {
+      ...promiseBase('no-ad-over-input', 'supporting'),
+      status: 'shipped',
+      proof: {
+        type: 'capture',
+        ref: 'store/assets/en-US/phone-04.png',
+        assertion: 'The frame shows the number pad with no advertisement over it.'
+      }
+    },
+    {
+      ...promiseBase('row-level-citation', 'supporting'),
+      status: 'dropped',
+      droppedReason: 'The table row data is not licensed for redistribution in the app.'
+    }
+  ]
+}
+
+// Leg 1 — a fully accounted-for contract passes, all four proof types resolve, and the
+// narrowed/dropped rows are printed rather than hidden inside the JSON.
+const passSlug = 'diffpass'
+writePromiseSlot(passSlug, resolvedClaims(passSlug))
+const passRun = runDiffCheck(passSlug)
+check(passRun.status === 0, `a resolved contract passes (got exit ${passRun.status})`)
+check(/PASS\s+contract schema/.test(passRun.output), 'the passing run reports the promise summary')
+check(
+  /NARROWED \[core\] cites-its-source/.test(passRun.output) &&
+    /DROPPED \[supporting\] row-level-citation/.test(passRun.output) &&
+    /owner's words/.test(passRun.output),
+  'the passing run reports every narrowed and dropped promise and whose decision it was'
+)
+
+// Leg 2 — a promised feature that never shipped must not pass. This is the defect the whole
+// contract exists for: ten promises delivered, ten quietly abandoned, and every other gate
+// still green.
+const deferredSlug = 'diffdeferred'
+writePromiseSlot(deferredSlug, [
+  shippedTest(deferredSlug, 'refuses-no-case', 'core'),
+  shippedCode(deferredSlug, 'keeps-working-visible', 'core'),
+  {
+    ...promiseBase('no-ad-over-input', 'supporting'),
+    status: 'deferred',
+    deferredReason: 'The ad SDK is not wired up yet.'
+  }
+])
+const deferredRun = runDiffCheck(deferredSlug)
+check(deferredRun.status !== 0, `a deferred promise fails the slot gate (got exit ${deferredRun.status})`)
+check(/still deferred/.test(deferredRun.output), 'the failure says which promise is unfinished')
+
+// Leg 3 — the same contract is readable by a builder mid-flight, which is the only thing
+// --allow-deferred is for.
+const progressRun = runDiffCheck(deferredSlug, ['--allow-deferred'])
+check(
+  progressRun.status === 0 && /still deferred/.test(progressRun.output),
+  '--allow-deferred reports progress without passing the slot'
+)
+
+// Leg 4 — the sensor's key leg. The promise status still says "shipped"; only the artifact
+// changed. A gate that reads the status field would pass, and this one must not.
+const artifactDir = writePromiseSlot('diffgone', resolvedClaims('diffgone'))
+writeFileSync(
+  join(artifactDir, 'app', 'src', 'test', 'java', 'com', 'gexetr', 'diffgone', 'ThingTest.kt'),
+  'package com.gexetr.diffgone\n\nclass ThingTest {\n}\n',
+  'utf8'
+)
+const goneRun = runDiffCheck('diffgone')
+check(goneRun.status !== 0, `a proof whose symbol was deleted fails (got exit ${goneRun.status})`)
+check(
+  /holdsThePromise/.test(goneRun.output) && /no longer appears/.test(goneRun.output),
+  'the failure names the symbol that left the artifact'
+)
+
+// Leg 5 — breaking a core promise is the owner's decision, not the builder's.
+const coreDroppedSlug = 'diffcore'
+writePromiseSlot(coreDroppedSlug, [
+  shippedTest(coreDroppedSlug, 'refuses-no-case', 'core'),
+  shippedCode(coreDroppedSlug, 'keeps-working-visible', 'core'),
+  {
+    ...promiseBase('cites-its-source', 'core'),
+    status: 'dropped',
+    droppedReason: 'The citation needs a data file the build cannot ship.'
+  }
+])
+const coreDroppedRun = runDiffCheck(coreDroppedSlug)
+check(coreDroppedRun.status !== 0, `a core promise dropped without owner words fails (got exit ${coreDroppedRun.status})`)
+check(/ownerDecision/.test(coreDroppedRun.output), 'the failure asks for the owner\'s own words')
+
+// Leg 6 — a proof must live where its type belongs, or it is a checkbox pointing anywhere.
+const wrongPlaceSlug = 'diffplace'
+writePromiseSlot(wrongPlaceSlug, [
+  shippedTest(wrongPlaceSlug, 'refuses-no-case', 'core', {
+    type: 'test',
+    ref: 'app/src/main/res/values/strings.xml',
+    symbol: 'result_citation'
+  }),
+  shippedCode(wrongPlaceSlug, 'keeps-working-visible', 'core'),
+  {
+    ...promiseBase('cites-its-source', 'supporting'),
+    status: 'dropped',
+    droppedReason: 'The citation needs a data file the build cannot ship.'
+  }
+])
+const wrongPlaceRun = runDiffCheck(wrongPlaceSlug)
+check(wrongPlaceRun.status !== 0, `a proof in the wrong location fails (got exit ${wrongPlaceRun.status})`)
+check(/is not in a location/.test(wrongPlaceRun.output), 'the failure names where a proof of that type may live')
+
+// Leg 7 — a contract copied from another slot claims the wrong recon.
+const copiedSlug = 'diffcopy'
+const copiedDir = writePromiseSlot(copiedSlug, resolvedClaims(copiedSlug))
+const copiedFile = join(copiedDir, 'differentiators.json')
+const copiedContract = JSON.parse(readFileSync(copiedFile, 'utf8'))
+copiedContract.slot = 'somewhere-else'
+writeFileSync(copiedFile, `${JSON.stringify(copiedContract, null, 2)}\n`, 'utf8')
+const copiedRun = runDiffCheck(copiedSlug)
+check(copiedRun.status !== 0, `a contract naming another slot fails (got exit ${copiedRun.status})`)
+check(/copied reason list/.test(copiedRun.output), 'the failure says the contract is not this slot\'s recon')
+
+// Leg 8 — a citation to recon that does not exist is a dangling reference, not evidence.
+const danglingSlug = 'diffdangling'
+const danglingClaims = resolvedClaims(danglingSlug)
+danglingClaims[0].evidence = {
+  strength: 'MEASURED',
+  source: 'docs/research/does-not-exist.md#demand',
+  finding: '3 of the 5 incumbents refuse this case in their own review replies.'
+}
+writePromiseSlot(danglingSlug, danglingClaims)
+const danglingRun = runDiffCheck(danglingSlug)
+check(danglingRun.status !== 0, `evidence citing a missing document fails (got exit ${danglingRun.status})`)
+check(/does not resolve to a file/.test(danglingRun.output), 'the failure names the unresolvable citation')
+
+// Leg 9 — the floors. A contract with one promise, or with no core promise, is not a reason
+// list an app can win on, and the gate must refuse it before it becomes a slot.
+const floorRun = runDiffCheck('diffmissing', [])
+check(floorRun.status !== 0, 'a contract for a slot that does not exist fails')
+const thinContract = join(diffSandbox, 'thin.json')
+writeFileSync(
+  thinContract,
+  `${JSON.stringify(validDifferentiators({
+    claims: [deferredClaim('only-one', 'supporting', 'Does the one thing the app does.')]
+  }), null, 2)}\n`,
+  'utf8'
+)
+const thinRun = spawnSync(
+  process.execPath,
+  [join(diffSandbox, 'scripts', 'check-differentiators.mjs'), '--differentiators', thinContract],
+  { cwd: diffSandbox, encoding: 'utf8', windowsHide: true }
+)
+const thinOutput = `${thinRun.stdout || ''}${thinRun.stderr || ''}`
+check(thinRun.status !== 0, 'a one-promise contract is refused')
+check(
+  /at least 3 promises/.test(thinOutput) && /"core"/.test(thinOutput),
+  'the refusal states the promise and core floors'
+)
+
+if (KEEP) {
+  console.log(`\n  INFO      promise-gate sandbox kept at ${diffSandbox}`)
+} else {
+  rmSync(diffSandbox, { recursive: true, force: true })
+}
 
 console.log(`\nVERDICT: ${failed ? 'FAIL' : 'PASS'}`)
 process.exitCode = failed ? 1 : 0

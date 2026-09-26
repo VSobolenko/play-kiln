@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
 import { applicationIdPattern, scaffoldPackage } from './lib/namespaces.mjs'
 import { resolveJavaHome } from './lib/java.mjs'
+import { checkReleaseApproval, slotSlug } from './lib/release-approval.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 let hasFailure = false
@@ -82,7 +83,9 @@ const requiredHarnessFiles = [
   '.cursor/mcp.json',
   '.cursor/hooks.json',
   '.cursor/commands/ship.md',
+  '.cursor/commands/release.md',
   '.cursor/commands/eval.md',
+  '.cursor/rules/release-gate.mdc',
   '.cursor/agents/planner.md',
   '.cursor/agents/generator.md',
   '.cursor/agents/evaluator.md',
@@ -95,6 +98,8 @@ const requiredHarnessFiles = [
   'scripts/lib/java.mjs',
   'scripts/codex-run.mjs',
   'scripts/prepare-release.mjs',
+  'scripts/approve-release.mjs',
+  'scripts/lib/release-approval.mjs',
   'scripts/sign-release.mjs',
   'scripts/store-kit.py',
   'scripts/lib/play-assets.mjs',
@@ -107,7 +112,8 @@ const requiredHarnessFiles = [
   'docs/play-publishing-playbook.md',
   'docs/monetization-strategy.md',
   '.cursor/rules/verification-discipline.mdc',
-  '.cursor/rules/build-speed.mdc'
+  '.cursor/rules/build-speed.mdc',
+  '.cursor/rules/visual-identity.mdc'
 ]
 for (const relativePath of requiredHarnessFiles) {
   line(existsSync(join(root, relativePath)) ? 'PASS' : 'FAIL', relativePath)
@@ -324,6 +330,49 @@ if (registry) {
     .map(([status, count]) => `${status}=${count}`)
     .join(', ')
   line('INFO', `registry apps: ${registry.apps.length}; statuses: ${summary || 'none'}`)
+}
+
+/**
+ * Which slots are still in development and which the owner has released.
+ *
+ * The phase is derived from the approval record, not from a field someone remembers to
+ * update: a slot is "released" only while its `.kiln-state.json` and its sources still hash
+ * to what the owner approved. An approval that a later edit voided reports as development
+ * again, which is the honest answer.
+ */
+section('Slot release state')
+const appsRoot = join(root, 'apps')
+let slotNames = []
+if (existsSync(appsRoot)) {
+  try {
+    slotNames = readdirSync(appsRoot)
+      .filter((name) => statSync(join(appsRoot, name)).isDirectory())
+      .sort()
+  } catch (error) {
+    line('WARN', `cannot inspect apps/: ${error.message}`)
+  }
+}
+if (slotNames.length === 0) {
+  line('INFO', 'no slots under apps/')
+}
+for (const name of slotNames) {
+  const slotDir = join(appsRoot, name)
+  if (!existsSync(join(slotDir, '.kiln-state.json'))) {
+    line('INFO', `${name}: not a scaffolded slot (.kiln-state.json absent)`)
+    continue
+  }
+  const approval = checkReleaseApproval(slotDir)
+  if (approval.ok) {
+    line(
+      'PASS',
+      `${name}: release approved by the owner at ${approval.record.approvedAt} over ${approval.record.sourceFiles} build input(s)`
+    )
+  } else {
+    line(
+      'INFO',
+      `${name}: in development — release gated until the owner approves: node scripts/approve-release.mjs --slot ${slotSlug(slotDir)} --note "<the owner's words>"`
+    )
+  }
 }
 
 section('Factory self-test')

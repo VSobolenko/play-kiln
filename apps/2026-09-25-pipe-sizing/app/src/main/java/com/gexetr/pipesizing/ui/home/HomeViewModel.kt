@@ -42,6 +42,7 @@ class HomeViewModel(
                 is HomeEvent.UnitChanged -> state.withUnit(event.unitSystem)
                 HomeEvent.ConfirmCapacity -> state.copy(capacityConfirmed = true, evaluation = null)
                 HomeEvent.Evaluate -> state.copy(evaluation = evaluate(state))
+                is HomeEvent.CaseLoaded -> state.restoredFrom(event.values)
             }
         }
         workScope.launch { persistence.save(_uiState.value.toStoredCase()) }

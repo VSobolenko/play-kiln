@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">Mark Book for Teachers</string>
+    <string name="app_idea" translatable="true">Un registro dei voti privato e offline, di piena proprietà dell\'insegnante: consente di creare, modificare ed eliminare ogni classe, studente, categoria, compito, voto, registrazione delle presenze, annotazione sulla partecipazione, contatto con i genitori e posizione nella piantina dei posti, senza account né server. Mostra una media progressiva comprensibile, indicando la regola di arrotondamento, la regola sui compiti non consegnati e ogni categoria esclusa; esporta in CSV e PDF e conserva una copia di sicurezza ripristinabile. Gratis per una classe fino a 20 studenti; si sblocca una sola volta, senza abbonamento.</string>
+</resources>

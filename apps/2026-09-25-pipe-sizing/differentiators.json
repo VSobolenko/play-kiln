@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "slot": "pipe-sizing",
+  "reconRef": "docs/research/2026-09-24-market-decision.md#22-the-us-pocket-filtered-by-hand--demand-proven-and-a-live-monetisation-window",
+  "claims": [
+    {
+      "id": "returns-the-missing-values",
+      "weight": "core",
+      "promise": "Takes the inputs a fitter has and returns the values they do not have, from the standard, instead of checking a number they already looked up.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-09-24-market-decision.md#22-the-us-pocket-filtered-by-hand--demand-proven-and-a-live-monetisation-window",
+        "finding": "A reviewer of the 100K+ incumbent writes: \"We know\\knew the length and pipe diameter. What I am looking for is to enter those and get the others based on industry standards.\" That is the measured job, and it is the one the wedge was built on."
+      },
+      "status": "dropped",
+      "droppedReason": "The slot ships a user-entered workbook, not a sizing engine, and that is a recorded decision rather than an implementation shortcut. docs/research/2026-09-25-pipe-sizing-code-source.md §5 and its \"Decisions this forces on the human\" table require, before any cell may be embedded: a written NFPA or ICC licence permitting reproduction in an app, a frozen edition with its TIAs, and a reviewer-signed transcription by a qualified fuel-gas code professional - the memo states that \"a developer self-check is not credible safety evidence\" and that \"no embedded numbers\" ship \"until a right is documented\". openspec/changes/app-pipe-sizing/tasks.md records the 2026-09-25 narrowing on the same ground: ICC permits free viewing but not reproduction without separate written permission, and the IFGS material carries an additional AGA copyright. The consequence is not stated only in a document: scripts/sizing/SizingDomain.kt supplies no capacity, equivalent-length, gravity, pressure-drop or diameter value, and capacity_help tells the user to read those values from their own code book. So the recon's clause is not delivered - the fitter supplies the capacity and the app owns no value of its own - and this claim is dropped openly rather than reworded."
+    },
+    {
+      "id": "every-input-editable",
+      "weight": "core",
+      "promise": "Leaves every calculation field editable, so a result is never gated behind a pipe size or a preset the app chose.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-09-24-market-decision.md#22-the-us-pocket-filtered-by-hand--demand-proven-and-a-live-monetisation-window",
+        "finding": "The same reviewer adds: \"about half of the calculations fields are locked so unless you need a 2\\\" pipe every time useless\" — a measured complaint about locked inputs in a 100K+ app."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/pipesizing/ui/home/HomeUiState.kt",
+        "symbol": "HomeField",
+        "assertion": "HomeField enumerates thirteen editable readings - material, pressure, load, length, fitting quantity and length, capacity, edition, table, row, gas specific gravity, pressure drop and pipe diameter - and HomeEvent.FieldChanged is the single path that writes any of them. There is no read-only field and no preset the app supplies."
+      }
+    },
+    {
+      "id": "records-the-citation",
+      "weight": "core",
+      "promise": "Cites the code edition and the table the answer came from, and prints that citation with the result.",
+      "evidence": {
+        "strength": "ON RECORD",
+        "source": "docs/research/2026-09-24-market-decision.md#22-the-us-pocket-filtered-by-hand--demand-proven-and-a-live-monetisation-window",
+        "finding": "The recorded wedge is \"the sizing tool that cites the edition of the standard it used\". The recon says accuracy is what this pocket audits, and a professional publicly disputed the fourth-highest-rated app's multipliers."
+      },
+      "status": "narrowed",
+      "narrowedTo": "Records the code and edition, the table and the row the user read, carries them through evaluation as the capacity's provenance, and prints them on the result as provenance_result.",
+      "lostCoverage": "The app holds no table of its own, so the citation is the user's reading rather than the app's lookup, and nothing verifies that the cited row actually supports the load. The only check performed is that the recorded capacity is at least the required load. That is forced by the same licence gate: with no documented right to carry a table, there is no table for a citation to point into, so the citation can only record what the user read.",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/pipesizing/sizing/SizingDomain.kt",
+        "symbol": "CodeCitation",
+        "assertion": "UserProvenance.CodeCitation carries codeAndEdition, table and row, and SizingEvaluation.Computed cannot be constructed without a non-null capacityProvenance, so a result without a citation is unrepresentable."
+      }
+    },
+    {
+      "id": "shows-its-arithmetic",
+      "weight": "core",
+      "promise": "Shows the correct multipliers rather than an opined number, so a professional can audit every step.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-09-24-market-decision.md#22-the-us-pocket-filtered-by-hand--demand-proven-and-a-live-monetisation-window",
+        "finding": "A union steamfitter, reviewing the 4.4-star incumbent: \"The multipliers on this app are flat out wrong. For a 45 offset you want to multiply the rise/run by 1.4142\". A named professional disputing the numbers, with the correct figure, in a rated app."
+      },
+      "status": "narrowed",
+      "narrowedTo": "Prints every arithmetic step the app performs: the required load as the sum of the loads, the developed length, the fitting allowance as quantity times equivalent length each, the total length, and the capacity comparison with its citation.",
+      "lostCoverage": "The app supplies no multipliers and no fitting table at all. The equivalent lengths and the capacity are values the user typed, so the app can show its working but cannot dispute a wrong multiplier - which is exactly the accuracy complaint the wedge was chosen to answer. Carrying the multipliers is the route docs/research/2026-09-25-pipe-sizing-code-source.md §5 prices at \"High until written permission\", and the equation alternative's copyright status is left UNVERIFIED there, so neither was taken.",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/pipesizing/ui/home/ResultLines.kt",
+        "symbol": "computedResultLines",
+        "assertion": "The computed result is rendered as an explicit list of labelled lines - case, method, compared capacity, load, total length, fitting allowance, supports/does-not-support, provenance - so every figure is read in the context it was computed for."
+      }
+    },
+    {
+      "id": "bought-once-not-rented",
+      "weight": "core",
+      "promise": "Is bought once instead of rented, because a working tool for a trade should not be a subscription.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-09-24-market-decision.md#22-the-us-pocket-filtered-by-hand--demand-proven-and-a-live-monetisation-window",
+        "finding": "All three critical reviews of the 4.8-star leader, with 1,590 rated reviews, are about the paywall: \"Every year we bought the apprentices the app for their android phones... not anymore. It was easy and affordable at $25 one-time fee for life.\" A repeat institutional buyer stopped over a move to a subscription."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/pipesizing/monetization/MonetizationConfig.kt",
+        "symbol": "PRO_UNLOCK",
+        "assertion": "The only thing sold is one non-consumable unlock, pro_unlock, and it lifts the free-tier saved-case limit from three rather than unlocking a capability the free app pretends not to have. There is no subscription product in the catalog."
+      }
+    },
+    {
+      "id": "chosen-unit-system",
+      "weight": "supporting",
+      "promise": "Gives the result in the unit system the user chose, and keeps the physical value exact across a switch.",
+      "evidence": {
+        "strength": "UNVERIFIED",
+        "source": "docs/research/2026-09-24-market-decision.md#5-what-this-does-not-establish",
+        "finding": "The recon never measured a unit-system complaint in this pocket. This is the factory's own reading of a trade that works in both imperial and metric, and it is recorded here as unverified rather than presented as evidence."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "resource",
+        "ref": "app/src/main/res/values/strings.xml",
+        "symbol": "result_capacity_metric",
+        "assertion": "The metric rendering path exists as its own string resource beside the imperial one, and HomeUiState keeps the canonical imperial reading separately from the editable text so a unit switch preserves the physical value instead of re-parsing rounded display text."
+      }
+    },
+    {
+      "id": "no-ad-over-an-input",
+      "weight": "supporting",
+      "promise": "Never puts an advertisement over an input field or in the middle of a calculation.",
+      "evidence": {
+        "strength": "UNVERIFIED",
+        "source": "docs/research/2026-09-24-market-decision.md#5-what-this-does-not-establish",
+        "finding": "The harvested complaints for this pocket were about price, multipliers and locked inputs - not advertising. The no-ad-over-an-input posture is the factory's own, and the recon did not establish that this pocket cares."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/pipesizing/monetization/MonetizationConfig.kt",
+        "symbol": "INTERSTITIAL_EVERY_N_EVALUATIONS",
+        "assertion": "A completed evaluation is the only place an interstitial is allowed, at most one every third evaluation, never on launch and never over an input; the banner unit is declared because the ads capability requires one and is deliberately never shown."
+      }
+    }
+  ]
+}

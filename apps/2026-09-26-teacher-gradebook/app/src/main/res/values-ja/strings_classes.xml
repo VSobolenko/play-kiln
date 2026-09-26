@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="classes_title_unlocked">あなたのクラス</string>
+    <string name="classes_title_free">あなたのクラス</string>
+    <string name="classes_about">アプリについて</string>
+    <string name="classes_new_class">新しいクラス</string>
+    <string name="classes_hero_eyebrow">クラスの概要</string>
+    <string name="classes_hero_headline">すべてのクラスの状況をひと目で</string>
+    <string name="classes_hero_supporting">クラスを開くと、生徒名簿・成績・日々の記録を管理できます。</string>
+    <string name="classes_stat_classes">クラス</string>
+    <string name="classes_stat_students">生徒</string>
+    <string name="classes_stat_overall_average">全体平均</string>
+    <string name="classes_not_enough_data">データがまだ不足しています</string>
+    <string name="classes_percent_format">%1$s％</string>
+    <string name="classes_empty_title">クラスがまだありません</string>
+    <string name="classes_empty_body">最初のクラスを作成して、成績・出欠・メモの記録を始めましょう。データはすべてこの端末に保存されます。アカウントもインターネットも不要です。</string>
+    <string name="classes_period_format">%1$s限</string>
+    <plurals name="classes_student_count">
+        <item quantity="other">生徒%1$d名</item>
+    </plurals>
+    <plurals name="classes_assignment_count">
+        <item quantity="other">課題%1$d件</item>
+    </plurals>
+    <string name="classes_average_value">クラス平均：%1$s</string>
+    <string name="classes_options">オプション</string>
+    <string name="classes_rename">名前を変更</string>
+    <string name="classes_delete">削除</string>
+    <string name="classes_hint">クラスをタップすると、生徒名簿・成績・出欠・メモ・座席・レポートを開けます。</string>
+    <string name="classes_create">作成</string>
+    <string name="classes_name_label">クラス名</string>
+    <plurals name="classes_free_add_warning">
+        <item quantity="other">無料版で保持できるクラスは%1$dつです。追加するにはアンロックが必要です。</item>
+    </plurals>
+    <string name="classes_rename_title">クラス名を変更</string>
+    <string name="classes_save">保存</string>
+    <string name="classes_delete_title">%1$sを削除しますか？</string>
+    <plurals name="classes_grade_count">
+        <item quantity="other">評価%1$d件</item>
+    </plurals>
+    <plurals name="classes_attendance_count">
+        <item quantity="other">出欠記録%1$d件</item>
+    </plurals>
+    <plurals name="classes_note_count">
+        <item quantity="other">メモ%1$d件</item>
+    </plurals>
+    <plurals name="classes_contact_count">
+        <item quantity="other">連絡%1$d件</item>
+    </plurals>
+    <string name="classes_delete_body">この操作では、クラスとその中に記録されたすべて（%1$s、%2$s、%3$s、%4$s、%5$s、%6$s、座席表）を削除します。\n\n元に戻すことはできません。不安な場合は、先に記録をバックアップしてください。</string>
+    <string name="classes_delete_confirm">クラスを削除</string>
+    <string name="classes_free_title">無料版</string>
+    <plurals name="classes_free_allowance">
+        <item quantity="other">クラス%1$dつ</item>
+    </plurals>
+    <string name="classes_free_allowance_label">無料枠</string>
+    <plurals name="classes_free_roster">
+        <item quantity="other">生徒%1$d名まで</item>
+    </plurals>
+    <plurals name="classes_free_roster_tile">
+        <item quantity="other">生徒%1$d名まで</item>
+    </plurals>
+    <string name="classes_free_roster_label">1クラスあたりの生徒数</string>
+    <string name="classes_free_available">%1$s・%2$sで、成績・出欠・メモ・座席は無制限です。クラス数の無制限、エクスポート、バックアップは一度きりのアンロックに含まれます。</string>
+    <string name="classes_free_spent">%1$s・%2$sで、成績・出欠・メモ・座席は無制限です。無料のクラスはすでに使用しているため、2つ目にはアンロックが必要です。</string>
+    <string name="classes_unlock_title">すべてを一度だけアンロック</string>
+    <string name="classes_unlock_body">買い切りの一度の購入で、定期課金ではありません。確定前に Google Play がお使いの通貨で正確な価格を表示します。新しい端末でも復元できます。</string>
+    <string name="classes_unlock_action">アンロックに含まれる内容を見る</string>
+</resources>

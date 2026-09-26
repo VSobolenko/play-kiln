@@ -77,9 +77,18 @@ function slotNonBuildPaths(slotDir, cwd) {
  * diff of only allowlisted paths are the two ways to pass, and a failed `git` invocation is neither.
  */
 export function buildInputsUnchangedBetween(gitCommit, head, slotDir, cwd = process.cwd()) {
-  if (!gitCommit || !head) return false
+  // A blank commit is not evidence of an unchanged tree; treat it as unprovable rather than acceptable,
+  // so a manifest that lost its gitCommit (null, '', whitespace) can never read as a pass here.
+  if (!String(gitCommit ?? '').trim() || !String(head ?? '').trim()) return false
   if (String(gitCommit) === String(head)) return true
-  const changed = spawnSync('git', ['diff', '--name-only', String(gitCommit), String(head)], {
+  // Rename detection must stay OFF. `--name-only` prints only the *destination* of a rename, so with
+  // detection on `git mv apps/slot/app/Screen.kt docs/Screen.kt` yields a single allowlisted path and
+  // the removal of a build input vanishes from the diff — a false pass that binds a capture to a tree
+  // whose sources no longer exist, which is the exact failure this module exists to prevent. It also
+  // hides content-edited renames below 100% similarity. `--no-renames` reports a rename as a delete
+  // plus an add, and both are then evaluated against the allowlist. Do not "simplify" this back to a
+  // bare `--name-only`: the flag is load-bearing.
+  const changed = spawnSync('git', ['diff', '--no-renames', '--name-only', String(gitCommit), String(head)], {
     cwd, encoding: 'utf8'
   })
   if (changed.status !== 0) return false
@@ -128,8 +137,14 @@ export function verifyArtifactChain({
   }
   const recorded = String(entry.sha256).toLowerCase()
 
-  if (!manifest.gitCommit) {
+  if (!manifest.gitCommit || !String(manifest.gitCommit).trim()) {
     throw new ProvenanceError(`${manifestLabel} records no gitCommit, so it cannot be tied to the current sources`)
+  }
+  // A record must never be written carrying a null/blank commit. Letting `head` through empty here
+  // would persist `gitCommit: null` in the provenance record, which a reader cannot distinguish from a
+  // deliberate omission — so an unresolvable HEAD is a refusal, not a pass.
+  if (!head || !String(head).trim()) {
+    throw new ProvenanceError('HEAD could not be resolved, so the capture cannot be tied to the sources being shipped')
   }
   if (String(manifest.gitCommit) !== head && !appSourcesUnchanged) {
     throw new ProvenanceError(

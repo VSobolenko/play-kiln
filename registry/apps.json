@@ -30,6 +30,17 @@
       "status": "scaffolded",
       "createdAt": "2026-09-25T15:37:50.949Z",
       "updatedAt": "2026-09-25T15:58:36.605Z"
+    },
+    {
+      "id": "teacher-gradebook",
+      "dir": "apps/2026-09-26-teacher-gradebook",
+      "name": "Mark Book for Teachers",
+      "applicationId": "com.gexetr.teachergradebook",
+      "idea": "Private offline classroom record book a teacher owns: create, edit and delete every class, student, assignment, grade, attendance mark, note, parent contact and seating position without an account or a server, see an explainable running average, export CSV and PDF, and keep a restorable backup file. Free for one class, unlocked once for unlimited classes and export.",
+      "archetype": "purchase_led_single_unlock",
+      "status": "scaffolded",
+      "createdAt": "2026-09-26T13:42:41.139Z",
+      "updatedAt": "2026-09-26T13:42:41.139Z"
     }
   ]
 }

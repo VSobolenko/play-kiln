@@ -1,22 +1,24 @@
 # Privacy policy — Gas Pipe Sizing Workbook
 
-**Last updated:** 2026-09-25
+**Last updated:** 2026-09-26
 
 ## Summary
 
-Enabled capabilities declare no collected data.
+Derived from the enabled capabilities and their bundled SDK declarations.
 
 ## Data collection and sharing
 
-The enabled capabilities declare no collection, transmission, sale, or sharing of user data. Data created in the app remains on the user's device and is subject to the device's backup settings.
+The app and its enabled SDKs collect the data types documented in store/data-safety.md.
 
 ## Permissions
 
-- None declared beyond platform-normal capabilities.
+- `com.google.android.gms.permission.AD_ID` — Declared by the Google Mobile Ads SDK to serve and measure ads; removing it disables the advertising ID and reduces ad revenue.
 
 ## Third-party services
 
-None declared.
+- Google Mobile Ads SDK 25.5.0 — https://policies.google.com/technologies/partner-sites
+- Google Play Billing Library 9.1.0 — https://developer.android.com/google/play/billing
+- Google User Messaging Platform 4.0.0 — https://developers.google.com/admob/android/privacy
 
 ## Data retention and deletion
 
@@ -29,3 +31,5 @@ Platform security and encrypted transport are required for networked capabilitie
 ## Contact
 
 Privacy questions: support@example.com
+
+<!-- kiln:generated policy - delete this line to keep your own wording -->

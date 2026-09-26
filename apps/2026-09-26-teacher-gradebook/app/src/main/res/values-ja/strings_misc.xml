@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unlock_title">制限を解除</string>
+    <string name="unlock_benefit_heading">無料版の制限なしで使い続ける</string>
+    <string name="unlock_benefit_classes">クラス数無制限</string>
+    <string name="unlock_benefit_students">すべてのクラスで生徒数無制限</string>
+    <string name="unlock_benefit_categories">重み付きカテゴリと最低点の除外</string>
+    <string name="unlock_benefit_csv">成績簿の CSV エクスポート</string>
+    <string name="unlock_benefit_pdf">印刷用の PDF クラス・生徒レポート</string>
+    <string name="unlock_benefit_backup">記録全体のバックアップと復元</string>
+    <string name="unlock_price_loading">価格は確定前に Google Play が表示します</string>
+    <string name="unlock_one_time_purchase">買い切りの一度の支払いです。定期課金ではありません。</string>
+    <string name="unlock_google_play_notice">購入は Google Play が処理し、確定前にお使いの通貨で正確な価格を表示します。永続アンロックは再インストール後や新しい端末への移行後も復元でき、復元後はオフラインでも動作します。</string>
+    <string name="unlock_billing_unavailable_title">現在 Google Play を利用できません</string>
+    <string name="unlock_billing_unavailable_body">購入と復元には Google Play への接続が必要です。既存の記録は安全で、引き続き使用できます。</string>
+    <string name="unlock_purchase_button">Google Play へ進む</string>
+    <string name="unlock_restore_button">購入を復元</string>
+    <string name="unlock_dismiss_button">後で</string>
+
+    <string name="about_title">このアプリについて</string>
+    <string name="about_hero_eyebrow">教師のための非公開の記録</string>
+    <string name="about_hero_purpose">クラス、評価、出欠、メモを、自分で管理できる1つの記録にまとめます。</string>
+    <string name="about_what_title">Mark Book とは</string>
+    <string name="about_what_body">学校のシステムとは別に手元で管理する記録のための、非公開の成績簿です。生徒名簿、評価、出欠、授業参加のメモ、保護者連絡、座席表をまとめて保持します。</string>
+    <string name="about_privacy_title">設計からして非公開</string>
+    <string name="about_privacy_body">アプリはオフラインで動作し、記録はこの端末の非公開ストレージに保存されます。アカウント、ログイン、分析、広告、開発者サーバーはありません。ファイルが外部に出るのは、システムのピッカーからエクスポートまたはバックアップしたときだけです。端末のバックアップが有効な場合、Android の自動バックアップがあなた自身の Google アカウントに記録をコピーすることがあります。</string>
+    <string name="about_privacy_billing">Google Play Billing は購入通信と購入履歴を処理しますが、このアプリを通じてあなたのクラス記録を受け取ることはありません。</string>
+    <string name="about_averages_title">平均は計算の根拠を明示します</string>
+    <string name="about_averages_body">すべての平均は、設定したカテゴリ、重み、丸め、未提出の扱いに従います。空欄や免除の課題が黙って0点に変わることはありません。使える評価がないカテゴリは名前を挙げて除外されます。</string>
+    <string name="about_purchase_title">一度きりの永続アンロック</string>
+    <string name="about_purchase_unlocked">この端末でアンロックが有効です。更新や解約が必要な定期課金はありません。</string>
+    <string name="about_purchase_free">無料版では1クラス、生徒20名まで、カテゴリ1つまで利用できます。一度きりの購入でこれらの制限がなくなり、重み付きカテゴリ、エクスポート、PDF レポート、バックアップと復元が追加されます。</string>
+    <string name="about_purchase_action">アンロックに含まれる内容を見る</string>
+    <string name="about_version_title">バージョン</string>
+    <string name="about_version_value">%1$s</string>
+    <string name="about_support_title">サポート</string>
+    <string name="about_leaving_title">データとアプリの削除</string>
+    <string name="about_leaving_body">個々の記録を削除する、アプリのストレージを消去する、アンインストールする、いずれも可能です。アンインストールすると端末上の記録は削除されますが、エクスポートしたコピーや Android がバックアップしたコピーはあなたの管理下に残ります。</string>
+
+    <string name="average_not_enough_title">データがまだ不足しています</string>
+    <string name="average_not_enough_body">まだこの平均に数えられる評価がありません。これは0点ではありません。</string>
+    <string name="average_percent_value">%1$s％</string>
+    <string name="average_overall_caption">総合平均</string>
+    <string name="average_rule_missing_zero">%1$s。未提出は0点として計算</string>
+    <string name="average_rule_missing_excluded">%1$s。未提出は除外</string>
+    <string name="average_rule_unweighted">どのカテゴリにも重みがないため、カテゴリ平均を等しく扱います。</string>
+    <string name="average_meaning">この結果をクラスの合格基準と比べてみましょう。計算の内訳を開くと、どのカテゴリが結果を下げているか、または変化しているかを確認できます。</string>
+    <string name="average_hide_working">計算の内訳を隠す</string>
+    <string name="average_show_working">計算の内訳を表示</string>
+    <string name="average_no_categories">このクラスにはまだカテゴリがないため、重み付けの対象がありません。</string>
+    <string name="average_category_weight">%1$s・重み %2$s</string>
+    <string name="average_category_excluded">平均から除外：このカテゴリにはまだ数えられる評価がありません。</string>
+    <plurals name="average_category_grade_count">
+        <item quantity="other">評価%2$d件から平均 %1$s</item>
+    </plurals>
+    <plurals name="average_dropped_count">
+        <item quantity="other">最低%1$d件を除外</item>
+    </plurals>
+    <plurals name="average_missing_count">
+        <item quantity="other">未提出%1$d件</item>
+    </plurals>
+    <plurals name="average_exempt_count">
+        <item quantity="other">免除%1$d件</item>
+    </plurals>
+    <string name="average_score_value">%1$s/%2$s</string>
+    <string name="average_missing">未提出</string>
+    <string name="average_exempt">免除</string>
+    <string name="average_empty_mark">—</string>
+    <string name="average_score_description">%2$s中%1$s</string>
+    <string name="average_missing_description">未提出として記録</string>
+    <string name="average_exempt_description">免除として記録</string>
+    <string name="average_empty_description">記録なし</string>
+    <string name="average_assignment_points">配点は %1$s点です。</string>
+    <string name="average_score">点数</string>
+    <string name="average_record_score_description">点数を記録</string>
+    <string name="average_points_earned">獲得点数</string>
+    <string name="average_points_too_high">この課題の配点 %1$s点を超えています。</string>
+    <string name="average_missing_rule_help">未提出の扱いは、このクラスの未提出ルールに従います。</string>
+    <string name="average_exempt_rule_help">免除された課題は平均から完全に除外されます。0点ではありません。</string>
+    <string name="average_save">保存</string>
+    <string name="average_clear">クリア</string>
+    <string name="average_cancel">キャンセル</string>
+</resources>

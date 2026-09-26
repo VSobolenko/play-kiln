@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_repeat_sales",
+  "payingUser": "A frequent leisure traveller who packs for a family or repeats similar trips and rebuilds the same packing list every time.",
+  "paidUnit": "Individual destination and season trip packs, such as a winter ski pack or a beach pack, each adding a prebuilt editable item list with a per-bag weight budget.",
+  "priceUsd": 3.99,
+  "momentOfPayment": "When the traveller opens a second destination pack before a booked trip and taps Add this pack, after one starter pack per install.",
+  "distinctnessSentence": "Each pack is an editable list with a per-bag weight budget, where the measured 1M+ leader cannot edit its own travel dates and its own paid edition is rated 3.1.",
+  "evidenceRef": "docs/ideation/2026-09-26-five-recipes.md#35-recipe-5--trip-packing-checklist-smart-packing-checklist",
+  "day1RevenuePath": "A free app with one starter pack, then a paid second destination pack bought in the days before a booked trip.",
+  "killCriteria": {
+    "windowDays": 60,
+    "minInstalls": 500,
+    "minRevenueUsd": 40
+  },
+  "assumptionsUnverified": [
+    "That travellers will buy destination packs instead of using the free leader, which has 1M+ installs and 42,087 reviews and is the highest-rated result on the query.",
+    "That a prebuilt pack is a purchase rather than a feature a free competitor copies in a week, since nothing in the format is defensible.",
+    "That repeat purchases recur often enough for this archetype, because a traveller who packs twice a year buys two packs a year at most."
+  ]
+}

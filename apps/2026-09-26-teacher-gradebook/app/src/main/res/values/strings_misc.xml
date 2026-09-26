@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unlock_title">Remove the limits</string>
+    <string name="unlock_benefit_heading">Keep teaching without the free limits</string>
+    <string name="unlock_benefit_classes">Unlimited classes</string>
+    <string name="unlock_benefit_students">Unlimited students in every class</string>
+    <string name="unlock_benefit_categories">Weighted categories and drop-lowest rules</string>
+    <string name="unlock_benefit_csv">CSV gradebook export</string>
+    <string name="unlock_benefit_pdf">Printable PDF class and student reports</string>
+    <string name="unlock_benefit_backup">Backup and restore your whole record</string>
+    <string name="unlock_price_loading">Price shown by Google Play before confirmation</string>
+    <string name="unlock_one_time_purchase">One payment. This is not a subscription.</string>
+    <string name="unlock_google_play_notice">Google Play handles the purchase and shows the exact price in your currency before you confirm. Your permanent unlock can be restored after reinstalling or moving to a new device, and works offline once restored.</string>
+    <string name="unlock_billing_unavailable_title">Google Play is unavailable right now</string>
+    <string name="unlock_billing_unavailable_body">Buying and restoring need a connection to Google Play. Your existing record is safe and keeps working.</string>
+    <string name="unlock_purchase_button">Continue to Google Play</string>
+    <string name="unlock_restore_button">Restore purchase</string>
+    <string name="unlock_dismiss_button">Not now</string>
+
+    <string name="about_title">About this app</string>
+    <string name="about_hero_eyebrow">Private teacher record</string>
+    <string name="about_app_name" translatable="false">Mark Book for Teachers</string>
+    <string name="about_hero_purpose">Classes, marks, attendance and notes in one record you control.</string>
+    <string name="about_what_title">What Mark Book is</string>
+    <string name="about_what_body">A private gradebook for the record you keep beside your school system. It keeps rosters, marks, attendance, participation notes, parent contacts and seating plans together.</string>
+    <string name="about_privacy_title">Private by design</string>
+    <string name="about_privacy_body">The app works offline and writes your record to private storage on this device. There is no account, login, analytics, advertising or developer server. Files leave only when you export or back up through the system picker; Android Auto Backup may also copy the record to your own Google account if device backup is enabled.</string>
+    <string name="about_privacy_billing">Google Play Billing handles purchase traffic and purchase history. It never receives your class record through this app.</string>
+    <string name="about_averages_title">Averages explain their working</string>
+    <string name="about_averages_body">Every average follows the categories, weights, rounding and missing-work rule you set. Empty and exempt work is never silently turned into zero, and categories without usable marks are named and left out.</string>
+    <string name="about_purchase_title">One permanent unlock</string>
+    <string name="about_purchase_unlocked">The unlock is active on this device. There is no subscription to renew or cancel.</string>
+    <string name="about_purchase_free">The free version keeps one class, up to 20 students and one category. A one-time purchase removes those limits and adds weighted categories, export, PDF reports, backup and restore.</string>
+    <string name="about_purchase_action">See what the unlock includes</string>
+    <string name="about_version_title">Version</string>
+    <string name="about_version_value">%1$s</string>
+    <string name="about_support_title">Support</string>
+    <string name="about_support_email" translatable="false">v.sobolenko.vs@gmail.com</string>
+    <string name="about_leaving_title">Your data, and leaving</string>
+    <string name="about_leaving_body">You can delete individual records, clear app storage or uninstall. Uninstalling deletes the on-device record; copies you exported or Android backed up remain under your control.</string>
+
+    <string name="average_not_enough_title">Not enough data yet</string>
+    <string name="average_not_enough_body">No recorded grade counts toward this average yet. This is not a zero.</string>
+    <string name="average_percent_value">%1$s%%</string>
+    <string name="average_overall_caption">Overall average</string>
+    <string name="average_rule_missing_zero">%1$s; missing work counts as zero</string>
+    <string name="average_rule_missing_excluded">%1$s; missing work is excluded</string>
+    <string name="average_rule_unweighted">No category has a weight, so category averages count equally.</string>
+    <string name="average_meaning">Compare this result with the class pass mark. Open the working to see which category is pulling the result down or drifting.</string>
+    <string name="average_hide_working">Hide the working</string>
+    <string name="average_show_working">Show the working</string>
+    <string name="average_no_categories">This class has no categories yet, so there is nothing to weigh.</string>
+    <string name="average_category_weight">%1$s · weight %2$s</string>
+    <string name="average_category_excluded">Excluded from the average: no grade counts in this category yet.</string>
+    <plurals name="average_category_grade_count">
+        <item quantity="one">Average %1$s from %2$d grade</item>
+        <item quantity="other">Average %1$s from %2$d grades</item>
+    </plurals>
+    <plurals name="average_dropped_count">
+        <item quantity="one">Lowest %1$d grade dropped</item>
+        <item quantity="other">Lowest %1$d grades dropped</item>
+    </plurals>
+    <plurals name="average_missing_count">
+        <item quantity="one">%1$d missing grade</item>
+        <item quantity="other">%1$d missing grades</item>
+    </plurals>
+    <plurals name="average_exempt_count">
+        <item quantity="one">%1$d exempt grade</item>
+        <item quantity="other">%1$d exempt grades</item>
+    </plurals>
+    <string name="average_score_value">%1$s/%2$s</string>
+    <string name="average_missing">Missing</string>
+    <string name="average_exempt">Exempt</string>
+    <string name="average_empty_mark">—</string>
+    <string name="average_score_description">%1$s of %2$s</string>
+    <string name="average_missing_description">Marked missing</string>
+    <string name="average_exempt_description">Marked exempt</string>
+    <string name="average_empty_description">Nothing recorded</string>
+    <string name="average_assignment_points">Worth %1$s points.</string>
+    <string name="average_score">Score</string>
+    <string name="average_record_score_description">Record a score</string>
+    <string name="average_points_earned">Points earned</string>
+    <string name="average_points_too_high">That is more than the %1$s points the assignment is worth.</string>
+    <string name="average_missing_rule_help">Missing work is handled by this class\'s missing-work rule.</string>
+    <string name="average_exempt_rule_help">Exempt work is left out of the average completely—it is not a zero.</string>
+    <string name="average_save">Save</string>
+    <string name="average_clear">Clear</string>
+    <string name="average_cancel">Cancel</string>
+</resources>

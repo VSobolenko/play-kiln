@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="classes_title_unlocked">Your classes</string>
+    <string name="classes_title_free">Your class</string>
+    <string name="classes_about">About</string>
+    <string name="classes_new_class">New class</string>
+    <string name="classes_hero_eyebrow">Class overview</string>
+    <string name="classes_hero_headline">See where every class stands</string>
+    <string name="classes_hero_supporting">Open a class to manage its roster, grades and daily records.</string>
+    <string name="classes_stat_classes">Classes</string>
+    <string name="classes_stat_students">Students</string>
+    <string name="classes_stat_overall_average">Overall average</string>
+    <string name="classes_not_enough_data">not enough data yet</string>
+    <string name="classes_percent_format">%1$s%%</string>
+    <string name="classes_empty_title">No classes yet</string>
+    <string name="classes_empty_body">Create your first class to start recording grades, attendance and notes. Everything stays on this device — no account, no internet.</string>
+    <string name="classes_period_format">Period %1$s</string>
+    <plurals name="classes_student_count">
+        <item quantity="one">%1$d student</item>
+        <item quantity="other">%1$d students</item>
+    </plurals>
+    <plurals name="classes_assignment_count">
+        <item quantity="one">%1$d assignment</item>
+        <item quantity="other">%1$d assignments</item>
+    </plurals>
+    <string name="classes_average_value">Class average: %1$s</string>
+    <string name="classes_options">Options</string>
+    <string name="classes_rename">Rename</string>
+    <string name="classes_delete">Delete</string>
+    <string name="classes_hint">Tap a class to open its roster, grades, attendance, notes, seating and reports.</string>
+    <string name="classes_create">Create</string>
+    <string name="classes_name_label">Class name</string>
+    <plurals name="classes_free_add_warning">
+        <item quantity="one">The free version keeps %1$d class. Creating another needs the unlock.</item>
+        <item quantity="other">The free version keeps %1$d classes. Creating another needs the unlock.</item>
+    </plurals>
+    <string name="classes_rename_title">Rename class</string>
+    <string name="classes_save">Save</string>
+    <string name="classes_delete_title">Delete %1$s?</string>
+    <plurals name="classes_grade_count">
+        <item quantity="one">%1$d grade</item>
+        <item quantity="other">%1$d grades</item>
+    </plurals>
+    <plurals name="classes_attendance_count">
+        <item quantity="one">%1$d attendance record</item>
+        <item quantity="other">%1$d attendance records</item>
+    </plurals>
+    <plurals name="classes_note_count">
+        <item quantity="one">%1$d note</item>
+        <item quantity="other">%1$d notes</item>
+    </plurals>
+    <plurals name="classes_contact_count">
+        <item quantity="one">%1$d contact</item>
+        <item quantity="other">%1$d contacts</item>
+    </plurals>
+    <string name="classes_delete_body">This removes the class together with everything recorded inside it: %1$s, %2$s, %3$s, %4$s, %5$s, %6$s and its seating plan.\n\nThis cannot be undone. If you are not sure, back the record up first.</string>
+    <string name="classes_delete_confirm">Delete the class</string>
+    <string name="classes_free_title">Free version</string>
+    <plurals name="classes_free_allowance">
+        <item quantity="one">One class</item>
+        <item quantity="other">%1$d classes</item>
+    </plurals>
+    <string name="classes_free_allowance_label">Free allowance</string>
+    <plurals name="classes_free_roster">
+        <item quantity="one">up to %1$d student</item>
+        <item quantity="other">up to %1$d students</item>
+    </plurals>
+    <plurals name="classes_free_roster_tile">
+        <item quantity="one">Up to %1$d student</item>
+        <item quantity="other">Up to %1$d students</item>
+    </plurals>
+    <string name="classes_free_roster_label">Students per class</string>
+    <string name="classes_free_available">%1$s with %2$s, unlimited grades, attendance, notes and seating. Unlimited classes, export and backup are part of the one-time unlock.</string>
+    <string name="classes_free_spent">%1$s with %2$s, unlimited grades, attendance, notes and seating. You have your class, so a second one needs the unlock.</string>
+    <string name="classes_unlock_title">Unlock everything, once</string>
+    <string name="classes_unlock_body">A single purchase, not a subscription. Google Play shows the exact price in your currency before you confirm, and it can be restored on a new device.</string>
+    <string name="classes_unlock_action">See what the unlock includes</string>
+</resources>

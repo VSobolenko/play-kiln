@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="classes_title_unlocked">Suas turmas</string>
+    <string name="classes_title_free">Sua turma</string>
+    <string name="classes_about">Sobre</string>
+    <string name="classes_new_class">Nova turma</string>
+    <string name="classes_hero_eyebrow">Visão geral das turmas</string>
+    <string name="classes_hero_headline">Veja a situação de cada turma</string>
+    <string name="classes_hero_supporting">Abra uma turma para gerenciar a lista de alunos, as notas e os registros diários.</string>
+    <string name="classes_stat_classes">Turmas</string>
+    <string name="classes_stat_students">Alunos</string>
+    <string name="classes_stat_overall_average">Média geral</string>
+    <string name="classes_not_enough_data">ainda não há dados suficientes</string>
+    <string name="classes_percent_format">%1$s%%</string>
+    <string name="classes_empty_title">Ainda não há turmas</string>
+    <string name="classes_empty_body">Crie sua primeira turma para começar a registrar notas, presença e observações. Tudo fica neste dispositivo — sem conta e sem internet.</string>
+    <string name="classes_period_format">Aula %1$s</string>
+    <plurals name="classes_student_count"><item quantity="one">%1$d aluno</item><item quantity="other">%1$d alunos</item></plurals>
+    <plurals name="classes_assignment_count"><item quantity="one">%1$d trabalho</item><item quantity="other">%1$d trabalhos</item></plurals>
+    <string name="classes_average_value">Média da turma: %1$s</string>
+    <string name="classes_options">Opções</string>
+    <string name="classes_rename">Renomear</string>
+    <string name="classes_delete">Excluir</string>
+    <string name="classes_hint">Toque em uma turma para abrir a lista de alunos, as notas, a presença, as observações, o mapa de lugares e os relatórios.</string>
+    <string name="classes_create">Criar</string>
+    <string name="classes_name_label">Nome da turma</string>
+    <plurals name="classes_free_add_warning"><item quantity="one">A versão gratuita permite %1$d turma. Para criar outra, é preciso desbloquear.</item><item quantity="other">A versão gratuita permite %1$d turmas. Para criar outra, é preciso desbloquear.</item></plurals>
+    <string name="classes_rename_title">Renomear turma</string>
+    <string name="classes_save">Salvar</string>
+    <string name="classes_delete_title">Excluir %1$s?</string>
+    <plurals name="classes_grade_count"><item quantity="one">%1$d nota</item><item quantity="other">%1$d notas</item></plurals>
+    <plurals name="classes_attendance_count"><item quantity="one">%1$d registro de presença</item><item quantity="other">%1$d registros de presença</item></plurals>
+    <plurals name="classes_note_count"><item quantity="one">%1$d observação</item><item quantity="other">%1$d observações</item></plurals>
+    <plurals name="classes_contact_count"><item quantity="one">%1$d contato</item><item quantity="other">%1$d contatos</item></plurals>
+    <string name="classes_delete_body">Isso remove a turma e tudo o que foi registrado nela: %1$s, %2$s, %3$s, %4$s, %5$s, %6$s e o mapa de lugares.\n\nNão é possível desfazer. Se tiver dúvidas, faça primeiro uma cópia de segurança do registro.</string>
+    <string name="classes_delete_confirm">Excluir a turma</string>
+    <string name="classes_free_title">Versão gratuita</string>
+    <plurals name="classes_free_allowance"><item quantity="one">Uma turma</item><item quantity="other">%1$d turmas</item></plurals>
+    <string name="classes_free_allowance_label">Limite gratuito</string>
+    <plurals name="classes_free_roster"><item quantity="one">até %1$d aluno</item><item quantity="other">até %1$d alunos</item></plurals>
+    <plurals name="classes_free_roster_tile"><item quantity="one">Até %1$d aluno</item><item quantity="other">Até %1$d alunos</item></plurals>
+    <string name="classes_free_roster_label">Alunos por turma</string>
+    <string name="classes_free_available">%1$s com %2$s, notas, presença, observações e mapa de lugares ilimitados. Turmas ilimitadas, exportação e cópia de segurança fazem parte do desbloqueio único.</string>
+    <string name="classes_free_spent">%1$s com %2$s, notas, presença, observações e mapa de lugares ilimitados. Você já tem sua turma; para criar uma segunda, é preciso desbloquear.</string>
+    <string name="classes_unlock_title">Desbloqueie tudo uma só vez</string>
+    <string name="classes_unlock_body">Uma compra única, não uma assinatura. O Google Play mostra o preço exato na sua moeda antes da confirmação, e a compra pode ser restaurada em um novo dispositivo.</string>
+    <string name="classes_unlock_action">Veja o que o desbloqueio inclui</string>
+</resources>

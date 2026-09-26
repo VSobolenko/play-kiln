@@ -1,0 +1,97 @@
+---
+description: Every slot ships its own visual identity, never stock Material
+alwaysApply: true
+---
+
+# Every app must look like itself
+
+The factory's differentiator is design, not code. A correct app that looks like an unstyled
+Material demo is a failed recipe even when every gate is green: nothing about it is worth
+installing, and nothing about it is worth paying for. The owner's instruction, recorded
+2026-09-26 while reviewing `apps/2026-09-26-teacher-gradebook`: an app must be unique and
+beautiful by design, not "just native buttons from the standard library" — every app gets its
+own pronounced style.
+
+The record: `apps/2026-09-25-pipe-sizing` shipped a working app whose store pack was rendered by
+the generic renderer, with an icon and screenshots that had nothing to do with the product. The
+studio (`store/studio.json` → `scripts/store-studio.py`) and this rule exist because that is the
+failure mode: the factory has to make an app's visual identity a **build input**, not a thing that
+gets decorated on at the end if time allows. `apps/2026-09-26-teacher-gradebook` is the reference
+implementation — deep indigo with amber reserved for work that needs attention, a slot-owned
+mark, hero panels with real stats, a section strip, and an icon that reads at 48dp.
+
+## The bar
+
+A slot is not styled until all of these are true.
+
+- **The identity is declared before the UI is styled.** `store/studio.json` names the `mark`, the
+  full `palette` (every role the renderer draws with), the per-shot `headlines` and `kickers`, the
+  `featureTagline` and the `featurePill`. It is not optional and it is not documentation: it is what
+  the launcher icon, the adaptive-icon vectors, the feature graphic and the store compositions are
+  rendered from, and `store-kit.py` refuses to render rather than silently falling back to the
+  generic pack. Decide the identity at stage 1, not during `/release`.
+- **The palette is one source of truth, shared with the app.** The colours in `studio.json` are the
+  colours in the slot's `ui/theme/Color.kt`. A store pack whose palette drifted from the app's own
+  theme is a screenshot of a different app; `scripts/visual-qa.py`'s `palette` section measures the
+  shipped pixels against the Kotlin palette to catch exactly that.
+- **The slot owns its theme**: its own `Color.kt`, its own shapes and typography, its own dark and
+  light mapping. The Material 3 defaults — including the default purple seed and dynamic colour —
+  are a starting point to replace, not a finished look.
+- **The slot owns components.** At least the shared vocabulary of the app is slot code, not library
+  calls: a mark glyph, a hero/stat panel, a section strip or tabs that are the slot's own, stat
+  tiles, panels, empty states, a status pill. `ui/components/Brand.kt` in the reference slot is the
+  shape to imitate; its values are not. A component earns its place by encoding a decision the app
+  makes repeatedly (a grade, an average with its working, a register state), not by wrapping `Card`.
+- **Depth and hierarchy are visible**: a gradient or tonal field, elevation that means something,
+  a glyph set used as iconography, spacing that separates groups. Not a grid of identical cards on
+  a flat background.
+- **The identity survives translation.** The strip in the reference slot renders an inactive pill as
+  its mark alone because seven labelled pills cannot fit once the longest locale's words are in
+  them. Any layout whose style depends on English string lengths (a fixed-width pill, a tab row of
+  labels, a one-line headline) is a defect that only appears after localisation.
+- **The icon is drawn, not borrowed.** It is generated from `studio.json`'s `mark`, it reads at
+  48dp, it survives the adaptive-icon masks (72dp circle, squircle, 66dp safe zone), and it carries
+  no baked-in rounded mask or shadow — Play rejects those, and `visual-qa.py`'s `icon` section
+  measures them.
+
+## What is banned
+
+- A screen whose entire visual language is library components with default styling — a stock
+  `TopAppBar` plus a stock `TabRow` plus the default `Button` and `OutlinedTextField`, arranged in
+  `Card`s on the default background. That is the "just tabs and buttons and numbers" app.
+- Shipping the first palette you thought of, or the same palette in two slots.
+- Emoji, clipart, or a stock icon as the app's mark or as UI iconography.
+- A styled store pack over an unstyled app. The style must be in the build the user installs, and
+  `media-capture.mjs` photographs real screens with asserted readings — a mocked-up pretty frame
+  around a plain screen is a false claim, not a marketing choice.
+- Deferring the style to `/release`. By then the layout and the components are fixed, and restyling
+  is a rewrite of every screen instead of a decision made once.
+
+## Identity is per slot, like the job is
+
+Two slots must not share a mark, a palette, or a component kit for the same reason they must not
+share a job: Google Play's Repetitive Content policy treats near-duplicate apps as a terminating
+offence, and a catalogue of apps that look identical is the same evidence as a catalogue of apps
+that do the same thing — see `docs/monetization-strategy.md` §1.2. "Our house style" is a name for
+reusing a slot's identity. Derive a new one per slot from that slot's own subject.
+
+## How it is verified
+
+- `store/studio.json` is a declaration: `scripts/verify-slot.mjs` treats a pack that declares it as
+  composed and requires `store/provenance.json` to bind the committed assets to a recorded build,
+  so `rm store/studio.json store/provenance.json` cannot drop the check.
+- `python scripts/visual-qa.py --slot <slug>` measures the shipped pixels independently: palette
+  against the app's own Kotlin palette, caption ink and edge clipping, WCAG contrast of caption and
+  mark, pairwise similarity of the six phone shots (six near-identical frames is not a pack), the
+  adaptive-mask clipping of the icon, and legibility of the caption at 360/180/90 px wide.
+- `node scripts/media-capture.mjs --slot <slug>` is what makes the claim true: it replays the
+  journey against the signed release build and refuses a frame that does not show the readings its
+  shot declares.
+
+None of these can say the app is beautiful. They can say the app's declared identity is the one in
+the build, the one in the pack, and the one in the pixels — and they can say two slots do not have
+the same one. `visual-qa.py` is a **report, not a gate**: it prints per-asset PASS/FAIL rows for
+Play's own asset rules and a `stability` verdict, but it exits 0 whenever it finishes, so a clean
+run is evidence to read, never an approval — the objective gates are `scripts/verify-slot.mjs`, and
+the judgement that separates a distinctive style from an ugly one stays with the owner, at the
+phase-1 review and the phase-2 approval; this rule's job is to ensure there is something to judge.

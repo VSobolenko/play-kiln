@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="classes_title_unlocked">我的班级</string>
+    <string name="classes_title_free">我的班级</string>
+    <string name="classes_about">关于</string>
+    <string name="classes_new_class">新建班级</string>
+    <string name="classes_hero_eyebrow">班级概览</string>
+    <string name="classes_hero_headline">一眼掌握每个班级的情况</string>
+    <string name="classes_hero_supporting">打开班级即可管理学生名单、成绩和日常记录。</string>
+    <string name="classes_stat_classes">班级</string>
+    <string name="classes_stat_students">学生</string>
+    <string name="classes_stat_overall_average">总平均分</string>
+    <string name="classes_not_enough_data">数据尚不充足</string>
+    <string name="classes_percent_format">%1$s%%</string>
+    <string name="classes_empty_title">还没有班级</string>
+    <string name="classes_empty_body">创建第一个班级，即可开始记录成绩、考勤和备注。所有内容都保存在本设备上——无需账号，无需联网。</string>
+    <string name="classes_period_format">第%1$s课时</string>
+    <plurals name="classes_student_count">
+        <item quantity="other">%1$d名学生</item>
+    </plurals>
+    <plurals name="classes_assignment_count">
+        <item quantity="other">%1$d项作业</item>
+    </plurals>
+    <string name="classes_average_value">班级平均分：%1$s</string>
+    <string name="classes_options">选项</string>
+    <string name="classes_rename">重命名</string>
+    <string name="classes_delete">删除</string>
+    <string name="classes_hint">点按班级即可打开学生名单、成绩、考勤、备注、座位表和报告。</string>
+    <string name="classes_create">创建</string>
+    <string name="classes_name_label">班级名称</string>
+    <plurals name="classes_free_add_warning">
+        <item quantity="other">免费版只能保留 %1$d 个班级。再创建一个需要解锁。</item>
+    </plurals>
+    <string name="classes_rename_title">重命名班级</string>
+    <string name="classes_save">保存</string>
+    <string name="classes_delete_title">删除%1$s？</string>
+    <plurals name="classes_grade_count">
+        <item quantity="other">%1$d个成绩</item>
+    </plurals>
+    <plurals name="classes_attendance_count">
+        <item quantity="other">%1$d条考勤记录</item>
+    </plurals>
+    <plurals name="classes_note_count">
+        <item quantity="other">%1$d条备注</item>
+    </plurals>
+    <plurals name="classes_contact_count">
+        <item quantity="other">%1$d条联系记录</item>
+    </plurals>
+    <string name="classes_delete_body">此操作会删除该班级及其中的全部记录：%1$s、%2$s、%3$s、%4$s、%5$s、%6$s 以及座位表。\n\n此操作无法撤销。如果不确定，请先备份记录。</string>
+    <string name="classes_delete_confirm">删除班级</string>
+    <string name="classes_free_title">免费版</string>
+    <plurals name="classes_free_allowance">
+        <item quantity="other">%1$d个班级</item>
+    </plurals>
+    <string name="classes_free_allowance_label">免费额度</string>
+    <plurals name="classes_free_roster">
+        <item quantity="other">最多%1$d名学生</item>
+    </plurals>
+    <plurals name="classes_free_roster_tile">
+        <item quantity="other">最多%1$d名学生</item>
+    </plurals>
+    <string name="classes_free_roster_label">每班学生数</string>
+    <string name="classes_free_available">%1$s，%2$s，成绩、考勤、备注和座位均不限量。班级不限量、导出和备份也属于一次性解锁的内容。</string>
+    <string name="classes_free_spent">%1$s，%2$s，成绩、考勤、备注和座位均不限量。你已有班级，再创建一个需要解锁。</string>
+    <string name="classes_unlock_title">一次解锁，全部功能</string>
+    <string name="classes_unlock_body">一次性购买，不是订阅。确认前 Google Play 会以你的货币显示准确价格，并且在新设备上可以恢复。</string>
+    <string name="classes_unlock_action">查看解锁包含的内容</string>
+</resources>

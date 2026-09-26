@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">Mark Book for Teachers</string>
+    <string name="app_idea" translatable="true">Prywatny, działający offline dziennik ocen, który nauczyciel ma na własność: twórz, edytuj i usuwaj każdą klasę, ucznia, kategorię, pracę, ocenę, wpis frekwencji, notatkę o uczestnictwie, kontakt z rodzicami i miejsce na planie sali — bez konta i bez serwera. Zobacz wyjaśnialną średnią bieżącą, która podaje regułę zaokrąglania, regułę nieoddanych prac i każdą wykluczoną kategorię, eksportuj CSV i PDF oraz prowadź kopię zapasową, którą można przywrócić. Bezpłatnie dla jednej klasy do 20 uczniów; odblokowanie jednorazowe, nie w abonamencie.</string>
+</resources>

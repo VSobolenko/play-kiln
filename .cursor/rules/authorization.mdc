@@ -1,0 +1,53 @@
+# Git, signing, and publishing require explicit authorization
+
+The owner decides what enters history and what leaves the machine. An agent that commits, pushes,
+signs, or uploads on its own initiative takes a decision that is not its to take, and it does so
+irreversibly: a pushed commit is public, a signed artifact binds an app's identity, an upload is a
+release.
+
+This rule exists because it was violated. During one session the factory committed repeatedly
+(`57663a9`, `1f95ea8`, `33aa492`, `5779a33`, `1681fbb`, `59f8e6a`, `e275134`) and generated a release
+signing key with a machine-chosen password, without the owner asking for either. Both were avoidable
+and neither was announced as a decision that needed permission.
+
+## Never do these without an explicit instruction in the current conversation
+
+- `git commit`, `git push`, `git tag`, `git branch` (other than read-only listing), `git merge`,
+  `git rebase`, `git cherry-pick`, `git stash` (anything that moves or writes refs).
+- `git reset --hard`, `git checkout -- <path>`, `git clean`, `git restore`, or any other command that
+  discards working-tree content. If a revert is needed, back up the bytes first and say so.
+- Any `gh` command that writes: `gh pr create`, `gh pr merge`, `gh issue create`, `gh release`, or
+  anything else that publishes.
+- Generating, rotating, or overwriting signing credentials — `scripts/sign-release.mjs --generate`,
+  `keytool -genkeypair`, or writing a `keystore.properties`.
+- Uploading to Play — `scripts/play-upload.mjs` in any mode that is not `--dry-run`.
+- Editing `.git/config`, remotes, or hooks.
+
+## Reading git is always allowed
+
+`git status`, `git log`, `git diff`, `git show`, `git ls-files`, `git rev-parse`, `git cat-file` and
+similar read-only inspection are how work gets verified. Use them freely and often.
+
+## What to do instead of committing
+
+1. Finish and verify the work.
+2. Report what changed, with the evidence.
+3. **Ask.** Offer the commit as a proposal — the message, the file list, whether it should be one
+   commit or several — and wait for a yes.
+4. If authorization is given, do exactly that and nothing broader. Permission for a commit is not
+   permission to push; permission for one push is not permission for the next one.
+
+## Signing and keys are the owner's decision, not a build detail
+
+A signing key is the app's permanent identity: lose it and the app cannot be updated under the same
+listing. An agent may not invent one. If signing is needed:
+
+- Check whether a keystore already exists and report where it is.
+- If none exists, **stop and ask**, explaining what will be created, where it will live, and that the
+  password must be chosen by the owner and stored somewhere recoverable.
+- Never print a password, key material, or `keystore.properties` contents into a transcript.
+
+## The same spirit applies beyond git
+
+Anything that leaves the machine, costs money, is hard to undo, or binds a public identity is a
+decision to surface and wait on — not to take quietly because it seemed like the next step.

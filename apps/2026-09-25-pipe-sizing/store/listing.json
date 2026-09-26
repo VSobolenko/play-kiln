@@ -17,35 +17,86 @@
   "locales": {
     "en-US": {
       "title": "Gas Pipe Sizing Workbook",
-      "shortDescription": "Offline gas pipe sizing arithmetic with user-entered loads and citations",
-      "fullDescription": "Gas Pipe Sizing Workbook is a paid-once, offline calculation aid for organizing gas pipe sizing inputs and arithmetic.\n\nEnter loads, developed lengths, fitting allowances, units, and user-confirmed capacity-like readings. The app sums loads and lengths, converts imperial and metric units both ways, compares required load with the value you entered, and records your edition, table, and row citation.\n\nThe app provides no code-table data and does not determine compliance, certify work, or endorse a source. It asserts no result when a required input, citation, range, or consistency check is missing; instead, it identifies what to correct.\n\nYour entries are saved on the device and restored the next time you open the app, including after the process has been killed. No history of previous cases is kept. No account, ads, subscription, in-app purchase, or network connection is required.",
+      "shortDescription": "Offline gas pipe sizing arithmetic, saved cases, and your own code citations",
+      "fullDescription": "Gas Pipe Sizing Workbook is an offline calculation aid for organizing the gas pipe sizing arithmetic you already do on paper, around the readings your own code book gives you.\n\nEnter the material or system, the pressure class, the total load, the developed length and the fitting allowance. The app sums the loads and the lengths, converts imperial and metric units in both directions, compares the capacity you confirm against the load you need, and records the edition, table and row each reading came from.\n\nSave the cases you work on\nKeep a run as a named case with its readings, method, units and citation. Loading a case replaces the calculator, so a result always belongs to the readings on screen. The free tier keeps three cases; the one-time Pro unlock removes the limit.\n\nA result is refused rather than guessed\nThe app ships no code tables and does not determine compliance. When a reading is missing, unreadable, out of range, or inconsistent with the selected method, it names what to correct instead of showing a partial number.\n\nShare a case report\nA case can be shared as text, with its readings, the sums, the comparison and the recorded citation.\n\nFree tier and Pro\nThe free tier may show an interstitial ad after every third completed evaluation, never on launch and never after a refused one; it can keep three saved cases, and it can unlock report sharing for the rest of the session by watching one rewarded video. Pro is a single Google Play purchase: it removes the interstitial ads, removes the saved-case limit, and unlocks case reports without watching anything. It is not a subscription and nothing renews. A purchase can be restored on a new device with the same Google account.\n\nPrivacy\nAds are served by Google AdMob and are requested only after your ad choices are resolved; refusing them leaves the app fully usable. Your cases are stored on your device and are never uploaded.\n\nVerify every result against your own applicable code book. This app is not a certification, an endorsement, or a code-compliance determination.",
       "screenshotCaptions": [
-        "Enter the sizing inputs",
-        "Add loads and lengths",
-        "Record the source citation",
+        "Enter the run readings",
+        "Cite your own table",
         "Convert units both ways",
+        "Save the case",
         "Review missing-input guidance",
         "Inspect the arithmetic result"
       ],
       "featureBullets": [
         "Sum user-entered loads and developed lengths",
         "Convert imperial and metric units both ways",
-        "Record citations and explain unavailable results"
+        "Keep saved cases with their citation, and explain a refused result"
       ]
     }
   },
   "dataSafety": {
-    "collectsData": false,
-    "reason": "Enabled capabilities declare no collected data.",
-    "dataTypes": [],
-    "thirdPartySdks": [],
-    "encryptedInTransit": false,
+    "collectsData": true,
+    "reason": "Derived from the enabled capabilities and their bundled SDK declarations.",
+    "dataTypes": [
+      {
+        "type": "App activity",
+        "purpose": "Advertising or marketing",
+        "shared": true,
+        "optional": false,
+        "notes": "Ad interaction events (impressions, clicks, rewarded completions) reported by the ad SDK."
+      },
+      {
+        "type": "App info and performance",
+        "purpose": "Analytics",
+        "shared": true,
+        "optional": false,
+        "notes": "Ad SDK diagnostics and crash data reported by the SDK itself."
+      },
+      {
+        "type": "Device or other IDs",
+        "purpose": "Advertising or marketing",
+        "shared": true,
+        "optional": false,
+        "notes": "Advertising ID, used for ad delivery and measurement; disabled by consent refusal in the EEA/UK."
+      },
+      {
+        "type": "Financial info",
+        "purpose": "App functionality",
+        "shared": false,
+        "optional": false,
+        "notes": "Purchase history: product IDs the user bought and their entitlement state. Payment instruments are handled entirely by Google Play and never reach the app."
+      }
+    ],
+    "thirdPartySdks": [
+      {
+        "name": "Google Mobile Ads SDK",
+        "version": "25.5.0",
+        "policyUrl": "https://policies.google.com/technologies/partner-sites"
+      },
+      {
+        "name": "Google Play Billing Library",
+        "version": "9.1.0",
+        "policyUrl": "https://developer.android.com/google/play/billing"
+      },
+      {
+        "name": "Google User Messaging Platform",
+        "version": "4.0.0",
+        "policyUrl": "https://developers.google.com/admob/android/privacy"
+      }
+    ],
+    "encryptedInTransit": true,
     "hasAccountDeletion": false
   },
-  "permissions": [],
+  "permissions": [
+    {
+      "name": "com.google.android.gms.permission.AD_ID",
+      "why": "Declared by the Google Mobile Ads SDK to serve and measure ads; removing it disables the advertising ID and reduces ad revenue.",
+      "dangerous": false
+    }
+  ],
   "ads": {
-    "containsAds": false,
-    "reason": "Enabled capabilities declare no advertising SDKs."
+    "containsAds": true,
+    "reason": "Enabled capabilities include advertising SDKs."
   },
   "contentRating": {
     "questionnaire": "notes",
@@ -57,8 +108,11 @@
     "accentColor": "#E8A83E"
   },
   "capabilityCompliance": {
-    "enabled": [],
-    "requiresConsent": false,
+    "enabled": [
+      "ads",
+      "billing"
+    ],
+    "requiresConsent": true,
     "requiresPurchaseAuthority": false,
     "purchaseAuthority": null
   }

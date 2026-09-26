@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="limit_second_class" translatable="true">無料版で保持できるクラスは1つです。一度きりのアンロックで、この制限とほかのすべての制限が解除されます：クラス数無制限、生徒数無制限、重み付きカテゴリ、エクスポート、バックアップ。</string>
+    <plurals name="limit_student_cap" translatable="true">
+        <item quantity="other">無料版では1クラスにつき生徒%1$d名までです。一度きりのアンロックで、この制限とほかのすべての制限が解除されます：クラス数無制限、生徒数無制限、重み付きカテゴリ、エクスポート、バックアップ。</item>
+    </plurals>
+    <string name="limit_single_category" translatable="true">無料版ではカテゴリを1つだけ使用するため、平均は単純平均になります。一度きりのアンロックで、この制限とほかのすべての制限が解除されます：クラス数無制限、生徒数無制限、重み付きカテゴリ、エクスポート、バックアップ。</string>
+    <string name="limit_export" translatable="true">成績表や印刷用レポートのエクスポートは一度きりのアンロックに含まれます。アンロックすると、無料版のすべての制限が解除されます：クラス数無制限、生徒数無制限、重み付きカテゴリ。</string>
+    <string name="limit_backup" translatable="true">バックアップと復元は一度きりのアンロックに含まれます。アンロックすると、無料版のすべての制限が解除されます：クラス数無制限、生徒数無制限、重み付きカテゴリ。</string>
+
+    <plurals name="import_imported" translatable="true">
+        <item quantity="other">%1$d名の生徒を取り込みました。</item>
+    </plurals>
+    <plurals name="import_already_on_roster" translatable="true">
+        <item quantity="other">%1$d行はすでに名簿にあったため、重複して追加されませんでした。</item>
+    </plurals>
+    <plurals name="import_skipped" translatable="true">
+        <item quantity="other">%1$d行をスキップしました：%2$s</item>
+    </plurals>
+    <string name="import_skipped_line" translatable="true">%1$d行目 — %2$s</string>
+    <plurals name="import_blocked_by_limit" translatable="true">
+        <item quantity="other">%1$d名の生徒が収まりませんでした：無料版では1クラスにつき%2$d名までです。</item>
+    </plurals>
+
+    <plurals name="restore_restored" translatable="true">
+        <item quantity="other">%1$dクラスを復元しました。</item>
+    </plurals>
+
+    <string name="storage_write_failed" translatable="true">その変更は画面に表示されていますが、この端末のストレージに書き込めませんでした。</string>
+
+    <string name="report_student_column" translatable="true">生徒</string>
+    <string name="report_overall_column" translatable="true">総合</string>
+    <string name="report_class_average" translatable="true">クラス平均：%1$s</string>
+    <string name="report_column_key" translatable="true">列の凡例：M = 未提出、E = 免除、%1$s = 記録なし。</string>
+    <string name="report_footer" translatable="true">%1$s · %2$dページ · この端末に保存された非公開の記録であり、公式な成績証明書ではありません</string>
+    <string name="report_student_gone" translatable="true">その生徒はもうこの名簿にいません。</string>
+    <string name="report_school_id" translatable="true">学校ID：%1$s</string>
+    <string name="report_overall" translatable="true">総合：%1$s</string>
+    <string name="report_period" translatable="true">%1$s限</string>
+    <string name="report_averages_rule" translatable="true">平均：%1$s；未提出は%2$s。</string>
+    <string name="report_missing_counts_zero" translatable="true">0点として計算</string>
+    <string name="report_missing_counts_excluded" translatable="true">除外</string>
+    <string name="report_printed" translatable="true">%1$s に印刷 · この端末に保存された非公開の記録</string>
+    <string name="report_categories" translatable="true">カテゴリ</string>
+    <string name="report_excluded_no_grade" translatable="true">除外（評価なし）</string>
+    <string name="report_dropped_lowest" translatable="true">, 最低%1$d件を除外</string>
+    <string name="report_missing_count" translatable="true">, 未提出%1$d件</string>
+    <string name="report_exempt_count" translatable="true">, 免除%1$d件</string>
+    <string name="report_grades" translatable="true">成績</string>
+    <string name="report_missing" translatable="true">未提出</string>
+    <string name="report_exempt" translatable="true">免除</string>
+    <string name="report_attendance" translatable="true">出欠</string>
+    <string name="report_notes" translatable="true">メモ</string>
+    <string name="report_parent_contacts" translatable="true">保護者連絡</string>
+    <string name="report_follow_up" translatable="true"> （フォロー %1$s）</string>
+</resources>

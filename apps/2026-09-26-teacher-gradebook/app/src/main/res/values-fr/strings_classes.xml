@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="classes_title_unlocked">Vos classes</string>
+    <string name="classes_title_free">Votre classe</string>
+    <string name="classes_about">À propos</string>
+    <string name="classes_new_class">Nouvelle classe</string>
+    <string name="classes_hero_eyebrow">Aperçu des classes</string>
+    <string name="classes_hero_headline">Suivez chaque classe</string>
+    <string name="classes_hero_supporting">Ouvrez une classe pour gérer sa liste d’élèves, ses notes et ses relevés quotidiens.</string>
+    <string name="classes_stat_classes">Classes</string>
+    <string name="classes_stat_students">Élèves</string>
+    <string name="classes_stat_overall_average">Moyenne générale</string>
+    <string name="classes_not_enough_data">pas encore assez de données</string>
+    <string name="classes_percent_format">%1$s%%</string>
+    <string name="classes_empty_title">Aucune classe</string>
+    <string name="classes_empty_body">Créez votre première classe pour saisir les notes, la présence et les remarques. Tout reste sur cet appareil, sans compte ni Internet.</string>
+    <string name="classes_period_format">Heure de cours %1$s</string>
+    <plurals name="classes_student_count">
+        <item quantity="one">%1$d élève</item>
+        <item quantity="other">%1$d élèves</item>
+    </plurals>
+    <plurals name="classes_assignment_count">
+        <item quantity="one">%1$d devoir</item>
+        <item quantity="other">%1$d devoirs</item>
+    </plurals>
+    <string name="classes_average_value">Moyenne de la classe : %1$s</string>
+    <string name="classes_options">Options</string>
+    <string name="classes_rename">Renommer</string>
+    <string name="classes_delete">Supprimer</string>
+    <string name="classes_hint">Touchez une classe pour ouvrir sa liste d’élèves, ses notes, sa présence, ses remarques, son plan de classe et ses rapports.</string>
+    <string name="classes_create">Créer</string>
+    <string name="classes_name_label">Nom de la classe</string>
+    <plurals name="classes_free_add_warning">
+        <item quantity="one">La version gratuite conserve %1$d classe. Le déblocage est requis pour en créer une autre.</item>
+        <item quantity="other">La version gratuite conserve %1$d classes. Le déblocage est requis pour en créer une autre.</item>
+    </plurals>
+    <string name="classes_rename_title">Renommer la classe</string>
+    <string name="classes_save">Enregistrer</string>
+    <string name="classes_delete_title">Supprimer %1$s ?</string>
+    <plurals name="classes_grade_count"><item quantity="one">%1$d note</item><item quantity="other">%1$d notes</item></plurals>
+    <plurals name="classes_attendance_count"><item quantity="one">%1$d relevé de présence</item><item quantity="other">%1$d relevés de présence</item></plurals>
+    <plurals name="classes_note_count"><item quantity="one">%1$d remarque</item><item quantity="other">%1$d remarques</item></plurals>
+    <plurals name="classes_contact_count"><item quantity="one">%1$d contact</item><item quantity="other">%1$d contacts</item></plurals>
+    <string name="classes_delete_body">Cette action supprime la classe et tout son contenu : %1$s, %2$s, %3$s, %4$s, %5$s, %6$s ainsi que son plan de classe.\n\nCette action est irréversible. En cas de doute, sauvegardez d’abord le dossier.</string>
+    <string name="classes_delete_confirm">Supprimer la classe</string>
+    <string name="classes_free_title">Version gratuite</string>
+    <plurals name="classes_free_allowance"><item quantity="one">Une classe</item><item quantity="other">%1$d classes</item></plurals>
+    <string name="classes_free_allowance_label">Quota gratuit</string>
+    <plurals name="classes_free_roster"><item quantity="one">jusqu’à %1$d élève</item><item quantity="other">jusqu’à %1$d élèves</item></plurals>
+    <plurals name="classes_free_roster_tile"><item quantity="one">Jusqu’à %1$d élève</item><item quantity="other">Jusqu’à %1$d élèves</item></plurals>
+    <string name="classes_free_roster_label">Élèves par classe</string>
+    <string name="classes_free_available">%1$s avec %2$s, notes, présence, remarques et plan de classe illimités. Les classes illimitées, l’exportation et la sauvegarde font partie du déblocage définitif.</string>
+    <string name="classes_free_spent">%1$s avec %2$s, notes, présence, remarques et plan de classe illimités. Vous avez déjà votre classe : le déblocage est requis pour en créer une deuxième.</string>
+    <string name="classes_unlock_title">Tout débloquer définitivement</string>
+    <string name="classes_unlock_body">Un achat unique, sans abonnement. Google Play affiche le prix exact dans votre devise avant confirmation. L’achat peut être restauré sur un nouvel appareil.</string>
+    <string name="classes_unlock_action">Voir le contenu du déblocage</string>
+</resources>

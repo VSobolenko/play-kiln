@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="limit_second_class">De gratis versie bewaart één klas. Eén ontgrendeling heft deze en elke andere limiet op: onbeperkt klassen, onbeperkt leerlingen, gewogen categorieën, export en back-up.</string>
+    <plurals name="limit_student_cap">
+        <item quantity="one">De gratis versie bevat maximaal %1$d leerling in een klas. Eén ontgrendeling heft deze en elke andere limiet op: onbeperkt klassen, onbeperkt leerlingen, gewogen categorieën, export en back-up.</item>
+        <item quantity="other">De gratis versie bevat maximaal %1$d leerlingen in een klas. Eén ontgrendeling heft deze en elke andere limiet op: onbeperkt klassen, onbeperkt leerlingen, gewogen categorieën, export en back-up.</item>
+    </plurals>
+    <string name="limit_single_category">De gratis versie gebruikt één categorie, dus is het gemiddelde het rekenkundige gemiddelde. Eén ontgrendeling heft deze en elke andere limiet op: onbeperkt klassen, onbeperkt leerlingen, gewogen categorieën, export en back-up.</string>
+    <string name="limit_export">Het exporteren van de cijferlijst of een afdrukbaar rapport hoort bij de eenmalige ontgrendeling, die elke gratis limiet opheft: onbeperkt klassen, onbeperkt leerlingen en gewogen categorieën.</string>
+    <string name="limit_backup">Back-up en herstel horen bij de eenmalige ontgrendeling, die elke gratis limiet opheft: onbeperkt klassen, onbeperkt leerlingen en gewogen categorieën.</string>
+
+    <plurals name="import_imported">
+        <item quantity="one">%1$d leerling is geïmporteerd.</item>
+        <item quantity="other">%1$d leerlingen zijn geïmporteerd.</item>
+    </plurals>
+    <plurals name="import_already_on_roster">
+        <item quantity="one">%1$d rij stond al op de leerlingenlijst, dus er is niets dubbel toegevoegd.</item>
+        <item quantity="other">%1$d rijen stonden al op de leerlingenlijst, dus er is niets dubbel toegevoegd.</item>
+    </plurals>
+    <plurals name="import_skipped">
+        <item quantity="one">%1$d rij is overgeslagen: %2$s</item>
+        <item quantity="other">%1$d rijen zijn overgeslagen: %2$s</item>
+    </plurals>
+    <string name="import_skipped_line">regel %1$d — %2$s</string>
+    <plurals name="import_blocked_by_limit">
+        <item quantity="one">%1$d leerling paste er niet meer bij: de gratis versie bevat %2$d leerlingen per klas.</item>
+        <item quantity="other">%1$d leerlingen pasten er niet meer bij: de gratis versie bevat %2$d leerlingen per klas.</item>
+    </plurals>
+
+    <plurals name="restore_restored">
+        <item quantity="one">%1$d klas hersteld.</item>
+        <item quantity="other">%1$d klassen hersteld.</item>
+    </plurals>
+
+    <string name="storage_write_failed">De wijziging staat op het scherm, maar kon niet naar de opslag van dit apparaat worden geschreven.</string>
+
+    <string name="report_student_column">Leerling</string>
+    <string name="report_overall_column">Algemeen</string>
+    <string name="report_class_average">Klasgemiddelde: %1$s</string>
+    <string name="report_column_key">Kolomtoelichting: M = niet ingeleverd, E = vrijgesteld, %1$s = niets vastgelegd.</string>
+    <string name="report_footer">%1$s · pagina %2$d · een lokaal privédossier, geen officieel schooldocument</string>
+    <string name="report_student_gone">Die leerling staat niet meer op deze leerlingenlijst.</string>
+    <string name="report_school_id">School-ID: %1$s</string>
+    <string name="report_overall">Algemeen: %1$s</string>
+    <string name="report_period">Lesuur %1$s</string>
+    <string name="report_averages_rule">Gemiddelden %1$s; niet ingeleverd werk: %2$s.</string>
+    <string name="report_missing_counts_zero">nul</string>
+    <string name="report_missing_counts_excluded">uitgesloten</string>
+    <string name="report_printed">Afgedrukt %1$s · privégegevens, op dit apparaat bewaard</string>
+    <string name="report_categories">Categorieën</string>
+    <string name="report_excluded_no_grade">uitgesloten (nog geen cijfer)</string>
+    <string name="report_dropped_lowest">, laagste %1$d laten vallen</string>
+    <string name="report_missing_count">, %1$d niet ingeleverd</string>
+    <string name="report_exempt_count">, %1$d vrijgesteld</string>
+    <string name="report_grades">Cijfers</string>
+    <string name="report_missing">Niet ingeleverd</string>
+    <string name="report_exempt">Vrijgesteld</string>
+    <string name="report_attendance">Aanwezigheid</string>
+    <string name="report_notes">Notities</string>
+    <string name="report_parent_contacts">Oudercontacten</string>
+    <string name="report_follow_up"> (opvolgen %1$s)</string>
+</resources>

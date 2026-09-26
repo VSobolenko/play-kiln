@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_cancel">Anuluj</string>
+    <string name="common_keep_it">Zatrzymaj</string>
+    <string name="common_date">Data</string>
+    <string name="common_today">Dzisiaj</string>
+    <string name="common_name">Nazwa</string>
+
+    <string name="grades_assignment">Praca</string>
+    <string name="grades_assignment_gone">Tej pracy już tu nie ma.</string>
+    <string name="grades_assignment_gone_body">Została usunięta wraz z zapisanymi za nią ocenami.</string>
+    <string name="grades_entry_eyebrow">Wprowadzanie ocen</string>
+    <string name="grades_points_max">Warto %1$s pkt</string>
+    <string name="grades_assignment_context">%1$s · waga %2$s%%</string>
+    <string name="grades_no_category">Bez kategorii</string>
+    <string name="grades_marked">Zapisano</string>
+    <string name="grades_unmarked">Nieocenione</string>
+    <string name="grades_everyone">Wszyscy</string>
+    <string name="grades_still_to_mark">Jeszcze do oceny</string>
+    <string name="grades_no_students">Ta klasa nie ma jeszcze uczniów. Dodaj ich na karcie Uczniowie.</string>
+    <string name="grades_all_recorded">Każdy uczeń ma coś zapisane za tę pracę.</string>
+    <string name="grades_entry_help">Dotknij ucznia, aby zapisać ocenę albo oznaczyć pracę jako nieoddaną lub zwolnioną. Nieoceniona komórka to nie zero.</string>
+
+    <string name="student_fallback_title">Uczeń</string>
+    <string name="student_report">Raport</string>
+    <string name="student_missing_title">Tego ucznia już tu nie ma.</string>
+    <string name="student_missing_body">Został usunięty z listy uczniów, co usunęło też jego oceny, frekwencję, notatki i kontakty.</string>
+    <string name="student_overview">Karta ucznia</string>
+    <string name="student_average_unavailable">Średnia niedostępna</string>
+    <string name="student_average_unavailable_caption">Żadna zapisana ocena jeszcze się nie liczy; to nie jest zero.</string>
+    <plurals name="student_average_item_count">
+        <item quantity="one">Obliczona na podstawie %1$d ocenionej pracy</item>
+        <item quantity="few">Obliczona na podstawie %1$d ocenionych prac</item>
+        <item quantity="many">Obliczona na podstawie %1$d ocenionych prac</item>
+        <item quantity="other">Obliczona na podstawie %1$d ocenionej pracy</item>
+    </plurals>
+    <string name="student_attendance_rate">Frekwencja</string>
+    <string name="student_graded">Ocenione</string>
+    <string name="student_ungraded">Nieocenione</string>
+    <string name="student_marks">Historia prac</string>
+    <string name="student_no_assignments">Ta klasa nie ma jeszcze prac. Dodaj je na karcie Oceny.</string>
+    <string name="student_no_category">Bez kategorii</string>
+    <string name="student_score_format">%1$s / %2$s</string>
+    <string name="student_percent_format">%1$s%%</string>
+    <string name="student_missing">Nieoddane</string>
+    <string name="student_exempt">Zwolnione</string>
+    <string name="student_unmarked">Nieocenione</string>
+    <string name="student_attendance">Frekwencja</string>
+    <string name="student_present">Obecny</string>
+    <string name="student_late">Spóźniony</string>
+    <string name="student_absent">Nieobecny</string>
+    <string name="student_attendance_exempt">Zwolniony</string>
+    <string name="student_no_attendance">Dla tego ucznia nie zapisano żadnej frekwencji.</string>
+    <string name="student_notes">Notatki</string>
+    <string name="student_no_notes">Nic jeszcze nie zapisano. Uczestnictwo, zachowanie, nieoddane prace i notatki ogólne pojawią się tutaj.</string>
+    <string name="student_note_participation">Uczestnictwo</string>
+    <string name="student_note_behaviour">Zachowanie</string>
+    <string name="student_note_missing_work">Nieoddane prace</string>
+    <string name="student_note_general">Ogólne</string>
+    <string name="student_contacts">Kontakty z rodzicami</string>
+    <string name="student_no_contacts">Dla tego ucznia nie zapisano żadnego kontaktu z rodzicami.</string>
+    <string name="student_dated_kind">%1$s · %2$s</string>
+    <string name="student_follow_up">Kontynuacja dnia %1$s</string>
+    <string name="student_remove_section">Usuń z listy uczniów</string>
+    <string name="student_remove_explanation">Usunięcie ucznia usuwa też jego oceny, frekwencję, notatki i kontakty. Oznaczenie go jako nieaktywnego zachowuje historię, ale nie liczy go do średniej klasy.</string>
+    <string name="student_remove_action">Usuń %1$s</string>
+    <string name="student_remove_title">Usunąć %1$s?</string>
+    <plurals name="student_remove_body">
+        <item quantity="one">To usuwa ucznia wraz z %1$d oceną, jego frekwencją, notatkami, kontaktami i miejscem w planie sali. Nie można tego cofnąć.</item>
+        <item quantity="few">To usuwa ucznia wraz z %1$d ocenami, jego frekwencją, notatkami, kontaktami i miejscem w planie sali. Nie można tego cofnąć.</item>
+        <item quantity="many">To usuwa ucznia wraz z %1$d ocenami, jego frekwencją, notatkami, kontaktami i miejscem w planie sali. Nie można tego cofnąć.</item>
+        <item quantity="other">To usuwa ucznia wraz z %1$d ocenami, jego frekwencją, notatkami, kontaktami i miejscem w planie sali. Nie można tego cofnąć.</item>
+    </plurals>
+    <string name="student_remove_confirm">Usuń ucznia</string>
+</resources>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="classes_title_unlocked">Twoje klasy</string>
+    <string name="classes_title_free">Twoja klasa</string>
+    <string name="classes_about">O aplikacji</string>
+    <string name="classes_new_class">Nowa klasa</string>
+    <string name="classes_hero_eyebrow">Przegląd klas</string>
+    <string name="classes_hero_headline">Zobacz, jak radzi sobie każda klasa</string>
+    <string name="classes_hero_supporting">Otwórz klasę, aby zarządzać jej listą uczniów, ocenami i bieżącymi wpisami.</string>
+    <string name="classes_stat_classes">Klasy</string>
+    <string name="classes_stat_students">Uczniowie</string>
+    <string name="classes_stat_overall_average">Średnia ogólna</string>
+    <string name="classes_not_enough_data">za mało danych</string>
+    <string name="classes_percent_format">%1$s%%</string>
+    <string name="classes_empty_title">Nie ma jeszcze klas</string>
+    <string name="classes_empty_body">Utwórz pierwszą klasę, aby zacząć zapisywać oceny, frekwencję i notatki. Wszystko zostaje na tym urządzeniu — bez konta i bez internetu.</string>
+    <string name="classes_period_format">Lekcja %1$s</string>
+    <plurals name="classes_student_count">
+        <item quantity="one">%1$d uczeń</item>
+        <item quantity="few">%1$d uczniów</item>
+        <item quantity="many">%1$d uczniów</item>
+        <item quantity="other">%1$d ucznia</item>
+    </plurals>
+    <plurals name="classes_assignment_count">
+        <item quantity="one">%1$d praca</item>
+        <item quantity="few">%1$d prace</item>
+        <item quantity="many">%1$d prac</item>
+        <item quantity="other">%1$d pracy</item>
+    </plurals>
+    <string name="classes_average_value">Średnia klasy: %1$s</string>
+    <string name="classes_options">Opcje</string>
+    <string name="classes_rename">Zmień nazwę</string>
+    <string name="classes_delete">Usuń</string>
+    <string name="classes_hint">Dotknij klasy, aby otworzyć jej listę uczniów, oceny, frekwencję, notatki, plan sali i raporty.</string>
+    <string name="classes_create">Utwórz</string>
+    <string name="classes_name_label">Nazwa klasy</string>
+    <plurals name="classes_free_add_warning">
+        <item quantity="one">Wersja bezpłatna obejmuje %1$d klasę. Utworzenie kolejnej wymaga odblokowania.</item>
+        <item quantity="few">Wersja bezpłatna obejmuje %1$d klasy. Utworzenie kolejnej wymaga odblokowania.</item>
+        <item quantity="many">Wersja bezpłatna obejmuje %1$d klas. Utworzenie kolejnej wymaga odblokowania.</item>
+        <item quantity="other">Wersja bezpłatna obejmuje %1$d klasy. Utworzenie kolejnej wymaga odblokowania.</item>
+    </plurals>
+    <string name="classes_rename_title">Zmień nazwę klasy</string>
+    <string name="classes_save">Zapisz</string>
+    <string name="classes_delete_title">Usunąć %1$s?</string>
+    <plurals name="classes_grade_count">
+        <item quantity="one">%1$d ocena</item>
+        <item quantity="few">%1$d oceny</item>
+        <item quantity="many">%1$d ocen</item>
+        <item quantity="other">%1$d oceny</item>
+    </plurals>
+    <plurals name="classes_attendance_count">
+        <item quantity="one">%1$d wpis frekwencji</item>
+        <item quantity="few">%1$d wpisy frekwencji</item>
+        <item quantity="many">%1$d wpisów frekwencji</item>
+        <item quantity="other">%1$d wpisu frekwencji</item>
+    </plurals>
+    <plurals name="classes_note_count">
+        <item quantity="one">%1$d notatka</item>
+        <item quantity="few">%1$d notatki</item>
+        <item quantity="many">%1$d notatek</item>
+        <item quantity="other">%1$d notatki</item>
+    </plurals>
+    <plurals name="classes_contact_count">
+        <item quantity="one">%1$d kontakt</item>
+        <item quantity="few">%1$d kontakty</item>
+        <item quantity="many">%1$d kontaktów</item>
+        <item quantity="other">%1$d kontaktu</item>
+    </plurals>
+    <string name="classes_delete_body">To usuwa klasę wraz ze wszystkim, co w niej zapisano: %1$s, %2$s, %3$s, %4$s, %5$s, %6$s i planem sali.\n\nNie można tego cofnąć. Jeśli nie masz pewności, najpierw zrób kopię zapasową dziennika.</string>
+    <string name="classes_delete_confirm">Usuń klasę</string>
+    <string name="classes_free_title">Wersja bezpłatna</string>
+    <plurals name="classes_free_allowance">
+        <item quantity="one">Jedna klasa</item>
+        <item quantity="few">%1$d klasy</item>
+        <item quantity="many">%1$d klas</item>
+        <item quantity="other">%1$d klasy</item>
+    </plurals>
+    <string name="classes_free_allowance_label">Bezpłatny limit</string>
+    <plurals name="classes_free_roster">
+        <item quantity="one">do %1$d ucznia</item>
+        <item quantity="few">do %1$d uczniów</item>
+        <item quantity="many">do %1$d uczniów</item>
+        <item quantity="other">do %1$d ucznia</item>
+    </plurals>
+    <plurals name="classes_free_roster_tile">
+        <item quantity="one">Do %1$d ucznia</item>
+        <item quantity="few">Do %1$d uczniów</item>
+        <item quantity="many">Do %1$d uczniów</item>
+        <item quantity="other">Do %1$d ucznia</item>
+    </plurals>
+    <string name="classes_free_roster_label">Uczniowie w klasie</string>
+    <string name="classes_free_available">%1$s, %2$s, bez limitu ocen, frekwencji, notatek i miejsc w planie sali. Nielimitowane klasy, eksport i kopia zapasowa wchodzą w skład jednorazowego odblokowania.</string>
+    <string name="classes_free_spent">%1$s, %2$s, bez limitu ocen, frekwencji, notatek i miejsc w planie sali. Masz już swoją klasę, więc druga wymaga odblokowania.</string>
+    <string name="classes_unlock_title">Odblokuj wszystko raz na zawsze</string>
+    <string name="classes_unlock_body">Jednorazowy zakup, nie abonament. Google Play pokazuje dokładną cenę w Twojej walucie przed potwierdzeniem, a odblokowanie można przywrócić na nowym urządzeniu.</string>
+    <string name="classes_unlock_action">Zobacz, co obejmuje odblokowanie</string>
+</resources>

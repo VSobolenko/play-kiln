@@ -13,5 +13,7 @@ alwaysApply: false
 - Navigation: Navigation Compose; type-safe routes when practical.
 - Gradle: version catalog; Kotlin Compose compiler plugin (Kotlin 2.x).
 - Prefer KSP over kapt.
-- Release artifact for Play is **AAB** (`bundleRelease`).
+- Release artifact for Play is **AAB** (`bundleRelease`), produced by `prepare-release.mjs` in
+  the `/release` phase after the owner approves the revision — never built by hand while the app
+  is still under development (`.cursor/rules/release-gate.mdc`).
 - minSdk ≥ 26 unless the slot's OpenSpec explicitly requires otherwise.

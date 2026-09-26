@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="records_add_note">Añadir observación</string>
+    <string name="records_add_note_title">Añadir una observación del alumno</string>
+    <string name="records_edit_note_title">Editar esta observación del alumno</string>
+    <string name="records_student">Alumno</string>
+    <string name="records_note_kind">Tipo de observación</string>
+    <string name="records_note_text">Observación</string>
+    <string name="records_note_change_help">Al guardar se registran el alumno seleccionado, el tipo, la fecha y el texto de la observación.</string>
+    <string name="records_save_note">Guardar observación</string>
+    <string name="records_add_contact">Registrar contacto con las familias</string>
+    <string name="records_add_contact_title">Registrar un contacto con las familias</string>
+    <string name="records_edit_contact_title">Editar este contacto con las familias</string>
+    <string name="records_contact_date">Fecha del contacto</string>
+    <string name="records_contact_method">Método o canal</string>
+    <string name="records_contact_summary">Lo que trataron</string>
+    <string name="records_follow_up_date">Fecha de seguimiento (opcional)</string>
+    <string name="records_contact_change_help">Al guardar se registran el alumno seleccionado, la fecha del contacto, el método, el resumen y la fecha de seguimiento opcional.</string>
+    <string name="records_save_contact">Guardar contacto</string>
+    <string name="records_edit">Editar</string>
+    <string name="records_edit_student">Editar alumno</string>
+    <string name="records_edit_student_title">Editar la ficha del alumno</string>
+    <string name="records_first_name">Nombre</string>
+    <string name="records_last_name">Apellidos</string>
+    <string name="records_external_id">Identificador escolar (opcional)</string>
+    <string name="records_active_student">Alumno activo</string>
+    <string name="records_active_help">Los alumnos inactivos conservan su historial, pero quedan excluidos de la media de la clase.</string>
+    <string name="records_student_change_help">Al guardar se cambian el nombre, el identificador escolar y el estado activo del alumno.</string>
+    <string name="records_save_student">Guardar alumno</string>
+    <string name="records_status_active">Activo</string>
+    <string name="records_status_inactive">Inactivo</string>
+</resources>

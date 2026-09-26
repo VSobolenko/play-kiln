@@ -1,1 +1,7 @@
-{"schemaVersion": 1, "enabled": []}
+{
+  "schemaVersion": 1,
+  "enabled": [
+    "ads",
+    "billing"
+  ]
+}

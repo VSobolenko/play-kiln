@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="limit_second_class" translatable="true">В бесплатной версии доступен один класс. Однократная разблокировка снимает это ограничение и все остальные: неограниченное число классов, неограниченное число учеников, взвешенные категории, экспорт и резервное копирование.</string>
+    <plurals name="limit_student_cap" translatable="true">
+        <item quantity="one">В бесплатной версии в классе может быть %1$d ученик. Однократная разблокировка снимает это ограничение и все остальные: неограниченное число классов, неограниченное число учеников, взвешенные категории, экспорт и резервное копирование.</item>
+        <item quantity="few">В бесплатной версии в классе может быть %1$d ученика. Однократная разблокировка снимает это ограничение и все остальные: неограниченное число классов, неограниченное число учеников, взвешенные категории, экспорт и резервное копирование.</item>
+        <item quantity="many">В бесплатной версии в классе может быть %1$d учеников. Однократная разблокировка снимает это ограничение и все остальные: неограниченное число классов, неограниченное число учеников, взвешенные категории, экспорт и резервное копирование.</item>
+        <item quantity="other">В бесплатной версии в классе может быть %1$d ученика. Однократная разблокировка снимает это ограничение и все остальные: неограниченное число классов, неограниченное число учеников, взвешенные категории, экспорт и резервное копирование.</item>
+    </plurals>
+    <string name="limit_single_category" translatable="true">В бесплатной версии доступна одна категория, поэтому средний балл — это простое среднее. Однократная разблокировка снимает это ограничение и все остальные: неограниченное число классов, неограниченное число учеников, взвешенные категории, экспорт и резервное копирование.</string>
+    <string name="limit_export" translatable="true">Экспорт журнала или печатного отчёта входит в однократную разблокировку, которая снимает все ограничения бесплатной версии: неограниченное число классов, неограниченное число учеников и взвешенные категории.</string>
+    <string name="limit_backup" translatable="true">Резервное копирование и восстановление входят в однократную разблокировку, которая снимает все ограничения бесплатной версии: неограниченное число классов, неограниченное число учеников и взвешенные категории.</string>
+
+    <plurals name="import_imported" translatable="true">
+        <item quantity="one">Импортирован %1$d ученик.</item>
+        <item quantity="few">Импортированы %1$d ученика.</item>
+        <item quantity="many">Импортированы %1$d учеников.</item>
+        <item quantity="other">Импортировано %1$d ученика.</item>
+    </plurals>
+    <plurals name="import_already_on_roster" translatable="true">
+        <item quantity="one">%1$d строка уже была в списке учеников, поэтому ничего не добавлено дважды.</item>
+        <item quantity="few">%1$d строки уже были в списке учеников, поэтому ничего не добавлено дважды.</item>
+        <item quantity="many">%1$d строк уже были в списке учеников, поэтому ничего не добавлено дважды.</item>
+        <item quantity="other">%1$d строки уже были в списке учеников, поэтому ничего не добавлено дважды.</item>
+    </plurals>
+    <plurals name="import_skipped" translatable="true">
+        <item quantity="one">%1$d строка пропущена: %2$s</item>
+        <item quantity="few">%1$d строки пропущены: %2$s</item>
+        <item quantity="many">%1$d строк пропущено: %2$s</item>
+        <item quantity="other">%1$d строки пропущено: %2$s</item>
+    </plurals>
+    <string name="import_skipped_line" translatable="true">строка %1$d — %2$s</string>
+    <plurals name="import_blocked_by_limit" translatable="true">
+        <item quantity="one">Ещё %1$d ученик не поместился: в бесплатной версии в классе может быть %2$d учеников.</item>
+        <item quantity="few">Ещё %1$d ученика не поместились: в бесплатной версии в классе может быть %2$d учеников.</item>
+        <item quantity="many">Ещё %1$d учеников не поместились: в бесплатной версии в классе может быть %2$d учеников.</item>
+        <item quantity="other">Ещё %1$d ученика не поместились: в бесплатной версии в классе может быть %2$d учеников.</item>
+    </plurals>
+
+    <plurals name="restore_restored" translatable="true">
+        <item quantity="one">Восстановлен %1$d класс.</item>
+        <item quantity="few">Восстановлены %1$d класса.</item>
+        <item quantity="many">Восстановлены %1$d классов.</item>
+        <item quantity="other">Восстановлено %1$d класса.</item>
+    </plurals>
+
+    <string name="storage_write_failed" translatable="true">Это изменение отображается на экране, но его не удалось записать в хранилище этого устройства.</string>
+
+    <string name="report_student_column" translatable="true">Ученик</string>
+    <string name="report_overall_column" translatable="true">Общий средний балл</string>
+    <string name="report_class_average" translatable="true">Средний балл класса: %1$s</string>
+    <string name="report_column_key" translatable="true">Обозначения столбцов: M = не сдано, E = освобождён, %1$s = ничего не записано.</string>
+    <string name="report_footer" translatable="true">%1$s · страница %2$d · личная запись на этом устройстве, а не официальный документ</string>
+    <string name="report_student_gone" translatable="true">Этого ученика больше нет в списке.</string>
+    <string name="report_school_id" translatable="true">Школьный ID: %1$s</string>
+    <string name="report_overall" translatable="true">Общий средний балл: %1$s</string>
+    <string name="report_period" translatable="true">Урок %1$s</string>
+    <string name="report_averages_rule" translatable="true">Средние баллы: %1$s; несданные работы — %2$s.</string>
+    <string name="report_missing_counts_zero" translatable="true">ноль</string>
+    <string name="report_missing_counts_excluded" translatable="true">исключаются</string>
+    <string name="report_printed" translatable="true">Напечатано %1$s · личная запись, хранится на этом устройстве</string>
+    <string name="report_categories" translatable="true">Категории</string>
+    <string name="report_excluded_no_grade" translatable="true">исключено (оценки пока нет)</string>
+    <string name="report_dropped_lowest" translatable="true">, отброшено низших: %1$d</string>
+    <string name="report_missing_count" translatable="true">, %1$d не сдано</string>
+    <string name="report_exempt_count" translatable="true">, %1$d освобождено</string>
+    <string name="report_grades" translatable="true">Оценки</string>
+    <string name="report_missing" translatable="true">не сдано</string>
+    <string name="report_exempt" translatable="true">освобождён</string>
+    <string name="report_attendance" translatable="true">Посещаемость</string>
+    <string name="report_notes" translatable="true">Заметки</string>
+    <string name="report_parent_contacts" translatable="true">Связь с родителями</string>
+    <string name="report_follow_up" translatable="true"> (вернуться %1$s)</string>
+</resources>

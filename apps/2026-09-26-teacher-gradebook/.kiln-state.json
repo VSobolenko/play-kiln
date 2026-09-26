@@ -1,0 +1,13 @@
+{
+  "slug": "teacher-gradebook",
+  "applicationId": "com.gexetr.teachergradebook",
+  "appName": "Mark Book for Teachers",
+  "idea": "Private offline classroom record book a teacher owns: create, edit and delete every class, student, assignment, grade, attendance mark, note, parent contact and seating position without an account or a server, see an explainable running average, export CSV and PDF, and keep a restorable backup file. Free for one class, unlocked once for unlimited classes and export.",
+  "createdAt": "2026-09-26T13:42:41.139Z",
+  "scaffoldVersion": "android-compose-v1",
+  "status": "scaffolded",
+  "economics": {
+    "archetype": "purchase_led_single_unlock",
+    "priceUsd": 6.99
+  }
+}

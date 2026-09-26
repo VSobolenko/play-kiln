@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "note": "Exploratory screen for the 2026-09-26 ideation run. Eight occupation/hobby/life families the factory has not screened, plus two calibration controls with known manual verdicts (habit tracker = fortress, bjj training log = dead-zone) so sensor drift is detectable in the same run.",
+  "steeringWarning": "This file is a SENSOR INPUT, not a build direction. A query appearing here is not a recommendation, and a `candidate` verdict is a spot check over ratings, not a measurement of demand or revenue. Every idea chosen for a slot must come from docs/ideation/ and pass scripts/check-economics.mjs. Calculators, converters and generic arithmetic tools are a closed topic (.cursor/rules/ideation-gate.mdc).",
+  "archetypes": [
+    {
+      "id": "unscreened-professions",
+      "label": "Professionals whose users are not developers",
+      "why": "The niche-selection heuristic: a job where the person doing the work would never build the app. None of these families has been screened by this factory.",
+      "queries": [
+        "massage therapist notes",
+        "personal trainer client tracker",
+        "teacher gradebook",
+        "youth sports lineup",
+        "basketball stat tracker",
+        "nurse shift handoff",
+        "truck driver expense log",
+        "gig driver earnings tracker"
+      ]
+    },
+    {
+      "id": "tabletop-and-games",
+      "label": "Tabletop, wargaming and competitive hobby scoring",
+      "why": "Passionate repeat users with discretionary spend, and a job that is pure local state (no server).",
+      "queries": [
+        "warhammer army list",
+        "dnd initiative tracker",
+        "chess opening trainer",
+        "scale model paint log",
+        "disc golf scorecard",
+        "archery scorecard",
+        "pickleball scoreboard"
+      ]
+    },
+    {
+      "id": "animal-hobby",
+      "label": "Animal care and training records",
+      "why": "Repeat daily use and an offline-by-nature job. Distinct jobs from the killed farrier/livestock rows, stated so the adjacency is a decision rather than an omission.",
+      "queries": [
+        "dog training log",
+        "puppy training schedule",
+        "horse riding log",
+        "chicken egg tracker",
+        "reptile care log"
+      ]
+    },
+    {
+      "id": "money-and-ownership",
+      "label": "Money and owned-asset records",
+      "why": "A user who already pays for this class of job elsewhere, and a record that is genuinely theirs.",
+      "queries": [
+        "subscription tracker",
+        "debt payoff tracker",
+        "car maintenance log",
+        "motorcycle maintenance log",
+        "tip tracker server",
+        "self employed mileage log"
+      ]
+    },
+    {
+      "id": "daily-use-health",
+      "label": "Daily-use behaviour and health counters",
+      "why": "The highest-frequency use shape the factory can build offline; frequency is what an ads-led plan needs (docs/monetization-strategy.md 2.1). Health claims are a posture question, not a demand question.",
+      "queries": [
+        "sober days counter",
+        "quit vaping tracker",
+        "blood pressure log"
+      ]
+    },
+    {
+      "id": "controls",
+      "label": "Calibration controls with known manual verdicts",
+      "why": "Known verdicts from docs/niche-selection.md. Used to detect sensor drift, never as candidates.",
+      "queries": [
+        "habit tracker",
+        "bjj training log"
+      ]
+    }
+  ]
+}

@@ -155,7 +155,26 @@ refuses(
   'the app sources differ'
 )
 
-/* 14-21. The commit-gap relaxation, against a real temporary repository. The relaxation is an
+/* 14. A blank commit must be refused rather than read as "nothing to compare". A record written with
+ *     `gitCommit: null` is indistinguishable from one that deliberately omitted it, so a null/blank
+ *     HEAD cannot be allowed even when the commit-gap relaxation is claimed. */
+refuses(
+  'a null HEAD is refused even when sources are claimed unchanged',
+  base({ head: null, appSourcesUnchanged: true }),
+  'HEAD could not be resolved'
+)
+refuses(
+  'a whitespace-only HEAD is refused even when sources are claimed unchanged',
+  base({ head: '   ', appSourcesUnchanged: true }),
+  'HEAD could not be resolved'
+)
+refuses(
+  'a whitespace-only manifest gitCommit is refused',
+  base({ manifest: manifestFor({ gitCommit: '   ' }), appSourcesUnchanged: true }),
+  'records no gitCommit'
+)
+
+/* 17-24. The commit-gap relaxation, against a real temporary repository. The relaxation is an
  *        allowlist: only paths that cannot change the built APK may differ. Defaulting to "rebuild"
  *        for anything unlisted is what keeps a new build input from being silently ignorable. */
 {
@@ -254,6 +273,118 @@ refuses(
     around('unreadable slot', () => {
       writeFileSync(path.join(repo, 'capabilities', 'billing', 'Wallet.kt'), 'version 3\n', 'utf8')
     }) === false
+  )
+
+  rmSync(repo, { recursive: true, force: true })
+}
+
+/* 25-38. Rename handling, against a real temporary repository. `git diff --name-only` prints only the
+ *        *destination* of a rename, so with detection on, moving a build input into an allowlisted
+ *        directory showed one harmless path and the removal never appeared - the function returned
+ *        true and attested a capture to a tree whose sources were gone. Every case below except the
+ *        controls returned the wrong answer before `--no-renames` was added. */
+{
+  const repo = mkdtempSync(path.join(tmpdir(), 'kiln-rename-'))
+  const git = (...args) => spawnSync('git', args, { cwd: repo, encoding: 'utf8' })
+  git('init', '-q')
+  git('config', 'user.email', 'test@example.invalid')
+  git('config', 'user.name', 'test')
+
+  const slot = path.join(repo, 'apps', 'slot')
+  const appDir = path.join(slot, 'app')
+  mkdirSync(appDir, { recursive: true })
+  mkdirSync(path.join(slot, 'store'), { recursive: true })
+  mkdirSync(path.join(repo, 'capabilities', 'billing'), { recursive: true })
+  for (const dir of ['docs', 'scripts', 'harness', '.kiln']) mkdirSync(path.join(repo, dir), { recursive: true })
+
+  // One source per case, so no case can be rescued or broken by another's mutation.
+  writeFileSync(path.join(appDir, 'Screen.kt'), 'fun screen(){}\n', 'utf8')
+  writeFileSync(path.join(appDir, 'Extra.kt'), 'fun extra(){}\n', 'utf8')
+  writeFileSync(path.join(appDir, 'Hidden.kt'), 'fun hidden(){}\n', 'utf8')
+  writeFileSync(path.join(appDir, 'Moved.kt'), 'fun moved(){}\n', 'utf8')
+  writeFileSync(path.join(appDir, 'Harnessed.kt'), 'fun harnessed(){}\n', 'utf8')
+  writeFileSync(
+    path.join(appDir, 'Edited.kt'),
+    'package app\n\nfun edited(): Int {\n  val a = 1\n  val b = 2\n  val c = 3\n  val d = 4\n  val e = 5\n  return a + b + c + d + e\n}\n',
+    'utf8'
+  )
+  writeFileSync(path.join(repo, 'capabilities', 'billing', 'Wallet.kt'), 'wallet 1\n', 'utf8')
+  writeFileSync(path.join(repo, 'docs', 'a.md'), 'notes a\n', 'utf8')
+  writeFileSync(path.join(repo, 'docs', 'incoming.md'), 'notes incoming\n', 'utf8')
+  git('add', '-A')
+  git('commit', '-q', '-m', 'build')
+  const first = String(git('rev-parse', 'HEAD').stdout).trim()
+
+  // Commits one change and reports whether HEAD still looks like it builds the prior commit.
+  const around = (message, mutate) => {
+    const before = String(git('rev-parse', 'HEAD').stdout).trim()
+    mutate()
+    git('add', '-A')
+    git('commit', '-q', '-m', message)
+    const after = String(git('rev-parse', 'HEAD').stdout).trim()
+    return buildInputsUnchangedBetween(before, after, slot, repo)
+  }
+
+  check('unchanged commits are still unchanged', buildInputsUnchangedBetween(first, first, slot, repo) === true)
+
+  // A build input moved into each allowlisted directory: the removal must force a rebuild.
+  check(
+    'moving a build input into docs/ demands a rebuild',
+    around('move to docs', () => git('mv', 'apps/slot/app/Screen.kt', 'docs/Screen.kt')) === false
+  )
+  check(
+    'moving a build input into scripts/ demands a rebuild',
+    around('move to scripts', () => git('mv', 'apps/slot/app/Extra.kt', 'scripts/Extra.kt')) === false
+  )
+  check(
+    'moving a build input into .kiln/ demands a rebuild',
+    around('move to kiln', () => git('mv', 'apps/slot/app/Hidden.kt', '.kiln/Hidden.kt')) === false
+  )
+  check(
+    'moving a build input into the slot store/ demands a rebuild',
+    around('move to store', () => git('mv', 'apps/slot/app/Moved.kt', 'apps/slot/store/Moved.kt')) === false
+  )
+  check(
+    'moving a build input into harness/ demands a rebuild',
+    around('move to harness', () => git('mv', 'apps/slot/app/Harnessed.kt', 'harness/Harnessed.kt')) === false
+  )
+
+  // The shared-capability case the reviewer used: a module the slot includes, moved out of the tree.
+  check(
+    'moving capabilities/billing/Wallet.kt into docs/ demands a rebuild',
+    around('move capability', () => git('mv', 'capabilities/billing/Wallet.kt', 'docs/Wallet.kt')) === false
+  )
+
+  // A content-edited rename is a rename with similarity < 100%; it hides a modification, not just a
+  // deletion, so it must also force a rebuild. The edit is one line of a multi-line file so git still
+  // scores it as a rename rather than a delete+add.
+  check(
+    'a content-edited rename of a build input demands a rebuild',
+    around('edit and move', () => {
+      git('mv', 'apps/slot/app/Edited.kt', 'docs/Edited.kt')
+      writeFileSync(
+        path.join(repo, 'docs', 'Edited.kt'),
+        'package app\n\nfun edited(): Int {\n  val a = 100\n  val b = 2\n  val c = 3\n  val d = 4\n  val e = 5\n  return a + b + c + d + e\n}\n',
+        'utf8'
+      )
+    }) === false
+  )
+
+  // The reverse direction: a build input *appears* because a file moved out of an allowlisted path.
+  check(
+    'moving an allowlisted file into app/ demands a rebuild',
+    around('move into app', () => git('mv', 'docs/incoming.md', 'apps/slot/app/incoming.md')) === false
+  )
+
+  // Controls: the fix must not over-reject. A rename wholly inside an allowlisted directory, and a
+  // plain new allowlisted file, are still not build inputs.
+  check(
+    'a rename wholly inside docs/ does not demand a rebuild',
+    around('rename within docs', () => git('mv', 'docs/a.md', 'docs/b.md')) === true
+  )
+  check(
+    'a new file under docs/ does not demand a rebuild',
+    around('new doc', () => writeFileSync(path.join(repo, 'docs', 'new.md'), 'new\n', 'utf8')) === true
   )
 
   rmSync(repo, { recursive: true, force: true })

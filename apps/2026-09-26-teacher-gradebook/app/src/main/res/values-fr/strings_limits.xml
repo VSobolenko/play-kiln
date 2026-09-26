@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="limit_second_class">La version gratuite conserve une classe. Un déblocage supprime cette limite et toutes les autres : classes illimitées, élèves illimités, catégories pondérées, exportation et sauvegarde.</string>
+    <plurals name="limit_student_cap">
+        <item quantity="one">La version gratuite accepte %1$d élève par classe. Un déblocage supprime cette limite et toutes les autres : classes illimitées, élèves illimités, catégories pondérées, exportation et sauvegarde.</item>
+        <item quantity="many">La version gratuite accepte %1$d élèves par classe. Un déblocage supprime cette limite et toutes les autres : classes illimitées, élèves illimités, catégories pondérées, exportation et sauvegarde.</item>
+        <item quantity="other">La version gratuite accepte %1$d élèves par classe. Un déblocage supprime cette limite et toutes les autres : classes illimitées, élèves illimités, catégories pondérées, exportation et sauvegarde.</item>
+    </plurals>
+    <string name="limit_single_category">La version gratuite utilise une seule catégorie, il s’agit donc d’une moyenne simple. Un déblocage supprime cette limite et toutes les autres : classes illimitées, élèves illimités, catégories pondérées, exportation et sauvegarde.</string>
+    <string name="limit_export">L’exportation du carnet de notes ou d’un rapport imprimable fait partie du déblocage définitif, qui supprime toutes les limites gratuites : classes illimitées, élèves illimités et catégories pondérées.</string>
+    <string name="limit_backup">La sauvegarde et la restauration font partie du déblocage définitif, qui supprime toutes les limites gratuites : classes illimitées, élèves illimités et catégories pondérées.</string>
+
+    <plurals name="import_imported">
+        <item quantity="one">%1$d élève a été importé.</item>
+        <item quantity="many">%1$d élèves ont été importés.</item>
+        <item quantity="other">%1$d élèves ont été importés.</item>
+    </plurals>
+    <plurals name="import_already_on_roster">
+        <item quantity="one">%1$d ligne était déjà dans la liste, rien n’a donc été ajouté en double.</item>
+        <item quantity="many">%1$d lignes étaient déjà dans la liste, rien n’a donc été ajouté en double.</item>
+        <item quantity="other">%1$d lignes étaient déjà dans la liste, rien n’a donc été ajouté en double.</item>
+    </plurals>
+    <plurals name="import_skipped">
+        <item quantity="one">%1$d ligne a été ignorée : %2$s</item>
+        <item quantity="many">%1$d lignes ont été ignorées : %2$s</item>
+        <item quantity="other">%1$d lignes ont été ignorées : %2$s</item>
+    </plurals>
+    <string name="import_skipped_line">ligne %1$d — %2$s</string>
+    <plurals name="import_blocked_by_limit">
+        <item quantity="one">%1$d élève supplémentaire n’a pas pu être ajouté : la version gratuite accepte %2$d élèves par classe.</item>
+        <item quantity="many">%1$d élèves supplémentaires n’ont pas pu être ajoutés : la version gratuite accepte %2$d élèves par classe.</item>
+        <item quantity="other">%1$d élèves supplémentaires n’ont pas pu être ajoutés : la version gratuite accepte %2$d élèves par classe.</item>
+    </plurals>
+
+    <plurals name="restore_restored">
+        <item quantity="one">%1$d classe restaurée.</item>
+        <item quantity="many">%1$d classes restaurées.</item>
+        <item quantity="other">%1$d classes restaurées.</item>
+    </plurals>
+
+    <string name="storage_write_failed">Cette modification apparaît à l’écran, mais n’a pas pu être enregistrée dans le stockage de cet appareil.</string>
+
+    <string name="report_student_column">Élève</string>
+    <string name="report_overall_column">Général</string>
+    <string name="report_class_average">Moyenne de la classe : %1$s</string>
+    <string name="report_column_key">Légende des colonnes : M = non rendu, E = dispensé, %1$s = aucune saisie.</string>
+    <string name="report_footer">%1$s · page %2$d · dossier privé local, sans valeur de relevé officiel</string>
+    <string name="report_student_gone">Cet élève ne figure plus dans cette liste.</string>
+    <string name="report_school_id">Identifiant scolaire : %1$s</string>
+    <string name="report_overall">Général : %1$s</string>
+    <string name="report_period">Heure de cours %1$s</string>
+    <string name="report_averages_rule">Moyennes %1$s ; travaux non rendus : %2$s.</string>
+    <string name="report_missing_counts_zero">zéro</string>
+    <string name="report_missing_counts_excluded">exclus</string>
+    <string name="report_printed">Imprimé %1$s · dossier privé, conservé sur cet appareil</string>
+    <string name="report_categories">Catégories</string>
+    <string name="report_excluded_no_grade">exclue (aucune note)</string>
+    <string name="report_dropped_lowest">, %1$d plus basses supprimées</string>
+    <string name="report_missing_count">, %1$d non rendu</string>
+    <string name="report_exempt_count">, %1$d dispensé</string>
+    <string name="report_grades">Notes</string>
+    <string name="report_missing">Non rendu</string>
+    <string name="report_exempt">Dispensé</string>
+    <string name="report_attendance">Présence</string>
+    <string name="report_notes">Remarques</string>
+    <string name="report_parent_contacts">Contacts avec les parents</string>
+    <string name="report_follow_up"> (relance %1$s)</string>
+</resources>

@@ -15,6 +15,7 @@ import process from 'node:process'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { bytesToHuman, sha256 } from './lib/play-assets.mjs'
 import { RELEASE_TASKS, runGradleTasks } from './lib/gradle.mjs'
+import { checkReleaseApproval } from './lib/release-approval.mjs'
 import { ensureSigning } from './sign-release.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -267,6 +268,17 @@ function runCli() {
   console.log('## PlayKiln release preparation\n')
   try {
     const slotDir = resolveSlotDir(slug)
+    // The release phase begins here, and only after the owner has approved the revision.
+    // Building, signing and staging artifacts is the irreversible half of the factory: a
+    // signed APK binds the app's permanent identity, so it must not run on a revision the
+    // owner has not seen. `--skip-build` is gated too — staging stale artifacts is still a
+    // release action.
+    const approval = checkReleaseApproval(slotDir)
+    if (!approval.ok) {
+      line('BLOCKED', approval.reason)
+      throw new ReleaseError('release approval is not recorded for the current revision')
+    }
+    line('PASS', `release approved by the owner at ${approval.record.approvedAt} (${approval.record.sourceFiles} build inputs)`)
     let metadata = parseGradleMetadata(slotDir)
     line('PASS', `slot ${path.basename(slotDir)} (${metadata.applicationId})`)
     const requestedVersionCode = argument('--version-code')

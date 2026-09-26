@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="limit_second_class" translatable="true">免费版只能保留一个班级。一次性解锁会取消这项限制和所有其他限制：班级数量不限、学生人数不限、加权类别，以及导出和备份。</string>
+    <plurals name="limit_student_cap" translatable="true">
+        <item quantity="other">免费版每个班级最多容纳 %1$d 名学生。一次性解锁会取消这项限制和所有其他限制：班级数量不限、学生人数不限、加权类别，以及导出和备份。</item>
+    </plurals>
+    <string name="limit_single_category" translatable="true">免费版只能使用一个类别，因此平均分就是简单平均值。一次性解锁会取消这项限制和所有其他限制：班级数量不限、学生人数不限、加权类别，以及导出和备份。</string>
+    <string name="limit_export" translatable="true">导出成绩单或可打印报告属于一次性解锁的内容，解锁后会取消免费版的所有限制：班级数量不限、学生人数不限和加权类别。</string>
+    <string name="limit_backup" translatable="true">备份和恢复属于一次性解锁的内容，解锁后会取消免费版的所有限制：班级数量不限、学生人数不限和加权类别。</string>
+
+    <plurals name="import_imported" translatable="true">
+        <item quantity="other">已导入 %1$d 名学生。</item>
+    </plurals>
+    <plurals name="import_already_on_roster" translatable="true">
+        <item quantity="other">有 %1$d 行已在名单中，因此没有重复添加。</item>
+    </plurals>
+    <plurals name="import_skipped" translatable="true">
+        <item quantity="other">已跳过 %1$d 行：%2$s</item>
+    </plurals>
+    <string name="import_skipped_line" translatable="true">第 %1$d 行 — %2$s</string>
+    <plurals name="import_blocked_by_limit" translatable="true">
+        <item quantity="other">有 %1$d 名学生未能加入：免费版每个班级最多容纳 %2$d 名学生。</item>
+    </plurals>
+
+    <plurals name="restore_restored" translatable="true">
+        <item quantity="other">已恢复 %1$d 个班级。</item>
+    </plurals>
+
+    <string name="storage_write_failed" translatable="true">该更改已显示在屏幕上，但无法写入本设备的存储空间。</string>
+
+    <string name="report_student_column" translatable="true">学生</string>
+    <string name="report_overall_column" translatable="true">总评</string>
+    <string name="report_class_average" translatable="true">班级平均分：%1$s</string>
+    <string name="report_column_key" translatable="true">列说明：M = 未交，E = 免修，%1$s = 未记录。</string>
+    <string name="report_footer" translatable="true">%1$s · 第 %2$d 页 · 本机保存的私密记录，并非正式成绩单</string>
+    <string name="report_student_gone" translatable="true">该学生已不在本班名单中。</string>
+    <string name="report_school_id" translatable="true">学号：%1$s</string>
+    <string name="report_overall" translatable="true">总评：%1$s</string>
+    <string name="report_period" translatable="true">第%1$s课时</string>
+    <string name="report_averages_rule" translatable="true">平均分：%1$s；未交作业：%2$s。</string>
+    <string name="report_missing_counts_zero" translatable="true">按零分计算</string>
+    <string name="report_missing_counts_excluded" translatable="true">不计入</string>
+    <string name="report_printed" translatable="true">%1$s 打印 · 本机保存的私密记录</string>
+    <string name="report_categories" translatable="true">类别</string>
+    <string name="report_excluded_no_grade" translatable="true">已排除（暂无成绩）</string>
+    <string name="report_dropped_lowest" translatable="true">, 去掉最低的 %1$d 项</string>
+    <string name="report_missing_count" translatable="true">, 未交 %1$d 项</string>
+    <string name="report_exempt_count" translatable="true">, 免修 %1$d 项</string>
+    <string name="report_grades" translatable="true">成绩</string>
+    <string name="report_missing" translatable="true">未交</string>
+    <string name="report_exempt" translatable="true">免修</string>
+    <string name="report_attendance" translatable="true">考勤</string>
+    <string name="report_notes" translatable="true">备注</string>
+    <string name="report_parent_contacts" translatable="true">家长联系</string>
+    <string name="report_follow_up" translatable="true"> （跟进 %1$s）</string>
+</resources>

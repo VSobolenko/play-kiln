@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_error_unknown_reason" translatable="true">unbekannter Grund</string>
+    <string name="app_nothing_written" translatable="true">Es wurde nichts geschrieben.</string>
+    <string name="app_write_failed" translatable="true">Diese Datei konnte nicht geschrieben werden: %1$s</string>
+    <string name="app_read_failed" translatable="true">Diese Datei konnte nicht gelesen werden: %1$s</string>
+    <string name="app_no_file_chosen" translatable="true">Es wurde keine Datei ausgewählt.</string>
+    <string name="app_class_gone" translatable="true">Diese Klasse ist nicht mehr vorhanden.</string>
+    <string name="app_record_loading" translatable="true">Der Datensatz wird noch geladen.</string>
+    <string name="app_wrote_csv" translatable="true">%1$s wurde geschrieben, eine Zeile pro Schüler.</string>
+    <string name="app_wrote_file" translatable="true">%1$s wurde geschrieben.</string>
+    <string name="app_backed_up" translatable="true">Sicherung in %1$s erstellt. Bewahren Sie sie an einem sicheren Ort auf.</string>
+    <string name="app_unlock_reason_classes" translatable="true">Die kostenlose Version speichert eine Klasse. Die Freischaltung hebt das Limit auf.</string>
+    <string name="app_unlock_reason_about" translatable="true">Über die Freischaltung</string>
+    <string name="app_unlock_purchased" translatable="true">Freigeschaltet. Alle Limits auf diesem Gerät sind aufgehoben.</string>
+    <string name="app_unlock_restored" translatable="true">Wiederhergestellt. Ihre Freischaltung ist wieder aktiv.</string>
+    <string name="app_unlock_nothing_to_restore" translatable="true">Play meldet keinen Kauf für dieses Konto, daher wurde nichts geändert. Falls Sie mit einem anderen Konto bezahlt haben, melden Sie sich damit an und versuchen Sie es erneut.</string>
+    <string name="app_unlock_pending" translatable="true">Play verarbeitet die Zahlung noch. Bis zum Abschluss wird nichts freigeschaltet, und es wurde nichts doppelt berechnet.</string>
+    <string name="app_unlock_unavailable" translatable="true">Google Play kann diesen Kauf auf diesem Gerät derzeit nicht abwickeln. Ihre Arbeit und eine bereits vorhandene Freischaltung bleiben unverändert.</string>
+    <string name="app_unlock_not_completed" translatable="true">Es wurde kein Kauf abgeschlossen und nichts berechnet. Alle Ihre Einträge sind weiterhin vorhanden.</string>
+    <string name="app_unlock_offline" translatable="true">Google Play war nicht erreichbar, daher wurde nichts versucht. Die App funktioniert offline weiter; für die Freischaltung selbst ist eine Verbindung nötig.</string>
+    <string name="app_unnamed_class_file" translatable="true">Klasse</string>
+    <string name="nav_back" translatable="true">Zurück</string>
+    <string name="document_could_not_open" translatable="true">Die Datei konnte nicht geöffnet werden.</string>
+    <string name="document_could_not_open_for_writing" translatable="true">Die Datei konnte nicht zum Schreiben geöffnet werden.</string>
+    <string name="document_chosen_file" translatable="true">die ausgewählte Datei</string>
+    <string name="backup_empty" translatable="true">Diese Datei ist leer, daher wurde nichts wiederhergestellt.</string>
+    <string name="backup_not_mark_book" translatable="true">Diese Datei ist keine Mark-Book-Sicherung, daher wurde nichts wiederhergestellt.</string>
+    <string name="backup_missing_schema" translatable="true">Diese Datei hat keine lesbare Schemaversion, daher wurde nichts wiederhergestellt.</string>
+    <string name="backup_unsupported_version" translatable="true">Diese Sicherung wurde mit einer anderen Version der App erstellt (Format %1$d; diese App liest Format %2$d). Es wurde nichts geändert.</string>
+    <string name="backup_damaged" translatable="true">Diese Sicherung ist beschädigt und konnte nicht gelesen werden, daher wurde nichts wiederhergestellt: %1$s</string>
+</resources>

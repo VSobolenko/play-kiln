@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">Mark Book for Teachers</string>
+    <string name="app_idea" translatable="true">Um diário de notas privado e offline que pertence integralmente ao professor: crie, edite e exclua cada turma, aluno, categoria, trabalho, nota, registro de presença, observação de participação, contato com os responsáveis e posição no mapa de lugares, sem conta nem servidor. Veja uma média atual explicável que informa a regra de arredondamento, a regra para trabalhos não entregues e cada categoria excluída, exporte CSV e PDF e mantenha um arquivo restaurável de cópia de segurança. Gratuito para uma turma com até 20 alunos; um único desbloqueio, sem assinatura.</string>
+</resources>

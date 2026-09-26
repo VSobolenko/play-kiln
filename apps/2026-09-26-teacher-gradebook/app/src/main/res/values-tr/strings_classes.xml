@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="classes_title_unlocked">Sınıflarınız</string>
+    <string name="classes_title_free">Sınıfınız</string>
+    <string name="classes_about">Hakkında</string>
+    <string name="classes_new_class">Yeni sınıf</string>
+    <string name="classes_hero_eyebrow">Sınıf özeti</string>
+    <string name="classes_hero_headline">Her sınıfın durumunu görün</string>
+    <string name="classes_hero_supporting">Öğrenci listesini, notları ve günlük kayıtları yönetmek için bir sınıf açın.</string>
+    <string name="classes_stat_classes">Sınıflar</string>
+    <string name="classes_stat_students">Öğrenciler</string>
+    <string name="classes_stat_overall_average">Genel ortalama</string>
+    <string name="classes_not_enough_data">henüz yeterli veri yok</string>
+    <string name="classes_percent_format">%1$s%%</string>
+    <string name="classes_empty_title">Henüz sınıf yok</string>
+    <string name="classes_empty_body">Notları, yoklamayı ve gözlem notlarını kaydetmeye başlamak için ilk sınıfınızı oluşturun. Her şey bu cihazda kalır — hesap yok, internet yok.</string>
+    <string name="classes_period_format">%1$s. ders saati</string>
+    <plurals name="classes_student_count">
+        <item quantity="one">%1$d öğrenci</item>
+        <item quantity="other">%1$d öğrenci</item>
+    </plurals>
+    <plurals name="classes_assignment_count">
+        <item quantity="one">%1$d ödev</item>
+        <item quantity="other">%1$d ödev</item>
+    </plurals>
+    <string name="classes_average_value">Sınıf ortalaması: %1$s</string>
+    <string name="classes_options">Seçenekler</string>
+    <string name="classes_rename">Yeniden adlandır</string>
+    <string name="classes_delete">Sil</string>
+    <string name="classes_hint">Öğrenci listesi, notlar, yoklama, gözlem notları, oturma planı ve raporlar için bir sınıfa dokunun.</string>
+    <string name="classes_create">Oluştur</string>
+    <string name="classes_name_label">Sınıf adı</string>
+    <plurals name="classes_free_add_warning">
+        <item quantity="one">Ücretsiz sürümde %1$d sınıf tutulur. Yeni bir sınıf için kilit açma gerekir.</item>
+        <item quantity="other">Ücretsiz sürümde %1$d sınıf tutulur. Yeni bir sınıf için kilit açma gerekir.</item>
+    </plurals>
+    <string name="classes_rename_title">Sınıfı yeniden adlandır</string>
+    <string name="classes_save">Kaydet</string>
+    <string name="classes_delete_title">%1$s silinsin mi?</string>
+    <plurals name="classes_grade_count">
+        <item quantity="one">%1$d not</item>
+        <item quantity="other">%1$d not</item>
+    </plurals>
+    <plurals name="classes_attendance_count">
+        <item quantity="one">%1$d yoklama kaydı</item>
+        <item quantity="other">%1$d yoklama kaydı</item>
+    </plurals>
+    <plurals name="classes_note_count">
+        <item quantity="one">%1$d gözlem notu</item>
+        <item quantity="other">%1$d gözlem notu</item>
+    </plurals>
+    <plurals name="classes_contact_count">
+        <item quantity="one">%1$d veli görüşmesi</item>
+        <item quantity="other">%1$d veli görüşmesi</item>
+    </plurals>
+    <string name="classes_delete_body">Bu işlem sınıfı, içinde kayıtlı her şeyle birlikte kaldırır: %1$s, %2$s, %3$s, %4$s, %5$s, %6$s ve oturma planı.\n\nBu geri alınamaz. Emin değilseniz önce kaydı yedekleyin.</string>
+    <string name="classes_delete_confirm">Sınıfı sil</string>
+    <string name="classes_free_title">Ücretsiz sürüm</string>
+    <plurals name="classes_free_allowance">
+        <item quantity="one">Tek sınıf</item>
+        <item quantity="other">%1$d sınıf</item>
+    </plurals>
+    <string name="classes_free_allowance_label">Ücretsiz hak</string>
+    <plurals name="classes_free_roster">
+        <item quantity="one">en fazla %1$d öğrenci</item>
+        <item quantity="other">en fazla %1$d öğrenci</item>
+    </plurals>
+    <plurals name="classes_free_roster_tile">
+        <item quantity="one">En fazla %1$d öğrenci</item>
+        <item quantity="other">En fazla %1$d öğrenci</item>
+    </plurals>
+    <string name="classes_free_roster_label">Sınıf başına öğrenci</string>
+    <string name="classes_free_available">%1$s, %2$s ile birlikte: sınırsız not, yoklama, gözlem notu ve oturma düzeni. Sınırsız sınıf, dışa aktarma ve yedekleme tek seferlik kilit açmaya dahildir.</string>
+    <string name="classes_free_spent">%1$s, %2$s ile birlikte: sınırsız not, yoklama, gözlem notu ve oturma düzeni. Sınıfınız olduğu için ikinci bir sınıf kilit açma gerektirir.</string>
+    <string name="classes_unlock_title">Her şeyi tek seferde açın</string>
+    <string name="classes_unlock_body">Tek bir satın alma, abonelik değil. Google Play onaylamadan önce tam fiyatı kendi para biriminizde gösterir ve yeni bir cihazda geri yüklenebilir.</string>
+    <string name="classes_unlock_action">Kilit açmaya nelerin dahil olduğunu görün</string>
+</resources>

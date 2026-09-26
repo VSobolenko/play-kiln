@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The words for the layers that cannot read resources.
+
+  `domain/FreeTier.kt` refuses an action with a typed `LimitReason`, `RecordBookViewModel` reports a
+  roster import, a restore and a failed write as values, and `data/ReportPdf.kt` draws a printable
+  report. None of them can call `stringResource`: the first two are not Composables, and the report is
+  handed to a school, so it needs the same resources as everything on screen.
+
+  Each free-tier refusal names the limit that was hit, what the free version still allows, and that a
+  single unlock lifts every limit — the meaning of the shipped copy, kept word for word. No price is
+  named here: Google Play shows the localized price on its own confirmation sheet.
+
+  Counts are plurals because "1 student" and "2 students" are two forms in English and four in
+  Russian; the code never builds "$n students" by hand.
+-->
+<resources>
+    <!-- Why a free-tier limit refused an action. Shown at the top of the unlock sheet. -->
+    <string name="limit_second_class" translatable="true">The free version keeps one class. One unlock removes this limit and every other: unlimited classes, unlimited students, weighted categories, export and backup.</string>
+    <plurals name="limit_student_cap" translatable="true">
+        <item quantity="one">The free version holds up to %1$d student in a class. One unlock removes this limit and every other: unlimited classes, unlimited students, weighted categories, export and backup.</item>
+        <item quantity="other">The free version holds up to %1$d students in a class. One unlock removes this limit and every other: unlimited classes, unlimited students, weighted categories, export and backup.</item>
+    </plurals>
+    <string name="limit_single_category" translatable="true">The free version uses a single category, so the average is the plain mean. One unlock removes this limit and every other: unlimited classes, unlimited students, weighted categories, export and backup.</string>
+    <string name="limit_export" translatable="true">Exporting the grade sheet or a printable report is part of the one-time unlock, which removes every free limit: unlimited classes, unlimited students and weighted categories.</string>
+    <string name="limit_backup" translatable="true">Backup and restore are part of the one-time unlock, which removes every free limit: unlimited classes, unlimited students and weighted categories.</string>
+
+    <!-- A CSV roster import, reported one sentence at a time so each count can be pluralised. -->
+    <plurals name="import_imported" translatable="true">
+        <item quantity="one">%1$d student was imported.</item>
+        <item quantity="other">%1$d students were imported.</item>
+    </plurals>
+    <plurals name="import_already_on_roster" translatable="true">
+        <item quantity="one">%1$d row was already on the roster, so nothing was added twice.</item>
+        <item quantity="other">%1$d rows were already on the roster, so nothing was added twice.</item>
+    </plurals>
+    <plurals name="import_skipped" translatable="true">
+        <item quantity="one">%1$d row was skipped: %2$s</item>
+        <item quantity="other">%1$d rows were skipped: %2$s</item>
+    </plurals>
+    <string name="import_skipped_line" translatable="true">line %1$d — %2$s</string>
+    <plurals name="import_blocked_by_limit" translatable="true">
+        <item quantity="one">%1$d more student did not fit: the free version holds %2$d students in a class.</item>
+        <item quantity="other">%1$d more students did not fit: the free version holds %2$d students in a class.</item>
+    </plurals>
+
+    <!-- A backup replaced the record. -->
+    <plurals name="restore_restored" translatable="true">
+        <item quantity="one">Restored %1$d class.</item>
+        <item quantity="other">Restored %1$d classes.</item>
+    </plurals>
+
+    <!-- The edit is on screen but the write to storage failed. -->
+    <string name="storage_write_failed" translatable="true">That change is on screen but could not be written to this device’s storage.</string>
+
+    <!--
+      The printable report. `classes_not_enough_data` ("not enough data yet") and `app_name` are
+      reused from the other string files rather than duplicated here.
+    -->
+    <string name="report_student_column" translatable="true">Student</string>
+    <string name="report_overall_column" translatable="true">Overall</string>
+    <string name="report_class_average" translatable="true">Class average: %1$s</string>
+    <string name="report_column_key" translatable="true">Column key: M = missing, E = exempt, %1$s = nothing recorded.</string>
+    <string name="report_footer" translatable="true">%1$s · page %2$d · a private local record, not an official transcript</string>
+    <string name="report_student_gone" translatable="true">That student is no longer on this roster.</string>
+    <string name="report_school_id" translatable="true">School id: %1$s</string>
+    <string name="report_overall" translatable="true">Overall: %1$s</string>
+    <string name="report_period" translatable="true">Period %1$s</string>
+    <string name="report_averages_rule" translatable="true">Averages %1$s; missing work counted as %2$s.</string>
+    <string name="report_missing_counts_zero" translatable="true">zero</string>
+    <string name="report_missing_counts_excluded" translatable="true">excluded</string>
+    <string name="report_printed" translatable="true">Printed %1$s · private record, kept on this device</string>
+    <string name="report_categories" translatable="true">Categories</string>
+    <string name="report_excluded_no_grade" translatable="true">excluded (no grade yet)</string>
+    <string name="report_dropped_lowest" translatable="true">, dropped lowest %1$d</string>
+    <string name="report_missing_count" translatable="true">, %1$d missing</string>
+    <string name="report_exempt_count" translatable="true">, %1$d exempt</string>
+    <string name="report_grades" translatable="true">Grades</string>
+    <string name="report_missing" translatable="true">missing</string>
+    <string name="report_exempt" translatable="true">exempt</string>
+    <string name="report_attendance" translatable="true">Attendance</string>
+    <string name="report_notes" translatable="true">Notes</string>
+    <string name="report_parent_contacts" translatable="true">Parent contacts</string>
+    <string name="report_follow_up" translatable="true"> (follow up %1$s)</string>
+</resources>

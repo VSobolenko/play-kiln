@@ -3,7 +3,14 @@
 
     <!-- Factory policy: request the fewest permissions possible, never export a component
          without a reason, and never enable cleartext traffic. -->
+
+    <!-- Ad and billing capability manifests declare the advertising ID permission; the network
+         permission the Ads and Play Billing SDKs require is declared here so the dependency is
+         visible in the slot's own manifest rather than only in a merged one. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
+        android:name=".PlayKilnApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:enableOnBackInvokedCallback="true"
@@ -24,6 +31,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- The Mobile Ads SDK reads its application ID from manifest metadata, not from code.
+             The value is a manifest placeholder so a release supplies the real AdMob app ID as a
+             Gradle property while a debug build keeps Google's public test ID and serves no live
+             inventory. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="${admobApplicationId}" />
     </application>
 
 </manifest>

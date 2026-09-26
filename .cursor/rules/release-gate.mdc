@@ -1,0 +1,106 @@
+# Two phases: develop, then release on the owner's word
+
+The factory used to run one undivided pass — research, implement, build the signed APK and
+AAB, compose every store asset, capture screenshots, verify — with no point at which the
+owner could say "this app is right". The owner therefore inspected the UI *after* the
+expensive, irreversible half was paid for, and a UI he rejected meant the whole release cost
+had been spent on a revision nobody wanted.
+
+The pipeline is now two phases with an explicit human gate between them. **Building, signing,
+screenshotting and store-pack assembly are release work and do not happen during
+development.**
+
+## Phase 1 — development (`/ship`)
+
+The phase ends when there is an app the owner can look at:
+
+- research, ideation, `economics.json`, and **human checkpoint 1** (approve the plan),
+- the slot, the Kotlin/Compose implementation, the tests,
+- unit tests through `node scripts/run-slot-tests.mjs --slot <slug>`,
+- a debug build the owner can install and inspect
+  (`node scripts/verify-slot.mjs --slot <slug> --build` compiles `assembleDebug`; the APK is
+  `app/build/outputs/apk/debug/app-debug.apk`),
+- source-level gates: `node scripts/verify-slot.mjs --slot <slug>`.
+- **human checkpoint 1.5**: the owner installs the debug APK, reviews the UI and behaviour, and
+  approves the release in his own words.
+
+Allowed in phase 1: `--init` drafts of `store/listing.json`, `verify-slot.mjs`, unit tests,
+a **debug** build. Cheap and reversible.
+
+Forbidden in phase 1 — these are release actions and are now gated in code:
+
+- `node scripts/prepare-release.mjs` (release APK + AAB + signing + release manifest),
+- `python scripts/store-kit.py` in its rendering modes (icon, feature graphic, screenshot
+  sets),
+- `node scripts/media-capture.mjs` (device screenshots),
+- generating or rotating a signing key (separately gated by `authorization.mdc`).
+
+Phase 1 ends by **stopping and asking**. The report says the app is ready to review, names
+what to look at, and waits. It does not prepare the release "while I am here".
+
+## The gate — the owner's approval
+
+The owner reviews the app and says so in his own words. That decision is recorded, once:
+
+```bash
+node scripts/approve-release.mjs --slot <slug> --note "<the owner's own words>"
+node scripts/approve-release.mjs --check  --slot <slug>   # what the release scripts call
+node scripts/approve-release.mjs --revoke --slot <slug>   # always safe
+```
+
+Rules for the recording step:
+
+- **Run it only when the owner has explicitly approved the release in the current
+  conversation.** The agent may not decide the app is good enough and approve it on his
+  behalf. This is the same discipline as `--approve-declarations` in `play-upload.mjs`.
+- **`--note` is required and must be the owner's own words.** A record with no words is a
+  boolean an agent could set by itself; the note is what makes it a decision a later reader
+  can audit. Never paraphrase a vague "ok" into an approval — ask what he approved.
+- Approval authorises **the release pipeline only**. Uploading, legal declarations and
+  publishing stay with the owner (`authorization.mdc`).
+
+The record is `apps/<slot>/release-approval.json`, gitignored, and the check is one module:
+`scripts/lib/release-approval.mjs`. `prepare-release.mjs`, `store-kit.py` and
+`media-capture.mjs` all call it, so it cannot be bypassed by invoking one of them directly.
+
+## The record is bound to the revision, not the slot name
+
+The approval stores a digest of every build input in the slot (plus the shared
+`capabilities/` tree). **Any edit to the app voids it**, because the approved revision no
+longer exists; the refusal names the command that re-records it. Restoring the approved
+bytes re-opens the gate, because the content is identical to what the owner reviewed.
+
+`store/`, `dist/`, `captures/`, `build/` and machine-local state are deliberately *excluded*
+from the digest: the release pipeline writes them after approval, so including them would
+make the pipeline void its own approval mid-run. `capabilities.json`, `economics.json`,
+`.kiln-state.json` and `README.md` are excluded too — they describe the slot but do not
+change the built bytes.
+
+If the digest ever disagrees with a change the owner actually wanted, the fix is to re-record
+the approval, never to weaken the check.
+
+## Phase 2 — release (`/release`)
+
+Runs only after the gate passes:
+
+1. `node scripts/prepare-release.mjs --slot <slug>` — one Gradle invocation: debug + release
+   APK + AAB, signature verified, artifacts staged, `dist/release-manifest.json` written.
+2. `python scripts/store-kit.py --slot <slug>` — listing copy, icon, feature graphic and the
+   full screenshot inventory.
+3. `node scripts/media-capture.mjs --slot <slug>` when a device is attached; real captures
+   beat synthetic ones, and any synthetic capture must be labelled as such.
+4. `node scripts/verify-slot.mjs --slot <slug> --strict-store --build`, then `/eval` and
+   `play-auditor`.
+5. Update `registry/apps.json`, then **human checkpoint 2**: the owner uploads and publishes.
+
+Report the release phase's own elapsed wall clock. The one-hour target is a direction and the
+release half is where the unavoidable build and capture time sits; do not present development
+time as if it covered the release.
+
+## What never changes
+
+- A green gate is not a reason to skip the owner's review. The gate decides *when* release
+  work may run, not whether the app is good.
+- Never record an approval to unblock yourself. If the release scripts refuse, the answer is
+  to ask the owner, not to delete or edit `release-approval.json`.
+- Never upload, never fill legal declarations, never publish (`authorization.mdc`).

@@ -22,6 +22,7 @@ import sys
 import textwrap
 import time
 from typing import Any, Callable
+from urllib.parse import urlparse
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -30,6 +31,36 @@ ROOT = Path(__file__).resolve().parents[1]
 APPS = ROOT / "apps"
 SUPPORTED_LOCALES = ("en-US", "ru-RU")
 MAX_PNG_BYTES = 8 * 1024 * 1024
+
+# The developer account's monitored support address, recorded once here because the generated
+# `listing.json` default and the generated "human checks" TODO both read it, and a second copy
+# drifts.  A slot may still override `listing.json.contactEmail`, and a hand-authored value is
+# never rewritten (see `write_preserving`).
+#
+# It is deliberately NOT a secret and NOT a `.env` value: Play publishes the contact address on the
+# store listing, so treating it as key material would hide the one field a reviewer must be able to
+# read.  The `.env` rule governs credentials, not a public support address.
+DEFAULT_CONTACT_EMAIL = "v.sobolenko.vs@gmail.com"
+
+# Hosts reserved for documentation by RFC 2606 / RFC 6761.  A pack that still points at one of these
+# has not been finished, and must say so out loud rather than let it reach a store listing.
+PLACEHOLDER_HOSTS = ("example.com", "example.org", "example.net", "example.edu", "localhost", "invalid")
+
+
+def _is_placeholder_host(host: str) -> bool:
+    host = host.lower().strip(".")
+    return not host or any(host == entry or host.endswith(f".{entry}") for entry in PLACEHOLDER_HOSTS)
+
+
+def is_placeholder_email(value: str) -> bool:
+    """True when an address still uses a reserved documentation domain."""
+    return _is_placeholder_host(value.rpartition("@")[2])
+
+
+def is_placeholder_url(value: str) -> bool:
+    """True when a URL still points at a reserved documentation host, or is not an http(s) URL."""
+    parsed = urlparse(value if "//" in value else f"//{value}")
+    return parsed.scheme not in ("http", "https") or _is_placeholder_host(parsed.hostname or "")
 SCREEN_TARGETS = {
     "phone": (6, (1080, 1920)),
     "tablet-7": (4, (1200, 1920)),
@@ -153,6 +184,47 @@ def resolve_slot(args: argparse.Namespace) -> Path:
         names = ", ".join(p.name for p in matches)
         raise StoreKitError(f"slot '{args.slot}' is ambiguous: {names}")
     return matches[0]
+
+
+def release_approval_block(slot: Path) -> str | None:
+    """The reason asset rendering must wait, or None when the owner has approved.
+
+    Rendering the icon, the feature graphic and the screenshot sets is release work: the
+    assets are the app's public claim about itself, and the owner approves the app before
+    they are produced rather than after. The decision itself lives in
+    `scripts/lib/release-approval.mjs` — the single source of truth every release-side script
+    imports — so this shells out to its `--check` mode instead of re-deriving the rule in
+    Python. `--init` (draft copy) and `--validate-only` (reading) stay ungated, because they
+    are how an unapproved slot is developed.
+    """
+    script = ROOT / "scripts" / "approve-release.mjs"
+    if not script.is_file():
+        return (
+            f"release approval cannot be checked because {script.relative_to(ROOT)} is missing; "
+            "restore the factory harness before rendering store assets"
+        )
+    node = shutil.which("node")
+    if not node:
+        return (
+            "release approval cannot be checked because node was not found on PATH; the "
+            "approval record is validated by scripts/approve-release.mjs"
+        )
+    result = subprocess.run(
+        [node, str(script), "--check", "--slot-dir", str(slot)],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode == 0:
+        return None
+    output = f"{result.stdout or ''}{result.stderr or ''}"
+    for row in output.splitlines():
+        stripped = row.strip()
+        if stripped.startswith("BLOCKED"):
+            reason = stripped[len("BLOCKED"):].strip()
+            if reason:
+                return reason
+    return output.strip() or f"approve-release.mjs --check exited {result.returncode}"
 
 
 def parse_locales(value: str | None, listing: dict[str, Any] | None = None) -> list[str]:
@@ -450,7 +522,9 @@ def default_listing(
         "defaultLocale": locales[0],
         "category": "PRODUCTIVITY",
         "tags": ["offline", "focus", "productivity"],
-        "contactEmail": "support@example.com",
+        "contactEmail": DEFAULT_CONTACT_EMAIL,
+        # No default privacy URL exists: the policy has to be hosted somewhere the owner controls,
+        # so this stays a reserved-host placeholder and the generated human-checks list says so.
         "privacyPolicyUrl": "https://example.com/privacy",
         "locales": locale_data,
         "dataSafety": {
@@ -923,17 +997,25 @@ def markdown_escape(value: Any) -> str:
 
 
 REVIEW_NOTES_MARKER = "<!-- kiln:generated notes - delete this line to keep your own wording -->"
+PRIVACY_MARKER = "<!-- kiln:generated policy - delete this line to keep your own wording -->"
+DATA_SAFETY_MARKER = "<!-- kiln:generated safety answers - delete this line to keep your own wording -->"
 
 
 def write_preserving(path: Path, content: str, marker: str) -> None:
     """Write generator output, but never over a file that was written by hand.
 
-    Rendering screenshots regenerates the reviewer notes as a side effect, which gives no hint that it
-    is about to replace prose someone wrote. The generated wording is necessarily generic - it cannot
-    know how this particular app is reviewed - so app-specific notes are the expected outcome rather
-    than an anomaly. Content without the generator marker is therefore treated as a human edit and
-    kept, the same way the listing's copy is preserved rather than clobbered. Delete the file, or
-    restore the marker line, to get generator output back.
+    A run regenerates the reviewer notes, the privacy policy and the Data safety answers as a side
+    effect, which gives no hint that it is about to replace prose someone wrote. The generated
+    wording is necessarily generic - it cannot know how this particular app is reviewed, what a
+    teacher's record actually contains, or which SDK contributed a permission - so app-specific text
+    is the expected outcome rather than an anomaly. Content without the generator marker is
+    therefore treated as a human edit and kept, the same way the listing's copy is preserved rather
+    than clobbered. Delete the file, or restore the marker line, to get generator output back.
+
+    This matters most for `privacy.md` and `data-safety.md`: a policy that does not match the
+    merged manifest is a compliance defect, and the generator cannot read the manifest, so the
+    hand-written version is the one that has to survive. Observed once already - a hand-written
+    policy was silently replaced by the capability-derived stub, and `verify-slot` passed the stub.
     """
     if path.is_file() and marker not in read_text(path):
         print(f"PRESERVE {path.name} - hand-written, not generator output")
@@ -1018,8 +1100,10 @@ Platform security and encrypted transport are required for networked capabilitie
 ## Contact
 
 Privacy questions: {listing['contactEmail']}
+
+{PRIVACY_MARKER}
 """
-    (store / "privacy.md").write_text(privacy, encoding="utf-8")
+    write_preserving(store / "privacy.md", privacy, PRIVACY_MARKER)
 
     type_rows = safety.get("dataTypes", [])
     data_rows = (
@@ -1054,14 +1138,33 @@ Privacy questions: {listing['contactEmail']}
 
 - Does the app support accounts? **No**
 - Is an account-deletion mechanism required? **No**
+
+{DATA_SAFETY_MARKER}
 """
-    (store / "data-safety.md").write_text(data_safety, encoding="utf-8")
+    write_preserving(store / "data-safety.md", data_safety, DATA_SAFETY_MARKER)
 
     capability_compliance = listing["capabilityCompliance"]
     authority_note = (
         capability_compliance.get("purchaseAuthority")
         if capability_compliance.get("requiresPurchaseAuthority")
         else "Not required — no SERVER_COST consumables are declared."
+    )
+
+    # Generated TODOs must not assert a defect the pack does not have. A line telling a human to
+    # replace a placeholder is itself wrong once the value is real, and it teaches the reader to
+    # skim the list. The checklist generator already makes its one such line conditional; these are
+    # the review-notes equivalent, so both documents agree about what is actually unfinished.
+    contact = listing["contactEmail"]
+    privacy_url = listing["privacyPolicyUrl"]
+    contact_todo = (
+        f"- TODO-HUMAN: Replace `{contact}` with a monitored support address - it is still a placeholder."
+        if is_placeholder_email(contact)
+        else f"- TODO-HUMAN: Confirm `{contact}` is monitored; Play publishes it on the listing."
+    )
+    privacy_todo = (
+        f"- TODO-HUMAN: Host `store/privacy.md` publicly and replace `{privacy_url}` with its final HTTPS URL."
+        if is_placeholder_url(privacy_url)
+        else f"- TODO-HUMAN: Confirm `{privacy_url}` still serves this `store/privacy.md`."
     )
 
     review = f"""# Reviewer notes — {listing['appName']}
@@ -1089,8 +1192,8 @@ No account, payment, invitation, or demo credentials are required.
 
 ## Human checks required before upload
 
-- TODO-HUMAN: Replace `{listing['contactEmail']}` with a monitored support address if it is still a placeholder.
-- TODO-HUMAN: Host `store/privacy.md` publicly and replace `{listing['privacyPolicyUrl']}` with its final HTTPS URL.
+{contact_todo}
+{privacy_todo}
 - TODO-HUMAN: Confirm the data-safety answers and permission list against the release AAB and all bundled SDKs.
 - TODO-HUMAN: {'Replace synthetic screenshots with real captures and regenerate the pack.' if synthetic else 'Inspect every captured screen for personal or test data.'}
 - TODO-HUMAN: Complete the Play Console legal declarations and first-app setup.
@@ -1164,7 +1267,7 @@ Four screenshots are supplied for both tablet formats. This satisfies the large-
     checklist = f"""# Google Play upload checklist — {listing['appName']}
 
 - [ ] Run `python scripts/store-kit.py --slot {listing['slug']} --validate-only` and resolve every FAIL.
-- [ ] Replace synthetic screenshots with real captures when `graphics.md` marks them synthetic.
+- [ ] {'Replace synthetic screenshots with real captures and regenerate the pack.' if synthetic else 'Inspect every captured screen for personal or test data.'}
 - [ ] Compare listing claims and captions with the release build.
 - [ ] Replace placeholder contact email and privacy-policy URL in `listing.json`.
 - [ ] Host `privacy.md` at the HTTPS URL declared in `listing.json`.
@@ -1381,13 +1484,178 @@ PROVENANCE_DEFERRED_NOTE = (
 )
 
 
-def validate_provenance(store: Path, required: bool = False) -> list[str]:
+_COMMIT_RE = re.compile(r"^[0-9a-fA-F]{40}$")
+_SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
+
+
+def _asset_key(relative: str) -> str:
+    """Normalise a slot-relative asset path so set comparison is separator- and prefix-stable."""
+    return relative.replace("\\", "/").lstrip("./")
+
+
+def expected_composed_assets(locales: list[str]) -> list[str]:
+    """Every composed asset the pack is required to ship, as slot-relative paths.
+
+    Derived from `SCREEN_TARGETS` (the single source of truth for the screenshot inventory) plus the
+    shared icon and feature graphic at the pack root and once per locale, so a hardcoded count here
+    cannot drift from the renderer.
+    """
+    expected = ["store/assets/icon-512.png", "store/assets/feature-graphic-1024x500.png"]
+    for locale in locales:
+        expected += [
+            f"store/assets/{locale}/icon-512.png",
+            f"store/assets/{locale}/feature-graphic-1024x500.png",
+        ]
+        for kind, (count, _dimensions) in SCREEN_TARGETS.items():
+            for index in range(1, count + 1):
+                expected.append(f"store/assets/{locale}/{kind}-{index:02d}.png")
+    return expected
+
+
+def expected_asset_counts(locales: list[str]) -> str:
+    """Human-readable `shared=4 phone=6 tablet7=4 tablet10=4 total=18` for the expected pack."""
+    shared = 2 + 2 * len(locales)
+    parts = [f"shared={shared}"]
+    parts += [f"{kind.replace('-', '')}={count}" for kind, (count, _dimensions) in SCREEN_TARGETS.items()]
+    total = shared + sum(count for count, _dimensions in SCREEN_TARGETS.values()) * len(locales)
+    parts.append(f"total={total}")
+    return " ".join(parts)
+
+
+def commit_exists(commit: str) -> bool:
+    """True when `commit` names a real commit object in this repository.
+
+    `git cat-file -e` is authoritative for existence and rejects a well-formed but nonexistent sha,
+    which a plain format check cannot. It runs against the factory repository (`ROOT`) because the
+    record's commit refers to PlayKiln, not to whatever directory a slot copy lives in.
+    """
+    try:
+        result = subprocess.run(
+            ["git", "cat-file", "-e", f"{commit}^{{commit}}"],
+            cwd=ROOT,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except OSError:
+        return False
+    return result.returncode == 0
+
+
+def verify_provenance_identity(
+    slot_dir: Path, record: dict[str, Any]
+) -> tuple[list[str], list[str], list[str]]:
+    """Authenticate the record's build-identity fields to the extent a device-less run can.
+
+    Returns `(failures, checked, unchecked)`. `checked` names the links confirmed in this run;
+    `unchecked` names the links that only a capture can verify, because they need the release artifact
+    tree (not version-controlled) or `adb`. No device-less substitute is invented for
+    `installedSha256`: an installed `base.apk` cannot be re-hashed without `adb`, so it is reported
+    rather than faked, and a reader can never mistake a partial local check for a full one.
+    """
+    failures: list[str] = []
+    checked: list[str] = []
+    unchecked: list[str] = []
+
+    commit = str(record.get("gitCommit") or "").strip()
+    if not _COMMIT_RE.match(commit):
+        failures.append(
+            f"gitCommit is not a full 40-hex commit sha (recorded {commit[:12]!r}), so the record is "
+            "not tied to any source revision"
+        )
+    elif not commit_exists(commit):
+        failures.append(f"gitCommit {commit[:12]} does not exist in this repository")
+    else:
+        checked.append(f"gitCommit {commit[:12]}")
+
+    artifact_rel = str(record.get("artifactPath") or "").strip()
+    recorded_artifact = str(record.get("artifactSha256") or "").lower()
+    if not _SHA256_RE.match(recorded_artifact):
+        failures.append(
+            f"artifactSha256 is not a full 64-hex sha256 (recorded {recorded_artifact[:12]!r}), so the "
+            "record claims no hashed artifact"
+        )
+    elif not artifact_rel:
+        failures.append("artifactPath is absent, so artifactSha256 names nothing to compare against")
+    else:
+        artifact_path = slot_dir / artifact_rel
+        if artifact_path.is_file():
+            actual = hashlib.sha256(artifact_path.read_bytes()).hexdigest()
+            if actual != recorded_artifact:
+                failures.append(
+                    f"{artifact_rel} hashes to {actual[:12]}… but provenance.json records "
+                    f"{recorded_artifact[:12]}…"
+                )
+            else:
+                checked.append(f"artifactSha256 {recorded_artifact[:12]}… == {artifact_rel}")
+        else:
+            unchecked.append(
+                f"artifactSha256 (dist/ is not version-controlled and {artifact_rel} is absent here)"
+            )
+
+    installed = str(record.get("installedSha256") or "").lower()
+    if not _SHA256_RE.match(installed):
+        failures.append(
+            f"installedSha256 is not a full 64-hex sha256 (recorded {installed[:12]!r}), so the "
+            "installed-APK link is not even claimed"
+        )
+    elif _SHA256_RE.match(recorded_artifact) and installed != recorded_artifact:
+        # `verifyArtifactChain` refuses any capture where these differ, so a record whose two hashes
+        # disagree contradicts itself. Comparing them needs no device and catches a forged
+        # installedSha256, which a hash-string-only reading of the record would accept.
+        failures.append(
+            f"installedSha256 {installed[:12]}… disagrees with artifactSha256 "
+            f"{recorded_artifact[:12]}…; the capture chain requires the installed base.apk to be "
+            "byte-identical to the signed artifact"
+        )
+    else:
+        unchecked.append(
+            f"installedSha256 {installed[:12]}… (needs adb to re-hash the installed base.apk)"
+        )
+
+    return failures, checked, unchecked
+
+
+def repo_relative(path: Path) -> str | None:
+    """The path as git would name it, or None when it lies outside the repository."""
+    try:
+        return path.resolve().relative_to(ROOT).as_posix()
+    except ValueError:
+        return None
+
+
+def path_is_tracked(path: Path) -> bool:
+    """True when a path is COMMITTED, even if it is missing from the working tree.
+
+    A composed slot declares itself with `store/studio.json` and records its evidence in
+    `store/provenance.json`, and both are committed. Keying the provenance requirement on those
+    files merely being present let `rm store/studio.json store/provenance.json` drop the entire
+    check while still reporting OK - the declaration was unprotected. Git remembers what the pack
+    is supposed to contain, so a tracked-but-absent file is a deletion to report, not a redesign.
+    """
+    relative = repo_relative(path)
+    if relative is None:
+        return False
+    result = subprocess.run(
+        ["git", "ls-files", "--error-unmatch", relative],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    return result.returncode == 0
+
+
+def validate_provenance(store: Path, locales: list[str], required: bool = False) -> list[str]:
     """Verify the committed screenshots still match the record of the build they came from.
 
     `store/provenance.json` is the only durable link between the committed images and the release APK,
     because `captures/` and `dist/` are excluded from version control. Checking the recorded hashes
     turns that link into something falsifiable: an image edited, replaced, or re-rendered without a
     fresh capture no longer matches, instead of silently keeping the previous claim.
+
+    The check is not merely self-consistency between the record and itself. Hashing only the entries
+    the record happens to list would let an attacker trim the list, so the record must also cover
+    EXACTLY the assets the pack is required to ship (derived from `SCREEN_TARGETS`), in both
+    directions: a missing expected asset, an unexpected extra entry, and an on-disk asset the record
+    omits are each failures. The record's identity fields are authenticated too, as far as a
+    device-less run allows; a link that cannot be re-checked here is named rather than assumed.
 
     `required` is set for slots that compose their media (`store/studio.json`), which are exactly the
     slots whose inventory claims captured screenshots. For those, an absent record is a failure rather
@@ -1435,12 +1703,41 @@ def validate_provenance(store: Path, required: bool = False) -> list[str]:
                 failures.append(f"{relative} does not match its recorded sha256")
                 print(f"FAIL provenance.json - {relative} does not match its recorded sha256 ({actual[:12]}…)")
 
+    # Completeness. The hashes above only prove the record agrees with itself; the entry list is
+    # attacker-trimmable, so an asset swapped while its entry was deleted passed. The record must cover
+    # EXACTLY the assets the pack is required to ship, in both directions.
+    composed_entries = record.get("composedAssets")
+    if isinstance(composed_entries, list) and composed_entries:
+        expected = {_asset_key(item) for item in expected_composed_assets(locales)}
+        recorded = {_asset_key(str(entry.get("file") or "")) for entry in composed_entries}
+        for missing in sorted(expected - recorded):
+            failures.append(f"required asset {missing} is not recorded in provenance.json")
+            print(f"FAIL provenance.json - required asset {missing} is not recorded")
+        for extra in sorted(recorded - expected):
+            failures.append(f"provenance.json lists {extra}, which is not part of the expected pack")
+            print(f"FAIL provenance.json - {extra} is not part of the expected pack")
+        assets_root = store / "assets"
+        if assets_root.is_dir():
+            for on_disk in sorted(p for p in assets_root.rglob("*.png") if p.is_file()):
+                key = _asset_key(on_disk.relative_to(slot_dir).as_posix())
+                if key not in recorded:
+                    failures.append(f"{key} is present on disk but is not recorded in provenance.json")
+                    print(f"FAIL provenance.json - {key} is on disk but is not recorded")
+
+    identity_failures, checked, unchecked = verify_provenance_identity(slot_dir, record)
+    for failure in identity_failures:
+        print(f"FAIL provenance.json - {failure}")
+    failures.extend(identity_failures)
+
     if not failures:
-        composed = len(record.get("composedAssets") or [])
+        composed = len(composed_entries or [])
+        counts = expected_asset_counts(locales)
+        detail = f"checked {'; '.join(checked) if checked else 'none'}"
+        if unchecked:
+            detail += f"; not checked this run: {'; '.join(unchecked)}"
         print(
-            f"PASS provenance.json - {composed} committed asset(s) match the record for commit "
-            f"{str(record.get('gitCommit') or '?')[:12]} (artifact sha256 "
-            f"{str(record.get('artifactSha256') or '?')[:12]}…)"
+            f"PASS provenance.json - {composed} committed asset(s) cover the expected pack "
+            f"({counts}) for commit {str(record.get('gitCommit'))[:12]} — {detail}"
         )
     return failures
 
@@ -1494,7 +1791,24 @@ def validate_store(
             size_bytes = path.stat().st_size
             print(f"PASS {relative} — {dimensions[0]}x{dimensions[1]} {mode}, {size_bytes} bytes")
     if not skip_provenance:
-        failures.extend(validate_provenance(store, required=(store / "studio.json").is_file()))
+        studio_path = store / "studio.json"
+        record_path = store / "provenance.json"
+        # Composed is a property of the SLOT, not of which files happen to survive on disk. A
+        # committed declaration or record keeps the check required, so deleting them cannot quietly
+        # downgrade the pack to "no captures to attest".
+        composed = (
+            studio_path.is_file()
+            or record_path.is_file()
+            or path_is_tracked(studio_path)
+            or path_is_tracked(record_path)
+        )
+        if path_is_tracked(studio_path) and not studio_path.is_file():
+            failures.append("store/studio.json is committed but missing from the working tree")
+            print(
+                "FAIL studio.json - committed but missing; the pack's declared visual identity "
+                "was deleted, and `graphics.md` still describes composed assets"
+            )
+        failures.extend(validate_provenance(store, locales, required=composed))
     return not failures
 
 
@@ -1512,6 +1826,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.capture and args.render_only:
         raise StoreKitError("--capture and --render-only are mutually exclusive")
     slot = resolve_slot(args)
+    # Producing the store assets is a release action. Check before anything is written, so a
+    # refusal leaves the slot exactly as it was; `--init` and `--validate-only` are the
+    # unapproved-slot routes and stay open.
+    if not (args.init or args.validate_only or args.capture):
+        approval_problem = release_approval_block(slot)
+        if approval_problem:
+            raise StoreKitError(approval_problem)
     meta = slot_metadata(slot)
     capability_config = slot / "capabilities.json"
     if not args.validate_only and not capability_config.is_file():

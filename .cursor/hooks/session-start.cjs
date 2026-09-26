@@ -23,15 +23,18 @@ function read(rel, max = 12000) {
   }
 }
 
-const mission = read('MISSION.md', 10000)
+const mission = read('MISSION.md', 14000)
 const extra = [
   '=== PLAYKILN SESSION (auto) ===',
   mission || 'MISSION.md missing — follow AGENTS.md.',
   '',
-  'Commands: /ship (idea → publish-ready app; also continues existing work), /eval, /kiln-status, /improve-harness.',
+  'Two phases: /ship develops an app to review (debug build, tests, source gates); /release signs,',
+  'packs and captures screenshots only after the owner approves the revision with',
+  '`node scripts/approve-release.mjs --slot <slug> --note "<the owner\'s own words>"`.',
+  'Commands: /ship <idea> (develop; also continues existing work), /release <slug>, /eval, /kiln-status, /improve-harness.',
   'Agents: planner, generator, evaluator, play-auditor, android-debugger.',
-  'Gate: node scripts/verify-slot.mjs — never self-PASS.',
-  'Full contract: AGENTS.md · DESIGN.md · harness/cursor-surface.md'
+  'Gate: node scripts/verify-slot.mjs — never self-PASS. Never record an approval yourself.',
+  'Full contract: AGENTS.md · DESIGN.md · .cursor/rules/release-gate.mdc · harness/cursor-surface.md'
 ].join('\n')
 
 process.stdout.write(

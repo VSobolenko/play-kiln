@@ -1,11 +1,13 @@
 {
   "version": 1,
   "note": "Archetype-spread query set for the market screen. Keep the two control queries: they are calibrated against manual readings in scripts/validate-play-scan.mjs, so a change in their verdict means the sensor drifted, not that the market moved.",
+  "steeringWarning": "This file is a SENSOR INPUT, not a build direction. It exists so the relevance guard stays calibrated against manual readings. A query appearing here is not a recommendation to build that app, and a `candidate` verdict for a query here is not evidence that the app is worth building. In particular the `trade-calculators` group is a calibration group: the factory's first real slot was scaffolded out of it and failed commercially (see docs/reviews/2026-09-26-slot-1-economics-postmortem.md). Calculators, converters and generic arithmetic tools are a closed topic per .cursor/rules/ideation-gate.mdc. Every idea chosen for a slot must come from docs/ideation/ and must pass scripts/check-economics.mjs.",
   "archetypes": [
     {
       "id": "trade-calculators",
       "label": "Trade and professional calculators",
-      "why": "Proven money-maker archetype: the measured electrician field has a 5M+ install leader selling ads + IAP, with weak mid-tier competitors. Users are professionals who buy tools.",
+      "steering": "CALIBRATION GROUP ONLY - not a build direction. Kept because the measured electrician field is a known-good shelf the relevance guard should still classify correctly. Do not choose a slot from this group; see the steeringWarning above.",
+      "why": "The measured electrician field has a 5M+ install leader selling ads + IAP, with weak mid-tier competitors. That is a fact about that one shelf, recorded so the sensor can be checked - it is not a template the factory should copy. The factory shipped a calculator out of this group and it failed commercially, which is why calculators are now a closed topic.",
       "queries": [
         "electrician calculator",
         "hvac load calculator",

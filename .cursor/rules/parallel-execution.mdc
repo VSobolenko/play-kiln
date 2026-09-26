@@ -70,6 +70,48 @@ no dependency between them.
 - If a worker needs Gradle, tell it not to run it and run the authoritative build yourself once,
   after the writers finish. Combine every task for one build into a **single** invocation.
 
+## The budget is one hour, and it is a design constraint
+
+The owner's limit is roughly **one hour of agent wall-clock per slot**. The first slot took about
+eight, and most of that went into evidence infrastructure — provenance chains, capture locks,
+store-asset completeness checks — for an app whose market had already been questioned in the
+factory's own research. The gates were good and the choice was wrong.
+
+**The measured baseline, ON RECORD.**
+`docs/reviews/2026-09-26-slot-1-economics-postmortem.md` §1 puts the first slot's
+scaffold-to-last-build span at **4 h 49 m as a lower bound**; it excludes evaluation, capture and
+repair. The five recipes in `docs/ideation/2026-09-26-five-recipes.md` each estimate **3.5–6 agent
+hours**. So the target and the practice are about fivefold apart, and that gap is not closed yet.
+
+**The cuts that would close it** (§6.4 of the same proposal, each one a real time cost):
+
+- Keep phase 1 free of release work. `.cursor/rules/release-gate.mdc` already forbids the
+  signed build, the store pack and the screenshots until the owner approves a revision, so the
+  cheapest cut is structural: nothing is rendered or signed for an app that is about to change.
+- Inside phase 2, skip `media-capture.mjs` when no device is attached and let `store-kit.py`
+  compose the asset set instead of a verified live-device journey; label the captures synthetic
+  in `store/review-notes.md`.
+- Run staging gates with `--skip-build` and do the single authoritative `--build` at the end.
+- Cut scope, not verification: fewer screens and a narrower job decided **before** the build, never a
+  skipped gate at the end.
+
+What that means for how you spend the time:
+
+- **Report the actual elapsed wall clock**, per stage where practical. A budget nobody measures is a
+  slogan, and `scripts/verify-slot.mjs` already reports elapsed time for Gradle tasks — extend that
+  habit to the whole slot in the handoff.
+- **Never cite the one-hour target as if it had been met.** It is a direction. The fastest measured
+  slot is still measured in hours, and an unachievable budget is worse than no budget because it
+  turns every honest estimate into a failure.
+- **Do not build infrastructure for an unvalidated idea.** Prove someone will pay first. A gate
+  that protects a product nobody wants is a cost, not an asset.
+- **Dispatch before you read.** Launch workers on the parts you have already recognised, then read
+  what you need. Sequential reconnaissance before the first dispatch is the single most expensive
+  habit this factory has.
+- **A worker that returns nothing usable cost more than the work it replaced.** A prompt that
+  asks for a plan instead of an artifact, or a read-only agent sent to write a file, burns the
+  budget and returns prose. Check the deliverable on disk.
+
 ## Do not confuse parallel with careless
 
 - Parallelism never relaxes verification. Independent work runs at the same time; it is **read
@@ -93,5 +135,6 @@ Four independent things, one round-trip, instead of four turns.
 
 - `AGENTS.md` — agent model and the Codex-first ladder.
 - `harness/dual-agent.md` — role cards, worker lifecycle, fallback ladder.
+- `.cursor/rules/release-gate.mdc` — the phase-1/phase-2 boundary and why it is a time lever.
 - `.cursor/rules/build-speed.mdc` — why Gradle is the exception.
 - `.cursor/rules/verification-discipline.mdc` — parallelism does not weaken evidence.

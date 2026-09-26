@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_error_unknown_reason" translatable="true">motivo desconocido</string>
+
+    <string name="app_nothing_written" translatable="true">No se escribió nada.</string>
+    <string name="app_write_failed" translatable="true">No se pudo escribir ese archivo: %1$s</string>
+    <string name="app_read_failed" translatable="true">No se pudo leer ese archivo: %1$s</string>
+    <string name="app_no_file_chosen" translatable="true">No se eligió ningún archivo.</string>
+    <string name="app_class_gone" translatable="true">Esa clase ya no existe.</string>
+    <string name="app_record_loading" translatable="true">El registro aún se está cargando.</string>
+    <string name="app_wrote_csv" translatable="true">Se escribió %1$s, una fila por alumno.</string>
+    <string name="app_wrote_file" translatable="true">Se escribió %1$s.</string>
+    <string name="app_backed_up" translatable="true">Copia de seguridad guardada en %1$s. Guárdela en un lugar de confianza.</string>
+
+    <string name="app_unlock_reason_classes" translatable="true">La versión gratuita admite una clase. El desbloqueo elimina ese límite.</string>
+    <string name="app_unlock_reason_about" translatable="true">Sobre el desbloqueo</string>
+
+    <string name="app_unlock_purchased" translatable="true">Desbloqueado. Todos los límites se han eliminado en este dispositivo.</string>
+    <string name="app_unlock_restored" translatable="true">Restaurado. Su desbloqueo vuelve a estar activo.</string>
+    <string name="app_unlock_nothing_to_restore" translatable="true">Play no registra ninguna compra en esta cuenta, así que no ha cambiado nada. Si pagó con otra cuenta, inicie sesión con ella e inténtelo de nuevo.</string>
+    <string name="app_unlock_pending" translatable="true">Play aún está procesando ese pago. Nada se desbloquea hasta que se complete, y no se ha cobrado dos veces.</string>
+    <string name="app_unlock_unavailable" translatable="true">Google Play no puede procesar esta compra en este dispositivo ahora mismo. Su trabajo, y el desbloqueo si ya lo tiene, no se han visto afectados.</string>
+    <string name="app_unlock_not_completed" translatable="true">No se completó ninguna compra, así que no se cobró nada. Todo lo que ha registrado sigue aquí.</string>
+    <string name="app_unlock_offline" translatable="true">No se pudo contactar con Google Play, así que no se intentó nada. La aplicación sigue funcionando sin conexión; el desbloqueo en sí necesita conexión.</string>
+
+    <string name="app_unnamed_class_file" translatable="true">Clase</string>
+    <string name="nav_back" translatable="true">Atrás</string>
+    <string name="document_could_not_open" translatable="true">No se pudo abrir el archivo.</string>
+    <string name="document_could_not_open_for_writing" translatable="true">No se pudo abrir el archivo para escribir.</string>
+    <string name="document_chosen_file" translatable="true">el archivo elegido</string>
+    <string name="backup_empty" translatable="true">Ese archivo está vacío, por lo que no se restauró nada.</string>
+    <string name="backup_not_mark_book" translatable="true">Ese archivo no es una copia de seguridad de Mark Book, por lo que no se restauró nada.</string>
+    <string name="backup_missing_schema" translatable="true">Ese archivo no tiene una versión de esquema legible, por lo que no se restauró nada.</string>
+    <string name="backup_unsupported_version" translatable="true">Esa copia de seguridad fue creada por otra versión de la aplicación (formato %1$d; esta aplicación lee el formato %2$d). No se modificó nada.</string>
+    <string name="backup_damaged" translatable="true">Esa copia de seguridad está dañada y no se pudo leer, por lo que no se restauró nada: %1$s</string>
+</resources>

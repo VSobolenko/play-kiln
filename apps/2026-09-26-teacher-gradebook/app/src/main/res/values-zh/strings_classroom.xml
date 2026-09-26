@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="classroom_class_title">班级</string>
+    <string name="classroom_back">返回</string>
+    <string name="classroom_back_to_classes">返回我的班级</string>
+    <string name="classroom_missing_title">该班级已不存在。</string>
+    <string name="classroom_missing_body">该班级已被删除。如果你备份过记录，恢复备份即可将它及其中所有内容找回。</string>
+
+    <string name="classroom_tab_roster">名单</string>
+    <string name="classroom_tab_grades">成绩</string>
+    <string name="classroom_tab_attendance">考勤</string>
+    <string name="classroom_tab_notes">备注</string>
+    <string name="classroom_tab_seating">座位</string>
+    <string name="classroom_tab_reports">报告</string>
+    <string name="classroom_tab_setup">设置</string>
+
+    <string name="classroom_roster_eyebrow">班级学生名单</string>
+    <string name="classroom_roster_headline">本班全体学生</string>
+    <string name="classroom_roster_supporting">打开学生即可查看其成绩、考勤、备注和联系记录。</string>
+    <string name="classroom_students_label">学生</string>
+    <string name="classroom_active_label">启用</string>
+    <string name="classroom_add_student">添加学生</string>
+    <string name="classroom_import_csv">从 CSV 导入</string>
+    <string name="classroom_roster_limit_title">名单上限</string>
+    <string name="classroom_roster_limit_body">免费版每个班级最多容纳 %1$d 名学生。解锁后可取消该限制，并同时获得导出和备份功能。</string>
+    <string name="classroom_roster_empty">还没有学生。可以逐个添加，或导入第一列为姓名的 CSV。导入不会覆盖名单中已有的学生。</string>
+    <string name="classroom_student_inactive">%1$s（已停用）</string>
+    <string name="classroom_school_id">学号 %1$s</string>
+    <string name="classroom_average_with_letter">%1$s（%2$s）</string>
+    <string name="classroom_no_average">暂无可计算的平均分</string>
+    <string name="classroom_no_average_short">暂无成绩</string>
+    <string name="classroom_student_summary">平均分：%1$s</string>
+    <string name="classroom_student_summary_with_attendance">平均分：%1$s · %2$s</string>
+    <plurals name="classroom_attendance_marks">
+        <item quantity="other">%1$d条考勤记录</item>
+    </plurals>
+    <string name="classroom_open">打开</string>
+    <string name="classroom_add">添加</string>
+    <string name="classroom_first_name">名字</string>
+    <string name="classroom_last_name">姓氏</string>
+    <string name="classroom_name_supporting">姓氏和名字只需填写一项。</string>
+
+    <string name="classroom_grades_headline">一目了然的评分</string>
+    <string name="classroom_class_average">班级平均分</string>
+    <string name="classroom_unmarked_cells">未评分项</string>
+    <string name="classroom_unmarked">未评分</string>
+    <string name="classroom_unmarked_legend">尚未记录分数、未交或免修。</string>
+    <string name="classroom_add_category">添加类别</string>
+    <string name="classroom_categories_empty">类别是作业的一种分类——如平时作业、考试——它在总评成绩中占有相应权重。没有类别，就无法为成绩配比权重。</string>
+    <string name="classroom_grades_no_students">请先在“名单”标签页添加学生，才能进行评分。</string>
+    <string name="classroom_assignments_empty">%1$s中还没有作业。</string>
+    <string name="classroom_grades_help">点按作业即可为全班评分。未交和免修与分数是分开的，因为未评分的项不等于零分。</string>
+    <string name="classroom_category_name">类别名称</string>
+    <string name="classroom_weight_percent">权重（%%）</string>
+    <string name="classroom_category_free_limit">免费版只能使用一个类别。加权类别属于解锁后的功能。</string>
+    <string name="classroom_weight_help">权重是相对值：60 和 40 与 6 和 4 含义相同。</string>
+    <string name="classroom_edit_named">编辑%1$s</string>
+    <string name="classroom_save">保存</string>
+    <string name="classroom_new_assignment_in">在%1$s中新建作业</string>
+    <string name="classroom_assignment_name">作业名称</string>
+    <string name="classroom_points_worth">满分分值</string>
+    <string name="classroom_points_positive">分值必须大于零。</string>
+    <string name="classroom_points_change_warning">更改分值会改变该作业的每个百分比。</string>
+    <string name="classroom_delete_named">删除%1$s？</string>
+    <string name="classroom_delete_category">删除类别</string>
+    <string name="classroom_delete_assignment">删除作业</string>
+    <plurals name="classroom_delete_category_body">
+        <item quantity="other">此操作会删除该类别、其下的 %1$d 项作业以及针对这些作业记录的所有成绩。其他类别不受影响。</item>
+    </plurals>
+    <plurals name="classroom_delete_assignment_body">
+        <item quantity="other">此操作会删除该作业以及针对它记录的 %1$d 个成绩。</item>
+    </plurals>
+    <string name="classroom_category_weight">权重 %1$s%%</string>
+    <string name="classroom_category_weight_drop">权重 %1$s%% · 去掉最低的 %2$d 个</string>
+    <string name="classroom_up">上移</string>
+    <string name="classroom_down">下移</string>
+    <string name="classroom_options">选项</string>
+    <string name="classroom_add_assignment">添加作业</string>
+    <string name="classroom_edit_name_weight">编辑名称和权重</string>
+    <string name="classroom_delete">删除</string>
+    <string name="classroom_assignment_points">满分 %1$s 分</string>
+    <string name="classroom_mark_class">为全班评分</string>
+    <string name="classroom_edit">编辑</string>
+    <plurals name="classroom_marked_count">
+        <item quantity="other">已评分 %1$d/%2$d</item>
+    </plurals>
+    <plurals name="classroom_missing_count">
+        <item quantity="other">未交 %1$d 项</item>
+    </plurals>
+    <plurals name="classroom_exempt_count">
+        <item quantity="other">免修 %1$d 项</item>
+    </plurals>
+
+    <string name="classroom_attendance_headline">今天的点名册</string>
+    <string name="classroom_attendance_present">出勤</string>
+    <string name="classroom_attendance_late">迟到</string>
+    <string name="classroom_attendance_excused">请假</string>
+    <string name="classroom_attendance_absent">缺勤</string>
+    <string name="classroom_register_for">点名日期</string>
+    <string name="classroom_date_help">请按 YYYY-MM-DD 格式输入日期，例如 %1$s。</string>
+    <string name="classroom_everyone_present">全部出勤</string>
+    <string name="classroom_attendance_recorded">已记录 %1$d/%2$d</string>
+    <string name="classroom_add_roster_first">请先在“名单”标签页添加学生。</string>
+    <string name="classroom_attendance_unrecorded">未记录</string>
+
+    <string name="classroom_notes_eyebrow">班级记录</string>
+    <string name="classroom_notes_headline">备注与家长联系</string>
+    <string name="classroom_notes_supporting">查看近期情况，以及哪些沟通需要跟进。</string>
+    <string name="classroom_notes_label">备注</string>
+    <string name="classroom_contacts_label">联系记录</string>
+    <string name="classroom_followups_label">待跟进</string>
+    <string name="classroom_followups_title">待跟进事项</string>
+    <string name="classroom_followups_empty">尚未设置跟进日期。在家长联系中添加跟进日期后，就会显示在这里。</string>
+    <string name="classroom_followup_summary">%1$s · %2$s · %3$s：%4$s</string>
+    <string name="classroom_former_student">已离班的学生</string>
+    <string name="classroom_parent_contacts">家长联系</string>
+    <string name="classroom_contacts_empty">尚未记录家长联系。可在学生页面添加联系记录。</string>
+    <string name="classroom_contact_with_followup">%1$s · %2$s · %3$s · 跟进 %4$s</string>
+    <string name="classroom_contact_summary">%1$s · %2$s · %3$s</string>
+    <string name="classroom_notes_empty">还没有备注。可在学生页面添加备注。</string>
+    <string name="classroom_note_summary">%1$s · %2$s · %3$s</string>
+    <string name="classroom_note_participation">课堂表现</string>
+    <string name="classroom_note_behaviour">行为表现</string>
+    <string name="classroom_note_missing_work">未交作业</string>
+    <string name="classroom_note_general">常规</string>
+    <string name="classroom_delete_note_title">删除这条备注？</string>
+    <string name="classroom_delete_note_body">将把 %2$s 的“%1$s”从该学生的历史记录中删除。</string>
+    <string name="classroom_delete_note">删除备注</string>
+    <string name="classroom_delete_contact_title">删除这条联系记录？</string>
+    <string name="classroom_delete_contact_body">将删除 %1$s 的 %2$s 记录。</string>
+    <string name="classroom_delete_contact">删除联系记录</string>
+
+    <string name="classroom_seating_eyebrow">教室布局</string>
+    <string name="classroom_seating_headline">让每名学生都尽收眼底</string>
+    <string name="classroom_seating_supporting">点按任意座位即可分配或移动学生。</string>
+    <string name="classroom_desks_label">座位</string>
+    <string name="classroom_seated_label">已入座</string>
+    <string name="classroom_unseated_label">未入座</string>
+    <string name="classroom_seating_none">还没有座位表。</string>
+    <string name="classroom_seating_summary">%1$d 行 × %2$d 列 · %4$d 个座位中已占用 %3$d 个</string>
+    <string name="classroom_set_up">设置</string>
+    <string name="classroom_resize">调整大小</string>
+    <string name="classroom_seating_empty">先设置座位网格，然后点按座位安排学生。在这里维护座位表的老师，每学期无需再在纸上重画。</string>
+    <string name="classroom_empty_desk">空座</string>
+    <string name="classroom_not_seated">尚未安排座位</string>
+    <string name="classroom_next_free_desk">下一个空座</string>
+    <string name="classroom_seating_grid">座位网格</string>
+    <string name="classroom_apply">应用</string>
+    <string name="classroom_rows">行数</string>
+    <string name="classroom_columns">列数</string>
+    <string name="classroom_desk_number">座位 %1$d</string>
+    <string name="classroom_seat">座位</string>
+    <string name="classroom_move_here">移到这里</string>
+    <string name="classroom_student_name">学生姓名</string>
+    <string name="classroom_seat_help">输入名单中的姓名。留空可清除该座位。</string>
+    <string name="classroom_student_not_found">本班名单中没有名为“%1$s”的学生。</string>
+
+    <string name="classroom_reports_eyebrow">随时可分享</string>
+    <string name="classroom_reports_headline">导出本班数据</string>
+    <string name="classroom_reports_ready">成绩单、可打印报告和备份均已就绪。</string>
+    <string name="classroom_reports_locked">你的记录始终可读；解锁后可导出或备份。</string>
+    <string name="classroom_csv_rows">CSV 行数</string>
+    <string name="classroom_assignments_label">作业</string>
+    <string name="classroom_backups_label">备份就绪</string>
+    <string name="classroom_csv_title">电子表格（CSV）</string>
+    <string name="classroom_csv_body">每名学生一行，每项作业一列，随后是各类别平均分和总平均分。只会写入你已存储的内容：未评分的项保持为空，含逗号或引号的姓名会正确加引号，确保文件仍能正常打开。</string>
+    <string name="classroom_export_grade_sheet">导出成绩单</string>
+    <string name="classroom_pdf_title">可打印报告（PDF）</string>
+    <string name="classroom_pdf_body">整个班级汇总在一页上，并印有取整规则和未交作业规则，让交出去的报告无需额外解释。每名学生也有各自的报告。</string>
+    <string name="classroom_export_class_report">导出班级报告</string>
+    <string name="classroom_backup_title">备份与恢复</string>
+    <string name="classroom_backup_body">备份是一个文件，包含所有班级、学生、成绩、考勤记录、备注、联系记录和座位表。恢复会用文件内容替换本设备上的数据；若文件无法识别，则拒绝操作，不会更改任何内容。</string>
+    <string name="classroom_backup">备份</string>
+    <string name="classroom_restore">恢复</string>
+    <string name="classroom_export_locked">导出和备份属于一次性解锁的内容。无论是否解锁，你记录的所有内容都始终可读。</string>
+    <string name="classroom_inventory_title">本班包含</string>
+    <plurals name="classroom_students_count">
+        <item quantity="other">%1$d名学生</item>
+    </plurals>
+    <plurals name="classroom_assignments_count">
+        <item quantity="other">%1$d项作业</item>
+    </plurals>
+    <plurals name="classroom_marks_count">
+        <item quantity="other">%1$d个成绩</item>
+    </plurals>
+    <plurals name="classroom_attendance_records_count">
+        <item quantity="other">%1$d条考勤记录</item>
+    </plurals>
+    <plurals name="classroom_notes_count">
+        <item quantity="other">%1$d条备注</item>
+    </plurals>
+    <plurals name="classroom_contacts_count">
+        <item quantity="other">%1$d条家长联系</item>
+    </plurals>
+
+    <string name="classroom_setup_eyebrow">班级规则</string>
+    <string name="classroom_setup_headline">本班成绩的计算方式</string>
+    <string name="classroom_setup_supporting">明确设置班级信息、取整方式、未交作业规则和字母等级区间。</string>
+    <string name="classroom_categories_label">类别</string>
+    <string name="classroom_grade_bands_label">等级区间</string>
+    <string name="classroom_class_details">班级信息</string>
+    <string name="classroom_no_subject">未设置科目</string>
+    <string name="classroom_period_value">第%1$s课时</string>
+    <string name="classroom_no_term">未设置学期</string>
+    <string name="classroom_separator"> · </string>
+    <string name="classroom_rounding">取整方式</string>
+    <string name="classroom_round_half_up">四舍五入</string>
+    <string name="classroom_round_half_even">四舍六入五成双</string>
+    <string name="classroom_round_floor">截断</string>
+    <plurals name="classroom_decimals">
+        <item quantity="other">%1$d位小数</item>
+    </plurals>
+    <string name="classroom_rounding_help">显示在每个平均分旁边，因为同样的成绩在不同规则下会得到不同的数值。</string>
+    <string name="classroom_missing_work_title">未交作业</string>
+    <string name="classroom_missing_counts_zero">未交作业按零分计算</string>
+    <string name="classroom_missing_excluded">未交作业不计入平均分</string>
+    <string name="classroom_exempt_help">免修的作业始终不计入。未评分的项两者都不算。</string>
+    <string name="classroom_letter_grades">字母等级</string>
+    <string name="classroom_letter_grades_empty">未设置字母等级标准，因此只显示百分比。添加一个区间，即可将百分比转换为学校使用的字母等级。</string>
+    <string name="classroom_grade_band">%2$s%% 起为 %1$s</string>
+    <string name="classroom_remove">移除</string>
+    <string name="classroom_add_band">添加区间</string>
+    <string name="classroom_delete_class_title">删除此班级</string>
+    <string name="classroom_delete_class_warning">删除会移除该班级及其中记录的所有内容。只要有可能还会用到，请先备份记录。</string>
+    <string name="classroom_delete_named_action">删除%1$s</string>
+    <string name="classroom_class_name">班级名称</string>
+    <string name="classroom_subject">科目</string>
+    <string name="classroom_period">课时</string>
+    <string name="classroom_term">学期</string>
+    <string name="classroom_add_letter_band">添加字母等级区间</string>
+    <string name="classroom_letter">字母</string>
+    <string name="classroom_letter_example">例如 A、B+ 或 4</string>
+    <string name="classroom_from_percent">起始百分比</string>
+    <string name="classroom_band_invalid">区间需要填写字母和百分比。</string>
+    <string name="classroom_delete_class">删除班级</string>
+    <plurals name="classroom_delete_class_body">
+        <item quantity="other">此操作会删除 %1$d 名学生以及为他们记录的所有内容：成绩、考勤、备注、联系记录和座位表。此操作无法撤销。</item>
+    </plurals>
+    <plurals name="rounding_half_up"><item quantity="other">四舍五入到 %1$d 位小数</item></plurals>
+    <plurals name="rounding_half_even"><item quantity="other">银行家舍入到 %1$d 位小数</item></plurals>
+    <plurals name="rounding_floor"><item quantity="other">截断到 %1$d 位小数</item></plurals>
+    <string name="edit_class_needs_name">班级需要名称。</string>
+    <string name="edit_class_gone">该班级已不存在。</string>
+    <string name="edit_student_needs_name">学生需要姓名。</string>
+    <string name="edit_student_gone">该学生已不在此名单中。</string>
+    <string name="edit_category_needs_name">类别需要名称。</string>
+    <string name="edit_category_weight_not_positive">类别权重必须大于零。</string>
+    <string name="edit_drop_lowest_negative">去掉最低分不能为负数。</string>
+    <string name="edit_category_gone">该类别已不存在。</string>
+    <string name="edit_category_already_at_end">该类别已在列表末尾。</string>
+    <string name="edit_assignment_needs_name">作业需要名称。</string>
+    <string name="edit_assignment_points_not_positive">作业分值必须大于零。</string>
+    <string name="edit_assignment_gone">该作业已不存在。</string>
+    <string name="edit_earned_points_negative">获得的分数不能为负数。</string>
+    <string name="edit_earned_points_above_maximum">获得的分数不能超过该作业的 %1$s 分。</string>
+    <string name="edit_note_needs_text">备注需要填写内容。</string>
+    <string name="edit_note_gone">该备注已不存在。</string>
+    <string name="edit_contact_needs_channel">联系记录需要联系方式。</string>
+    <string name="edit_contact_needs_summary">联系记录需要摘要。</string>
+    <string name="edit_contact_gone">该联系记录已不存在。</string>
+    <string name="edit_seating_grid_negative">座位表不能为负数。</string>
+    <string name="edit_seating_grid_too_large">座位表最多为 20 × 20 张课桌。</string>
+    <string name="edit_desk_outside_grid">该课桌不属于座位表。</string>
+    <string name="edit_seating_grid_full">座位表中的每张课桌都已占用。</string>
+    <string name="csv_student">学生</string>
+    <string name="csv_external_id">外部 ID</string>
+    <string name="csv_overall_percent">总百分比</string>
+    <string name="csv_letter">字母</string>
+    <string name="csv_missing_counted_as_zero">缺交按零分计算</string>
+    <string name="csv_rounding">舍入</string>
+    <string name="csv_missing">缺交</string>
+    <string name="csv_exempt">免除</string>
+    <string name="csv_yes">是</string>
+    <string name="csv_no">否</string>
+    <string name="import_no_name_first_column">第一列没有姓名</string>
+    <string name="report_attendance_present">出勤</string>
+    <string name="report_attendance_tardy">迟到</string>
+    <string name="report_attendance_absent_excused">请假缺勤</string>
+    <string name="report_attendance_absent_unexcused">无故缺勤</string>
+    <string name="report_note_participation">参与</string>
+    <string name="report_note_behaviour">行为</string>
+    <string name="report_note_missing_work">缺交作业</string>
+    <string name="report_note_general">一般</string>
+</resources>

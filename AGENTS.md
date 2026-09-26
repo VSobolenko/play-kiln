@@ -11,20 +11,70 @@ factory brief is [`MISSION.md`](./MISSION.md) and must be honored in every sessi
 
 ## Factory pipeline
 
+Two phases, separated by the owner's approval. Phase 1 produces an app the owner can install
+and review, and deliberately produces **no** signed artifacts, no store pack and no screenshots,
+because all of those are wasted work while the app can still change. Phase 2 produces them and
+refuses to run without the approval. The rule is `.cursor/rules/release-gate.mdc`.
+
+**Phase 1 — development, `/ship <idea>`**
+
 | Order | Stage | Owner | Gate or output |
 |---:|---|---|---|
-| 0 | `<idea>` and plan | Human + Cursor | **Human checkpoint 1:** approve the plan |
+| 0 | `<idea>` from measured demand | Cursor, per `.cursor/rules/ideation-gate.mdc` | A proposal in `docs/ideation/` with measured demand evidence; never a topic carried over from an example |
+| 0.5 | Economic plan | Cursor | `economics.json` passing `scripts/check-economics.mjs`, plus **Human checkpoint 1:** approve the plan and its price |
+| 0.6 | Promise contract (recon's reason list) | Cursor | `differentiators.json` passing `scripts/check-differentiators.mjs`, authored from recon **before** the UI, so the reasons the app was chosen cannot be lost during the build; every promise starts `deferred` |
 | 1 | `/ship <idea>` | Cursor | Automatic after approval |
-| 2 | `scripts/new-slot.mjs` | Factory | Automatic isolated `apps/<date>-<slug>/` slot |
-| 3 | Implement | Codex workers, orchestrated by Cursor | Automatic code, tests, and app behavior |
-| 4 | `scripts/store-kit.py` | Factory | Automatic complete store pack |
-| 5 | `scripts/prepare-release.mjs` | Factory | Automatic signed APK, signed AAB, and release manifest |
-| 6 | `scripts/verify-slot.mjs` | Factory + Cursor | Automatic objective gates plus a read diff |
-| 7 | `/eval` | Cursor evaluator | Automatic independent verdict; repair until green |
-| 8 | Play Console legal steps, first upload, publish | Human | **Human checkpoint 2:** complete declarations, upload once, press publish |
+| 2 | `scripts/new-slot.mjs --economics <path> --differentiators <path>` | Factory | Automatic isolated `apps/<date>-<slug>/` slot; **refuses to scaffold without a validated plan and a validated promise contract** |
+| 3 | Implement | Codex workers, orchestrated by Cursor | Automatic code, tests, and app behavior; each promise moves from `deferred` to `shipped` with a proof, or to `narrowed`/`dropped` in writing |
+| 4 | Development verification | Factory + Cursor | `scripts/run-slot-tests.mjs` plus `scripts/verify-slot.mjs --build`, which compiles `assembleDebug` and does not sign; **fails while any promise is still deferred**; a readable diff |
+| 5 | **Human checkpoint 1.5: approve the release** | Human | The owner installs the debug APK, reviews the UI and behavior, and states approval in his own words. Recorded with `scripts/approve-release.mjs --slot <slug> --note "<owner words>"`, bound to a digest of the app's build inputs |
+
+**Phase 2 — release, `/release <slug>`** — every step below refuses to run without the approval
+from stage 5, and the approval lapses by itself if the app's sources change.
+
+| Order | Stage | Owner | Gate or output |
+|---:|---|---|---|
+| 6 | `scripts/prepare-release.mjs` | Factory | signed APK, signed AAB, and release manifest |
+| 7 | `scripts/store-kit.py` | Factory | complete store pack |
+| 8 | `scripts/media-capture.mjs` | Factory | real-device screenshots, when a device is available |
+| 9 | `scripts/verify-slot.mjs --strict-store --build` and `/eval` | Factory + Cursor | Objective gates plus an independent verdict; repair until green |
+| 10 | Play Console legal steps, first upload, publish | Human | **Human checkpoint 2:** complete declarations, upload once, press publish |
+| 11 | Earn | Human + Cursor | The plan's `killCriteria` evaluated against real install and revenue numbers; a slot that misses them is archived |
 
 One idea must take one command through this pipeline. Never silently upload, commit
-an edit, or publish on the human's behalf.
+an edit, or publish on the human's behalf. An approval is recorded only from the owner's own
+words, never inferred from an agent's confidence, and never recorded to unblock a step.
+
+**The factory's product is revenue, not green gates.** Both phases measure form: that the
+APK builds, that the store pack is complete and truthfully described, that the assets exist and
+match a recorded build. None of them can tell you whether anyone will pay, and none of them can tell
+you whether the app is still the app recon chose. Stages 0, 0.5, 0.6 and 11 are the money stages, and
+only stage 11 produces the answer. A slot that passes every gate and earns
+nothing is a failed slot, and the failure is in stage 0, not in verification.
+
+Stage 0 exists because the factory's first real slot inverted it: a topic was inherited from an
+example, the market was chosen on that inheritance, and the shipped app had
+`capabilities.json` of `{"schemaVersion": 1, "enabled": []}` — no billing, no ads, no revenue
+mechanism — while every gate returned PASS. That post-mortem is
+`docs/reviews/2026-09-26-slot-1-economics-postmortem.md`. The economics contract that now blocks
+it is `docs/slot-economics.md`.
+
+**Recon's reason list is a contract too.** Recon answers two questions, not one: whether an app
+can earn, and *why anyone would install it*. The second answer is a list of promises, and it is the
+first thing a build loses — the easy promises ship, the hard ones get a `// TODO`, and the end of
+the work is declared by whoever is tired. Stage 0.6 writes that list into `differentiators.json`
+before the UI exists; every promise starts `deferred`, and stage 4 fails while any promise is still
+deferred, so a slot cannot be called done with ten of twenty reasons delivered. Losing or weakening
+a `core` promise requires the owner's own words, exactly as the release approval does. The contract
+is `docs/slot-differentiators.md` and the gate is `scripts/check-differentiators.mjs`.
+
+The wall-clock target is **about one hour of agent time per slot**, and buildability is therefore a
+first-class selection criterion rather than a detail discovered during the build. That target is a
+direction, not a measurement: the first slot's scaffold-to-last-build span is on record as
+**4 h 49 m as a lower bound** (`docs/reviews/2026-09-26-slot-1-economics-postmortem.md` §1), and
+every recipe in `docs/ideation/2026-09-26-five-recipes.md` estimates 3.5–6 hours. Never cite the
+target as if it had been met; report the elapsed wall clock instead. The concrete cuts that would
+make one hour reachable are in `.cursor/rules/parallel-execution.mdc`.
 
 ## Published namespace
 
@@ -172,6 +222,14 @@ Default locale is `en-US`; supported additional locale is `ru-RU`. If login gate
 content, `review-notes.md` must provide usable demo access. Claims and screenshots
 must describe the shipped app; synthetic captures must be identified as synthetic.
 
+`listing.json.contactEmail` must be the developer account's monitored address,
+`v.sobolenko.vs@gmail.com` — defined once as `DEFAULT_CONTACT_EMAIL` in
+`scripts/store-kit.py` and applied as the default for every new slot, so no pack
+ships the generator's `support@example.com`. It is a public support address, not a
+secret, and does not belong in `.env`. `privacyPolicyUrl` has no default: it must be
+a hosted HTTPS URL the owner controls. A pack still pointing at a reserved
+documentation host is unfinished, and the generated human-checks list says so.
+
 ## Play compliance floor
 
 Before a slot is `ready`:
@@ -185,7 +243,10 @@ Before a slot is `ready`:
 - Edge-to-edge and predictive back behavior work at the target SDK.
 - Ads, content rating, target audience, review access, and AI-content declarations
   are truthful and complete.
-- Native libraries have confirmed 16 KB readiness.
+- Native libraries have confirmed 16 KB readiness, measured from the built artifact by
+  `scripts/check-16k.py` (ELF `p_align` per `PT_LOAD`, plus the stored-and-aligned container
+  offset in the APK). `prepare-release.mjs` cannot tell you this — it only knows that `.so` files
+  exist, so it records `confirmation-required` until this script is run and read.
 
 Use [`docs/play-publishing-playbook.md`](docs/play-publishing-playbook.md) for the
 human/agent handoff,
@@ -194,6 +255,25 @@ for the requirements brief, and
 [`docs/research/2026-09-23-google-play-automation-surface.md`](docs/research/2026-09-23-google-play-automation-surface.md)
 for what the Play API can and cannot automate (no official Play MCP exists; the API
 cannot create an app; Data safety can be written from a reviewed CSV).
+
+## Visual identity
+
+Every slot ships its own pronounced visual identity; the factory's edge is design, not only
+correctness. A working app that looks like an unstyled Material demo is a failed recipe even when
+every gate is green. The binding rule is `.cursor/rules/visual-identity.mdc` and the human-facing
+summary is [`DESIGN.md`](./DESIGN.md).
+
+- The identity is declared in `store/studio.json` (`mark`, `palette`, per-shot `headlines` and
+  `kickers`, `featureTagline`, `featurePill`) **before** the UI is styled, and the launcher icon,
+  adaptive-icon vectors, feature graphic and store compositions are rendered from it.
+- The declared palette is the slot's own `ui/theme/Color.kt` palette, so the pack cannot drift from
+  the app, and the slot owns its theme and its component vocabulary rather than shipping library
+  defaults.
+- The identity is per slot: two slots never share a mark, a palette or a component kit, for the same
+  reason they never share a job (`docs/monetization-strategy.md` §1.2).
+- Evidence: `verify-slot --strict-store` requires `store/provenance.json` for a composed pack,
+  `scripts/visual-qa.py` measures the pixels, and `media-capture.mjs` photographs the real signed
+  build with asserted readings. `apps/2026-09-26-teacher-gradebook` is the reference slot.
 
 ## Defaults to suppress
 
@@ -210,6 +290,8 @@ cannot create an app; Data safety can be written from a reviewed CSV).
 | Keystores, passwords, service-account JSON, or keyed `google-services.json` in Git | Environment variables or ignored local paths |
 | Hardcoded Material colors | `MaterialTheme.colorScheme` |
 | Shared `applicationId` values | Unique `com.gexetr.<slug>` per slot |
+| An unstyled Material 3 app — default seed, stock components as the whole look | A slot-owned identity declared in `store/studio.json` and carried into the slot's theme and components |
+| The same mark, palette or component kit in two slots | A new identity per slot, like a new job |
 | A thin AI chat wrapper | A differentiated workflow with required content reporting |
 
 Do not set obsolete AGP flags such as `android.enableR8.fullMode`,
@@ -231,11 +313,26 @@ harness/                          protocols, ambition, surface map, and lessons
 apps/<date>-<slug>/               isolated Android projects
 scaffold/android-compose/         new-slot template
 registry/apps.json                slot registry
-scripts/new-slot.mjs              create a slot
+scripts/new-slot.mjs              create a slot (requires a validated --economics plan and promise contract)
 scripts/lib/namespaces.mjs        single source of truth for `com.gexetr.*`
+scripts/lib/slot-economics.mjs    the slot economics contract: parsing, validation, capability pairing
+scripts/check-economics.mjs       money gate: does the plan name a real revenue mechanism
+scripts/lib/slot-differentiators.mjs the promise contract: parsing, proof typing, delivery resolution
+scripts/check-differentiators.mjs promise gate: is every reason this app was chosen delivered or dropped
+scripts/check-locales.mjs         checks declared app languages against resource coverage
+scripts/test-locale-dedup.mjs     regression test: a non-translatable key is declared once
+scripts/check-adaptive-icon.py    checks launcher-mark fit inside adaptive-icon masks
+scripts/check-16k.py              measures 16 KB page-size readiness from the built APK/AAB itself
+docs/slot-economics.md            the economics.json contract and its archetype/capability pairing
+docs/slot-differentiators.md      the differentiators.json contract: promises, proofs, owner decisions
+docs/ideation/                    idea proposals awaiting the owner's decision
 scripts/selftest.mjs              regression tests for the factory scripts
 scripts/codex-run.mjs             durable Codex worker runner
+scripts/lib/release-approval.mjs  source digest + owner approval: the two-phase gate
+scripts/approve-release.mjs       record, check, or revoke the owner's release approval
 scripts/store-kit.py              generate and validate store packs
+scripts/visual-qa.py              report pixel measurements for store-pack visual identity
+scripts/test-visual-qa-discovery.py regression test for visual-QA theme discovery
 scripts/sign-release.mjs          configure and inspect local upload signing
 scripts/prepare-release.mjs       build, sign, verify, and stage APK/AAB artifacts
 scripts/media-capture.mjs         capture store media through ADB journeys
@@ -261,20 +358,48 @@ factory conventions belong in this file, OpenSpec, or `harness/`.
 ## Verification
 
 ```bash
+# phase 1 — development
+node scripts/check-economics.mjs --slot <slug>           # money stage: plan vs enabled capabilities
+node scripts/check-differentiators.mjs --slot <slug>     # promise gate: is every reason delivered or dropped
+node scripts/check-differentiators.mjs --slot <slug> --allow-deferred  # builder progress read, never completion
+node scripts/check-locales.mjs --slot <slug>             # declared app languages have resources
+node scripts/test-locale-dedup.mjs                       # a non-translatable key is declared once
+python scripts/check-adaptive-icon.py --slot <slug>      # launcher mark fits adaptive-icon masks
+python scripts/visual-qa.py --slot <slug>                # visual-identity report; read it, exit 0 is not approval
+python scripts/test-visual-qa-discovery.py               # visual-QA theme-discovery regression test
 node scripts/selftest.mjs                         # factory scripts vs a sandbox slot
 node scripts/verify-slot.mjs                      # runs the self-test too
 node scripts/verify-slot.mjs --slot <slug>
-node scripts/verify-slot.mjs --slot <slug> --strict-store
-node scripts/verify-slot.mjs --slot <slug> --build
+node scripts/verify-slot.mjs --slot <slug> --build   # phase-1 evidence: source gates + assembleDebug
+node scripts/kiln-status.mjs                      # factory health + each slot's phase
+
+# the approval boundary
+node scripts/approve-release.mjs --check --slot <slug>    # is this revision approved for release?
+node scripts/approve-release.mjs --slot <slug> --note "<the owner's own words>"
+node scripts/approve-release.mjs --revoke --slot <slug>   # always safe, always allowed
+
+# phase 2 — release (each of these refuses without the approval above)
+node scripts/prepare-release.mjs --slot <slug>
+python scripts/store-kit.py --slot <slug>
+node scripts/media-capture.mjs --slot <slug>
+python scripts/check-16k.py apps/<slot>/dist/*.apk apps/<slot>/dist/*.aab  # 16 KB page-size readiness
 node scripts/verify-slot.mjs --slot <slug> --strict-store --build   # release evidence
 node scripts/verify-slot.mjs --base main
 node scripts/verify-slot.mjs --no-selftest        # skip the self-test (rare)
-node scripts/kiln-status.mjs
 node scripts/test-capture-publish.mjs             # capture-publish failure injection (offline, fast)
 node scripts/test-apk-provenance.mjs              # APK provenance failure injection (offline, fast)
 node scripts/test-play-reviews.mjs                # review-sensor unit tests (offline, fast)
 node scripts/verify-reviews-sensor.mjs            # review sensor vs live Play pages
 ```
+
+`scripts/lib/release-approval.mjs` is the single source of truth for the phase boundary. An
+approval record (`apps/<slot>/release-approval.json`, gitignored) stores the owner's own words, a
+timestamp, and a SHA-256 digest of the slot's build inputs. Editing any of those inputs invalidates
+the approval on the next check, so "approve, then keep coding" cannot silently ship an unreviewed
+revision. `--revoke` is always safe and never needs permission; recording one never does. When a
+release script refuses, the fix is to ask the owner, never to edit or delete the record — and
+`prepare-release.mjs`, `store-kit.py`'s rendering paths and `media-capture.mjs` all refuse, while
+`store-kit.py --init` and `--validate-only` stay usable during development.
 
 `scripts/test-capture-publish.mjs` injects the interruptions that publish's fail-closed claim
 depends on — a swap killed between its two renames, a throwing rename, a leftover backup beside a
@@ -334,8 +459,22 @@ see `.cursor/rules/verification-discipline.mdc`.
 ## Working rules
 
 - One idea creates one slot unless the human explicitly asks to extend a slot.
+- Development and release are separate phases: `/ship` stops at a debug build and a review, and
+  signing, store packs and screenshots happen in `/release` only after the owner's recorded
+  approval. Never record an approval, edit the record, or work around a refusing release script.
 - Slots never depend on each other; the shared harness remains at repository root.
 - No secret may be committed or printed into a worker prompt or log.
 - Improve the root harness when the same failure recurs across slots.
 - Archive or kill failed attempts; do not turn PlayKiln into one product repo.
 - Human approval is mandatory for legal declarations, first upload, and publish.
+- A slot is never scaffolded without a validated `economics.json`; the money stage is not optional.
+- A slot is never scaffolded without a validated `differentiators.json` either, and it is authored
+  from recon **before** the UI. Every promise starts `deferred`, and `verify-slot.mjs` fails while
+  any promise is deferred: shipping ten of twenty reasons is not shipping the app that was chosen.
+  Losing or weakening a `core` promise needs the owner's own words — see
+  `.cursor/rules/differentiator-contract.mdc`.
+- An example the owner gives is a shape, never a topic. Topics are chosen from measured demand.
+- Never generate or rotate a signing key without the owner's explicit permission in the current
+  conversation; a signing key is the app's permanent identity and its password is the owner's to
+  choose and store. See `.cursor/rules/authorization.mdc`.
+- Target roughly one hour of agent wall-clock per slot, and report the actual time taken.

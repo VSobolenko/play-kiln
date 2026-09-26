@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
-  "_comment": "Copy for the composed store assets rendered by scripts/store-studio.py. Headlines are benefit-led and kept to 3-5 words so they stay readable at thumbnail size; the bodies come from journey.json so the shot copy and the shot's verification stay in one place.",
-  "_claim_bounds": "Every headline must be true of the bounded app. It performs sizing ARITHMETIC on readings the user supplies; it ships no code-table data, does not determine the pipe size itself, and does not determine compliance. So 'Size any gas run' was wrong (it implies the app owns the sizing data) and absolute guarantees like 'Nothing gets assumed' were wrong (the app trusts the user's confirmed capacity). Each headline below names something the app verifiably does. Reviewed against an independent evaluator finding: unbounded store claims exceed the implemented behaviour.",
+  "_comment": "Copy for the composed store assets rendered by scripts/store-studio.py. Headlines are benefit-led and kept to 3-5 words so they stay readable at thumbnail size; the bodies come from journey.json so the shot copy and the shot's verification stay in one place. One headline per journey shot, in journey order: the studio falls back to the shot title when this list is short, so a shorter list would silently change the pack.",
+  "_claim_bounds": "Every headline must be true of the bounded app. It performs sizing ARITHMETIC on readings the user supplies; it ships no code-table data, does not determine the pipe size itself, and does not determine compliance. So 'Size any gas run' was wrong (it implies the app owns the sizing data) and absolute guarantees like 'Nothing gets assumed' were wrong (the app trusts the user's confirmed capacity). Each headline below names something the app verifiably does, and the shot behind it is asserted by store/journey.json: 'Record the fitting allowance' is 12 x 5.5 ft echoed as 66.00 ft, 'Record the source citation' is the 2024/A/2 citation echoed on the result, 'Convert units both ways' is the same readings in kW and m, 'Missing inputs are named' is the refusal 'Enter gas specific gravity.', and 'See the arithmetic' is the full result card with its citation and disclaimer.",
   "headlines": [
-    "Enter the run details",
-    "Loads and lengths in",
-    "Cite your own table",
-    "Switch to metric",
+    "Enter the sizing inputs",
+    "Record the fitting allowance",
+    "Record the source citation",
+    "Convert units both ways",
     "Missing inputs are named",
     "See the arithmetic"
   ],
   "kickers": [
     "INPUTS",
-    "LOAD & LENGTH",
+    "FITTINGS",
     "PROVENANCE",
     "UNITS",
     "GUARDRAILS",
