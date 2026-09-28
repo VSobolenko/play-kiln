@@ -1,15 +1,25 @@
 package com.gexetr.pipesizing.ui.home
 
+import com.gexetr.pipesizing.sizing.LengthSubstitution
 import com.gexetr.pipesizing.sizing.RefusalKind
 import com.gexetr.pipesizing.sizing.SizingEvaluation
 import com.gexetr.pipesizing.sizing.SizingMethod
+import com.gexetr.pipesizing.sizing.TableApplicability
+import com.gexetr.pipesizing.sizing.TableCitation
+import com.gexetr.pipesizing.sizing.TableRow
+import com.gexetr.pipesizing.sizing.USER_RECORDED_MARKER
 import com.gexetr.pipesizing.sizing.UnitSystem
 import com.gexetr.pipesizing.sizing.Units
+import com.gexetr.pipesizing.sizing.UserCapacityTable
 import com.gexetr.pipesizing.sizing.UserProvenance
+import com.gexetr.pipesizing.ui.tables.TablesRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -128,9 +138,11 @@ class HomeViewModelTest {
     @Test
     fun physicalMethodComputesOnceItsInputsAreSupplied() {
         val vm = completeVm(method = SizingMethod.CAPACITY_COMPARISON_WITH_PHYSICAL_INPUTS)
-        field(vm, HomeField.GAS_SPECIFIC_GRAVITY, "0.62")
-        field(vm, HomeField.PRESSURE_DROP, "0.3")
-        field(vm, HomeField.PIPE_DIAMETER, "1.049")
+        // Invented synthetics, not code or standard readings: 21.5 is no gas's specific gravity,
+        // 35.5 is no pressure-drop allowance, 88.5 is no pipe's inside diameter.
+        field(vm, HomeField.GAS_SPECIFIC_GRAVITY, "21.5")
+        field(vm, HomeField.PRESSURE_DROP, "35.5")
+        field(vm, HomeField.PIPE_DIAMETER, "88.5")
 
         assertTrue(evaluate(vm) is SizingEvaluation.Computed)
     }
@@ -372,6 +384,268 @@ class HomeViewModelTest {
         assertEquals(RefusalKind.MISSING_INPUT, (result as SizingEvaluation.Refused).kind)
     }
 
+    // -------------------------------------------------------------------------------------------
+    // Step 4.1 — the table-selection fields are editable through the same single write path, and
+    // editing either of them clears the shown result like every other input does.
+    // -------------------------------------------------------------------------------------------
+
+    @Test
+    fun choosingARecordedTableIsEditableAndClearsTheShownResult() {
+        val table = syntheticTable()
+        val vm = tableVm(TablesRepository.InMemory(listOf(table)))
+        evaluate(enterTableCase(vm, table.id))
+        assertTrue(vm.uiState.value.evaluation is SizingEvaluation.ReturnedFromUserTable)
+
+        field(vm, HomeField.SELECTED_TABLE, table.id)
+
+        assertEquals(table.id, vm.uiState.value.selectedTableId)
+        // Choosing a table records the revision of the contents that were chosen (design D9), so a
+        // later edit to that table can be detected rather than answered from a revision the case was
+        // never read against.
+        assertEquals(table.contentDigest(), vm.uiState.value.tableDigest)
+        assertNull(vm.uiState.value.evaluation)
+    }
+
+    @Test
+    fun enteringTheNominalSizeIsEditableAndClearsTheShownResult() {
+        val table = syntheticTable()
+        val vm = tableVm(TablesRepository.InMemory(listOf(table)))
+        evaluate(enterTableCase(vm, table.id))
+        assertTrue(vm.uiState.value.evaluation is SizingEvaluation.ReturnedFromUserTable)
+
+        field(vm, HomeField.TABLE_NOMINAL_SIZE, "synthetic-size-b")
+
+        assertEquals("synthetic-size-b", vm.uiState.value.tableNominalSize)
+        assertNull(vm.uiState.value.evaluation)
+    }
+
+    // -------------------------------------------------------------------------------------------
+    // Step 4.2 — the new methods compute from a table the user recorded, and every refusal names
+    // the field or the limit it hit. Nothing below asserts a capacity the app supplied: the rows are
+    // invented synthetic readings ("synthetic-size-a", 1.0, 2.0) that say so.
+    // -------------------------------------------------------------------------------------------
+
+    @Test
+    fun theForwardMethodReturnsTheRecordedRowForTheEnteredSize() {
+        val table = syntheticTable()
+        val vm = tableVm(TablesRepository.InMemory(listOf(table)))
+
+        val returned = evaluate(enterTableCase(vm, table.id)) as SizingEvaluation.ReturnedFromUserTable
+
+        assertEquals("synthetic-size-a", returned.returnedSize)
+        assertEquals(2.0, returned.returnedCapacityMbh, 0.0)
+        assertNull(returned.substitution)
+        // The citation travels with the value, so a returned number is never shown without its source.
+        assertEquals(table.citation.codeAndEdition, returned.capacityProvenance.codeAndEdition)
+        assertEquals(table.citation.tableIdentifier, returned.capacityProvenance.tableIdentifier)
+    }
+
+    @Test
+    fun theForwardMethodReportsTheLengthItSubstitutedFromTheRecordedRows() {
+        val table = syntheticTable(
+            rows = listOf(
+                TableRow("synthetic-size-a", null, 1.0, 2.0),
+                TableRow("synthetic-size-a", null, 3.0, 1.0),
+            ),
+        )
+        val vm = tableVm(TablesRepository.InMemory(listOf(table)))
+
+        // No row is recorded at 2.0, so the closest larger recorded length is used and both values
+        // are reported; the capacity returned is the one recorded at the length actually used.
+        val returned = evaluate(enterTableCase(vm, table.id, length = "2")) as SizingEvaluation.ReturnedFromUserTable
+
+        assertEquals(LengthSubstitution(2.0, 3.0), returned.substitution)
+        assertEquals(1.0, returned.returnedCapacityMbh, 0.0)
+        assertNotEquals(2.0, returned.returnedCapacityMbh, 0.0)
+    }
+
+    @Test
+    fun theReverseMethodReturnsTheSmallestRecordedSizeThatCarriesTheLoad() {
+        val table = syntheticTable(
+            rows = listOf(
+                TableRow("synthetic-size-a", null, 1.0, 2.0),
+                TableRow("synthetic-size-b", null, 1.0, 4.0),
+            ),
+        )
+        val vm = tableVm(TablesRepository.InMemory(listOf(table)))
+        enterTableCase(vm, table.id, method = SizingMethod.SMALLEST_SIZE_FOR_LOAD)
+
+        // Both recorded sizes carry a load of 1, so the first in the user's own recorded order wins.
+        val light = evaluate(vm) as SizingEvaluation.ReturnedFromUserTable
+        assertEquals("synthetic-size-a", light.returnedSize)
+        assertEquals(2.0, light.returnedCapacityMbh, 0.0)
+
+        // The smallest one no longer carries a load of 3, so the next recorded size is returned.
+        field(vm, HomeField.LOAD, "3")
+        val heavier = evaluate(vm) as SizingEvaluation.ReturnedFromUserTable
+        assertEquals("synthetic-size-b", heavier.returnedSize)
+        assertEquals(4.0, heavier.returnedCapacityMbh, 0.0)
+    }
+
+    @Test
+    fun aTableMethodWithNoRecordedTableSelectedIsRefused() {
+        val vm = tableVm(TablesRepository.InMemory(listOf(syntheticTable())))
+
+        val refused = evaluate(enterTableCase(vm, tableId = "")) as SizingEvaluation.Refused
+
+        assertEquals(RefusalKind.NO_TABLE_SELECTED, refused.kind)
+        assertTrue(refused.correctionRequired.contains("table", ignoreCase = true))
+    }
+
+    @Test
+    fun aMismatchedApplicabilityIsRefusedNamingBothValues() {
+        val table = syntheticTable()
+        val vm = tableVm(TablesRepository.InMemory(listOf(table)))
+        enterTableCase(vm, table.id)
+
+        field(vm, HomeField.MATERIAL, "other system")
+        val material = evaluate(vm) as SizingEvaluation.Refused
+        assertEquals(RefusalKind.APPLICABILITY_MISMATCH, material.kind)
+        assertTrue(material.correctionRequired.contains("other system"))
+        assertTrue(material.correctionRequired.contains("synthetic system"))
+
+        // The gravity comparison is exact, and the refusal names the case's reading and the table's.
+        // 22.5 is a deliberate near miss of the table's invented 21.5: close enough that a rounded
+        // comparison would accept it, and the test still exercises a mismatch rather than equality.
+        field(vm, HomeField.MATERIAL, "synthetic system")
+        field(vm, HomeField.GAS_SPECIFIC_GRAVITY, "22.5")
+        val gravity = evaluate(vm) as SizingEvaluation.Refused
+        assertEquals(RefusalKind.APPLICABILITY_MISMATCH, gravity.kind)
+        assertTrue(gravity.correctionRequired.contains("22.5"))
+        assertTrue(gravity.correctionRequired.contains("21.5"))
+    }
+
+    @Test
+    fun aLengthAboveEveryRecordedRowIsRefusedNamingTheLongestRecordedLength() {
+        val table = syntheticTable(rows = listOf(TableRow("synthetic-size-a", null, 1.0, 2.0)))
+        val vm = tableVm(TablesRepository.InMemory(listOf(table)))
+
+        val refused = evaluate(enterTableCase(vm, table.id, length = "2")) as SizingEvaluation.Refused
+
+        assertEquals(RefusalKind.LENGTH_ABOVE_EVERY_ENTERED_ROW, refused.kind)
+        assertTrue(refused.correctionRequired.contains("1.0"))
+        assertTrue(refused.correctionRequired.contains("synthetic-size-a"))
+    }
+
+    @Test
+    fun aLoadAboveEveryRecordedCapacityIsRefusedNamingTheLargestRecordedCapacity() {
+        val table = syntheticTable(
+            rows = listOf(
+                TableRow("synthetic-size-a", null, 1.0, 2.0),
+                TableRow("synthetic-size-b", null, 1.0, 4.0),
+            ),
+        )
+        val vm = tableVm(TablesRepository.InMemory(listOf(table)))
+        enterTableCase(vm, table.id, method = SizingMethod.SMALLEST_SIZE_FOR_LOAD)
+        field(vm, HomeField.LOAD, "9")
+
+        val refused = evaluate(vm) as SizingEvaluation.Refused
+
+        assertEquals(RefusalKind.LOAD_ABOVE_EVERY_ENTERED_CAPACITY, refused.kind)
+        assertTrue(refused.correctionRequired.contains("4.0"))
+        assertTrue(refused.correctionRequired.contains("synthetic-size-b"))
+    }
+
+    @Test
+    fun theReverseMethodAnswersWithoutANominalSize() {
+        val table = syntheticTable()
+        val vm = tableVm(TablesRepository.InMemory(listOf(table)))
+
+        // The reverse method searches every recorded size, so asking for one would be asking for a
+        // reading the method does not read.
+        val returned = evaluate(
+            enterTableCase(vm, table.id, size = null, method = SizingMethod.SMALLEST_SIZE_FOR_LOAD),
+        ) as SizingEvaluation.ReturnedFromUserTable
+
+        assertEquals("synthetic-size-a", returned.returnedSize)
+    }
+
+    // -------------------------------------------------------------------------------------------
+    // Step 4.5 — a case binds to the revision of the table it was read against (design D9), and a
+    // case written before those fields existed still loads.
+    // -------------------------------------------------------------------------------------------
+
+    @Test
+    fun aCaseSavedAgainstATableRefusesWhenThatTablesRecordedContentsChange() {
+        val store = FakeCasePersistence()
+        val table = syntheticTable()
+        val repository = TablesRepository.InMemory(listOf(table))
+        val original = tableVm(repository, store)
+        assertEquals(
+            2.0,
+            (evaluate(enterTableCase(original, table.id)) as SizingEvaluation.ReturnedFromUserTable).returnedCapacityMbh,
+            0.0,
+        )
+        assertEquals(table.id, store.saved[CaseKeys.SELECTED_TABLE])
+        assertEquals(table.contentDigest(), store.saved[CaseKeys.TABLE_DIGEST])
+
+        // The user edits the capacity the case was read against, then the app is started again.
+        runBlocking { repository.upsert(table.copy(rows = listOf(TableRow("synthetic-size-a", null, 1.0, 9.0)))) }
+        val nextRun = tableVm(repository, store)
+
+        val refused = evaluate(nextRun) as SizingEvaluation.Refused
+
+        assertEquals(RefusalKind.TABLE_CHANGED, refused.kind)
+        // The readings themselves load unchanged; only the value returned from the table is withheld.
+        assertEquals("synthetic system", nextRun.uiState.value.material)
+        assertEquals("1", nextRun.uiState.value.loadMbh)
+    }
+
+    @Test
+    fun aCaseSavedAgainstATableRefusesWhenThatTableIsDeleted() {
+        val store = FakeCasePersistence()
+        val table = syntheticTable()
+        val repository = TablesRepository.InMemory(listOf(table))
+        evaluate(enterTableCase(tableVm(repository, store), table.id))
+
+        runBlocking { repository.delete(table.id) }
+        val nextRun = tableVm(repository, store)
+
+        val refused = evaluate(nextRun) as SizingEvaluation.Refused
+
+        assertEquals(RefusalKind.TABLE_CHANGED, refused.kind)
+        assertEquals(table.id, nextRun.uiState.value.selectedTableId)
+    }
+
+    @Test
+    fun aCaseSavedAgainstAnUntouchedTableReturnsTheSameRecordedValue() {
+        val store = FakeCasePersistence()
+        val table = syntheticTable()
+        val repository = TablesRepository.InMemory(listOf(table))
+        evaluate(enterTableCase(tableVm(repository, store), table.id))
+
+        val nextRun = tableVm(repository, store)
+        val returned = evaluate(nextRun) as SizingEvaluation.ReturnedFromUserTable
+
+        assertEquals("synthetic-size-a", returned.returnedSize)
+        assertEquals(2.0, returned.returnedCapacityMbh, 0.0)
+    }
+
+    @Test
+    fun aCaseSavedBeforeTheTableFieldsExistedLoadsWithNoTableSelected() {
+        // Exactly the keys the shipped build wrote: the three table-binding keys are absent, and
+        // their absence must be a defined state rather than a crash or a guessed table.
+        val shipped = mapOf(
+            CaseKeys.MATERIAL to "steel",
+            CaseKeys.PRESSURE to "low",
+            CaseKeys.LOAD to "100",
+            CaseKeys.LENGTH to "40",
+            CaseKeys.CAPACITY to "120",
+            CaseKeys.METHOD to SizingMethod.CAPACITY_COMPARISON.name,
+            CaseKeys.UNIT_SYSTEM to UnitSystem.IMPERIAL.name,
+            CaseKeys.PROVENANCE_MODE to ProvenanceMode.USER_SUPPLIED.name,
+            CaseKeys.CAPACITY_CONFIRMED to true.toString(),
+        )
+        val restored = newVm(FakeCasePersistence(shipped))
+
+        val state = restored.uiState.value
+        assertEquals("", state.selectedTableId)
+        assertEquals("", state.tableDigest)
+        assertEquals("", state.tableNominalSize)
+        // And the case itself is unaffected: the arithmetic methods never read the table fields.
+        assertTrue(evaluate(restored) is SizingEvaluation.Computed)
+    }
+
     @Test
     fun shippedCopyCarriesNoScaffoldMarkers() {
         val xml = stringsXml().readText().lowercase()
@@ -435,6 +709,64 @@ class HomeViewModelTest {
             stored = values
         }
     }
+
+    /**
+     * A state holder over a table store. The table flow is mirrored into the state when the state
+     * holder starts, so the assertion below pins that premise: without it a refused evaluation could
+     * be caused by a store read that had not finished rather than by the rule under test.
+     */
+    private fun tableVm(repo: TablesRepository, store: CasePersistence = FakeCasePersistence()): HomeViewModel {
+        val expected = runBlocking { repo.tables.first().size }
+        val vm = HomeViewModel(persistence = store, tables = repo, scope = CoroutineScope(Dispatchers.Unconfined))
+        assertEquals("recorded tables must reach the state holder before it is used", expected, vm.uiState.value.availableTables.size)
+        return vm
+    }
+
+    /**
+     * The readings a case needs before a recorded table can answer it: the case's material or system
+     * and inlet pressure class must be the ones the table declares, and its gas specific gravity must
+     * be the table's (D7 compares those three and nothing else).
+     */
+    private fun enterTableCase(
+        vm: HomeViewModel,
+        tableId: String,
+        size: String? = "synthetic-size-a",
+        length: String = "1",
+        method: SizingMethod = SizingMethod.RETURN_FROM_USER_TABLE,
+    ): HomeViewModel {
+        vm.onEvent(HomeEvent.MethodChanged(method))
+        field(vm, HomeField.SELECTED_TABLE, tableId)
+        if (size != null) field(vm, HomeField.TABLE_NOMINAL_SIZE, size)
+        field(vm, HomeField.MATERIAL, "synthetic system")
+        field(vm, HomeField.PRESSURE, "synthetic class")
+        field(vm, HomeField.LOAD, "1")
+        field(vm, HomeField.LENGTH, length)
+        field(vm, HomeField.GAS_SPECIFIC_GRAVITY, "21.5")
+        return vm
+    }
+
+    /**
+     * Invented synthetic readings. The app supplies no table content, so every value here is
+     * arbitrary filler chosen to be obviously not a code reading ("synthetic-size-a", 1.0, 2.0);
+     * the declared gas specific gravity of 21.5 is no gas's, and is read from no code or standard.
+     */
+    private fun syntheticTable(
+        id: String = "table-1",
+        rows: List<TableRow> = listOf(TableRow("synthetic-size-a", null, 1.0, 2.0)),
+    ): UserCapacityTable = UserCapacityTable(
+        id = id,
+        name = "synthetic table",
+        applicability = TableApplicability(
+            fuel = "synthetic fuel",
+            materialOrSystem = "synthetic system",
+            inletPressureClass = "synthetic class",
+            permittedPressureDrop = "synthetic drop",
+            gasSpecificGravity = "21.5",
+        ),
+        citation = TableCitation(codeAndEdition = "synthetic edition", tableIdentifier = "synthetic identifier"),
+        marker = USER_RECORDED_MARKER,
+        rows = rows,
+    )
 
     private companion object {
         const val TOLERANCE = 0.000001

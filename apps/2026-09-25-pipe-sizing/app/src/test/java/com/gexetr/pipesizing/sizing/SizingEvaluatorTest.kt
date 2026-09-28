@@ -4,6 +4,16 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+/**
+ * The case readings below are invented synthetics, not code or standard values. The physical
+ * readings the method requires — gas specific gravity, pressure drop and inside diameter — are
+ * deliberately absurd (21.5, 35.5, 88.5) so a reader cannot mistake them for a code table's
+ * figures; no code or standard reads that way. The app supplies no capacity data of its own
+ * (`docs/research/2026-09-25-pipe-sizing-code-source.md`). The unit identities asserted in
+ * `convertsImperialToMetricAndBackWithoutChangingPhysicalValue` are the SI/imperial definitions
+ * themselves, not slot data, and are the subject of that test rather than a fixture standing in
+ * for one.
+ */
 class SizingEvaluatorTest {
 
     @Test
@@ -53,9 +63,11 @@ class SizingEvaluatorTest {
 
         val result = SizingEvaluator.evaluate(
             case.copy(
-                gasSpecificGravity = sourced(0.62),
-                pressureDropAllowance = sourced(0.3),
-                pipeInsideDiameter = sourced(1.049),
+                // Invented synthetics, not code or standard readings: 21.5 is no gas's specific
+                // gravity, 35.5 is no pressure-drop allowance, 88.5 is no pipe's inside diameter.
+                gasSpecificGravity = sourced(21.5),
+                pressureDropAllowance = sourced(35.5),
+                pipeInsideDiameter = sourced(88.5),
             ),
         )
 

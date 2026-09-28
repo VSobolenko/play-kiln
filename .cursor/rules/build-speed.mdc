@@ -69,8 +69,25 @@ the loop slower than it needed to be.
 ## Multiple Gradle processes must not share one slot
 
 - `org.gradle.caching` and `org.gradle.configuration-cache` are safe, but concurrent
- builds in the same project directory contend for `build/` and can corrupt
- incremental state. Serialize them, or build in separate worktrees.
+  builds in the same project directory contend for `build/` and can corrupt
+  incremental state. Serialize them, or build in separate worktrees.
+- **The symptom to expect is not a slow build; it is a dead worker.** Four Codex workers
+  in one session were killed by the wrapper's own distribution lock —
+  `FileNotFoundException: ...gradle-9.7.1-bin.zip.lck (access denied)` — while the
+  orchestrator also had a Gradle run in that slot. The wrapper's lock lives in
+  `GRADLE_USER_HOME`, not in the slot, so it is not shareable at all: the second process
+  does not wait, it dies. A worker that dies this way stops **mid-write**, which is the
+  part that costs the most: one left a Kotlin file with three return-type errors, and
+  another left three files that never existed while its ledger label said only
+  `BLOCKED(RATE_LIMITED)`. The tree, not the label, is what tells you what happened.
+- **Serialization is therefore a coordination duty, not a build optimisation.** The
+  orchestrator must not run Gradle while a worker holds the slot, and must say so in the
+  worker's brief so the worker does not retry in a loop. Verify a dead worker's files on
+  disk before assigning its scope to someone else.
+- Fixing this properly means the harness holds an explicit per-slot lock and reports the
+  holder instead of crashing; see `harness/lessons.md` (2026-09-26, the wrapper lock).
+  Until that exists, the rule is enforced by the orchestrator scheduling one Gradle
+  consumer at a time.
 
 ## Report cost, not just outcome
 

@@ -32,6 +32,7 @@ import {
   mkdtempSync,
   readFileSync,
   rmSync,
+  utimesSync,
   writeFileSync
 } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -1803,9 +1804,100 @@ try {
       !failed.ok && failed.exitCode !== 0 && failedLines.some((message) => message.includes('FAIL testDebugUnitTest')),
       'a failed slot unit-test task reports FAIL and returns a non-zero exit'
     )
+
+    // A green Gradle exit is not an executed suite. `strings.xml` is read off disk by
+    // `HomeViewModelTest`, so a copy-only change leaves the task UP-TO-DATE and the XML
+    // under build/test-results/ is the *previous* run's output. Reporting that as PASS is
+    // a check that cannot fail; the runner must refuse to call it a PASS.
+    const reportXml = (tests) =>
+      `<?xml version="1.0" encoding="UTF-8"?>\n<testsuite name="fixture" tests="${tests}" failures="0" errors="0" skipped="0"></testsuite>\n`
+    const staleDir = join(fakeSlot, 'app', 'build', 'test-results', 'testDebugUnitTest')
+    mkdirSync(staleDir, { recursive: true })
+    const staleReport = join(staleDir, 'TEST-fixture.xml')
+    writeFileSync(staleReport, reportXml(125), 'utf8')
+    const hourAgo = new Date(Date.now() - 3600_000)
+    utimesSync(staleReport, hourAgo, hourAgo)
+
+    const upToDateLines = []
+    const upToDate = runSlotUnitTests('runner-fixture', {
+      appsDir: fakeApps,
+      report: (message) => upToDateLines.push(message),
+      runGradle: () => ({
+        result: { status: 0, stdout: '> Task :app:testDebugUnitTest UP-TO-DATE', stderr: '' },
+        elapsedMs: 1
+      })
+    })
+    check(
+      !upToDate.ok &&
+        upToDate.exitCode === 2 &&
+        upToDateLines.some((message) => message.startsWith('STALE testDebugUnitTest')) &&
+        upToDateLines.some((message) => message.includes('--rerun')) &&
+        !upToDateLines.some((message) => /^PASS\s+testDebugUnitTest/.test(message)),
+      'an UP-TO-DATE test task is reported STALE with exit 2, never PASS on a previous run\u2019s report'
+    )
+
+    // The backstop, for when Gradle's console does not name the task at all: reports that
+    // already existed and were not rewritten in this run cannot describe this run.
+    const silentLines = []
+    const silent = runSlotUnitTests('runner-fixture', {
+      appsDir: fakeApps,
+      report: (message) => silentLines.push(message),
+      runGradle: () => ({ result: { status: 0, stdout: '', stderr: '' }, elapsedMs: 1 })
+    })
+    check(
+      !silent.ok &&
+        silent.exitCode === 2 &&
+        silentLines.some((message) => message.startsWith('STALE testDebugUnitTest')),
+      'an unnamed test task over untouched pre-existing reports is reported STALE'
+    )
+
+    // A sensor that can only fail is not a sensor: a task that really ran and rewrote its
+    // report must still be a PASS, or the staleness guard would reject every honest run.
+    const freshLines = []
+    const fresh = runSlotUnitTests('runner-fixture', {
+      appsDir: fakeApps,
+      report: (message) => freshLines.push(message),
+      runGradle: () => {
+        writeFileSync(staleReport, reportXml(126), 'utf8')
+        return {
+          result: { status: 0, stdout: '> Task :app:testDebugUnitTest', stderr: '' },
+          elapsedMs: 1
+        }
+      }
+    })
+    check(
+      fresh.ok &&
+        fresh.exitCode === 0 &&
+        freshLines.some((message) => /^PASS testDebugUnitTest — 126 tests/.test(message)),
+      'a test task that executed and rewrote its report is still reported PASS'
+    )
+
+    const rerunCalls = []
+    runSlotUnitTests('runner-fixture', {
+      appsDir: fakeApps,
+      force: true,
+      report: () => {},
+      runGradle: (directory, tasks) => {
+        rerunCalls.push({ directory, tasks })
+        return {
+          result: { status: 0, stdout: '> Task :app:testDebugUnitTest', stderr: '' },
+          elapsedMs: 1
+        }
+      }
+    })
+    check(
+      rerunCalls.length === 1 &&
+        rerunCalls[0].tasks.includes('testDebugUnitTest') &&
+        rerunCalls[0].tasks.includes('--rerun'),
+      'forcing the runner adds Gradle --rerun to the one invocation'
+    )
   } else {
     check(false, 'the runner can report no tests found distinctly from PASS')
     check(false, 'a failed slot unit-test task returns a non-zero exit')
+    check(false, 'an UP-TO-DATE test task is reported STALE with exit 2')
+    check(false, 'an unnamed test task over untouched reports is reported STALE')
+    check(false, 'a test task that executed and rewrote its report is still reported PASS')
+    check(false, 'forcing the runner adds Gradle --rerun to the one invocation')
   }
 
   const { RELEASE_TASKS, gradleArgs, runGradleTasks, FORBIDDEN_GRADLE_FLAGS } = await import(

@@ -13,7 +13,7 @@
     <string name="home_snackbar_already_completed" translatable="true">Update a reading and evaluate again.</string>
     <string name="about_title" translatable="true">About this app</string>
     <string name="about_back" translatable="true">Back</string>
-    <string name="about_body" translatable="true">%1$s is an offline calculation aid for organizing gas pipe sizing arithmetic from your own readings. It does not provide code tables or determine compliance.</string>
+    <string name="about_body" translatable="true">%1$s is an offline calculation aid for organizing gas pipe sizing arithmetic from your own readings, including comparing the capacity you confirmed against the load you need. It can also return a capacity from the table you record yourself, naming the row it used. It supplies no code tables and does not determine compliance. A recorded table is compared only on material or system, inlet pressure class and gas specific gravity; the fuel and the permitted pressure drop you recorded for a table are not compared, and nothing you record is verified or corrected.</string>
     <string name="about_privacy_note" translatable="true">Your case is saved on this device and restored when you reopen the app. It is never sent anywhere. Verify every result against your own applicable code book; this app is not a certification or endorsement.</string>
     <string name="disclaimer">This is a calculation aid, not a code-compliance determination. You are responsible for verifying this work against the applicable adopted code.</string>
     <string name="material_label">Material or system</string><string name="pressure_label">Pressure class</string><string name="load_label">Total load (MBH)</string><string name="length_label">Developed length (ft)</string><string name="fittings_heading">Fitting allowance</string><string name="fitting_quantity_label">Fitting quantity</string><string name="fitting_length_label">Equivalent length each (ft)</string><string name="capacity_label">User-confirmed capacity (MBH)</string><string name="capacity_help">Read capacity and fitting values from your applicable code book or free online code; this app provides no code-table data.</string><string name="user_supplied">User-supplied</string><string name="code_citation">Code citation</string><string name="edition_label">Code and edition</string><string name="table_label">Table</string><string name="row_label">Row</string><string name="evaluate_action">Evaluate sizing case</string><string name="result_title">Sizing arithmetic</string><string name="capacity_supports">The entered capacity supports the required load.</string><string name="capacity_does_not_support">The entered capacity does not support the required load.</string><string name="provenance_result">Capacity provenance: %1$s</string>
@@ -33,11 +33,32 @@
     <string name="result_method_label">Method: %1$s</string>
     <string name="result_capacity_imperial">Compared capacity: %1$s MBH</string><string name="result_capacity_metric">Compared capacity: %1$s kW</string>
     <string name="result_physical_inputs">Gas specific gravity %1$s; pressure-drop allowance %2$s; pipe inside diameter %3$s</string>
+    <string name="returned_table_result_title">Recorded table result</string>
+    <string name="returned_table_capacity_imperial">Recorded capacity: %1$s MBH</string>
+    <string name="returned_table_capacity_metric">Recorded capacity: %1$s kW</string>
+    <string name="returned_table_row">Recorded row: %1$s — %2$s</string>
+    <string name="returned_table_length_substitution_imperial">Entered length: %1$s ft; table length used: %2$s ft</string>
+    <string name="returned_table_length_substitution_metric">Entered length: %1$s m; table length used: %2$s m</string>
+    <string name="returned_table_citation">Recorded table citation: %1$s; %2$s; %3$s</string>
+    <string name="returned_table_unverified">This value was recorded by you and is not verified by this app.</string>
+
+    <!-- The return-from-user-table method's own controls and labels. The app supplies no table
+         content, so the picker lists only tables the user recorded and the nominal-size field starts
+         empty. Nothing here claims the app checks a reading it does not compare. -->
+    <string name="method_return_from_table">Return the capacity from my recorded table</string>
+    <string name="method_smallest_size">Return the smallest size that carries the load</string>
+    <string name="section_recorded_table">Recorded table</string>
+    <string name="recorded_table_note">Choose the table you recorded for this case. Only rows you recorded are used, and every table stays on this device.</string>
+    <string name="table_nominal_size_label">Nominal size you are reading</string>
+    <string name="table_applicability_heading">Table applicability to match</string>
+    <string name="table_applicability_note">The app compares your material or system, inlet pressure class and gas specific gravity with the values you recorded for the table. The fuel or gas, and the permitted pressure drop, you recorded for a table are for your own reference and are not compared; no other reading is compared either.</string>
+    <string name="returned_table_user_recorded">Value source: %1$s — the app neither transcribed nor verified it.</string>
 
     <!-- Navigation -->
     <string name="nav_calculator">Calculator</string>
     <string name="nav_cases">Cases</string>
     <string name="nav_guide">Guide</string>
+    <string name="nav_tables">Tables</string>
     <string name="nav_pro">Pro</string>
 
     <!-- Section headings on the calculator -->
@@ -71,7 +92,7 @@
     <string name="report_locked_short">Sharing a case report is a rewarded unlock on the free tier.</string>
     <string name="report_unlocked">Report unlocked for this case.</string>
     <string name="report_share_chooser">Share case report</string>
-    <string name="report_unavailable">A report needs a computed result. Evaluate the case first.</string>
+    <string name="report_unavailable">Evaluate the case first: a report needs a result on screen.</string>
     <string name="report_pro_line">Generated by Gas Pipe Sizing Workbook (Pro), an offline calculation aid.</string>
     <string name="report_free_line">Generated by Gas Pipe Sizing Workbook, an offline calculation aid.</string>
     <string name="report_rewarded_hint">Watch a short video to share this case once, or unlock Pro for unlimited reports and no interstitial ads.</string>
@@ -108,7 +129,7 @@
     <!-- Guide -->
     <string name="guide_intro">A field notebook for the pipe sizing arithmetic you already do on paper, plus the citation that says where each reading came from.</string>
     <string name="guide_purpose_title">What this app does and does not do</string>
-    <string name="guide_purpose_body">It sums the loads and developed lengths you type, converts imperial and metric units in both directions, and compares the capacity you confirmed against the load you need. It ships no code tables, asserts no result when an input, citation, range or consistency check is missing, and does not certify compliance.</string>
+    <string name="guide_purpose_body">It sums the loads and developed lengths you type, converts imperial and metric units in both directions, and compares the capacity you confirmed against the load you need. From a capacity table you record yourself, it can also return the capacity recorded for a size and length, or the smallest recorded size that carries your load, naming the row it used. It compares your material or system, inlet pressure class and gas specific gravity with the values you recorded for that table; it does not compare the fuel or the permitted pressure drop you recorded for that table. It ships no code tables, names what to correct instead of asserting a result when a reading is missing, unusable, out of range, absent from the table you recorded, or inconsistent with the selected method, and it does not certify compliance.</string>
     <string name="guide_correctness_title">Why a result can be refused</string>
     <string name="guide_correctness_body">A number produced for the wrong code edition, unit or method is worse than no number. When a reading is missing, unparseable, out of range, or inconsistent with the selected method, the app names what to correct instead of calculating.</string>
     <string name="guide_privacy_title">Privacy</string>
@@ -116,4 +137,47 @@
     <string name="guide_purchase_title">Purchases</string>
     <string name="guide_purchase_body">Pro is a one-time purchase handled by Google Play; it is not a subscription and nothing renews. Restoring a purchase on a new device uses the same Google account.</string>
     <string name="guide_version_label">Version %1$s</string>
+
+    <!-- Recorded tables: the user records their own table from their own code book, and the app
+         returns values from it. The app supplies no table content and stores table data only on
+         this device; there is deliberately no export, import, share or paste surface. -->
+    <string name="tables_title">Recorded tables</string>
+    <string name="tables_intro">Record a capacity table from your own code book, once, then return values from it. This app supplies no table data, does not verify what you record, and keeps every table on this device.</string>
+    <string name="tables_recorded_heading">Your recorded tables</string>
+    <string name="tables_empty">No recorded tables yet.</string>
+    <string name="tables_empty_hint">Record a table from your own code book to return values from it.</string>
+    <string name="tables_no_distribution_note">Tables are stored on this device only. There is no export, import, share or paste surface, so table data never leaves the device.</string>
+    <string name="tables_unnamed">Unnamed table</string>
+    <string name="tables_citation_summary">Citation: %1$s · %2$s</string>
+    <string name="tables_applicability_summary">Recorded for: %1$s</string>
+    <string name="tables_row_count">%1$d recorded rows</string>
+    <string name="tables_open">Open</string>
+    <string name="tables_delete">Delete</string>
+    <string name="tables_new">Record a table</string>
+    <string name="tables_header_heading">Table header</string>
+    <string name="tables_marker_note">Every value in this table is recorded by you; the app neither transcribed nor verified it. Marker: %1$s</string>
+    <string name="tables_rows_heading">Recorded rows</string>
+    <string name="tables_rows_empty">No rows recorded yet. Add the rows exactly as your code book lists them.</string>
+    <string name="tables_add_row">Add row</string>
+    <string name="tables_remove_row">Remove this row</string>
+    <string name="tables_row_number">Row %1$d</string>
+    <string name="tables_derived_order_heading">Derived size order (read-only)</string>
+    <string name="tables_derived_order_empty">Add rows to see the size order this table will use.</string>
+    <string name="tables_derived_order_index">%1$d.</string>
+    <string name="tables_derived_order_note">This order is the order in which you record the sizes, from top to bottom. The app holds no size ladder. Check it before a case depends on it.</string>
+    <string name="tables_incomplete">Complete every required cell before saving.</string>
+    <string name="tables_save">Save table</string>
+    <string name="tables_discard">Discard changes</string>
+    <string name="tables_name_label">Table name</string>
+    <string name="tables_fuel_label">Fuel or gas</string>
+    <string name="tables_material_label">Material or system</string>
+    <string name="tables_pressure_class_label">Inlet pressure class</string>
+    <string name="tables_pressure_drop_label">Permitted pressure drop (as read)</string>
+    <string name="tables_gravity_label">Gas specific gravity</string>
+    <string name="tables_edition_label">Code and edition</string>
+    <string name="tables_table_identifier_label">Table identifier</string>
+    <string name="tables_row_size_label">Nominal size</string>
+    <string name="tables_row_diameter_label">Inside diameter (optional, as read)</string>
+    <string name="tables_row_length_label">Length (ft)</string>
+    <string name="tables_row_capacity_label">Capacity (MBH)</string>
 </resources>

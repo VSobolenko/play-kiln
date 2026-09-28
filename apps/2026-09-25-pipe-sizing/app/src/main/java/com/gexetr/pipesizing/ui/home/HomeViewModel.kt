@@ -7,15 +7,19 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.gexetr.pipesizing.sizing.*
+import com.gexetr.pipesizing.ui.tables.DataStoreTablesRepository
+import com.gexetr.pipesizing.ui.tables.TablesRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val persistence: CasePersistence = CasePersistence.None,
+    private val tables: TablesRepository = TablesRepository.InMemory(),
     scope: CoroutineScope? = null,
 ) : ViewModel() {
     // Resolved lazily so a state holder constructed with an explicit scope never touches the main
@@ -28,6 +32,14 @@ class HomeViewModel(
         workScope.launch {
             val stored = persistence.load()
             if (stored.isNotEmpty()) _uiState.update { it.restoredFrom(stored) }
+        }
+        // The user's recorded tables are mirrored into the state so the picker can list them and an
+        // evaluation can resolve the selected one without a suspending store read on its own path:
+        // the shown result must not depend on when a read happened to finish.
+        workScope.launch {
+            tables.tables.collect { recorded ->
+                _uiState.update { it.copy(availableTables = recorded) }
+            }
         }
     }
 
@@ -49,6 +61,10 @@ class HomeViewModel(
     }
 
     internal fun evaluate(state: HomeUiState): SizingEvaluation {
+        // A case bound to a table whose recorded contents have moved is refused before anything else
+        // is read out of that table: every other answer it could give is an answer about a revision
+        // the case was not read against (design D9).
+        state.tableRevisionRefusal()?.let { return it }
         // One provenance is recorded for every capacity-like reading in the case. The evaluator
         // refuses a capacity or fitting equivalent length without one, and the domain surfaces the
         // capacity's provenance on a computed result, so the app never shows a number without it.
@@ -102,8 +118,49 @@ class HomeViewModel(
             gasSpecificGravity = optionalReading(state.gasSpecificGravity, provenance),
             pressureDropAllowance = optionalReading(state.pressureDropAllowance, provenance),
             pipeInsideDiameter = optionalReading(state.pipeInsideDiameter, provenance),
+            // The table the case is read against is an input like any other, so it travels on the
+            // case; the evaluator routes table-returning methods to the lookup engine and the two
+            // arithmetic methods to the arithmetic it always performed.
+            tableSelection = TableSelection(
+                tableId = state.selectedTableId.trim().takeIf { it.isNotEmpty() },
+                nominalSize = state.tableNominalSize.trim().takeIf { it.isNotEmpty() },
+            ),
         )
-        return SizingEvaluator.evaluate(case)
+        return SizingEvaluator.evaluate(case, state.selectedTable())
+    }
+
+    /**
+     * The recorded table the case names, or null when it names none. Read out of the state rather
+     * than fetched from the store, because the evaluation runs inside a state update and a
+     * suspending read there would make the shown result depend on store timing.
+     */
+    private fun HomeUiState.selectedTable(): UserCapacityTable? =
+        selectedTableId.trim()
+            .takeIf { it.isNotEmpty() }
+            ?.let { id -> availableTables.firstOrNull { it.id == id } }
+
+    /**
+     * The one refusal the lookup engine cannot raise, because a deleted or edited table never
+     * reaches it as itself. A case that names no table is left to the engine, which refuses it with
+     * `NO_TABLE_SELECTED`; a case that names a table which is gone, or whose contents no longer
+     * hash to the revision the case recorded, is refused here as `TABLE_CHANGED`.
+     */
+    private fun HomeUiState.tableRevisionRefusal(): SizingEvaluation.Refused? {
+        if (!method.returnsFromUserTable) return null
+        val id = selectedTableId.trim().takeIf { it.isNotEmpty() } ?: return null
+        val table = availableTables.firstOrNull { it.id == id }
+            ?: return SizingEvaluation.Refused(
+                RefusalKind.TABLE_CHANGED,
+                "Recorded table is gone: record the table this case names again, or choose another table.",
+            )
+        val recordedRevision = tableDigest.trim()
+        if (recordedRevision.isNotEmpty() && recordedRevision != table.contentDigest()) {
+            return SizingEvaluation.Refused(
+                RefusalKind.TABLE_CHANGED,
+                "Recorded table ${table.name} changed after this case was read against it. Read the case against the table again.",
+            )
+        }
+        return null
     }
 
     /**
@@ -188,6 +245,14 @@ class HomeViewModel(
         HomeField.GAS_SPECIFIC_GRAVITY -> copy(gasSpecificGravity = value)
         HomeField.PRESSURE_DROP -> copy(pressureDropAllowance = value)
         HomeField.PIPE_DIAMETER -> copy(pipeInsideDiameter = value)
+        // Choosing a table records the revision of the table that was chosen, so a later edit to that
+        // table refuses instead of answering from a revision the case was not read against (D9). A
+        // table that is gone records no revision, which is the other `TABLE_CHANGED` case.
+        HomeField.SELECTED_TABLE -> copy(
+            selectedTableId = value,
+            tableDigest = availableTables.firstOrNull { it.id == value }?.contentDigest().orEmpty(),
+        )
+        HomeField.TABLE_NOMINAL_SIZE -> copy(tableNominalSize = value)
     }
 
     private fun HomeUiState.loadReading(text: String): Double? =
@@ -197,11 +262,16 @@ class HomeViewModel(
         canonicalReading(text, unitSystem == UnitSystem.METRIC, Units::metersToFeet)
 
     companion object {
-        /** Supplies the on-device store so a case survives process death. */
+        /** Supplies the on-device stores so a case and the tables it is read against survive process death. */
         fun factory(context: Context): ViewModelProvider.Factory {
             val applicationContext = context.applicationContext
             return viewModelFactory {
-                initializer { HomeViewModel(DataStoreCasePersistence(applicationContext)) }
+                initializer {
+                    HomeViewModel(
+                        persistence = DataStoreCasePersistence(applicationContext),
+                        tables = DataStoreTablesRepository(applicationContext),
+                    )
+                }
             }
         }
     }

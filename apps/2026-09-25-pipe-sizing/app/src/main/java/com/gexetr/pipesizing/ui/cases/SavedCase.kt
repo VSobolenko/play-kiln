@@ -1,5 +1,11 @@
 package com.gexetr.pipesizing.ui.cases
 
+import com.gexetr.pipesizing.ui.storage.ENTRY_SEPARATOR
+import com.gexetr.pipesizing.ui.storage.FIELD_SEPARATOR
+import com.gexetr.pipesizing.ui.storage.KEY_VALUE_SEPARATOR
+import com.gexetr.pipesizing.ui.storage.RECORD_SEPARATOR
+import com.gexetr.pipesizing.ui.storage.escapeField
+import com.gexetr.pipesizing.ui.storage.unescapeField
 import java.util.UUID
 
 /**
@@ -28,23 +34,22 @@ data class SavedCase(
  * unreadable record is safer here than a parser that throws and loses every case because one was
  * truncated. Separators inside a user-typed name are escaped, so a name containing the separator
  * cannot split a record.
+ *
+ * The escaping rule is `ui/storage/LineCodec.kt`'s and is imported, never restated: the table codec
+ * uses the same one, and two hand-written copies of an escape table is the defect
+ * `.cursor/rules/verification-discipline.mdc` names under "One source of truth, imported".
  */
 internal object SavedCaseCodec {
-
-    private const val RECORD_SEPARATOR = '\n'
-    private const val FIELD_SEPARATOR = '|'
-    private const val ENTRY_SEPARATOR = ';'
-    private const val KEY_VALUE_SEPARATOR = '='
 
     fun encode(cases: List<SavedCase>): String = cases.joinToString(RECORD_SEPARATOR.toString()) { case ->
         val fields = case.fields.entries
             .sortedBy { it.key }
             .joinToString(ENTRY_SEPARATOR.toString()) { (key, value) ->
-                escape(key) + KEY_VALUE_SEPARATOR + escape(value)
+                escapeField(key) + KEY_VALUE_SEPARATOR + escapeField(value)
             }
         listOf(
-            escape(case.id),
-            escape(case.name),
+            escapeField(case.id),
+            escapeField(case.name),
             case.savedAtEpochMillis.toString(),
             fields,
         ).joinToString(FIELD_SEPARATOR.toString())
@@ -65,57 +70,17 @@ internal object SavedCaseCodec {
             parts[3].split(ENTRY_SEPARATOR).forEach { entry ->
                 val separator = entry.indexOf(KEY_VALUE_SEPARATOR)
                 if (separator <= 0) return@forEach
-                val key = unescape(entry.substring(0, separator))
-                val value = unescape(entry.substring(separator + 1))
+                val key = unescapeField(entry.substring(0, separator))
+                val value = unescapeField(entry.substring(separator + 1))
                 if (key.isNotEmpty()) fields[key] = value
             }
         }
 
         return SavedCase(
-            id = unescape(parts[0]),
-            name = unescape(parts[1]),
+            id = unescapeField(parts[0]),
+            name = unescapeField(parts[1]),
             savedAtEpochMillis = timestamp,
             fields = fields,
         )
-    }
-
-    /**
-     * Escapes the three characters that carry structure. Backslash is escaped first, so an escaped
-     * separator can never be re-read as a real one.
-     */
-    private fun escape(value: String): String = buildString(value.length) {
-        value.forEach { character ->
-            when (character) {
-                '\\' -> append("\\\\")
-                FIELD_SEPARATOR -> append("\\p")
-                ENTRY_SEPARATOR -> append("\\s")
-                KEY_VALUE_SEPARATOR -> append("\\e")
-                RECORD_SEPARATOR -> append("\\n")
-                '\r' -> append("\\r")
-                else -> append(character)
-            }
-        }
-    }
-
-    private fun unescape(value: String): String = buildString(value.length) {
-        var index = 0
-        while (index < value.length) {
-            val character = value[index]
-            if (character != '\\' || index == value.lastIndex) {
-                append(character)
-                index += 1
-                continue
-            }
-            when (val escaped = value[index + 1]) {
-                '\\' -> append('\\')
-                'p' -> append(FIELD_SEPARATOR)
-                's' -> append(ENTRY_SEPARATOR)
-                'e' -> append(KEY_VALUE_SEPARATOR)
-                'n' -> append(RECORD_SEPARATOR)
-                'r' -> append('\r')
-                else -> append(escaped)
-            }
-            index += 2
-        }
     }
 }

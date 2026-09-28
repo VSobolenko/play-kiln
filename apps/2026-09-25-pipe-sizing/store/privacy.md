@@ -22,7 +22,7 @@ The app and its enabled SDKs collect the data types documented in store/data-saf
 
 ## Data retention and deletion
 
-The app has no account system. Users can delete locally stored data by clearing app storage or uninstalling the app.
+The app has no account system. Everything you enter — sizing cases you save, and any capacity values you record — is held only in this app's local storage on your device. It is not uploaded to the developer, and there is no server that receives it. Users can delete locally stored data by clearing app storage or uninstalling the app.
 
 ## Security
 
@@ -30,6 +30,4 @@ Platform security and encrypted transport are required for networked capabilitie
 
 ## Contact
 
-Privacy questions: support@example.com
-
-<!-- kiln:generated policy - delete this line to keep your own wording -->
+Privacy questions: v.sobolenko.vs@gmail.com

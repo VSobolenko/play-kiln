@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,11 +50,14 @@ import com.gexetr.pipesizing.ui.guide.GuideScreen
 import com.gexetr.pipesizing.ui.home.HomeEvent
 import com.gexetr.pipesizing.ui.home.HomeScreen
 import com.gexetr.pipesizing.ui.home.HomeViewModel
-import com.gexetr.pipesizing.ui.home.buildCaseReport
+import com.gexetr.pipesizing.ui.home.buildReportFor
 import com.gexetr.pipesizing.ui.home.shareCaseReport
 import com.gexetr.pipesizing.ui.home.toStoredCase
 import com.gexetr.pipesizing.ui.monetization.PaywallSheet
 import com.gexetr.pipesizing.ui.monetization.ReportUnlockDialog
+import com.gexetr.pipesizing.ui.tables.DataStoreTablesRepository
+import com.gexetr.pipesizing.ui.tables.TablesScreen
+import com.gexetr.pipesizing.ui.tables.TablesViewModel
 import kotlinx.coroutines.launch
 
 private sealed interface PlayKilnDestination
@@ -64,9 +68,12 @@ private data object CasesDestination : PlayKilnDestination
 
 private data object GuideDestination : PlayKilnDestination
 
+private data object TablesDestination : PlayKilnDestination
+
 private const val CalculatorKey = "calculator"
 private const val CasesKey = "cases"
 private const val GuideKey = "guide"
+private const val TablesKey = "tables"
 
 private val DestinationBackStackSaver =
     listSaver<SnapshotStateList<PlayKilnDestination>, String>(
@@ -76,6 +83,7 @@ private val DestinationBackStackSaver =
                     CalculatorDestination -> CalculatorKey
                     CasesDestination -> CasesKey
                     GuideDestination -> GuideKey
+                    TablesDestination -> TablesKey
                 }
             }
         },
@@ -85,6 +93,7 @@ private val DestinationBackStackSaver =
                     when (key) {
                         CasesKey -> CasesDestination
                         GuideKey -> GuideDestination
+                        TablesKey -> TablesDestination
                         else -> CalculatorDestination
                     }
                 }
@@ -95,8 +104,9 @@ private val DestinationBackStackSaver =
 
 /**
  * The app's composition root: one Scaffold owns the bars and the snackbar host, and every screen is
- * content only. Both ViewModels are created here rather than inside a destination so switching tabs
- * cannot drop the working case the user is in the middle of entering.
+ * content only. All three ViewModels are created here rather than inside a destination so switching
+ * tabs cannot drop the working case the user is in the middle of entering, nor the table they are
+ * editing.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -106,9 +116,15 @@ fun PlayKilnApp(container: PlayKilnContainer, modifier: Modifier = Modifier) {
 
     val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.factory(context))
     val casesViewModel: CasesViewModel = viewModel(factory = CasesViewModel.factory(container.cases))
+    // The table surface's state holder is created here too, so switching tabs cannot drop a table
+    // being edited. It reads the same device-local store the calculator's table picker reads.
+    val tablesViewModel: TablesViewModel = viewModel(
+        factory = TablesViewModel.factory(DataStoreTablesRepository(context.applicationContext)),
+    )
 
     val homeState by homeViewModel.uiState.collectAsStateWithLifecycle()
     val savedCases by casesViewModel.cases.collectAsStateWithLifecycle()
+    val tablesState by tablesViewModel.uiState.collectAsStateWithLifecycle()
     val monetization by container.monetization.state.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -182,6 +198,13 @@ fun PlayKilnApp(container: PlayKilnContainer, modifier: Modifier = Modifier) {
                     onSelect = { backStack.select(GuideDestination) },
                     icon = { Icon(Icons.Filled.Info, contentDescription = null) },
                 )
+                TabItem(
+                    // The entry surface for the tables the calculator returns values from.
+                    labelRes = R.string.nav_tables,
+                    selected = backStack.lastOrNull() == TablesDestination,
+                    onSelect = { backStack.select(TablesDestination) },
+                    icon = { Icon(Icons.Filled.Edit, contentDescription = null) },
+                )
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -225,16 +248,16 @@ fun PlayKilnApp(container: PlayKilnContainer, modifier: Modifier = Modifier) {
                                 container.monetization.openPaywall()
                             },
                             onShareReport = {
-                                val computed = homeState.evaluation
-                                if (computed !is SizingEvaluation.Computed) {
-                                    showMessage(context.getString(R.string.report_unavailable))
-                                } else if (monetization.pro || reportUnlockedThisSession) {
-                                    shareCaseReport(
-                                        context,
-                                        buildCaseReport(context, homeState, computed, monetization.pro),
-                                    )
-                                } else {
-                                    reportDialogVisible = true
+                                // One decision for whatever is on screen: an arithmetic case or a
+                                // value returned from the user's own recorded table both have a
+                                // report; a refusal has none.
+                                val report = buildReportFor(context, homeState, monetization.pro)
+                                when {
+                                    report == null ->
+                                        showMessage(context.getString(R.string.report_unavailable))
+                                    monetization.pro || reportUnlockedThisSession ->
+                                        shareCaseReport(context, report)
+                                    else -> reportDialogVisible = true
                                 }
                             },
                             onOpenPaywall = { container.monetization.openPaywall() },
@@ -279,6 +302,13 @@ fun PlayKilnApp(container: PlayKilnContainer, modifier: Modifier = Modifier) {
                             onOpenPaywall = { container.monetization.openPaywall() },
                         )
                     }
+
+                    TablesDestination -> NavEntry(key) {
+                        TablesScreen(
+                            state = tablesState,
+                            onEvent = tablesViewModel::onEvent,
+                        )
+                    }
                 }
             },
         )
@@ -319,12 +349,10 @@ fun PlayKilnApp(container: PlayKilnContainer, modifier: Modifier = Modifier) {
                 coroutineScope.launch {
                     if (container.monetization.watchRewarded()) {
                         reportUnlockedThisSession = true
-                        val computed = homeState.evaluation
-                        if (computed is SizingEvaluation.Computed) {
-                            shareCaseReport(
-                                context,
-                                buildCaseReport(context, homeState, computed, monetization.pro),
-                            )
+                        // The unlock applies to the same report decision the share action uses, so a
+                        // returned-from-table value is shareable after a rewarded video too.
+                        buildReportFor(context, homeState, monetization.pro)?.let { report ->
+                            shareCaseReport(context, report)
                         }
                     } else {
                         showMessage(context.getString(R.string.rewarded_failed))

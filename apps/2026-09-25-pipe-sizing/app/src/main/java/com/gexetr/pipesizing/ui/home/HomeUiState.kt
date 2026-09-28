@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.gexetr.pipesizing.sizing.SizingEvaluation
 import com.gexetr.pipesizing.sizing.SizingMethod
 import com.gexetr.pipesizing.sizing.UnitSystem
+import com.gexetr.pipesizing.sizing.UserCapacityTable
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -27,6 +28,16 @@ data class HomeUiState(
     val row: String = "",
     val capacityConfirmed: Boolean = false,
     val evaluation: SizingEvaluation? = null,
+    // The case's binding to the user-recorded table it is read against (design D9). The id names the
+    // table, the digest pins the revision of that table's recorded contents, and the nominal size is
+    // the forward method's query. All three are user inputs or derivations of one, never app data.
+    val selectedTableId: String = "",
+    val tableDigest: String = "",
+    val tableNominalSize: String = "",
+    // The user's recorded tables, supplied by the repository so the picker can name them and an
+    // evaluation can resolve the selected one without a suspending store read on the evaluation path.
+    // This holds the user's own transcription; the app supplies no table content.
+    val availableTables: List<UserCapacityTable> = emptyList(),
     // The quantity fields above are what the user sees and edits, in whichever unit they have
     // selected. These are the same readings held once in the canonical imperial units the domain
     // works in, and they are what the arithmetic runs on and what the fields are re-rendered from
@@ -76,4 +87,4 @@ sealed interface HomeEvent {
     data class CaseLoaded(val values: Map<String, String>) : HomeEvent
 }
 
-enum class HomeField { MATERIAL, PRESSURE, LOAD, LENGTH, FITTING_QUANTITY, FITTING_LENGTH, CAPACITY, EDITION, TABLE, ROW, GAS_SPECIFIC_GRAVITY, PRESSURE_DROP, PIPE_DIAMETER }
+enum class HomeField { MATERIAL, PRESSURE, LOAD, LENGTH, FITTING_QUANTITY, FITTING_LENGTH, CAPACITY, EDITION, TABLE, ROW, GAS_SPECIFIC_GRAVITY, PRESSURE_DROP, PIPE_DIAMETER, SELECTED_TABLE, TABLE_NOMINAL_SIZE }

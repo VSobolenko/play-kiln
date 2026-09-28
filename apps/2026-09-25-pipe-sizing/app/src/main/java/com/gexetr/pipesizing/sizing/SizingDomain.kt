@@ -26,7 +26,12 @@ enum class SizingMethod(val requiredInputs: Set<CapacityLikeKind>) {
             CapacityLikeKind.PIPE_INSIDE_DIAMETER,
         ),
     ),
+    RETURN_FROM_USER_TABLE(emptySet()),
+    SMALLEST_SIZE_FOR_LOAD(emptySet()),
 }
+
+val SizingMethod.returnsFromUserTable: Boolean
+    get() = this == SizingMethod.RETURN_FROM_USER_TABLE || this == SizingMethod.SMALLEST_SIZE_FOR_LOAD
 
 sealed interface UserProvenance {
     data object UserSupplied : UserProvenance
@@ -35,6 +40,12 @@ sealed interface UserProvenance {
         val codeAndEdition: String,
         val table: String,
         val row: String,
+    ) : UserProvenance
+
+    data class RecordedTableCitation(
+        val tableId: String,
+        val codeAndEdition: String,
+        val tableIdentifier: String,
     ) : UserProvenance
 }
 
@@ -59,6 +70,11 @@ data class CapacityEntry(
     val statedMaximumTotalLengthFeet: Double? = null,
 )
 
+data class TableSelection(
+    val tableId: String? = null,
+    val nominalSize: String? = null,
+)
+
 data class SizingCase(
     val materialOrSystem: String,
     val pressureClass: String,
@@ -71,11 +87,40 @@ data class SizingCase(
     val gasSpecificGravity: SourcedValue? = null,
     val pressureDropAllowance: SourcedValue? = null,
     val pipeInsideDiameter: SourcedValue? = null,
+    val tableSelection: TableSelection = TableSelection(),
 )
 
 fun SizingCase.requireCapacity(): CapacityEntry = requireNotNull(capacity)
 
-enum class RefusalKind { MISSING_INPUT, OUT_OF_RANGE, INCONSISTENT_INPUT, MISSING_PROVENANCE }
+/*
+ * The one definition of the case's load and length sums. The arithmetic evaluator and the
+ * user-table lookup both consume these; a second copy is what `verification-discipline.mdc`
+ * forbids, because the two would be free to drift.
+ */
+internal fun SizingCase.requiredLoadMbh(): Double = loads.sumOf { it.mbh }
+
+internal fun SizingCase.developedLengthFeet(): Double = developedLengths.sumOf { it.feet }
+
+internal fun SizingCase.fittingAllowanceFeet(): Double =
+    fittingAllowances.sumOf { it.quantity.toDouble() * it.equivalentLengthFeet.value }
+
+internal fun SizingCase.totalLengthFeet(): Double = developedLengthFeet() + fittingAllowanceFeet()
+
+enum class RefusalKind {
+    MISSING_INPUT,
+    OUT_OF_RANGE,
+    INCONSISTENT_INPUT,
+    MISSING_PROVENANCE,
+    NO_TABLE_SELECTED,
+    TABLE_INCOMPLETE,
+    APPLICABILITY_MISMATCH,
+    SIZE_NOT_IN_TABLE,
+    NOMINAL_SIZE_MISSING,
+    LENGTH_ABOVE_EVERY_ENTERED_ROW,
+    LOAD_ABOVE_EVERY_ENTERED_CAPACITY,
+    SIZE_ORDER_INDETERMINATE,
+    TABLE_CHANGED,
+}
 
 sealed interface SizingEvaluation {
     data class Computed internal constructor(
@@ -87,8 +132,20 @@ sealed interface SizingEvaluation {
         val capacityProvenance: UserProvenance,
     ) : SizingEvaluation
 
+    data class ReturnedFromUserTable internal constructor(
+        val requiredLoadMbh: Double,
+        val totalLengthFeet: Double,
+        val returnedCapacityMbh: Double,
+        val returnedSize: String,
+        val rowLabel: String,
+        val substitution: LengthSubstitution?,
+        val capacityProvenance: UserProvenance.RecordedTableCitation,
+    ) : SizingEvaluation
+
     data class Refused(val kind: RefusalKind, val correctionRequired: String) : SizingEvaluation
 }
+
+data class LengthSubstitution(val enteredLengthFeet: Double, val usedLengthFeet: Double)
 
 object Units {
     // Pure unit identities, not pipe/code-table data.
@@ -101,7 +158,14 @@ object Units {
 }
 
 object SizingEvaluator {
-    fun evaluate(case: SizingCase): SizingEvaluation {
+    fun evaluate(case: SizingCase, table: UserCapacityTable? = null): SizingEvaluation =
+        if (case.method.returnsFromUserTable) {
+            evaluateCaseAgainstUserTable(case, table)
+        } else {
+            evaluateArithmetically(case)
+        }
+
+    private fun evaluateArithmetically(case: SizingCase): SizingEvaluation {
         if (case.materialOrSystem.isBlank()) return missing("material or system")
         if (case.pressureClass.isBlank()) return missing("pressure class")
         if (case.loads.isEmpty()) return missing("at least one load")
@@ -140,12 +204,10 @@ object SizingEvaluator {
             if (!validPositive(input.value)) return outOfRange(kind.displayName())
         }
 
-        val requiredLoad = case.loads.sumOf { it.mbh }
-        val developedLength = case.developedLengths.sumOf { it.feet }
-        val fittingAllowance = case.fittingAllowances.sumOf {
-            it.quantity.toDouble() * it.equivalentLengthFeet.value
-        }
-        val totalLength = developedLength + fittingAllowance
+        val requiredLoad = case.requiredLoadMbh()
+        val developedLength = case.developedLengthFeet()
+        val fittingAllowance = case.fittingAllowanceFeet()
+        val totalLength = case.totalLengthFeet()
         val maximumLength = capacity.statedMaximumTotalLengthFeet
         if (maximumLength != null && (!validPositive(maximumLength) || totalLength > maximumLength)) {
             return outOfRange("total length for the user-confirmed capacity")

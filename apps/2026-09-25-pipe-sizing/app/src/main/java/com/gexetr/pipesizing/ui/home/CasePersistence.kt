@@ -4,9 +4,12 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.gexetr.pipesizing.sizing.Units
 import com.gexetr.pipesizing.sizing.UnitSystem
+import com.gexetr.pipesizing.sizing.Units
+import com.gexetr.pipesizing.sizing.UserCapacityTable
+import com.gexetr.pipesizing.ui.tables.TableCodec
 import kotlinx.coroutines.flow.first
+import java.security.MessageDigest
 
 /**
  * Stores the user's case between runs so a sizing case survives process death.
@@ -64,7 +67,21 @@ internal object CaseKeys {
     const val TABLE = "table"
     const val ROW = "row"
     const val CAPACITY_CONFIRMED = "capacityConfirmed"
+    const val SELECTED_TABLE = "selectedTableId"
+    const val TABLE_DIGEST = "tableDigest"
+    const val TABLE_NOMINAL_SIZE = "tableNominalSize"
 }
+
+/**
+ * The change sensor of design D9: a SHA-256 over the table's contents as the storage codec writes
+ * them, so "this table changed" means the same thing to the store and to the case that was read
+ * against it. Re-encoding the table by hand here would be a second definition of what the table's
+ * contents are, free to drift from the one that is actually stored
+ * (`.cursor/rules/verification-discipline.mdc`).
+ */
+internal fun UserCapacityTable.contentDigest(): String = MessageDigest.getInstance("SHA-256")
+    .digest(TableCodec.encode(listOf(this)).toByteArray(Charsets.UTF_8))
+    .joinToString(separator = "") { byte -> "%02x".format(byte.toInt() and 0xFF) }
 
 /**
  * The entered case, without the transient evaluation: a stored result could otherwise be shown as
@@ -88,6 +105,9 @@ internal fun HomeUiState.toStoredCase(): Map<String, String> = mapOf(
     CaseKeys.TABLE to table,
     CaseKeys.ROW to row,
     CaseKeys.CAPACITY_CONFIRMED to capacityConfirmed.toString(),
+    CaseKeys.SELECTED_TABLE to selectedTableId,
+    CaseKeys.TABLE_DIGEST to tableDigest,
+    CaseKeys.TABLE_NOMINAL_SIZE to tableNominalSize,
 )
 
 /**
@@ -117,6 +137,11 @@ internal fun HomeUiState.restoredFrom(stored: Map<String, String>): HomeUiState 
         table = stored[CaseKeys.TABLE] ?: table,
         row = stored[CaseKeys.ROW] ?: row,
         capacityConfirmed = stored[CaseKeys.CAPACITY_CONFIRMED]?.toBooleanStrictOrNull() ?: capacityConfirmed,
+        // Every one of the three table-binding keys is read with a default, so a case written by a
+        // build that had none of them restores unchanged and simply names no table.
+        selectedTableId = stored[CaseKeys.SELECTED_TABLE] ?: selectedTableId,
+        tableDigest = stored[CaseKeys.TABLE_DIGEST] ?: tableDigest,
+        tableNominalSize = stored[CaseKeys.TABLE_NOMINAL_SIZE] ?: tableNominalSize,
         evaluation = null,
     )
     val metric = rebuilt.unitSystem == UnitSystem.METRIC

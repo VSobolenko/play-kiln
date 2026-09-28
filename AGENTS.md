@@ -26,7 +26,7 @@ refuses to run without the approval. The rule is `.cursor/rules/release-gate.mdc
 | 1 | `/ship <idea>` | Cursor | Automatic after approval |
 | 2 | `scripts/new-slot.mjs --economics <path> --differentiators <path>` | Factory | Automatic isolated `apps/<date>-<slug>/` slot; **refuses to scaffold without a validated plan and a validated promise contract** |
 | 3 | Implement | Codex workers, orchestrated by Cursor | Automatic code, tests, and app behavior; each promise moves from `deferred` to `shipped` with a proof, or to `narrowed`/`dropped` in writing |
-| 4 | Development verification | Factory + Cursor | `scripts/run-slot-tests.mjs` plus `scripts/verify-slot.mjs --build`, which compiles `assembleDebug` and does not sign; **fails while any promise is still deferred**; a readable diff |
+| 4 | Development verification | Factory + Cursor | `scripts/run-slot-tests.mjs --rerun` plus `scripts/verify-slot.mjs --build`, which compiles `assembleDebug` and does not sign; **fails while any promise is still deferred**; a readable diff |
 | 5 | **Human checkpoint 1.5: approve the release** | Human | The owner installs the debug APK, reviews the UI and behavior, and states approval in his own words. Recorded with `scripts/approve-release.mjs --slot <slug> --note "<owner words>"`, bound to a digest of the app's build inputs |
 
 **Phase 2 — release, `/release <slug>`** — every step below refuses to run without the approval
@@ -440,6 +440,12 @@ expected to fail against the implementation they replaced.
 `--build` compiles the slot. Without it the gate reports `UNVERIFIED` (exit 2), not
 PASS, because source-only evidence cannot prove the app builds; never cite a
 build-less run as release evidence.
+
+`run-slot-tests.mjs` reports `STALE` (exit 2) when Gradle did not execute the test task in that
+invocation — the XML under `build/test-results/` is then a *previous* run's output. A Kotlin change
+forces re-execution and hides this; a change confined to `res/` does not, because a test that reads
+`strings.xml` off disk is an input Gradle cannot see. `STALE` is never a PASS, and `--rerun` is what
+an evidence run must use.
 
 `scripts/test-play-reviews.mjs` is the offline regression suite for the review-text sensor
 (`scripts/lib/play-reviews.mjs`); `scripts/verify-reviews-sensor.mjs` checks the same sensor
