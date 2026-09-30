@@ -1,0 +1,8 @@
+schema: spec-driven
+created: 2026-09-30
+goal: >-
+  Cut the factory harness from 88 source files and 47,358 lines to a measured program core that
+  checks only facts a machine can measure, move every judgement rule into agent role prompts plus
+  two human checkpoints, delete the meta-runner chain that verifies the verifiers, and preserve
+  100% of the accumulated Play/EU/asset/console/icon requirements as a written contract so the
+  refactor cannot lose a single measured detail.

@@ -7,7 +7,10 @@
  *   node scripts/approve-release.mjs --revoke --slot <slug>
  *
  * `--check` is what every release-side script calls: it exits 0 only when a current
- * approval exists, and 2 with an actionable reason otherwise.
+ * approval exists, and 2 with an actionable reason otherwise. The reason names which half of the
+ * approval is stale — the app whose build inputs moved, or the authored store pack whose listing,
+ * journey or identity changed — because the two are different documents and the reader has to
+ * know which one to review again.
  *
  * The write path is a **human decision, not a build step**. Run it only when the owner has
  * explicitly approved the app in the current conversation, and pass their own words as
@@ -123,8 +126,12 @@ function runCheck(slotDir) {
   }
   line('PASS', `${path.basename(slotDir)} is approved for release`)
   line('PASS', `owner's words: ${result.record.note}`)
-  line('PASS', `approved at ${result.record.approvedAt} over ${result.record.sourceFiles} build input(s)`)
-  line('PASS', `digest ${String(result.digest).slice(0, 12)}…`)
+  line('PASS', `approved at ${result.record.approvedAt}`)
+  // The two halves are reported separately because they are separate documents the owner reviewed:
+  // the app the build reads, and the authored pack Play is told about. A refusal names the half that
+  // moved, so a reader can tell an edit to a Kotlin file from an edit to the listing.
+  line('PASS', `app digest ${String(result.digest).slice(0, 12)}… over ${result.files} build input(s)`)
+  line('PASS', `pack digest ${String(result.packDigest).slice(0, 12)}… over ${result.packFiles} authored input(s)`)
   console.log('\nVERDICT: APPROVED')
 }
 
@@ -133,8 +140,13 @@ function runWrite(slotDir, note) {
   const record = writeReleaseApproval(slotDir, { note })
   line('PASS', `recorded ${path.relative(ROOT, approvalPath(slotDir)).split(path.sep).join('/')}`)
   line('PASS', `owner's words: ${record.note}`)
-  line('PASS', `bound to ${record.sourceFiles} build input(s), digest ${record.sourceDigest.slice(0, 12)}…`)
-  line('INFO', 'any edit to the app voids this approval until the owner approves the new revision again')
+  line('PASS', `bound to ${record.sourceFiles} build input(s), app digest ${record.sourceDigest.slice(0, 12)}…`)
+  line(
+    'PASS',
+    `bound to ${record.packFiles} authored pack input(s) (${record.packInputs.join(', ') || 'none'}), ` +
+      `pack digest ${String(record.packDigest).slice(0, 12)}…`
+  )
+  line('INFO', 'any edit to the app or to an authored store input voids this approval until the owner approves the new revision again')
   line('INFO', `release may now run: node scripts/prepare-release.mjs --slot ${slotSlug(slotDir)}`)
   line('INFO', 'signing, uploading and publishing keep their own authorizations')
   console.log('\nVERDICT: APPROVED — the release phase may proceed')

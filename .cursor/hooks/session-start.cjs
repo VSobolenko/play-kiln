@@ -24,6 +24,20 @@ function read(rel, max = 12000) {
 }
 
 const mission = read('MISSION.md', 14000)
+
+// Stamp the session boundary for `.cursor/hooks/stop-gate.cjs`. That hook decides whether to
+// remind the agent about evidence by comparing `mtime`s under `apps/` and `harness/` against a
+// watermark; without a stamp taken here, its first check has nothing to compare against and it
+// writes one itself, so this is an improvement rather than a dependency — it just means changes
+// made in the first moments of a session are attributed correctly instead of being missed.
+try {
+  const stamp = path.join(root, '.superpowers', 'stop-gate', 'session.json')
+  fs.mkdirSync(path.dirname(stamp), { recursive: true })
+  fs.writeFileSync(stamp, JSON.stringify({ since: new Date().toISOString(), root }, null, 2) + '\n')
+} catch {
+  // A read-only workspace must not stop the session from starting.
+}
+
 const extra = [
   '=== PLAYKILN SESSION (auto) ===',
   mission || 'MISSION.md missing — follow AGENTS.md.',

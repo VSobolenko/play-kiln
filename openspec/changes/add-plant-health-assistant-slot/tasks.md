@@ -382,7 +382,8 @@ gated group until the named decision is recorded in this file.
   Acceptance: `node scripts/verify-slot.mjs --slot plant-health-assistant --strict-store`
   reports PASS.
 - [ ] 10.3 **[Store]** Produce the assets: 512×512 icon, 1024×500 feature graphic, 6 phone
-  screenshots at 1080×1920, 4 seven-inch at 1200×1920, 4 ten-inch at 1600×2560, each locale.
+  screenshots at 1080×1920, 4 seven-inch at 1080×1920, 4 ten-inch at 1440×2560 (every set 9:16,
+  the ratio the Play Console states in each screenshot field), each locale.
   Acceptance: the strict-store gate reports PASS with every asset present at its exact size.
 - [ ] 10.4 **[Store]** Write `review-notes.md` with the path to reach a diagnosis without
   login gates and note that captured screenshots are synthetic if they are. Acceptance: a

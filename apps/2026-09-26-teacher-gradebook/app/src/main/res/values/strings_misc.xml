@@ -26,6 +26,8 @@
     <string name="about_privacy_title">Private by design</string>
     <string name="about_privacy_body">The app works offline and writes your record to private storage on this device. There is no account, login, analytics, advertising or developer server. Files leave only when you export or back up through the system picker; Android Auto Backup may also copy the record to your own Google account if device backup is enabled.</string>
     <string name="about_privacy_billing">Google Play Billing handles purchase traffic and purchase history. It never receives your class record through this app.</string>
+    <string name="about_privacy_policy_action">Open the privacy policy</string>
+    <string name="about_privacy_policy_url" translatable="false">https://telegra.ph/Mark-Book-for-Teachers--privacy-policy-09-26</string>
     <string name="about_averages_title">Averages explain their working</string>
     <string name="about_averages_body">Every average follows the categories, weights, rounding and missing-work rule you set. Empty and exempt work is never silently turned into zero, and categories without usable marks are named and left out.</string>
     <string name="about_purchase_title">One permanent unlock</string>

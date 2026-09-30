@@ -178,7 +178,7 @@ PlayStore.enabled=true
 fastboot.forceFastBoot=yes
 ```
 
-**There is no tablet AVD.** A 7-inch (1200×1920) and a 10-inch (1600×2560) AVD would
+**There is no tablet AVD.** A 7-inch (1080×1920) and a 10-inch (1440×2560) AVD would
 have to be created, and the tool that normally does that (`avdmanager`) is absent.
 
 ## 3. Can an emulator be started here?
@@ -301,10 +301,14 @@ with
 ```text
 31|SCREEN_TARGETS = {
 32|    "phone": (6, (1080, 1920)),
-33|    "tablet-7": (4, (1200, 1920)),
-34|    "tablet-10": (4, (1600, 2560)),
+33|    "tablet-7": (4, (1080, 1920)),
+34|    "tablet-10": (4, (1440, 2560)),
 35|}
 ```
+
+(The three targets became 9:16 on 2026-09-29, from the console's own aspect sentence; the
+reason is in `AGENTS.md`. The measured blocks below are the 2026-09-23 records and keep the
+sizes that were current when they were run.)
 
 and `frame_screen` normalises whatever it is given with `cover()` (scale-to-cover +
 centre crop). **Same 6 sources → phone, tablet-7 and tablet-10.**
@@ -448,14 +452,17 @@ Nothing in gaps 1–4 was changed here; the task forbade touching `scripts/**`.
 
 ## 5. Runbook — from a built debug APK to the three screenshot sets
 
-Contract sizes and counts (`AGENTS.md`, `scripts/store-kit.py:31-35`), per locale,
-for both `en-US` and `ru-RU`:
+Contract sizes and counts (`AGENTS.md`, `scripts/store-kit.py`), per locale,
+for both `en-US` and `ru-RU`. The three sets became 9:16 on 2026-09-29 — the aspect the
+console states in every screenshot field; the sizes below are current, and the
+`1200×1920` / `1600×2560` figures elsewhere in this 2026-09-23 report are the sizes that
+were measured at the time:
 
 | Set | Count | Size (W×H) | File names |
 |---|---:|---|---|
 | Phone | 6 | 1080×1920 | `store/assets/<locale>/phone-01.png` … `phone-06.png` |
-| 7-inch | 4 | 1200×1920 | `store/assets/<locale>/tablet-7-01.png` … `tablet-7-04.png` |
-| 10-inch | 4 | 1600×2560 | `store/assets/<locale>/tablet-10-01.png` … `tablet-10-04.png` |
+| 7-inch | 4 | 1080×1920 | `store/assets/<locale>/tablet-7-01.png` … `tablet-7-04.png` |
+| 10-inch | 4 | 1440×2560 | `store/assets/<locale>/tablet-10-01.png` … `tablet-10-04.png` |
 
 ### Step 0 — machine setup (once)
 
@@ -533,18 +540,18 @@ Verified to work at the capture level, but `store-kit.py` cannot frame them yet
 (gap 1), so this is the one part of the runbook that is **not fully scripted**:
 
 ```powershell
-# 7-inch: 4 shots at 1200x1920
-adb shell wm size 1200x1920
+# 7-inch: 4 shots at 1080x1920 (9:16, the console's stated aspect)
+adb shell wm size 1080x1920
 # run the same 6-step journey, save the raw PNGs to a size-specific folder
 #   adb shell screencap -p /sdcard/s.png   (NOT `adb exec-out ... > file` on PowerShell)
 #   adb pull /sdcard/s.png  store/captures/raw-tablet7/NN.png
-# 10-inch: 4 shots at 1600x2560
-adb shell wm size 1600x2560
+# 10-inch: 4 shots at 1440x2560 (9:16)
+adb shell wm size 1440x2560
 # ... same, into store/captures/raw-tablet10/
 adb shell wm size reset
 ```
 
-Then either frame them by hand at 1200×1920 / 1600×2560, or (preferred, and the fix
+Then either frame them by hand at 1080×1920 / 1440×2560, or (preferred, and the fix
 this report recommends) extend `render_screenshots` to read a per-size raw set.
 
 ### Step 7 — localized screenshots (**partly manual today**)

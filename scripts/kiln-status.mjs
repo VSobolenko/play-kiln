@@ -1,10 +1,25 @@
 #!/usr/bin/env node
 /**
- * Report whether the PlayKiln factory has the files and local tools needed to build and ship.
+ * Report whether the PlayKiln factory has the files and local tools needed to build and ship,
+ * and what each slot has earned.
  * Usage: node scripts/kiln-status.mjs
+ *        node scripts/kiln-status.mjs --kill <slug> --reason "<why>" [--force]
+ *
+ * The earnings section exists because the factory's product is revenue, and until now nothing
+ * in this file — or in the repository — ever related a shipped slot to a number. `economics.json`
+ * carried `killCriteria` and `check-economics.mjs` validated that they were present, and no
+ * program read `minInstalls` or `minRevenueUsd` afterwards; the post-mortem for the first slot
+ * called this out in its own words ("the kill criteria will remain prose that nothing
+ * evaluates"). A portfolio only works when attempts that miss are stopped on a clock, so the
+ * verdict is computed here for every slot, and `--kill` is the path that records the decision.
+ *
+ * `--kill` refuses without a reason, because the prior-art failure it replaces is a slot that is
+ * silently abandoned rather than archived with its numbers. It also refuses to kill a slot whose
+ * latest reading meets its own criteria unless `--force` is passed: the threshold it enforces is
+ * the one the plan itself declared, and a rule that can be fired at anything is not a rule.
  */
 
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
@@ -34,6 +49,7 @@ function run(command, args) {
   })
   return {
     ok: result.status === 0,
+    status: result.status,
     output: `${result.stdout || ''}${result.stderr || ''}`.trim(),
     error: result.error
   }
@@ -75,7 +91,119 @@ function compareVersions(left, right) {
 
 console.log('# PlayKiln status')
 
+const ARGV = process.argv.slice(2)
+
+/** The value that follows `flag`, or null. A flag with no value is not a value. */
+function flagValue(flag) {
+  const index = ARGV.indexOf(flag)
+  if (index === -1) return null
+  const value = ARGV[index + 1]
+  return value && !value.startsWith('--') ? value : null
+}
+
+const KILL_SLOT = flagValue('--kill')
+const KILL_REASON = flagValue('--reason')
+const KILL_FORCE = ARGV.includes('--force')
+
+/**
+ * The money stage: what each slot has actually earned, and whether it is time to stop.
+ *
+ * The verdict comes from `scripts/check-outcomes.mjs`, which reads the slot's own
+ * `economics.json` thresholds and its `store/outcomes.json` readings — so the number that
+ * decides a slot's fate is the number the slot declared before it was built, not one chosen
+ * after the fact. `MISSED` is the only failure: `NO-DATA` and `TOO-EARLY` are honest states, and
+ * making them fail would teach the operator to silence the check, which is the failure mode
+ * this replaces.
+ */
+function portfolioEarnings() {
+  const script = join(root, 'scripts', 'check-outcomes.mjs')
+  if (!existsSync(script)) {
+    line('FAIL', 'scripts/check-outcomes.mjs is missing — the revenue plan has no sensor')
+    return
+  }
+  const apps = Array.isArray(registry?.apps) ? registry.apps : []
+  if (apps.length === 0) {
+    line('INFO', 'no registered slots')
+    return
+  }
+  for (const app of apps) {
+    const killable = typeof app?.killReason === 'string' && app.killReason
+    if (app.status === 'killed') {
+      line('INFO', `${app.id}: killed ${app.killedAt || ''} — ${firstLine(killable)}`)
+      continue
+    }
+    const result = run(process.execPath, [script, '--slot', app.id])
+    const verdict = /VERDICT:\s*([A-Z-]+)/.exec(result.output)?.[1] || 'UNKNOWN'
+    const detail = /(no readings|missing|elapsed|meets|window)[^\n]*/i.exec(result.output)
+    if (verdict === 'ON-TRACK') {
+      line('PASS', `${app.id}: ${verdict} — ${firstLine(detail)}`)
+    } else if (verdict === 'MISSED') {
+      line('FAIL', `${app.id}: ${verdict} — ${firstLine(detail)}`)
+      console.log(`         node scripts/kiln-status.mjs --kill ${app.id} --reason "<why it did not earn>"`)
+    } else {
+      line('INFO', `${app.id}: ${verdict} — ${firstLine(detail)}`)
+    }
+  }
+}
+
+/**
+ * Record a kill decision, or refuse to.
+ *
+ * The slot's own thresholds decide whether this is allowed: a slot whose latest reading meets
+ * its declared `minInstalls` and `minRevenueUsd` is `ON-TRACK`, and killing it needs an explicit
+ * `--force` rather than a moment of impatience. The registry is the durable record and is written
+ * with the file's own line endings, so a kill does not reformat an unrelated file into a
+ * repository-wide diff.
+ */
+function killSlot(slug, reason, force) {
+  const apps = Array.isArray(registry?.apps) ? registry.apps : []
+  const app = apps.find((entry) => entry?.id === slug || String(entry?.dir || '').endsWith(`-${slug}`))
+  if (!app) {
+    line('FAIL', `--kill ${slug}: no registry entry matches that id or directory`)
+    return false
+  }
+  if (!reason || reason.trim().length < 10) {
+    line(
+      'FAIL',
+      '--kill needs --reason "<what the numbers were and why the slot stops>"; a kill with no recorded reason is the silent abandonment this path replaces'
+    )
+    return false
+  }
+  const slotDir = join(root, app.dir || '')
+  const outcome = existsSync(join(root, 'scripts', 'check-outcomes.mjs'))
+    ? run(process.execPath, [join(root, 'scripts', 'check-outcomes.mjs'), '--slot', app.id])
+    : null
+  const verdict = outcome ? /VERDICT:\s*([A-Z-]+)/.exec(outcome.output)?.[1] || 'UNKNOWN' : 'UNKNOWN'
+  if (verdict === 'ON-TRACK' && !force) {
+    line(
+      'FAIL',
+      `${app.id} meets its own kill criteria (${verdict}) — pass --force only if the decision is about something the numbers do not measure`
+    )
+    return false
+  }
+
+  app.status = 'killed'
+  app.killedAt = new Date().toISOString()
+  app.killReason = reason.trim()
+  app.killVerdict = verdict
+  app.updatedAt = app.killedAt
+  const registryPath = join(root, 'registry', 'apps.json')
+  const original = readFileSync(registryPath, 'utf8')
+  const eol = original.includes('\r\n') ? '\r\n' : '\n'
+  writeFileSync(
+    registryPath,
+    JSON.stringify(registry, null, 2).split('\n').join(eol) + eol,
+    'utf8'
+  )
+  line('PASS', `${app.id}: killed (${verdict}) — ${app.killReason}`)
+  console.log(`         the slot directory is left in place so its evidence survives; archive it with:`)
+  console.log(`         git mv ${app.dir} apps/_archive/${app.dir.split('/').pop()}`)
+  if (slotDir && !existsSync(slotDir)) line('WARN', `the recorded directory ${app.dir} does not exist`)
+  return true
+}
+
 section('Harness files')
+
 const requiredHarnessFiles = [
   'AGENTS.md',
   'MISSION.md',
@@ -100,12 +228,28 @@ const requiredHarnessFiles = [
   'scripts/prepare-release.mjs',
   'scripts/approve-release.mjs',
   'scripts/lib/release-approval.mjs',
+  'scripts/lib/pack-approval.mjs',
   'scripts/sign-release.mjs',
   'scripts/store-kit.py',
   'scripts/lib/play-assets.mjs',
+  'scripts/check-in-app-policy.mjs',
+  'scripts/lib/in-app-policy.mjs',
+  'scripts/check-client-secrets.mjs',
+  'scripts/lib/client-secrets.mjs',
+  'scripts/check-freshness.mjs',
+  'scripts/lib/freshness.mjs',
+  'scripts/check-lessons.mjs',
+  'scripts/lib/lessons.mjs',
+  'scripts/check-outcomes.mjs',
+  'scripts/lib/outcomes.mjs',
+  'scripts/lib/slot-lock.mjs',
   'harness/ambition.md',
   'harness/cursor-surface.md',
   'harness/lessons.md',
+  'docs/research/measured-facts.json',
+  'docs/self-learning.md',
+  'docs/monetization-owner.md',
+  '.cursor/agents/money-owner.md',
   'docs/research/2026-09-20-android-play-ai-agents.md',
   'docs/research/2026-09-22-android-play-requirements.md',
   'docs/research/2026-09-23-google-play-automation-surface.md',
@@ -113,7 +257,10 @@ const requiredHarnessFiles = [
   'docs/monetization-strategy.md',
   '.cursor/rules/verification-discipline.mdc',
   '.cursor/rules/build-speed.mdc',
-  '.cursor/rules/visual-identity.mdc'
+  '.cursor/rules/visual-identity.mdc',
+  '.cursor/rules/client-side-secrets.mdc',
+  '.cursor/rules/differentiator-contract.mdc',
+  '.cursor/rules/authorization.mdc'
 ]
 for (const relativePath of requiredHarnessFiles) {
   line(existsSync(join(root, relativePath)) ? 'PASS' : 'FAIL', relativePath)
@@ -331,6 +478,20 @@ if (registry) {
     .join(', ')
   line('INFO', `registry apps: ${registry.apps.length}; statuses: ${summary || 'none'}`)
 }
+
+/**
+ * A kill is an action, not a report: it runs before the status report so it cannot be half-done
+ * by a later failing check, and it exits with its own verdict.
+ */
+if (KILL_SLOT) {
+  section('Kill decision')
+  process.exitCode = killSlot(KILL_SLOT, KILL_REASON, KILL_FORCE) ? 0 : 1
+  console.log(process.exitCode === 0 ? '\nVERDICT: KILLED' : '\nVERDICT: NOT KILLED')
+  process.exit(process.exitCode)
+}
+
+section('Portfolio earnings')
+portfolioEarnings()
 
 /**
  * Which slots are still in development and which the owner has released.

@@ -24,6 +24,7 @@
     <string name="about_privacy_title">Privé par conception</string>
     <string name="about_privacy_body">L’application fonctionne hors ligne et enregistre votre dossier dans le stockage privé de cet appareil. Aucun compte, connexion, outil d’analyse, publicité ou serveur du développeur. Les fichiers ne quittent l’appareil que lors d’une exportation ou sauvegarde via le sélecteur système ; Android Auto Backup peut aussi copier le dossier vers votre compte Google si la sauvegarde de l’appareil est activée.</string>
     <string name="about_privacy_billing">Google Play Billing traite l’achat et son historique. Il ne reçoit jamais le dossier de votre classe via cette application.</string>
+    <string name="about_privacy_policy_action">Ouvrir la politique de confidentialité</string>
     <string name="about_averages_title">Des moyennes expliquées</string>
     <string name="about_averages_body">Chaque moyenne suit les catégories, coefficients, règles d’arrondi et de travaux non rendus que vous définissez. Un devoir vide ou dispensé ne devient jamais silencieusement un zéro, et les catégories sans note exploitable sont nommées puis exclues.</string>
     <string name="about_purchase_title">Un déblocage définitif</string>

@@ -21,7 +21,7 @@ refuses to run without the approval. The rule is `.cursor/rules/release-gate.mdc
 | Order | Stage | Owner | Gate or output |
 |---:|---|---|---|
 | 0 | `<idea>` from measured demand | Cursor, per `.cursor/rules/ideation-gate.mdc` | A proposal in `docs/ideation/` with measured demand evidence; never a topic carried over from an example |
-| 0.5 | Economic plan | Cursor | `economics.json` passing `scripts/check-economics.mjs`, plus **Human checkpoint 1:** approve the plan and its price |
+| 0.5 | Economic plan | Cursor + the **money owner** role (`.cursor/agents/money-owner.md`) | `economics.json` passing `scripts/check-economics.mjs`, plus **Human checkpoint 1:** approve the plan and its price |
 | 0.6 | Promise contract (recon's reason list) | Cursor | `differentiators.json` passing `scripts/check-differentiators.mjs`, authored from recon **before** the UI, so the reasons the app was chosen cannot be lost during the build; every promise starts `deferred` |
 | 1 | `/ship <idea>` | Cursor | Automatic after approval |
 | 2 | `scripts/new-slot.mjs --economics <path> --differentiators <path>` | Factory | Automatic isolated `apps/<date>-<slug>/` slot; **refuses to scaffold without a validated plan and a validated promise contract** |
@@ -38,12 +38,16 @@ from stage 5, and the approval lapses by itself if the app's sources change.
 | 7 | `scripts/store-kit.py` | Factory | complete store pack |
 | 8 | `scripts/media-capture.mjs` | Factory | real-device screenshots, when a device is available |
 | 9 | `scripts/verify-slot.mjs --strict-store --build` and `/eval` | Factory + Cursor | Objective gates plus an independent verdict; repair until green |
-| 10 | Play Console legal steps, first upload, publish | Human | **Human checkpoint 2:** complete declarations, upload once, press publish |
-| 11 | Earn | Human + Cursor | The plan's `killCriteria` evaluated against real install and revenue numbers; a slot that misses them is archived |
+| 10 | Play Console submission, walked from the dashboard to `Изменения на проверке` | Cursor, driven under the owner's observation; **Human checkpoint 2** covers two steps only | The ladder is `docs/play-publishing-playbook.md` §5.1 and was measured live 2026-09-29. Every declaration answer, the release form, the save, the submit and the pre-review check are performed by the agent. Exactly two steps stay human: **uploading the five store-graphic fields** (the sandboxed browser cannot set a `file` input — an unsolved tooling limitation, deliberately recorded as such and not as a policy) and **the two first-publication legal declarations**, which are the owner's own attestation, once per app. Submitting at all still requires the stage-5 approval record, and the ladder is a recorded runbook, **not yet code** — no script performs those clicks today |
+| 11 | Earn | Human + the **money owner** role | `node scripts/check-outcomes.mjs --slot <slug>` verdicts the plan's own `killCriteria` against a recorded reading from `apps/<slot>/store/outcomes.json`; `NO-DATA` and `TOO-EARLY` are honest states, `MISSED` names the kill command, and `node scripts/kiln-status.mjs --kill <slug> --reason "<why>"` records the decision. A slot that misses its own thresholds is archived, and the archive is a decision with the numbers in it rather than an abandoned directory |
 
 One idea must take one command through this pipeline. Never silently upload, commit
-an edit, or publish on the human's behalf. An approval is recorded only from the owner's own
-words, never inferred from an agent's confidence, and never recorded to unblock a step.
+an edit, or act in the console without the owner's direction and his ability to watch. An
+approval is recorded only from the owner's own
+words, never inferred from an agent's confidence, and never recorded to unblock a step. The
+distinction the first real submission measured on 2026-09-29: an agent **may** walk the console ladder
+when the owner has directed it and is observing, and it may not do any of it silently, on its own
+initiative, or in place of the approval stage.
 
 **The factory's product is revenue, not green gates.** Both phases measure form: that the
 APK builds, that the store pack is complete and truthfully described, that the assets exist and
@@ -67,6 +71,20 @@ before the UI exists; every promise starts `deferred`, and stage 4 fails while a
 deferred, so a slot cannot be called done with ten of twenty reasons delivered. Losing or weakening
 a `core` promise requires the owner's own words, exactly as the release approval does. The contract
 is `docs/slot-differentiators.md` and the gate is `scripts/check-differentiators.mjs`.
+
+**The earn stage is a sensor now, not a paragraph.** Stage 11 used to be the one part of the pipeline
+with nothing behind it: `killCriteria` were validated for shape and then read by no program, so the one
+stage the mission calls the product could not answer whether a slot had earned anything. Two things
+changed. `apps/<slot>/store/outcomes.json` carries dated readings from Play Console, and
+`scripts/check-outcomes.mjs` judges them against the thresholds the slot declared **before** it was
+built — `ON-TRACK`, `TOO-EARLY`, `NO-DATA`, or `MISSED`. `scripts/kiln-status.mjs` prints that verdict
+for every slot and `--kill <slug> --reason "<why>"` records the decision, refusing a kill with no
+reason and refusing one for a slot that meets its own criteria unless `--force`. The role that owns the
+numbers, the price, the paywall and the reading is **the money owner** (`.cursor/agents/money-owner.md`,
+contract in `docs/monetization-owner.md`) — a sibling to the scout, which finds demand, and to the
+visual-identity work, which owns the look. Its rule is that an unmeasured claim is `UNVERIFIED`:
+invented revenue is the defect it exists to prevent, and the factory has no revenue API, so a
+hand-recorded reading with an `observedAt` is the current mechanism and is labelled as such.
 
 The wall-clock target is **about one hour of agent time per slot**, and buildability is therefore a
 first-class selection criterion rather than a detail discovered during the build. That target is a
@@ -193,6 +211,8 @@ store/listing.md
 store/privacy.md
 store/data-safety.md
 store/review-notes.md
+store/release-notes.md
+store/console-answers.md
 store/graphics.md
 store/checklist.md
 store/assets/icon-512.png
@@ -208,19 +228,47 @@ store/assets/<locale>/tablet-10-01.png ... tablet-10-04.png
 |---|---|
 | Listing text | Title ≤ 30, short description ≤ 80, full description ≤ 4000 characters |
 | App icon | 512×512, 32-bit PNG with alpha, sRGB, ≤ 1024 KB; no drawn rounded mask or shadow |
-| Feature graphic | Exactly 1024×500, JPEG or 24-bit PNG without alpha |
-| Phone set | Exactly 6 at 1080×1920; Play permits 2–8, no alpha, ≤ 8 MB each, sides 320–3840, long side ≤ 2× short side |
-| 7-inch set | Exactly 4 at 1200×1920; Play permits 4–8, short edge ≥ 1080; Play's Large screens rule allows long edges to 7,680 but its general Requirements cap any dimension at 3,840, so the factory enforces the conservative 3,840 (`scripts/store-kit.py`) — <https://support.google.com/googleplay/android-developer/answer/9866151?hl=en> |
-| 10-inch set | Exactly 4 at 1600×2560; Play permits 4–8, short edge ≥ 1080; Play's Large screens rule allows long edges to 7,680 but its general Requirements cap any dimension at 3,840, so the factory enforces the conservative 3,840 (`scripts/store-kit.py`) — <https://support.google.com/googleplay/android-developer/answer/9866151?hl=en> |
+| Feature graphic | Exactly 1024×500, JPEG or 24-bit PNG without alpha, ≤ 15 MB |
+| Phone set | Exactly 6 at 1080×1920; the console's phone field requires 2–8, 16:9 or 9:16, each side 320–3840, ≤ 8 MB each |
+| 7-inch set | Exactly 4 at 1080×1920; the console's 7-inch field requires 2–8, 16:9 or 9:16, each side 320–3840, ≤ 8 MB each — measured live in the RU console 2026-09-29 |
+| 10-inch set | Exactly 4 at 1440×2560; the console's 10-inch field requires 2–8, 16:9 or 9:16, each side 1080–7680, ≤ 8 MB each — measured live in the RU console 2026-09-29 |
+| Release name | An internal Play Console label, never shown to a user; it exists so the console's release list can tell one build from another. Play prefills it from the bundle's `versionName`, so `store/release-notes.md` states it as `<versionName> (<versionCode>)` and `store-kit.py` checks it against `dist/release-manifest.json` — a name that disagrees with the upload makes the list lie about which build is which |
+| Release notes | `store/release-notes.md`, carrying a fenced block in **Play's own multi-language format** — one `<locale>` tag per language, tags on their own lines, the whole block pasted into the console's single text box. Play **does** show these on the store page and caps each language at **500 characters**, truncating silently rather than refusing, so every note in the block is measured at pack validation (`MAX_RELEASE_NOTE_CHARS` in `scripts/store-kit.py`) — including one for a language the listing does not declare, because text in the block is text a human may paste. The block is the note rather than a rendering of it, so the measured string and the pasted string are the same characters |
+| Console answers | `store/console-answers.md`, the Ctrl-C/Ctrl-V sheet for a first upload: for every console field, the exact string to paste, in a fenced block, derived from the slot's own pack so it cannot drift from it. The owner performed the first upload of `teacher-gradebook` by hand, answering page after page in chat — the privacy-policy URL, ten App-content declarations, the credentials dialog — and nothing carried those answers, so each was re-derived by a human. The sheet is **written, not preserved**: it is a copy of what the pack already says, so a hand edit could only make it disagree. It carries a machine-readable claims block, and `validate_console_answers` fails a sheet whose answer contradicts the pack, names a product the slot's Kotlin does not declare, or carries a reserved documentation host. Generated by `write_documents` after `release-notes.md` (it embeds that file's paste block and release name), from the shared model `scripts/lib/console-form.json` |
 
-The tablet sets are 5:8 (`1200×1920`, `1600×2560`), not the 16:9/9:16 ratio Play's Large
-screens section recommends. Accepted deviation recorded 2026-09-24: the hard Requirements
-caps (320–3840 px, max dimension ≤ 2× min, short edge ≥ 1080) are met, and the ratio
-affects only large-screen surface selection, not review eligibility — <https://support.google.com/googleplay/android-developer/answer/9866151?hl=en>
+Every screenshot set is 9:16 — phone and 7-inch at `1080×1920`, 10-inch at `1440×2560` — because that is
+the aspect the console states in **every** screenshot field ("Соотношение сторон изображения должно
+составлять 16:9 или 9:16"), not merely what its Large screens section recommends. That sentence and the
+per-field size windows above were measured live in the RU console on 2026-09-29, from each field's own
+inline strings rather than from the documentation; the two tablet windows genuinely differ
+(320–3840 against 1080–7680) and the targets sit inside both. The factory previously shipped 5:8 tablet
+canvases (`1200×1920`, `1600×2560`) on the reading that the ratio only affected large-screen surface
+selection. The console did accept a 5:8 upload, but the factory's decision is to satisfy the stated
+prose, because it cannot be refused either — and `screenshot_rule_failures` (`scripts/store-kit.py`)
+now asserts the ratio for every kind, so a `max_ratio: None` kind is no longer size-only.
+
+The **Desktop** and **Android XR** screenshot fields are deliberately **not produced**. They carry no
+asterisk in the console — they are optional — and the owner's instruction on 2026-09-29 is that the pack
+does not fill them. No target, no asset and no check exists for them, and adding one is a product
+decision rather than a completeness fix.
 
 Default locale is `en-US`; supported additional locale is `ru-RU`. If login gates
 content, `review-notes.md` must provide usable demo access. Claims and screenshots
 must describe the shipped app; synthetic captures must be identified as synthetic.
+
+**Never enable Play Console's automatic string translation for a language the slot already
+translates.** A first upload shows three rows of one list — the bundle *signed by Google Play*,
+*automatic protection*, and *automatic strings translation* — because Play App Signing unlocks all
+three as bundle enhancements; the third is a feature being offered, not a finding about the app, and
+declining it blocks nothing. Enabling it for a translated language **overrides that language's
+existing translations** ("Any existing translations for these languages will be overridden", <https://support.google.com/googleplay/android-developer/answer/9844778?hl=en>), replacing
+git-tracked, diffable, reviewable `values-<locale>/` resources with machine output that lives only in
+Console — where the next upload replaces it and switching the feature off discards it. The
+repository is the source of truth for a translation. Using the feature as a bootstrap for a language
+the slot does not translate at all is coherent only if the output is reviewed and frozen into
+`values-<locale>/` afterwards. No Play requirement links the app's resource languages to the
+languages declared on the listing, so a single-language listing over a multi-language app is
+legitimate and needs no "fix".
 
 `listing.json.contactEmail` must be the developer account's monitored address,
 `v.sobolenko.vs@gmail.com` — defined once as `DEFAULT_CONTACT_EMAIL` in
@@ -236,6 +284,11 @@ Before a slot is `ready`:
 
 - Data safety is complete even when no data is collected, matches every SDK, and
   matches a public privacy policy.
+- The privacy policy exists in **both** places Play requires it: the listing's public
+  HTTPS URL, and **inside the app**. A slot that declares a `privacyPolicyUrl` must let
+  the user open the policy from the app; privacy prose in an About screen is not the
+  policy. Only the store URL was ever checked here, and `teacher-gradebook` shipped
+  without the in-app half.
 - Apps with accounts provide deletion in-app and through an external web resource.
 - Permissions are minimized; Photo Picker is preferred; foreground-service types
   are declared; exact alarms are treated as restricted.
@@ -243,10 +296,32 @@ Before a slot is `ready`:
 - Edge-to-edge and predictive back behavior work at the target SDK.
 - Ads, content rating, target audience, review access, and AI-content declarations
   are truthful and complete.
+- The two first-publication declarations — **Developer Program Policies** and **US export
+  laws** — are acknowledged by the owner when the app is created, once per app rather than
+  per release. The export declaration is a certification about encryption the app uses, and
+  every slot uses encryption whether or not it imports crypto code; the factory records the
+  annual BIS self-classification question as an open obligation rather than settled law.
+- "Collect" in Data safety means **transmitting data off the device**, so an app whose whole
+  record stays in local storage declares none of it — but it must not under-declare a bundled
+  SDK that does transmit (Play Billing's `datatransport` put a Financial-info row in
+  `teacher-gradebook`).
+- An in-app disclosure-and-consent gate is required only when handling may fall outside the
+  user's reasonable expectation — background or unexpected collection — and **not** for a
+  foreground-only app handling only what the user just typed into it. Do not add a
+  launch-blocking consent screen to a slot that does not trigger this.
 - Native libraries have confirmed 16 KB readiness, measured from the built artifact by
-  `scripts/check-16k.py` (ELF `p_align` per `PT_LOAD`, plus the stored-and-aligned container
-  offset in the APK). `prepare-release.mjs` cannot tell you this — it only knows that `.so` files
-  exist, so it records `confirmation-required` until this script is run and read.
+ `scripts/check-16k.py` (ELF `p_align` per `PT_LOAD`, plus the stored-and-aligned container
+ offset in the APK). `prepare-release.mjs` cannot tell you this — it only knows that `.so` files
+ exist, so it records `confirmation-required` until this script is run and read.
+- **No shipped slot calls a paid API from the client.** A key compiled into `app/src/main/`, or a
+ provider SDK whose only useful form needs a server-side secret, is the signature defect of this era:
+ 41% of LLM-enabled apps leaked API credentials in one 206,867-app scan, and secrets were found in 35%
+ of 50,000 Play apps. `scripts/check-client-secrets.mjs` (rule
+ `.cursor/rules/client-side-secrets.mdc`) scans the shipped client for key-shaped literals, paid-provider
+ SDKs, direct calls to paid hosts and a keyed `google-services.json`. A slot that wants a paid capability
+ must be offline by construction, or carry nothing it cannot serve without a secret. A slot-owned
+ `apps/<slot>/client-secrets-exempt.json` may exempt a finding, but each entry needs a reason and a
+ decider, and every applied exemption is printed.
 
 Use [`docs/play-publishing-playbook.md`](docs/play-publishing-playbook.md) for the
 human/agent handoff,
@@ -274,6 +349,32 @@ summary is [`DESIGN.md`](./DESIGN.md).
 - Evidence: `verify-slot --strict-store` requires `store/provenance.json` for a composed pack,
   `scripts/visual-qa.py` measures the pixels, and `media-capture.mjs` photographs the real signed
   build with asserted readings. `apps/2026-09-26-teacher-gradebook` is the reference slot.
+
+## Self-learning loop
+
+The factory changes Google Play policy, the Android toolchain and its own harness continuously, so
+noticing a change is part of the pipeline rather than an occasional clean-up. Three ledgers carry it,
+each with a program that reads it (contract: [`docs/self-learning.md`](docs/self-learning.md)):
+
+| Ledger | Says | Read by |
+|---|---|---|
+| `docs/research/measured-facts.json` | every external rule the factory encodes, when it was measured, and **which program enforces it** | `scripts/check-freshness.mjs` — a fact past its window is `UNVERIFIED`, and a fact naming an enforcing script or probe that does not exist is a failure |
+| `harness/lessons.md` | every defect that already cost this factory time, with the sensor that stops it recurring | `scripts/check-lessons.mjs` — a lesson whose named sensor has been deleted or renamed fails |
+| `scripts/test-*.mjs`, `test-*.py` | the regression suites those sensors live in | `scripts/selftest.mjs`, which **runs every suite it finds on disk** and fails when one is neither executed nor given a reason |
+
+Two rules keep that loop honest, and both were paid for. **A fact with no enforcing program is
+reported as `UNENFORCED` (exit 2), never as fresh** — the factory follows some of its rules on prose
+alone, and the ledger names which, instead of implying a check exists. **A check that exists and is
+never run cannot be told apart from a check that does not exist**: six suites were written, cited in
+this file as release evidence, and never executed by the one command a session actually runs, which is
+why the self-test now discovers and runs all of them. Adding a suite to `scripts/` needs no edit in the
+self-test — the safe direction, because a hand-maintained runner list fails by omission.
+
+What the loop still cannot do, stated plainly in `docs/self-learning.md`: it does not browse Google
+Play by itself, so a policy change is noticed when an agent or the owner reads the page and re-dates the
+fact; and the two known unenforced positions — Play Console's automatic string translation overriding a
+git-tracked translation, and the AGP/Kotlin/Compose BOM version pins — are recorded there as gaps
+rather than closed.
 
 ## Defaults to suppress
 
@@ -315,6 +416,18 @@ scaffold/android-compose/         new-slot template
 registry/apps.json                slot registry
 scripts/new-slot.mjs              create a slot (requires a validated --economics plan and promise contract)
 scripts/lib/namespaces.mjs        single source of truth for `com.gexetr.*`
+scripts/lib/slot-lock.mjs         the per-slot build lease: a second Gradle consumer reports the holder
+scripts/lib/gradle.mjs            the only Gradle route; fails closed when no supported JDK resolves
+scripts/lib/client-secrets.mjs    the detector behind the no-client-side-paid-API rule
+scripts/check-client-secrets.mjs  gate: a key-shaped literal or paid-provider SDK in the shipped client
+scripts/lib/outcomes.mjs          the post-ship reading contract: schema, verdicts, kill instruction
+scripts/check-outcomes.mjs        earn gate: dated readings vs the plan's own kill criteria
+scripts/lib/freshness.mjs         measured-fact ledger: expiry plus the program enforcing each fact
+scripts/lib/lessons.mjs           lesson-to-sensor contract: a named check must still exist on disk
+scripts/lib/pack-approval.mjs     the authored pack inputs the approval binds, separate from the build
+scripts/check-in-app-policy.mjs   gate: the privacy policy is reachable from inside the app
+docs/self-learning.md             the improvement loop: inputs, cadence, and its honest limits
+docs/monetization-owner.md        the money owner's contract: KPIs, cadence, verdicts
 scripts/lib/slot-economics.mjs    the slot economics contract: parsing, validation, capability pairing
 scripts/check-economics.mjs       money gate: does the plan name a real revenue mechanism
 scripts/lib/slot-differentiators.mjs the promise contract: parsing, proof typing, delivery resolution
@@ -331,6 +444,9 @@ scripts/codex-run.mjs             durable Codex worker runner
 scripts/lib/release-approval.mjs  source digest + owner approval: the two-phase gate
 scripts/approve-release.mjs       record, check, or revoke the owner's release approval
 scripts/store-kit.py              generate and validate store packs
+scripts/lib/console-form.json     the console form: the ten declarations, page paths, field caps, release and billing rules
+scripts/console-walkthrough.mjs   render and drift-check docs/play-console-walkthrough.md from that model
+scripts/test-console-answers.py   regression suite for the generated store/console-answers.md sheet
 scripts/visual-qa.py              report pixel measurements for store-pack visual identity
 scripts/test-visual-qa-discovery.py regression test for visual-QA theme discovery
 scripts/sign-release.mjs          configure and inspect local upload signing
@@ -360,14 +476,20 @@ factory conventions belong in this file, OpenSpec, or `harness/`.
 ```bash
 # phase 1 — development
 node scripts/check-economics.mjs --slot <slug>           # money stage: plan vs enabled capabilities
+node scripts/check-outcomes.mjs --slot <slug>            # earn stage: dated readings vs the plan's own kill criteria
+node scripts/check-client-secrets.mjs --slot <slug>      # no client-side paid-API credential in the shipped app
 node scripts/check-differentiators.mjs --slot <slug>     # promise gate: is every reason delivered or dropped
 node scripts/check-differentiators.mjs --slot <slug> --allow-deferred  # builder progress read, never completion
 node scripts/check-locales.mjs --slot <slug>             # declared app languages have resources
 node scripts/test-locale-dedup.mjs                       # a non-translatable key is declared once
+node scripts/check-freshness.mjs                         # a measured fact is in date and names a program that enforces it
+node scripts/check-lessons.mjs                           # every lesson's named sensor still exists on disk
 python scripts/check-adaptive-icon.py --slot <slug>      # launcher mark fits adaptive-icon masks
 python scripts/visual-qa.py --slot <slug>                # visual-identity report; read it, exit 0 is not approval
 python scripts/test-visual-qa-discovery.py               # visual-QA theme-discovery regression test
-node scripts/selftest.mjs                         # factory scripts vs a sandbox slot
+python scripts/test-console-answers.py                   # generated console sheet: generation, drift, and the model
+node scripts/console-walkthrough.mjs --check             # the walkthrough still matches the shared console model
+node scripts/selftest.mjs                         # factory scripts vs a sandbox slot, plus every scripts/test-* suite
 node scripts/verify-slot.mjs                      # runs the self-test too
 node scripts/verify-slot.mjs --slot <slug>
 node scripts/verify-slot.mjs --slot <slug> --build   # phase-1 evidence: source gates + assembleDebug
@@ -386,19 +508,44 @@ python scripts/check-16k.py apps/<slot>/dist/*.apk apps/<slot>/dist/*.aab  # 16 
 node scripts/verify-slot.mjs --slot <slug> --strict-store --build   # release evidence
 node scripts/verify-slot.mjs --base main
 node scripts/verify-slot.mjs --no-selftest        # skip the self-test (rare)
+# factory health and the portfolio's money
+node scripts/kiln-status.mjs                      # every slot's phase, every slot's earnings verdict
+node scripts/kiln-status.mjs --kill <slug> --reason "<why>"  # record a kill; refuses without a reason
 node scripts/test-capture-publish.mjs             # capture-publish failure injection (offline, fast)
 node scripts/test-apk-provenance.mjs              # APK provenance failure injection (offline, fast)
 node scripts/test-play-reviews.mjs                # review-sensor unit tests (offline, fast)
+node scripts/test-slot-lock.mjs                   # per-slot lease: holder named, no deadlock
+node scripts/test-client-secrets.mjs              # client-secret detector, with negative controls
+node scripts/test-outcomes.mjs                    # post-ship verdicts and the kill boundary
+node scripts/test-pack-approval.mjs               # approval covers the authored pack, not just the build
+python scripts/test-store-studio-completeness.py  # composed media: needs local store/captures (gitignored)
 node scripts/verify-reviews-sensor.mjs            # review sensor vs live Play pages
 ```
 
 `scripts/lib/release-approval.mjs` is the single source of truth for the phase boundary. An
 approval record (`apps/<slot>/release-approval.json`, gitignored) stores the owner's own words, a
-timestamp, and a SHA-256 digest of the slot's build inputs. Editing any of those inputs invalidates
-the approval on the next check, so "approve, then keep coding" cannot silently ship an unreviewed
-revision. `--revoke` is always safe and never needs permission; recording one never does. When a
-release script refuses, the fix is to ask the owner, never to edit or delete the record — and
-`prepare-release.mjs`, `store-kit.py`'s rendering paths and `media-capture.mjs` all refuse, while
+timestamp, and **two** SHA-256 digests: one of the slot's build inputs, and one — `pack-approval.mjs` —
+of the authored pack inputs the owner actually reviewed (`store/listing.json`, `store/journey.json`,
+`store/studio.json`, `store/review-notes.md`). Editing any of those invalidates the approval on the
+next check, so "approve, then keep coding" cannot silently ship an unreviewed revision, and neither can
+"approve the app, then rewrite the listing to claim something the app does not do" — that second half
+was outside the digest entirely, and the demonstration was a one-file edit that both `store-kit.py` and
+`media-capture.mjs` accepted. Pipeline outputs (`store/assets/**`, `provenance.json`, `console-answers.md`)
+are deliberately **not** in the pack digest: a digest over the pipeline's own output would void its own
+approval every time the pipeline ran. `prepare-release.mjs`, `store-kit.py`'s rendering paths,
+`media-capture.mjs` and now `play-upload.mjs` all refuse without it — the uploader was the one script
+that talked to Google Play and never asked whether the revision was approved. `--revoke` is always safe
+and never needs permission; recording one never does. When a release script refuses, the fix is to ask
+the owner, never to edit or delete the record.
+
+Two honest limits, stated rather than implied. First, neither digest covers `scripts/**`,
+`.cursor/rules/**` or this file, so an agent could in principle weaken the check that judges it after
+approval; widening the digest to `scripts/**` would void every slot's approval on every harness
+improvement, which is the opposite of what this factory is, so the boundary is made **auditable**
+(one command reports exactly which bytes the owner approved) rather than tamper-proof. The real defence
+is that recorded approvals are read back and the harness changes are reviewed as diffs. Second,
+`approvedBy: 'owner'` is a constant in the record: nothing can distinguish the owner's words from an
+agent's. Only recording an approval from the owner's own words, never inferred, keeps that true.
 `store-kit.py --init` and `--validate-only` stay usable during development.
 
 `scripts/test-capture-publish.mjs` injects the interruptions that publish's fail-closed claim
@@ -472,7 +619,11 @@ see `.cursor/rules/verification-discipline.mdc`.
 - No secret may be committed or printed into a worker prompt or log.
 - Improve the root harness when the same failure recurs across slots.
 - Archive or kill failed attempts; do not turn PlayKiln into one product repo.
-- Human approval is mandatory for legal declarations, first upload, and publish.
+- Human approval is mandatory for the legal declarations and for releasing at all: the stage-5
+ approval record is the owner's own words and is never inferred. What is **not** human any more is
+ pressing the console's controls — `docs/play-publishing-playbook.md` §5.1 records the submission
+ ladder as walked by the agent on 2026-09-29, and only the graphics upload and the two
+ first-publication attestations stay with the owner.
 - A slot is never scaffolded without a validated `economics.json`; the money stage is not optional.
 - A slot is never scaffolded without a validated `differentiators.json` either, and it is authored
   from recon **before** the UI. Every promise starts `deferred`, and `verify-slot.mjs` fails while

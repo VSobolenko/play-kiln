@@ -22,6 +22,17 @@
  * fails on a legitimate rename. An explicit list with the claim it enforces beside it is reviewable,
  * and a reviewer adding a feature is the person who should add its line.
  *
+ * **The defect this table then caused, recorded 2026-09-29.** Because the table is written for the one
+ * slot it was authored against, it reported a *pass* for every other slot while checking nothing: a
+ * slot with no ViewModel under `ui/` printed "nothing to check", and a slot whose ViewModels share none
+ * of these names printed "0 reachable, 0 reported as notes". An independent review reproduced it on
+ * `apps/2026-09-25-pipe-sizing` — a green line for a check that structurally cannot go red, printed by
+ * `verify-slot.mjs` for every slot unconditionally. That is precisely what
+ * `.cursor/rules/verification-discipline.mdc` forbids ("a check that cannot fail is not a check"), so
+ * the two ways of checking nothing are now `UNVERIFIED` (exit 2) rather than `PASS`: the honest
+ * statement is "this check cannot speak for this slot", and it stops a release from being called green
+ * until someone writes the slot's own mapping.
+ *
  * Usage:
  *   node scripts/check-ui-coverage.mjs --slot teacher-gradebook
  */
@@ -132,8 +143,16 @@ function main() {
 
   const viewModels = uiDirs.filter((file) => path.basename(file).endsWith('ViewModel.kt'))
   if (viewModels.length === 0) {
-    console.log(`PASS ui-coverage - ${path.basename(slot)} has no ViewModel under ui/, nothing to check`)
-    return
+    // This used to be a PASS. It is not one: with no ViewModel under `ui/` there is no operation to
+    // compare against any claim, so the check has measured nothing and must not be read as a clean
+    // result. Exit 2 is the repository's convention for exactly this ("measured once, unverified
+    // now"), and `verify-slot.mjs` turns it into UNVERIFIED rather than a green line.
+    console.log(
+      `UNVERIFIED ui-coverage - ${path.basename(slot)} declares no ViewModel under ui/, so nothing ` +
+        'about the listing\'s claims could be checked. Point REQUIRED at this slot\'s own operations ' +
+        'before treating this as evidence.',
+    )
+    process.exit(2)
   }
 
   // A screen's own file is not a caller of its own ViewModel: the operation is dangling unless some
@@ -141,6 +160,24 @@ function main() {
   const corpus = uiDirs
     .filter((file) => !viewModels.includes(file))
     .map((file) => ({ file, source: fs.readFileSync(file, 'utf8') }))
+
+  const declared = new Set()
+  for (const vm of viewModels) {
+    for (const operation of declaredOperations(fs.readFileSync(vm, 'utf8'))) declared.add(operation)
+  }
+
+  // The required table is authored for one slot. When none of its names exists in this slot's
+  // ViewModels, the table describes a different app, so a pass here would be a claim about a check
+  // that never ran — the exact false green an independent review found on `pipe-sizing`.
+  const applicable = Object.keys(REQUIRED).filter((operation) => declared.has(operation))
+  if (applicable.length === 0) {
+    console.log(
+      `UNVERIFIED ui-coverage - ${path.basename(slot)} declares ${declared.size} ViewModel ` +
+        `operation(s) and none of them is named by REQUIRED, so this table cannot check this slot. ` +
+        'Add its claimed operations to REQUIRED, with the listing sentence each one keeps.',
+    )
+    process.exit(2)
+  }
 
   const missing = []
   const notes = []

@@ -734,7 +734,11 @@ function main() {
   }
   // Screenshots are release media: they are composed after approval and then committed as a
   // claim about the shipped build. Refuse before touching a device rather than after a
-  // journey has run, so an unapproved revision costs a device run nothing.
+  // journey has run, so an unapproved revision costs a device run nothing. The check covers both
+  // halves of the approval and its reason names the half that moved: the app (the build inputs
+  // the capture is proven against, further down this file) and the authored store pack — this
+  // run photographs `store/journey.json` and renders from `store/studio.json`, so a pack edited
+  // after approval would otherwise be captured as if the owner had reviewed it.
   const approval = checkReleaseApproval(slotDir)
   if (!approval.ok) block(approval.reason)
   const store = path.join(slotDir, 'store')

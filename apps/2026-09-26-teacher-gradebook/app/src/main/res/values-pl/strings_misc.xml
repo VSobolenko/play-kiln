@@ -25,6 +25,7 @@
     <string name="about_privacy_title">Prywatność z założenia</string>
     <string name="about_privacy_body">Aplikacja działa offline i zapisuje dziennik w prywatnej pamięci tego urządzenia. Nie ma konta, logowania, analityki, reklam ani serwera dewelopera. Pliki opuszczają urządzenie tylko wtedy, gdy je wyeksportujesz lub zrobisz kopię zapasową przez systemowe okno wyboru; Android Auto Backup może również skopiować dziennik na Twoje konto Google, jeśli kopie zapasowe urządzenia są włączone.</string>
     <string name="about_privacy_billing">Płatności i historię zakupów obsługuje Google Play Billing. Nigdy nie otrzymuje Twojego dziennika klasowego przez tę aplikację.</string>
+    <string name="about_privacy_policy_action">Otwórz politykę prywatności</string>
     <string name="about_averages_title">Średnie wyjaśniają swoje obliczenia</string>
     <string name="about_averages_body">Każda średnia działa według ustawionych kategorii, wag, zaokrąglania i reguły nieoddanych prac. Puste i zwolnione prace nigdy nie stają się po cichu zerem, a kategorie bez użytecznych ocen są nazwane i pomijane.</string>
     <string name="about_purchase_title">Jedno stałe odblokowanie</string>

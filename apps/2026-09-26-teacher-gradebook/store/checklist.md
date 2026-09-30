@@ -12,5 +12,14 @@
 - [ ] Upload phone, 7-inch tablet, and 10-inch tablet assets for every locale.
 - [ ] Verify edge-to-edge, orientation, text scale, and tablet layouts on representative devices.
 - [ ] For a brand-new package, upload the first AAB and complete legal declarations manually in Play Console.
+
+## Billing — create and activate what the app asks for
+
+A purchase flow that references an unknown product fails in the reviewer's session, so every
+step below has to be done, and confirmed with a real test purchase, before review submits.
+
+- [ ] Create each of these in Play Console → Monetize with Play → Products → In-app products: `recordbook_pro`.
+- [ ] Activate each product's purchase option. An option left in Draft *isn't returned by the Play Billing Library*, so the app behaves as if the product does not exist.
+- [ ] Add the account that will test purchases to Play Console → Settings → License testing. An account added only as an internal tester on a track is **not** a license tester, and a purchase made by it is charged **real money**.
 - [ ] Use `node scripts/play-upload.mjs --slot teacher-gradebook --track internal --dry-run` before any live upload.
 - [ ] Obtain explicit human approval before committing a Play edit.

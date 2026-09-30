@@ -19,6 +19,19 @@ dist/
 *.keystore
 keystore.properties
 
+# Promo codes issued for this slot's promotions. A code is a free unlock of whatever the
+# slot sells, so a downloaded batch is a pile of giveaways: it belongs beside the slot on
+# one machine, never in a repository that can be cloned, forked, shared, or made public
+# later. `store/console-answers.md` carries the reviewer instruction with a placeholder
+# rather than a live code, so the committed pack has nothing to leak.
+#
+# Both names are listed because the console's own export is `promotion_codes.csv` while the
+# factory's convention for the same file is `promo-codes.csv`, and a rule that covers only
+# the second one leaves the console's real filename untracked-but-committable - which is how
+# a batch of 100 codes sat staged for a commit on 2026-09-29.
+promo-codes.csv
+promotion_codes.csv
+
 # Local environment and service credentials.
 .env
 .env.*

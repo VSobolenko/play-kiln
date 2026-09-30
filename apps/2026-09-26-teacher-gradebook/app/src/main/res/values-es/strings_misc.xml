@@ -25,6 +25,7 @@
     <string name="about_privacy_title">Privado por diseño</string>
     <string name="about_privacy_body">La aplicación funciona sin conexión y guarda su registro en el almacenamiento privado de este dispositivo. No hay cuenta, inicio de sesión, analíticas, publicidad ni servidor del desarrollador. Los archivos solo salen cuando usted exporta o hace una copia de seguridad mediante el selector del sistema; la Copia de seguridad de Android también puede copiar el registro a su propia cuenta de Google si la copia de seguridad del dispositivo está activada.</string>
     <string name="about_privacy_billing">Google Play Billing gestiona el tráfico de compras y el historial de compras. Nunca recibe el registro de su clase a través de esta aplicación.</string>
+    <string name="about_privacy_policy_action">Abrir la política de privacidad</string>
     <string name="about_averages_title">Las medias explican sus cálculos</string>
     <string name="about_averages_body">Cada media sigue las categorías, las ponderaciones, el redondeo y la regla de trabajos no entregados que usted haya definido. El trabajo sin calificar o exento nunca se convierte en cero de forma silenciosa, y las categorías sin notas utilizables se indican y se excluyen.</string>
     <string name="about_purchase_title">Un desbloqueo permanente</string>

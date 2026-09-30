@@ -25,6 +25,7 @@
     <string name="about_privacy_title">Privato per progettazione</string>
     <string name="about_privacy_body">L\'app funziona offline e scrive il registro nella memoria privata di questo dispositivo. Non ci sono account, accessi, analisi, pubblicità né server dello sviluppatore. I file escono solo quando esporta o salva una copia di sicurezza tramite il selettore di sistema; il backup automatico di Android può anche copiare il registro sul suo account Google, se il backup del dispositivo è attivo.</string>
     <string name="about_privacy_billing">Google Play Billing gestisce il traffico di acquisto e la cronologia degli acquisti. Non riceve mai il registro delle classi tramite questa app.</string>
+    <string name="about_privacy_policy_action">Apri l\'informativa sulla privacy</string>
     <string name="about_averages_title">Le medie spiegano il proprio calcolo</string>
     <string name="about_averages_body">Ogni media segue le categorie, i pesi, l\'arrotondamento e la regola sui compiti non consegnati che ha impostato. Il lavoro vuoto o esonerato non diventa mai zero di nascosto, e le categorie senza voti utilizzabili vengono indicate ed escluse.</string>
     <string name="about_purchase_title">Un unico sblocco permanente</string>

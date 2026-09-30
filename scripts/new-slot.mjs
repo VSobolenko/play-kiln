@@ -66,7 +66,12 @@ const excludedDirectories = new Set([
   '.git',
   'captures',
   '.cxx',
-  'dist'
+  'dist',
+  // A Python bytecode cache is a build output: `scripts/__pycache__/*.pyc` is machine-local, binary
+  // and gitignored. It is listed here rather than in one caller's filter because the predicate is the
+  // single answer to "what must not be copied", and `scripts/selftest.mjs` now walks the whole
+  // `scripts/` tree through it.
+  '__pycache__'
 ])
 const excludedFiles = new Set(['local.properties', 'keystore.properties', '.DS_Store'])
 const excludedSuffixes = ['.apk', '.aab', '.ap_', '.jks', '.keystore', '.iml']

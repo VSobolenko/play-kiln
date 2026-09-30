@@ -10,13 +10,13 @@ rules:
   proposal:
     - State the app idea, target user, and non-goals in under 400 words
     - Include unique applicationId / slug
-    - State the monetization archetype, the paying user, what exactly is bought, the price, the
+    - 'State the monetization archetype, the paying user, what exactly is bought, the price, the
       moment of payment, and numeric kill criteria, matching the economics plan the slot will be
       created with. The authoritative vocabulary and field list are in `docs/slot-economics.md`;
       the gate is `scripts/check-economics.mjs`. A proposal with no revenue mechanism is
       incomplete, not merely thin: the factory shipped `apps/2026-09-25-pipe-sizing` with
       `capabilities.json` of `{"enabled": []}` and every gate passed
-      (`docs/reviews/2026-09-26-slot-1-economics-postmortem.md`).
+      (`docs/reviews/2026-09-26-slot-1-economics-postmortem.md`).'
     - Cite the demand evidence for this category and label every claim MEASURED / ON RECORD /
       INFERRED / UNVERIFIED. Do not propose a topic inherited from an example the owner gave, do
       not propose a calculator, unit converter or generic arithmetic tool, and do not re-propose

@@ -5,11 +5,14 @@ notes** fields. Claims here describe the shipped build only.
 
 ## App access
 
-**No account, login or special access is required.** Everything works on a fresh install: the app
-opens on an empty class list and the reviewer can create a class, mark it and export from there.
+The slot sells an unlock, so some content is behind a purchase. The console's «no» branch asserts
+that paying for content is not required, which this slot cannot assert truthfully; the reviewer
+therefore needs access given to them, which is a promo code in the instructions.
 
-There is no demo account because there are no accounts. Nothing in the app is gated behind a login
-or a code.
+The access itself is recorded in the console's App access declaration (`Контент приложения →
+Учетные данные`), whose exact string to paste is generated into `store/console-answers.md`; the
+credential is deliberately not reproduced here, because it is access the slot hands out rather than
+text the pack publishes.
 
 ## What to do in two minutes
 

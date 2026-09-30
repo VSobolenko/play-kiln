@@ -6,8 +6,19 @@ import { inflateSync } from 'node:zlib'
 // Google Play app icon rule: 512x512 32-bit PNG with alpha, at most 1024 KB.
 export const APP_ICON = Object.freeze({ width: 512, height: 512, maxBytes: 1024 * 1024, format: 'png', alpha: true })
 
-// Google Play feature graphic rule: exactly 1024x500, JPEG or 24-bit PNG without alpha.
-export const FEATURE_GRAPHIC = Object.freeze({ width: 1024, height: 500, formats: Object.freeze(['jpeg', 'png']), alpha: false })
+// Google Play feature graphic rule: exactly 1024x500, JPEG or 24-bit PNG without alpha, at most 15 MB.
+export const FEATURE_GRAPHIC = Object.freeze({ width: 1024, height: 500, formats: Object.freeze(['jpeg', 'png']), alpha: false, maxBytes: 15 * 1024 * 1024 })
+
+// The aspect rule the Play Console states in EVERY screenshot field, in the console's own inline
+// words (measured live, RU console, 2026-09-29, on the app's `Стандартная страница приложения`
+// page): "Соотношение сторон изображения должно составлять 16:9 или 9:16". Phone, 7-inch and
+// 10-inch share the sentence, so it is one constant here rather than a per-kind key.
+//
+// `store-kit.py` -> `SCREENSHOT_ASPECT_RATIOS` remains the authoritative copy (it is what renders
+// and validates the pack, and what `scripts/verify-slot.mjs` reads); this export exists so a
+// caller of this library applies the same rule rather than trusting `maxAspectRatio: 2`, which is
+// Play's weaker general-Requirements cap and never the console's aspect requirement.
+export const SCREENSHOT_ASPECT_RATIOS = Object.freeze([Object.freeze([16, 9]), Object.freeze([9, 16])])
 
 // Google Play phone screenshot rule: 2-8 images, 320-3840px sides, long side no more than twice the short side.
 //
@@ -67,10 +78,15 @@ export const NON_DEGENERATE = Object.freeze({
   minScreenshotColours: 12
 })
 
-// Google Play 7-inch tablet screenshot rule: 4-8 images, short edge at least 1080px, long edge at most 7680px.
-export const TABLET_7 = Object.freeze({ min: 4, max: 8, minShortSide: 1080, maxLongSide: 7680, maxBytes: 8 * 1024 * 1024 })
+// Google Play 7-inch tablet screenshot rule: 4-8 images, sides 320-3840px, at most 8 MB each.
+//
+// The console's 7-inch field accepts 320..3840 ("каждая сторона 320..3840"), the same window as
+// the phone field, so this is the laxer of the two tablet windows: the 1080px floor belongs to
+// the 10-inch field, not this one. `SCREENSHOT_ASPECT_RATIOS` above is the ratio rule both
+// tablet fields and the phone field share.
+export const TABLET_7 = Object.freeze({ min: 4, max: 8, minShortSide: 320, maxLongSide: 3840, maxBytes: 8 * 1024 * 1024 })
 
-// Google Play 10-inch tablet screenshot rule: 4-8 images, short edge at least 1080px, long edge at most 7680px.
+// Google Play 10-inch tablet screenshot rule: 4-8 images, sides 1080-7680px, at most 8 MB each.
 export const TABLET_10 = Object.freeze({ min: 4, max: 8, minShortSide: 1080, maxLongSide: 7680, maxBytes: 8 * 1024 * 1024 })
 
 // Google Play main-store-listing character limits: title 30, short description 80, full description 4000.
@@ -142,6 +158,20 @@ function isStartOfFrame(marker) {
   return marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)
 }
 
+/**
+ * The console's aspect rule for one screenshot size, or `null` when it is 16:9 or 9:16.
+ *
+ * The comparison cross-multiplies so an exactly 9:16 canvas is decided by integers, never by a
+ * float rounding a pixel-perfect 1080x1920 into a near miss.
+ */
+export function aspectRatioProblem(kind, width, height) {
+  for (const [across, down] of SCREENSHOT_ASPECT_RATIOS) {
+    if (width * down === height * across || width * across === height * down) return null
+  }
+  const allowed = SCREENSHOT_ASPECT_RATIOS.map(([across, down]) => `${across}:${down}`).join(' or ')
+  return `${kind}: ${width}x${height} is not ${allowed}`
+}
+
 export function isValidScreenshot(width, height) {
   if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) return false
   const shortSide = Math.min(width, height)
@@ -149,7 +179,8 @@ export function isValidScreenshot(width, height) {
   return (
     shortSide >= PHONE_SCREENSHOTS.minSide &&
     longSide <= PHONE_SCREENSHOTS.maxSide &&
-    longSide <= shortSide * PHONE_SCREENSHOTS.maxAspectRatio
+    longSide <= shortSide * PHONE_SCREENSHOTS.maxAspectRatio &&
+    aspectRatioProblem('screenshot', width, height) === null
   )
 }
 

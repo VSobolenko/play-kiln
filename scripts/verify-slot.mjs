@@ -180,6 +180,64 @@ function storeLine(ok, message) {
   line(ok ? 'PASS' : STRICT_STORE ? 'FAIL' : 'WARN', message)
 }
 
+/**
+ * A factory file that another process wrote *while* this gate was reading it.
+ *
+ * Recorded 2026-09-29: `verify-slot.mjs --strict-store --build` reported `VERDICT: FAIL` for a slot
+ * whose app was untouched, with `composed-asset inventory could not be read — scripts/store-kit.py ...
+ * SCREENSHOT_ASPECT_RATIOS declares no ratio`. The constant was declared; a worker was rewriting
+ * `store-kit.py` at that moment and the reader had loaded the file mid-write, between the constant's
+ * name and its value. Nothing in that output said "the factory is being edited" — it read as a verdict
+ * about the slot's pack, which is a verdict about the wrong thing, and a run like that is how a real
+ * defect gets dismissed as noise on the next attempt.
+ *
+ * So a shared factory source is read with its mtime sampled on both sides. If it moved, no reader can
+ * tell a half-written file from a broken one, and this throws instead of judging. Callers report
+ * `UNVERIFIED`, never `FAIL`: the same reasoning as `run-slot-tests.mjs`, where a test task Gradle did
+ * not re-execute is `STALE` rather than a test result.
+ *
+ * The read is the whole mechanism — a lock would have to be held by every writer, including a human in
+ * an editor, so the sensor is the only version that cannot be forgotten by the side being protected.
+ */
+class FactorySourceMovedError extends Error {}
+
+function readFactorySource(relative) {
+  const file = path.join(ROOT, relative.split('/').join(path.sep))
+  const before = statSync(file).mtimeMs
+  const text = readFileSync(file, 'utf8')
+  const after = statSync(file).mtimeMs
+  if (before !== after) {
+    throw new FactorySourceMovedError(
+      `${relative} changed while it was being read (${new Date(before).toISOString()} -> ${new Date(after).toISOString()}), so a half-written file cannot be told from a broken one`
+    )
+  }
+  return text
+}
+
+/**
+ * The documents a store pack must contain, and what each one's absence means, read from the model.
+ *
+ * `store-kit.py`'s `pack_documents()` reads the same `packDocuments` inventory, so a document added
+ * to the generator is judged here too. That is the whole point: while both gates carried their own
+ * list, `store/console-answers.md` was missing from a shipped slot's pack and neither noticed.
+ * A model that cannot be read is a broken gate rather than an empty inventory, so it throws and the
+ * caller reports it instead of printing a clean pack.
+ */
+function packDocumentInventory() {
+  let form
+  try {
+    form = JSON.parse(readFactorySource('scripts/lib/console-form.json'))
+  } catch (error) {
+    if (error instanceof FactorySourceMovedError) throw error
+    throw new Error(`scripts/lib/console-form.json could not be read (${error.message}); the pack has no inventory without it`)
+  }
+  const documents = form?.packDocuments?.documents
+  if (!Array.isArray(documents) || documents.length === 0) {
+    throw new Error('scripts/lib/console-form.json packDocuments.documents is empty, so no document can be judged present or absent')
+  }
+  return documents
+}
+
 function pngDetails(file) {
   try {
     const bytes = readFileSync(file)
@@ -232,7 +290,7 @@ const SCREEN_KINDS = Object.freeze({
  * loudly instead of silently verifying nothing.
  */
 function loadStoreKitInventory() {
-  const source = readFileSync(path.join(ROOT, 'scripts', 'store-kit.py'), 'utf8')
+  const source = readFactorySource('scripts/store-kit.py')
 
   const targetBlock = source.match(/SCREEN_TARGETS\s*=\s*\{([\s\S]*?)\n\}/)
   if (!targetBlock) throw new Error('SCREEN_TARGETS not found in scripts/store-kit.py')
@@ -258,12 +316,30 @@ function loadStoreKitInventory() {
   if (!maxBytesMatch) throw new Error('MAX_PNG_BYTES not found in scripts/store-kit.py')
   const maxBytes = maxBytesMatch[1].split('*').reduce((total, part) => total * Number(part.trim()), 1)
 
+  // The console's aspect sentence - "Соотношение сторон изображения должно составлять 16:9 или
+  // 9:16" - applies to every screenshot field, so it is read from the same authoritative file
+  // rather than restated. Without it a `max_ratio: None` kind (both tablet kinds) was checked for
+  // size only, and a 5:8 canvas passed a gate that Play's own prose refuses.
+  //
+  // The value carries a type annotation (`SCREENSHOT_ASPECT_RATIOS: tuple[tuple[int, int], ...] =
+  // ((16, 9), (9, 16))`), so the whole line is matched and the pairs are read out of it; anchoring
+  // on `((`/`))` instead would let the greedy group swallow the final pair's closing paren.
+  const aspectLine = source.match(/^SCREENSHOT_ASPECT_RATIOS[^\n]*$/m)
+  if (!aspectLine) throw new Error('SCREENSHOT_ASPECT_RATIOS not found in scripts/store-kit.py')
+  const aspectRatios = [...aspectLine[0].matchAll(/\((\d+)\s*,\s*(\d+)\)/g)].map((match) => [
+    Number(match[1]),
+    Number(match[2])
+  ])
+  if (aspectRatios.length === 0) {
+    throw new Error('scripts/store-kit.py SCREENSHOT_ASPECT_RATIOS declares no ratio')
+  }
+
   const inventory = []
   for (const [kind, target] of targets) {
     const limit = limits.get(kind)
     if (!limit) throw new Error(`scripts/store-kit.py has no SCREENSHOT_LIMITS entry for ${kind}`)
     if (!SCREEN_KINDS[kind]) throw new Error(`verify-slot has no Play count rule for screenshot kind ${kind}`)
-    inventory.push({ kind, ...target, ...limit, maxBytes })
+    inventory.push({ kind, ...target, ...limit, maxBytes, aspectRatios })
   }
   for (const kind of Object.keys(SCREEN_KINDS)) {
     if (!targets.has(kind)) throw new Error(`scripts/store-kit.py SCREEN_TARGETS has no ${kind} entry`)
@@ -275,6 +351,13 @@ function loadStoreKitInventory() {
 function screenshotRuleProblem(limit, { width, height }) {
   const shortSide = Math.min(width, height)
   const longSide = Math.max(width, height)
+  const allowed = limit.aspectRatios.map(([across, down]) => `${across}:${down}`).join(' or ')
+  const ratioOk = limit.aspectRatios.some(
+    ([across, down]) => width * down === height * across || width * across === height * down
+  )
+  if (!ratioOk) {
+    return `${width}x${height} is not ${allowed} (Play's screenshot aspect rule, scripts/store-kit.py SCREENSHOT_ASPECT_RATIOS)`
+  }
   if (shortSide < limit.minShort) return `short side ${shortSide}px is below the ${limit.minShort}px minimum`
   if (longSide > limit.maxLong) return `long side ${longSide}px exceeds the ${limit.maxLong}px maximum`
   if (limit.maxRatio !== null && longSide > shortSide * limit.maxRatio) {
@@ -346,8 +429,13 @@ function verifyComposedAssets(locale, localeDir, inventory) {
       const ruleProblem = dimensions ? screenshotRuleProblem(target, dimensions) : 'unreadable PNG header'
       const content = pngContentProblem(file, { screenshot: true })
       const hash = sha256(file)
-      const duplicate = seenHashes.get(hash)
-      if (!duplicate) seenHashes.set(hash, `${locale}/${name}`)
+      // Scoped to the kind on purpose. Phone and 7-inch are now both 1080x1920 9:16 canvases -
+      // the console's own ratio rule - so identical bytes across those two kinds is the declared
+      // pack shipped to two fields, while two identical frames inside one set is still the
+      // copy-paste defect this check exists for.
+      const hashKey = `${target.kind}:${hash}`
+      const duplicate = seenHashes.get(hashKey)
+      if (!duplicate) seenHashes.set(hashKey, `${locale}/${name}`)
 
       const problems = []
       if (!sizeValid) problems.push(`expected ${target.width}x${target.height} from store-kit.py SCREEN_TARGETS`)
@@ -393,9 +481,7 @@ function verifyComposedAssets(locale, localeDir, inventory) {
 function verifyStorePack(slotDir) {
   console.log('\n#### store pack')
   const storeDir = path.join(slotDir, 'store')
-  const listingMarkdown = path.join(storeDir, 'listing.md')
   const listingJson = path.join(storeDir, 'listing.json')
-  storeLine(existsSync(listingMarkdown), 'store/listing.md')
   storeLine(existsSync(listingJson), 'store/listing.json')
 
   let listing = null
@@ -415,8 +501,39 @@ function verifyStorePack(slotDir) {
     }
   }
 
-  for (const file of ['privacy.md', 'data-safety.md', 'review-notes.md', 'checklist.md']) {
-    storeLine(existsSync(path.join(storeDir, file)), `store/${file}`)
+  // The pack's documents, and what each one's absence means, are the model's inventory
+  // (`scripts/lib/console-form.json` -> `packDocuments`), not a list restated here. Two gates read
+  // it - this one and `store-kit.py --validate-only` - and while each carried its own copy they
+  // disagreed: `store/console-answers.md` was missing from a shipped slot's pack and
+  // `--validate-only` still printed `STORE-KIT: OK`, because the Python list did not name it. A
+  // document only one gate knows about is a document the other one will let go missing.
+  //
+  // A `fail` document is a WARN while the slot is being built and a FAIL under `--strict-store`,
+  // which is the release path; a `warn` document is a WARN either way and its line carries the
+  // model's own reason, because an exemption nobody can read is indistinguishable from a check
+  // nobody wrote. A present-but-empty file counts as absent - it carries no answer to paste.
+  let packDocuments = []
+  try {
+    packDocuments = packDocumentInventory()
+  } catch (error) {
+    if (error instanceof FactorySourceMovedError) {
+      // Not a verdict about this slot: the model changed under the reader.
+      line('UNVERIFIED', `store pack inventory — ${error.message}`)
+      unverified.push('store pack inventory (a factory source moved during the read)')
+    } else {
+      line('FAIL', `store pack inventory — ${error.message}`)
+    }
+  }
+  for (const entry of packDocuments) {
+    const name = String(entry.name)
+    const file = path.join(storeDir, name)
+    if (existsSync(file) && statSync(file).size > 0) {
+      storeLine(true, `store/${name}`)
+    } else if (entry.absence === 'warn') {
+      line('WARN', `store/${name} — absent; ${entry.absenceEn}`)
+    } else {
+      storeLine(false, `store/${name} — missing or empty`)
+    }
   }
 
   const assetsDir = path.join(storeDir, 'assets')
@@ -446,16 +563,18 @@ function verifyStorePack(slotDir) {
   } else {
     const details = pngDetails(featureFile)
     const content = pngContentProblem(featureFile)
+    const featureBytes = statSync(featureFile).size
     const valid =
       details?.width === FEATURE_GRAPHIC.width &&
       details?.height === FEATURE_GRAPHIC.height &&
       details.bitDepth === 8 &&
       details.colorType === 2 &&
       !details.hasTransparencyChunk &&
-      !content.problem
+      !content.problem &&
+      featureBytes <= FEATURE_GRAPHIC.maxBytes
     storeLine(
       valid,
-      `feature-graphic-1024x500.png — ${details ? `${details.width}x${details.height}` : 'invalid PNG'}, ${content.note}${valid ? '' : ' (requires 1024x500 24-bit RGB PNG without alpha, non-uniform content)'}`
+      `feature-graphic-1024x500.png — ${details ? `${details.width}x${details.height}` : 'invalid PNG'}, ${bytesToHuman(featureBytes)}, ${content.note}${valid ? '' : ` (requires 1024x500 24-bit RGB PNG without alpha, <= ${bytesToHuman(FEATURE_GRAPHIC.maxBytes)}, non-uniform content)`}`
     )
   }
 
@@ -463,7 +582,13 @@ function verifyStorePack(slotDir) {
   try {
     inventory = loadStoreKitInventory()
   } catch (error) {
-    storeLine(false, `composed-asset inventory could not be read — ${error.message}`)
+    if (error instanceof FactorySourceMovedError) {
+      // A concurrent writer, not an app defect: the pack cannot be judged from a half-written source.
+      line('UNVERIFIED', `composed-asset inventory — ${error.message}`)
+      unverified.push('composed-asset inventory (a factory source moved during the read)')
+    } else {
+      storeLine(false, `composed-asset inventory could not be read — ${error.message}`)
+    }
   }
 
   if (inventory) {
@@ -759,6 +884,14 @@ function verifyUiCoverage(slotDir) {
     line('PASS', out.split(/\r?\n/).find((entry) => entry.startsWith('PASS')) || 'UI coverage')
     return
   }
+  if (result.status === 2) {
+    // The check measured nothing for this slot: no ViewModel under `ui/`, or a required table that
+    // names none of this slot's operations. That is `UNVERIFIED`, not a pass and not a defect — it
+    // was a pass until an independent review reproduced this exact false green on `pipe-sizing`.
+    line('UNVERIFIED', out.split(/\r?\n/).find((entry) => entry.startsWith('UNVERIFIED')) || 'UI coverage')
+    unverified.push('UI coverage')
+    return
+  }
   line('FAIL', 'a feature the store listing claims has no control in any screen')
   for (const problem of out.split(/\r?\n/).map((entry) => entry.trim())) {
     if (problem.startsWith('FAIL') || problem.startsWith('NOTE') || problem.startsWith('BLOCKED')) {
@@ -811,6 +944,176 @@ function verifyLocales(slotDir) {
   line('FAIL', 'a declared app language has no resources behind it')
   for (const problem of out.split(/\r?\n/).map((entry) => entry.trim())) {
     if (/^(FAIL|BLOCKED)/.test(problem)) console.log(`            ${problem}`)
+  }
+}
+
+/**
+ * The privacy policy must be reachable from inside the app, not only from the store page.
+ *
+ * Play requires it in **two** places and the console says so in its own words; `AGENTS.md` has stated
+ * the rule for a while and nothing measured it, so `teacher-gradebook` shipped with the policy
+ * nowhere in the app — privacy prose and a support e-mail in `AboutScreen.kt`, and no way to open the
+ * policy. A rule that only a document asserts is the defect, so the check is
+ * `scripts/check-in-app-policy.mjs` and this wrapper is what makes it part of the gate instead of one
+ * more script nobody invokes. The logic lives in `scripts/lib/in-app-policy.mjs`, which
+ * `scripts/test-in-app-policy.mjs` drives against sandboxes, so the suite and the gate cannot drift.
+ *
+ * Exit 2 is the honest verdict for a pack that declares no policy at all: there is then nothing to
+ * mirror, and `scripts/store-kit.py` still owns whether a pack must carry one.
+ */
+function verifyInAppPolicy(slotDir) {
+  const slug = path.basename(slotDir)
+  const script = path.join(ROOT, 'scripts', 'check-in-app-policy.mjs')
+  if (!existsSync(script)) {
+    line('FAIL', 'in-app privacy policy unverified — scripts/check-in-app-policy.mjs is missing')
+    return
+  }
+  const result = spawnSync(process.execPath, [script, '--slot', slug], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    windowsHide: true
+  })
+  const out = `${result.stdout || ''}${result.stderr || ''}`.trim()
+  if (result.error) {
+    line('FAIL', `in-app privacy policy unverified — ${result.error.message}`)
+    return
+  }
+  const rows = out
+    .split(/\r?\n/)
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+  if (result.status === 0) {
+    // The last PASS row is the summary one (the earlier rows name the files); reporting it keeps the
+    // gate line short enough to read while still naming the resource the app opens.
+    const summary = rows.filter((entry) => entry.startsWith('PASS')).pop()
+    line('PASS', summary ? summary.replace(/^PASS\s+/, '') : 'privacy policy reachable in the app')
+    return
+  }
+  if (result.status === 2) {
+    line('UNVERIFIED', 'in-app privacy policy — no privacyPolicyUrl declared, or the pack is unreadable')
+    unverified.push('in-app policy')
+    return
+  }
+  line('FAIL', 'the store pack declares a privacy policy that the app itself cannot open')
+  for (const row of rows) {
+    if (/^(FAIL|NOTE)/.test(row)) console.log(`            ${row}`)
+  }
+}
+
+/**
+ * The shipped APK must not carry a credential for a paid API.
+ *
+ * External research measured this category's signature defect: of 206,867 Android apps scanned,
+ * 1,207 were LLM-enabled and 66.3% had at least one LLM-API misuse, 41% leaked API credentials;
+ * separately, secrets were found in 35% of 50,000 Play apps, 1,802 of them verified live. Every one
+ * of those apps passed its own review, because the leak is invisible to a build, a lint pass and a
+ * unit test — it is a string in a resource file and a dependency in a version catalog.
+ *
+ * The exposure here was total: `secret-guard` and `.cursor/rules/security-secrets.mdc` cover the
+ * repository, and nothing looked inside `app/src/main/`. A slot that called a paid API from the
+ * client would have passed every gate this factory had and shipped its key to anyone who unzipped
+ * the APK. The rule is in `.cursor/rules/client-side-secrets.mdc`; this is the sensor, and it
+ * reports every exemption it applied so a suppressed finding is never invisible.
+ *
+ * A slot with no `app/src/main/` is UNVERIFIED rather than PASS: there is then nothing that could
+ * carry a key, and reporting that as a pass would be a claim about code that does not exist.
+ */
+function verifyClientSecrets(slotDir) {
+  const slug = path.basename(slotDir)
+  const script = path.join(ROOT, 'scripts', 'check-client-secrets.mjs')
+  if (!existsSync(script)) {
+    line('FAIL', 'client-side secrets unverified — scripts/check-client-secrets.mjs is missing')
+    return
+  }
+  const result = spawnSync(process.execPath, [script, '--slot', slug], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    windowsHide: true
+  })
+  const out = `${result.stdout || ''}${result.stderr || ''}`.trim()
+  if (result.error) {
+    line('FAIL', `client-side secrets unverified — ${result.error.message}`)
+    return
+  }
+  const rows = out
+    .split(/\r?\n/)
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+  if (result.status === 0) {
+    const summary = rows.filter((entry) => /^PASS\b/.test(entry)).pop()
+    line('PASS', summary ? summary.replace(/^PASS\s+/, '') : 'no client-side credential or paid-provider call')
+    return
+  }
+  if (result.status === 2) {
+    line('UNVERIFIED', 'client-side secrets — nothing to scan, or the slot is unreadable')
+    unverified.push('client secrets')
+    return
+  }
+  line('FAIL', 'the shipped client carries a credential or calls a paid API directly')
+  for (const row of rows.filter((entry) => /^(FAIL|FINDING|NOTE)/.test(entry)).slice(0, 8)) {
+    console.log(`            ${row}`)
+  }
+}
+
+/**
+ * The measured facts this factory's rules rest on must not quietly go stale.
+ *
+ * Every rule here is a fact measured at a moment in time: Play's field limits, the console's own
+ * sentences, a pinned toolchain version, the EU geo-blocking notice. They live as prose in
+ * `AGENTS.md`, `design docs` and `scripts/lib/console-form.json`, and none of them recorded *when*
+ * they were true — so a Google Play limit changing was, from inside this repository, undetectable,
+ * and the next slot would silently ship against a stale rule. `docs/research/measured-facts.json`
+ * now carries each fact with its source, the date it was re-checked and the paths that depend on it,
+ * and `scripts/check-freshness.mjs` is the watchdog.
+ *
+ * Stale is `UNVERIFIED`, never PASS: the fix is for a human to re-open the source and re-date the
+ * entry, and no amount of green code can substitute for that. It is not `FAIL` either — a Play
+ * requirement changing is not a code defect, and blocking a slot on it would teach people to silence
+ * the check, which is the failure mode this replaces.
+ */
+function verifyMeasuredFacts() {
+  const script = path.join(ROOT, 'scripts', 'check-freshness.mjs')
+  if (!existsSync(script)) {
+    line('FAIL', 'measured facts unverified — scripts/check-freshness.mjs is missing')
+    return
+  }
+  const result = spawnSync(process.execPath, [script], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    windowsHide: true
+  })
+  const out = `${result.stdout || ''}${result.stderr || ''}`.trim()
+  if (result.error) {
+    line('FAIL', `measured facts unverified — ${result.error.message}`)
+    return
+  }
+  const rows = out
+    .split(/\r?\n/)
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+  if (result.status === 0) {
+    line('PASS', rows.find((entry) => /^VERDICT:/.test(entry)) || 'measured facts are within their re-check windows')
+    return
+  }
+  if (result.status === 2) {
+    // Exit 2 is "the ledger cannot be trusted right now", and it has more than one cause: a fact past
+    // its re-check window, and a fact that names no enforcing program at all. The first version of
+    // this wrapper named only the window, so the run printed "a measured fact is past its re-check
+    // window" while every fact was in date and the actual reason was the unenforced one - a message
+    // describing a defect that was not there is how a real finding gets dismissed as noise. The
+    // verdict is read back from the gate instead, and the rows that explain it are echoed.
+    const verdict = rows.find((entry) => /^VERDICT:/.test(entry))
+    const reason = verdict ? verdict.replace(/^VERDICT:\s*/, '') : 'a measured fact cannot be trusted right now'
+    line('UNVERIFIED', `measured facts — ${reason}`)
+    for (const row of rows.filter((entry) => /UNENFORCED|\bNOTE\b|\bstale\b/i.test(entry) && !/^VERDICT:/.test(entry))) {
+      console.log(`            ${row.trim()}`)
+    }
+    unverified.push('measured facts')
+    return
+  }
+  line('FAIL', 'the measured-facts ledger is broken')
+  for (const row of rows.filter((entry) => /^(FAIL|ERROR)/i.test(entry)).slice(0, 6)) {
+    console.log(`            ${row}`)
   }
 }
 
@@ -972,6 +1275,23 @@ function manifestPermissions(manifestText) {
       .map((match) => match[1])
   )
 }
+
+/**
+ * Composed store media must be complete, and a capture run must not leave half of one behind.
+ *
+ * That is what `scripts/test-store-studio-completeness.py` drives: `render_slot` used to `continue`
+ * past a missing or unreadable raw capture, leaving the **previous** run's composed asset in place —
+ * a pack mixing two capture runs, which `store-kit --validate-only` and `--strict-store` both
+ * accepted, because neither looks at where the pixels came from.
+ *
+ * It is deliberately **not** wired in here, and the reason is a measurement rather than an oversight:
+ * the suite composes the full pack eleven times, so it is minutes-scale, and it reads
+ * `store/captures/raw/`, which is gitignored. A gate that cannot run on a clean checkout and takes
+ * minutes when it can is not a gate — it is a release-procedure step, run by the operator on the
+ * machine holding the captures, and `AGENTS.md` lists it there. `SUITE_EXCLUSIONS` in
+ * `scripts/selftest.mjs` carries the same reason, so its absence from the self-test is a recorded
+ * decision and not a suite nobody remembers to run.
+ */
 
 function verifyCapabilityCompliance(slotDir) {
   console.log('\n#### capability compliance')
@@ -1232,6 +1552,13 @@ if (!ARGV.includes('--no-selftest')) {
   }
 }
 
+// The facts every rule above rests on have a date. This is the only check in the file that is about
+// the factory rather than about a slot, and it is here because a watchdog nobody runs is exactly the
+// defect it was built to catch (`check-adaptive-icon.py` sat uninvoked while the mask it measures
+// clipped the mark). It runs on every verification, slot or not.
+console.log('\n### factory measured facts')
+verifyMeasuredFacts()
+
 const docs = tracked.filter((file) => file.startsWith('openspec/') || file.startsWith('docs/') || file.endsWith('.md'))
 if (docs.length > 0) {
   console.log(`\n### docs/openspec (${docs.length})`)
@@ -1298,6 +1625,8 @@ for (const name of slotDirs) {
   verifyUiCoverage(dir)
   verifyLocales(dir)
   verifyAdaptiveIcon(dir)
+  verifyInAppPolicy(dir)
+  verifyClientSecrets(dir)
   verifyStorePack(dir)
 
   const kotlinChanged = tracked.filter((file) => file.startsWith(`apps/${name}/`) && file.endsWith('.kt'))

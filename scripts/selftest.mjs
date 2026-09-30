@@ -31,6 +31,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
   rmSync,
   utimesSync,
   writeFileSync
@@ -39,12 +40,24 @@ import { tmpdir } from 'node:os'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { isExcludedScaffoldPath, walkFiles } from './new-slot.mjs'
+import { PLACEHOLDER_HOSTS } from './lib/in-app-policy.mjs'
 import { applicationIdForSlug, applicationIdPattern, packagePrefix, scaffoldPackage } from './lib/namespaces.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const SCAFFOLD = join(ROOT, 'scaffold')
 const SLOT_SCAFFOLD = join(SCAFFOLD, 'android-compose')
 const KEEP = process.argv.includes('--keep')
+
+// Python probes below read Russian and English console text, so on a Windows console whose
+// codepage cannot represent every character they die with UnicodeEncodeError and the gate goes
+// red for a reason that has nothing to do with what it grades. Measured 2026-09-29: the `→` in a
+// Russian page path inside `scripts/lib/console-form.json` killed `test-console-answers.py` under
+// cp1251, and `scripts/selftest.mjs` reported `console-answers test exits 0 -> FAIL` on a machine
+// where the suite passed all 113 of its own content legs. A verdict must not depend on the
+// terminal's glyph set. Setting it on the parent environment rather than on each `spawnSync`
+// options object is deliberate: children inherit it, so a probe added later cannot forget it.
+process.env.PYTHONIOENCODING = 'utf-8'
+process.env.PYTHONUTF8 = '1'
 
 let failed = false
 
@@ -92,30 +105,32 @@ function textFiles(directory, { skip = () => false } = {}) {
 
 function createSandbox() {
   const sandbox = mkdtempSync(join(tmpdir(), 'playkiln-selftest-'))
-  mkdirSync(join(sandbox, 'scripts', 'lib'), { recursive: true })
-  copyFileSync(join(ROOT, 'scripts', 'new-slot.mjs'), join(sandbox, 'scripts', 'new-slot.mjs'))
-  copyFileSync(
-    join(ROOT, 'scripts', 'lib', 'namespaces.mjs'),
-    join(sandbox, 'scripts', 'lib', 'namespaces.mjs')
-  )
-  // `new-slot.mjs` now imports the economics validator, so the sandbox needs the
-  // module beside it or the first scaffold run dies on a missing import.
-  copyFileSync(
-    join(ROOT, 'scripts', 'lib', 'slot-economics.mjs'),
-    join(sandbox, 'scripts', 'lib', 'slot-economics.mjs')
-  )
-  // The promise gate and its module are driven against synthetic slots below, so the
-  // sandbox needs both or the section cannot run. The two recon documents exist because
-  // a promise's evidence and the contract's `reconRef` are resolved on disk: a citation
-  // to a file that is not there is the dangling reference the gate is meant to catch.
-  copyFileSync(
-    join(ROOT, 'scripts', 'check-differentiators.mjs'),
-    join(sandbox, 'scripts', 'check-differentiators.mjs')
-  )
-  copyFileSync(
-    join(ROOT, 'scripts', 'lib', 'slot-differentiators.mjs'),
-    join(sandbox, 'scripts', 'lib', 'slot-differentiators.mjs')
-  )
+  // The whole `scripts/` tree, copied once, here, through the factory's own exclusion predicate.
+  //
+  // This replaced a hand-maintained list of individual files, and that list is a defect generator: it
+  // fails by omission, and it fails as a *crash* rather than a readable FAIL line. It was caught twice
+  // in one session — `lib/gradle.mjs` grew an import of `lib/slot-lock.mjs` and every sandboxed
+  // `verify-slot.mjs` died with `ERR_MODULE_NOT_FOUND`, taking twelve capability assertions red for a
+  // reason unrelated to what they grade; and `play-upload.mjs` grew an import of
+  // `lib/release-approval.mjs` while the section that copies it was added without its module, so
+  // `play-upload.mjs --help` inside the sandbox printed a stack trace instead of the flags it documents
+  // (the assertion for `--help documents target release` passed on the word "release" inside the error
+  // text, which is how a crash reads as a partial success).
+  //
+  // Copying the tree makes every future addition automatic, and the predicate is shared with
+  // `new-slot.mjs`, so "what must not be copied" has one answer: build outputs and machine-local files
+  // (`__pycache__`, `*.pyc`) are filtered out, and the scaffold-integrity section proves the filter works.
+  cpSync(join(ROOT, 'scripts'), join(sandbox, 'scripts'), {
+    recursive: true,
+    dereference: false,
+    filter: (source) => {
+      const rel = relative(join(ROOT, 'scripts'), source)
+      return rel === '' || !isExcludedScaffoldPath(rel)
+    }
+  })
+  // The two recon documents exist because a promise's evidence and the contract's `reconRef` are
+  // resolved on disk: a citation to a file that is not there is the dangling reference the gate is
+  // meant to catch.
   mkdirSync(join(sandbox, 'docs', 'research'), { recursive: true })
   mkdirSync(join(sandbox, 'docs', 'ideation'), { recursive: true })
   writeFileSync(
@@ -182,8 +197,16 @@ check(
 const scaffoldIgnore = existsSync(join(SLOT_SCAFFOLD, '.gitignore'))
   ? readFileSync(join(SLOT_SCAFFOLD, '.gitignore'), 'utf8').split(/\r?\n/).map((item) => item.trim())
   : []
-for (const entry of ['keystore.properties', '*.jks', '*.keystore', '.env', 'local.properties', 'release-approval.json']) {
+for (const entry of ['keystore.properties', '*.jks', '*.keystore', '.env', 'local.properties', 'release-approval.json', 'promo-codes.csv', 'promotion_codes.csv']) {
   check(scaffoldIgnore.includes(entry), `scaffold .gitignore covers ${entry}`)
+}
+// The console exports promo codes under its own filename, so a rule covering only the
+// factory's `promo-codes.csv` left the real download untracked-but-committable. The root
+// `.gitignore` is the backstop for a file that lands at the repository root instead of in a
+// slot, and it has to name the same two files or the protection depends on the folder.
+const rootIgnore = readFileSync(join(ROOT, '.gitignore'), 'utf8').split(/\r?\n/).map((item) => item.trim())
+for (const entry of ['promo-codes.csv', 'promotion_codes.csv']) {
+  check(rootIgnore.includes(entry), `root .gitignore covers ${entry}`)
 }
 
 // --------------------------------------------------------------------------
@@ -767,7 +790,9 @@ try {
 
   section('play-upload guards')
 
-  copyFileSync(join(ROOT, 'scripts', 'play-upload.mjs'), join(sandbox, 'scripts', 'play-upload.mjs'))
+  // The sandbox's `scripts/` tree is populated in full by `createSandbox()`, so the upload guards need
+  // no copies of their own — that per-section copying is what missed `play-upload.mjs`'s new import of
+  // `lib/release-approval.mjs` and turned a help-text assertion into a stack trace.
 
   const uploadSlot = join(sandbox, 'apps', `${slotDate}-upload`)
   mkdirSync(join(uploadSlot, 'store'), { recursive: true })
@@ -792,6 +817,38 @@ try {
     )
     return { status: result.status, output: `${result.stdout || ''}${result.stderr || ''}` }
   }
+
+  // `play-upload.mjs` is the only script that talks to Google Play, and it did not ask whether the
+  // revision was approved: an independent review drove it to a complete `--dry-run` plan for a slot no
+  // owner had approved. It now refuses before the pack is read, before the credentials file is opened and
+  // before any plan is printed, so this section needs a fixture approval to exercise the guards behind it
+  // — and the refusal is asserted *before* it is granted, because that assertion is the regression test
+  // for the finding. The third check is the one that matters most: a refusal that still prints the plan
+  // would leak exactly what the gate exists to withhold.
+  const uploadUnapprovedSlot = runUpload(['--slot', 'upload', '--only', 'details', '--dry-run'])
+  check(uploadUnapprovedSlot.status !== 0, 'an unapproved slot is refused before any Play call')
+  check(
+    uploadUnapprovedSlot.output.includes('approve-release.mjs'),
+    'the uploader refusal names the command that records approval'
+  )
+  check(
+    !uploadUnapprovedSlot.output.includes('updateMask'),
+    'the refusal precedes the dry-run plan, so an unapproved revision is not planned'
+  )
+
+  const uploadApproval = spawnSync(
+    process.execPath,
+    [
+      join(sandbox, 'scripts', 'approve-release.mjs'),
+      '--slot-dir', uploadSlot,
+      '--note', 'selftest fixture: this approval exists only inside a temporary sandbox directory'
+    ],
+    { cwd: sandbox, encoding: 'utf8', windowsHide: true }
+  )
+  check(
+    uploadApproval.status === 0,
+    `the fixture approval is recorded (${`${uploadApproval.stdout || ''}${uploadApproval.stderr || ''}`.trim().split(/\r?\n/).pop()})`
+  )
 
   const uploadHelp = runUpload(['--help'])
   check(uploadHelp.status === 0, '--help exits 0')
@@ -876,29 +933,61 @@ try {
   // sandbox politely: the run reports FAIL for the missing helper, so a build-less
   // run stops reporting UNVERIFIED and this section's own honesty checks break. That
   // is how `check-ui-coverage.mjs` was missed when the claimed-feature gate was added.
-  for (const relative of [
-    'verify-slot.mjs',
-    'check-economics.mjs',
-    'check-ui-coverage.mjs',
-    'check-locales.mjs',
-    'check-adaptive-icon.py',
-    'lib/slot-economics.mjs',
-    'lib/play-assets.mjs',
-    'lib/capabilities.mjs',
-    'lib/gradle.mjs',
-    'lib/java.mjs'
-  ]) {
-    copyFileSync(join(ROOT, 'scripts', relative), join(sandbox, 'scripts', relative))
-  }
-
-  // `verify-slot.mjs` now drives the money gate, which resolves the plan's
-  // evidenceRef against the repo root and pairs the archetype with
-  // capabilities.json. Both must exist in the sandbox, or the readiness run fails
-  // on the money gate instead of the build honesty this section is testing.
+  //
+  // `lib/console-form.json` is on the list for the same reason: the store-pack check
+  // judges each document's absence against the inventory that file carries, so a
+  // sandbox without it cannot read the pack's contract at all.
+  // `verify-slot.mjs` drives the money gate, which resolves the plan's evidenceRef against the repo root
+  // and pairs the archetype with capabilities.json, so both must exist here — the scripts tree itself
+  // comes from `createSandbox()`.
+  //
+  // The measured-facts ledger is here for the same reason and was missed the same way: `verify-slot.mjs`
+  // runs `check-freshness.mjs` on every slot, and that gate reads `docs/research/measured-facts.json`
+  // from the root it is run in. Without the file the sandbox run reported a FAIL, so this section's
+  // UNVERIFIED-exit assertion failed with `got 1` instead of 2 — again for a reason unrelated to what it
+  // grades.
   mkdirSync(join(sandbox, 'docs', 'research'), { recursive: true })
   copyFileSync(
     join(ROOT, ...ECONOMICS_EVIDENCE_REF.split('/')),
     join(sandbox, ...ECONOMICS_EVIDENCE_REF.split('/'))
+  )
+  copyFileSync(
+    join(ROOT, 'docs', 'research', 'measured-facts.json'),
+    join(sandbox, 'docs', 'research', 'measured-facts.json')
+  )
+
+  // `check-freshness.mjs` verifies that every path the ledger names in `whereUsed` exists in the
+  // repository, which is what makes a renamed rule file fail instead of silently orphaning the fact it
+  // enforced. The sandbox is a partial copy, so the gate was right and the sandbox was incomplete:
+  // `verify-slot.mjs` inside it reported `LEDGER-WHERE-USED-MISSING: play-listing-text-caps.whereUsed
+  // names AGENTS.md`, which turned this section's "an UNVERIFIED verdict exits 2" assertion into
+  // `got 1` — a red self-test for a reason that had nothing to do with what it grades.
+  //
+  // The files are therefore derived from the ledger rather than listed here: a hand-kept list of the
+  // files a ledger points at is the same drift in a new place, and the ledger is the thing that already
+  // knows the answer.
+  const measuredLedger = JSON.parse(
+    readFileSync(join(ROOT, 'docs', 'research', 'measured-facts.json'), 'utf8')
+  )
+  const ledgerFacts = Array.isArray(measuredLedger) ? measuredLedger : measuredLedger.facts ?? []
+  const ledgerReferences = new Set()
+  for (const fact of ledgerFacts) {
+    for (const where of fact.whereUsed ?? []) {
+      if (typeof where === 'string' && !/^[a-z]+:\/\//i.test(where)) ledgerReferences.add(where)
+    }
+  }
+  let ledgerReferencesCopied = 0
+  for (const relativePath of ledgerReferences) {
+    const source = join(ROOT, relativePath)
+    if (!existsSync(source)) continue
+    const target = join(sandbox, relativePath)
+    mkdirSync(dirname(target), { recursive: true })
+    cpSync(source, target, { recursive: true, dereference: false })
+    ledgerReferencesCopied += 1
+  }
+  check(
+    ledgerReferencesCopied > 0,
+    `the measured-facts ledger's referenced files are present in the sandbox (${ledgerReferencesCopied} copied, ${ledgerReferences.size} named)`
   )
   const readinessCapabilities = join(slotDir, 'capabilities.json')
   writeFileSync(
@@ -923,6 +1012,21 @@ try {
   check(helpRun.elapsedMs < 5000, `--help short-circuits instead of running the suite (${helpRun.elapsedMs}ms)`)
 
   const noBuildRun = runVerify(['--slot', 'selftest', '--no-selftest'])
+  // When this section is red, the reason is inside the nested run and the nested output is otherwise
+  // discarded — which cost three self-test runs to diagnose once: the sandbox's `verify-slot.mjs` was
+  // reporting `LEDGER-WHERE-USED-MISSING: play-listing-text-caps.whereUsed names AGENTS.md`, and nothing
+  // in this log said so. An assertion that fails without showing its evidence is the defect the assertion
+  // was written to catch.
+  const noBuildVerdict = /VERDICT: (\S+)/.exec(noBuildRun.output)?.[1] ?? 'none'
+  if (noBuildVerdict !== 'UNVERIFIED' || noBuildRun.status !== 2) {
+    console.log(`         nested verdict: ${noBuildVerdict}, exit ${noBuildRun.status}`)
+    for (const row of noBuildRun.output
+      .split(/\r?\n/)
+      .filter((line) => /^\s*(FAIL|UNVERIFIED)\b/.test(line))
+      .slice(0, 10)) {
+      console.log(`         nested: ${row.trim()}`)
+    }
+  }
   check(
     !/VERDICT: PASS/.test(noBuildRun.output),
     'a run that skips the build never reports PASS'
@@ -1037,6 +1141,89 @@ try {
   )
   rmSync(join(slotDir, 'store', 'gate-probe.txt'), { force: true })
   rmSync(join(slotDir, 'dist', 'gate-probe.txt'), { force: true })
+
+  // The factory's own promotions step writes the reviewer's promo-code batch beside the slot,
+  // and that batch must not count as a build input. Counting it made the release pipeline void
+  // the approval for the revision the owner had just reviewed while the app was byte-identical:
+  // `--check` reported `236 now` against `235 approved`, and the whole difference was this one
+  // gitignored CSV of Play promo codes sitting in the slot root (`harness/lessons.md`, 2026-09-29).
+  // The second half is what makes the first half discriminating: a file the curated list does not
+  // name still voids the approval, so this cannot pass by exempting everything beside the slot.
+  for (const promoName of ['promotion_codes.csv', 'promo-codes.csv']) {
+    const batch = join(slotDir, promoName)
+    writeFileSync(batch, 'code,redeemed\nABCD-EFGH-1234,false\n', 'utf8')
+    check(
+      checkReleaseApproval(slotDir).ok === true,
+      `a promo-code batch (${promoName}) does not void the approval it was minted for`
+    )
+    rmSync(batch, { force: true })
+  }
+  const unrelatedProbe = join(slotDir, 'PROBE-not-an-excluded-name.md')
+  writeFileSync(unrelatedProbe, 'a slot-root file the curated exclusion list does not name\n', 'utf8')
+  check(
+    checkReleaseApproval(slotDir).ok === false,
+    'a slot-root file the curated list does not name still voids the approval'
+  )
+  rmSync(unrelatedProbe, { force: true })
+  check(
+    checkReleaseApproval(slotDir).ok === true,
+    'removing that probe restores the approval, so the previous check compared the file, not the run'
+  )
+
+  // The criterion and the exclusion list are one decision in two views, and until 2026-09-29 they were
+  // two: an absolute sentence — "an entry may be excluded only if it cannot alter the built artifact or
+  // its signature" — sat above `keystore.properties` and `local.properties`, which choose the key the
+  // APK is signed with and the SDK it is compiled against. A prose criterion next to a list that
+  // violates it is worse than no criterion, so the criterion is now the closed set
+  // `EXCLUSION_REASONS`, every excluded name carries one of them, and this section fails on the three
+  // ways they can come apart again: a name whose reason is not in the set, a reason no name uses, and a
+  // criterion that does not name every reason. The two machine-config entries are asserted by name,
+  // because they are the ones the old sentence contradicted.
+  const {
+    EXCLUSION_CRITERION,
+    EXCLUSION_REASONS,
+    EXCLUDED_FILE_REASONS,
+    exclusionReason
+  } = await import(pathToFileURL(join(ROOT, 'scripts', 'lib', 'release-approval.mjs')).href)
+
+  const allowedReasons = new Set(Object.keys(EXCLUSION_REASONS))
+  const unlistedReasons = [...EXCLUDED_FILE_REASONS]
+    .filter(([, reason]) => !allowedReasons.has(reason))
+    .map(([name, reason]) => `${name}: ${reason}`)
+  check(
+    unlistedReasons.length === 0,
+    `every excluded name is excluded for a reason the criterion states (unlisted: ${unlistedReasons.join(', ') || 'none'})`
+  )
+
+  const usedReasons = new Set(EXCLUDED_FILE_REASONS.values())
+  const unusedReasons = [...allowedReasons].filter((reason) => !usedReasons.has(reason))
+  check(
+    unusedReasons.length === 0,
+    `every reason the criterion states is used by a name in the list, so the criterion carries no clause nothing satisfies (unused: ${unusedReasons.join(', ') || 'none'})`
+  )
+
+  const unnamedReasons = [...allowedReasons].filter((reason) => !EXCLUSION_CRITERION.includes(reason))
+  check(
+    unnamedReasons.length === 0,
+    `the criterion names every reason the list may use, so the sentence a reader applies is not narrower than the list (unnamed: ${unnamedReasons.join(', ') || 'none'})`
+  )
+
+  for (const machineConfig of ['keystore.properties', 'local.properties', '.env']) {
+    check(
+      EXCLUDED_FILE_REASONS.get(machineConfig) === 'machine-local' &&
+        exclusionReason(machineConfig) === 'machine-local',
+      `${machineConfig} is excluded as the machine's configuration, which is a reason the criterion admits — the two the old sentence contradicted`
+    )
+  }
+  check(
+    exclusionReason('.env.local') === exclusionReason('.env') &&
+      exclusionReason('.env.production') === exclusionReason('.env'),
+    'an .env variant is excluded for the same reason as .env, so the prefix rule is not a second list with its own criterion'
+  )
+  check(
+    exclusionReason('app/build.gradle.kts') === undefined,
+    'an ordinary build input has no exclusion reason, so the tables above are not a blanket exemption'
+  )
 
   // ------------------------------------------------------------------------
   // 8. Capability declarations must drive the slot compliance gate.
@@ -1292,15 +1479,19 @@ try {
   }
 
   // ------------------------------------------------------------------------
-  // 10. Store-pack contracts: per-kind screenshot limits and idea provenance.
+  // 10. Store-pack contracts: per-kind screenshot limits, the console's aspect rule, and idea
+  // provenance.
   //
-  // Two store-kit behaviours regressed silently before this section existed:
+  // Three store-kit behaviours regressed silently before this section existed:
   //
-  //  * `SCREENSHOT_LIMITS` split the screenshot gate per asset kind. The tablet
-  //    rule wants a 1080px short side and a 3840px long side with NO 2x cap,
-  //    because Play's large-screen section conflicts with its general
-  //    requirements; the old blanket rule applied the phone 2x cap to tablets and
-  //    wrongly rejected a 1080x3000 tablet asset.
+  //  * `SCREENSHOT_LIMITS` split the screenshot gate per asset kind, and the two tablet fields do
+  //    NOT share a window: the console's own 7-inch field accepts 320..3840 while its 10-inch
+  //    field starts at 1080. A single blanket rule got one of the two wrong, and the old tablet
+  //    rule used the 10-inch floor for both.
+  //  * `SCREENSHOT_ASPECT_RATIOS` is the console's own sentence - "Соотношение сторон изображения
+  //    должно составлять 16:9 или 9:16" - stated in every screenshot field. Without it, a
+  //    `max_ratio: None` kind was checked for size only and the retired 5:8 tablet canvases
+  //    (1200x1920, 1600x2560) passed a gate Play's own prose refuses.
   //  * `refresh_idea_from_record` rewrites only the copy that
   //    `is_idea_derived_output` proves is still generator output for the listing's
   //    previous idea, so a hand-written `shortDescription` survives a refresh.
@@ -1323,6 +1514,34 @@ try {
       windowsHide: true
     })
     return { status: result.status, output: `${result.stdout || ''}${result.stderr || ''}` }
+  }
+
+  /**
+   * Re-record the sandbox slot's fixture approval before a render, because rendering is now gated.
+   *
+   * `store-kit.py --render-only` refuses without an approval record — the boundary working, and the
+   * refusal is asserted in the approval section above. These contract checks then rewrite
+   * `store/listing.json`, `capabilities.json` and the generated documents between renders, and both
+   * digests cover those files, so an approval granted once at the top of the section lapses by design
+   * on the first edit and every later render is refused. Approving before each render keeps the
+   * boundary visible inside these tests instead of bypassed: a render with no approval call above it is
+   * a red test, which is why the failure this fixed was worth chasing rather than silencing.
+   */
+  function approveFixture() {
+    const result = spawnSync(
+      process.execPath,
+      [
+        join(ROOT, 'scripts', 'approve-release.mjs'),
+        '--slot-dir', slotDir,
+        '--note', 'selftest fixture: approved inside a temporary directory to exercise the render paths'
+      ],
+      { cwd: ROOT, encoding: 'utf8', windowsHide: true }
+    )
+    if (result.status !== 0) {
+      throw new Error(
+        `selftest fixture approval failed: ${`${result.stdout || ''}${result.stderr || ''}`.trim()}`
+      )
+    }
   }
 
   function writePngFill(path, width, height) {
@@ -1365,6 +1584,7 @@ try {
 
   const contractInit = runStoreKit(['--init'])
   check(contractInit.status === 0, 'store-kit --init writes a draft listing for the contract checks')
+  approveFixture()
   const contractRender = runStoreKit(['--render-only'])
   check(
     contractRender.status === 0,
@@ -1375,41 +1595,59 @@ try {
   const contractBaseline = runStoreKit(['--validate-only'])
   check(contractBaseline.status === 0, 'a generated store pack passes --validate-only with exit 0')
 
-  // (2)-(6) Per-kind screenshot rule, through the CLI.
+  // (2)-(7) Per-kind screenshot rule, through the CLI.
   //
-  // `validate_store` also enforces the exact canonical size from SCREEN_TARGETS
-  // (`--render-only` writes 1200x1920 tablets and 1080x1920 phones), so a size-mutated
-  // asset always exits non-zero for that unrelated reason. Without weakening that
-  // guard there is no CLI route to exit 0 for a mutated asset, so these checks assert
-  // *which* rule the failure names: the tablet 1080x3000 case — the regression — must
-  // name no rule at all, while a phone 1080x3000 must still name the phone 2x rule.
+  // `validate_store` also enforces the exact canonical size from SCREEN_TARGETS (1080x1920 for
+  // phone and 7-inch, 1440x2560 for 10-inch), so a size-mutated asset always exits non-zero for
+  // that unrelated reason. Without weakening that guard there is no CLI route to exit 0 for a
+  // mutated asset, so these checks assert *which* rule the failure names.
   const tabletAsset = join(contractAssets, 'tablet-7-01.png')
+  const tenInchAsset = join(contractAssets, 'tablet-10-01.png')
   const phoneAsset = join(contractAssets, 'phone-01.png')
   const tabletOriginal = readFileSync(tabletAsset)
+  const tenInchOriginal = readFileSync(tenInchAsset)
   const phoneOriginal = readFileSync(phoneAsset)
 
-  const tabletTallWritten = writePngFill(tabletAsset, 1080, 3000)
-  const tabletTall = runStoreKit(['--validate-only'])
-  const tabletTallFailure = assetFailure(tabletTall.output, 'tablet-7-01.png')
+  // The retired factory canvas. 1200x1920 is 5:8 - neither 16:9 nor 9:16 - and every console
+  // screenshot field states the aspect rule, so it must fail on the ratio and not on the
+  // phone-only 2x cap.
+  const tabletFiveEightWritten = writePngFill(tabletAsset, 1200, 1920)
+  const tabletFiveEight = runStoreKit(['--validate-only'])
+  const tabletFiveEightFailure = assetFailure(tabletFiveEight.output, 'tablet-7-01.png')
   check(
-    tabletTallWritten &&
-      tabletTallFailure.includes('1080x3000') &&
-      !tabletTallFailure.includes('more than 2x') &&
-      !tabletTallFailure.includes('below the 1080px minimum'),
-    'tablet 1080x3000 satisfies the per-kind tablet rule (short >= 1080, long <= 3840, no 2x rule) ' +
-      `-> ${tabletTallFailure.trim()}`
+    tabletFiveEightWritten &&
+      tabletFiveEight.status !== 0 &&
+      tabletFiveEightFailure.includes('is not 16:9 or 9:16') &&
+      !tabletFiveEightFailure.includes('more than 2x'),
+    'the retired 1200x1920 tablet canvas (5:8) fails the console aspect rule, not the phone 2x cap ' +
+      `-> ${tabletFiveEightFailure.trim()}`
   )
   writeFileSync(tabletAsset, tabletOriginal)
 
-  const tabletShortWritten = writePngFill(tabletAsset, 720, 1280)
-  const tabletShort = runStoreKit(['--validate-only'])
-  const tabletShortFailure = assetFailure(tabletShort.output, 'tablet-7-01.png')
+  // The two tablet windows differ, exactly as the console states them: the 7-inch field accepts
+  // 320..3840 while the 10-inch field starts at 1080. A 720x1280 canvas is exactly 9:16, so the
+  // only rule it can fail is the 10-inch short-side floor.
+  const tenInchShortWritten = writePngFill(tenInchAsset, 720, 1280)
+  const tenInchShort = runStoreKit(['--validate-only'])
+  const tenInchShortFailure = assetFailure(tenInchShort.output, 'tablet-10-01.png')
   check(
-    tabletShortWritten &&
-      tabletShort.status !== 0 &&
-      tabletShortFailure.includes('short side 720px is below the 1080px minimum') &&
-      !tabletShortFailure.includes('more than 2x'),
-    'tablet 720x1280 fails the tablet 1080px short-side minimum, not the phone 2x rule'
+    tenInchShortWritten &&
+      tenInchShort.status !== 0 &&
+      tenInchShortFailure.includes('short side 720px is below the 1080px minimum') &&
+      !tenInchShortFailure.includes('is not 16:9 or 9:16') &&
+      !tenInchShortFailure.includes('more than 2x'),
+    'a 9:16 720x1280 asset fails only the 10-inch 1080px floor, which the 7-inch field does not have'
+  )
+  writeFileSync(tenInchAsset, tenInchOriginal)
+
+  const tabletLongWritten = writePngFill(tabletAsset, 1200, 4000)
+  const tabletLong = runStoreKit(['--validate-only'])
+  const tabletLongFailure = assetFailure(tabletLong.output, 'tablet-7-01.png')
+  check(
+    tabletLongWritten &&
+      tabletLong.status !== 0 &&
+      tabletLongFailure.includes('long side 4000px exceeds the 3840px maximum'),
+    'tablet 1200x4000 is rejected for exceeding the 7-inch 3840px long-side cap'
   )
   writeFileSync(tabletAsset, tabletOriginal)
 
@@ -1435,21 +1673,105 @@ try {
   )
   writeFileSync(phoneAsset, phoneOriginal)
 
-  const tabletOverlongWritten = writePngFill(tabletAsset, 1200, 4000)
-  const tabletOverlong = runStoreKit(['--validate-only'])
-  const tabletOverlongFailure = assetFailure(tabletOverlong.output, 'tablet-7-01.png')
+  // (8) The declared inventory, not the pixels: every canvas the factory renders must satisfy the
+  // console's aspect sentence and its own field window, and the per-kind window must be the
+  // console's. This is the check that fails when `SCREEN_TARGETS` is changed back to the old 5:8
+  // tablets, because it reads the constants a render would use.
+  const targetScript = [
+    'import importlib.util, json, sys',
+    'sys.dont_write_bytecode = True',
+    "spec = importlib.util.spec_from_file_location('store_kit_contract', sys.argv[1])",
+    'module = importlib.util.module_from_spec(spec)',
+    'spec.loader.exec_module(module)',
+    'print(json.dumps({',
+    '    "targets": {k: {"count": c, "size": list(s)} for k, (c, s) in module.SCREEN_TARGETS.items()},',
+    '    "limits": module.SCREENSHOT_LIMITS,',
+    '    "aspects": [list(pair) for pair in module.SCREENSHOT_ASPECT_RATIOS],',
+    '}))'
+  ].join('\n')
+  const consoleWindows = { phone: [320, 3840], 'tablet-7': [320, 3840], 'tablet-10': [1080, 7680] }
+  const targetRun = spawnSync('python', ['-B', '-c', targetScript, storeKitScript], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    windowsHide: true
+  })
+  let declared = null
+  try {
+    declared = JSON.parse(targetRun.stdout || '')
+  } catch {
+    declared = null
+  }
   check(
-    tabletOverlongWritten &&
-      tabletOverlong.status !== 0 &&
-      tabletOverlongFailure.includes('long side 4000px exceeds the 3840px maximum'),
-    'tablet 1200x4000 is rejected for exceeding the tablet 3840px long-side cap'
+    declared !== null && Object.keys(declared.targets).length === 3,
+    'the screenshot inventory is readable from store-kit.py'
   )
-  writeFileSync(tabletAsset, tabletOriginal)
+  if (declared) {
+    for (const [kind, window] of Object.entries(consoleWindows)) {
+      const target = declared.targets[kind]
+      check(Boolean(target), `SCREEN_TARGETS declares the ${kind} kind`)
+      if (!target) continue
+      const [width, height] = target.size
+      const ratioOk = declared.aspects.some(
+        ([across, down]) => width * down === height * across || width * across === height * down
+      )
+      check(
+        ratioOk,
+        `${kind} target ${width}x${height} matches the console's 16:9/9:16 screenshot aspect rule`
+      )
+      check(
+        Math.min(width, height) >= window[0] && Math.max(width, height) <= window[1],
+        `${kind} target ${width}x${height} sits inside the console's own ${window[0]}..${window[1]} field window`
+      )
+      check(
+        declared.limits[kind].min_short === window[0] && declared.limits[kind].max_long === window[1],
+        `${kind} SCREENSHOT_LIMITS window is the console's ${window[0]}..${window[1]}, not another field's`
+      )
+    }
+  }
 
-  // (2) again, as a pure rule verdict: `screenshot_rule_failures` is the function
-  // `validate_store` calls for every screenshot, so importing it directly shows that
-  // a 1080x3000 tablet asset produces no rule failure at all while the same size on a
-  // phone does. This is the core regression the blanket rule caused.
+  // (8b) One source of truth, imported - never restated. `store-studio.py` carried a *second* copy
+  // of `SCREEN_TARGETS` until 2026-09-29, which is the defect `.cursor/rules/
+  // verification-discipline.mdc` names: the two copies were free to drift, and a studio render would
+  // have produced the 5:8 canvas `store-kit --validate-only` now refuses. The check reads the
+  // factory's own modules, so re-adding the literal fails here rather than at capture time.
+  const contractLiteral = /^\s*(SCREEN_TARGETS|SCREENSHOT_LIMITS)\s*(?::[^=\n]*)?=\s*[{[]/m
+  const contractOwners = walkFiles(join(ROOT, 'scripts'))
+    .filter((file) => /\.(py|mjs|cjs|js)$/.test(file))
+    .filter((file) => contractLiteral.test(readFileSync(file, 'utf8')))
+    .map((file) => relative(ROOT, file).split('\\').join('/'))
+  check(
+    contractOwners.length === 1 && contractOwners[0] === 'scripts/store-kit.py',
+    'the screenshot inventory is defined in exactly one module, and it is store-kit.py ' +
+      `(found: ${contractOwners.join(', ') || 'none'})`
+  )
+  check(
+    readFileSync(join(ROOT, 'scripts', 'store-studio.py'), 'utf8').includes(
+      '_STORE_KIT.SCREEN_TARGETS'
+    ),
+    'store-studio.py imports SCREEN_TARGETS from store-kit.py instead of restating it'
+  )
+
+  // (8c) The aspect rule exists twice in the factory out of necessity - once in the Python module
+  // that renders and validates the pack, once in the JS library the store tools share - and a JS
+  // module cannot import a Python constant. Two copies that must agree is exactly what a check is
+  // for: this one fails the moment `scripts/lib/play-assets.mjs` and `scripts/store-kit.py`
+  // disagree about the sentence the console prints in every screenshot field.
+  if (declared && declared.aspects) {
+    const { SCREENSHOT_ASPECT_RATIOS: jsAspects } = await import(
+      pathToFileURL(join(ROOT, 'scripts', 'lib', 'play-assets.mjs')).href
+    )
+    const jsPairs = jsAspects.map((pair) => [...pair])
+    check(
+      JSON.stringify(jsPairs) === JSON.stringify(declared.aspects),
+      'scripts/lib/play-assets.mjs restates the aspect rule and agrees with store-kit.py ' +
+        `(got ${JSON.stringify(jsPairs)} against ${JSON.stringify(declared.aspects)})`
+    )
+  }
+
+  // (9) The rule as a pure verdict: `screenshot_rule_failures` is the function `validate_store`
+  // calls for every screenshot, so importing it directly shows which sentence each size trips.
+  // Both tablet kinds have `max_ratio: None`, and every case below proves the aspect rule still
+  // decides them.
   const ruleScript = [
     'import importlib.util, json, sys',
     'sys.dont_write_bytecode = True',
@@ -1460,11 +1782,14 @@ try {
     'print(json.dumps([module.screenshot_rule_failures(k, (w, h)) for k, w, h in cases]))'
   ].join('\n')
   const ruleCases = [
-    ['tablet-7', 1080, 3000],
-    ['tablet-7', 720, 1280],
-    ['phone', 1080, 3000],
-    ['phone', 320, 800],
-    ['tablet-7', 1200, 4000]
+    ['tablet-7', 1200, 1920],  // the retired 5:8 factory canvas
+    ['tablet-7', 320, 800],    // inside 320..3840 and under the 2x cap, still not 16:9 or 9:16
+    ['tablet-10', 720, 1280],  // exactly 9:16, below the 10-inch 1080px floor
+    ['tablet-7', 720, 1280],   // exactly 9:16 and inside the 7-inch window -> accepted
+    ['phone', 1080, 3000],     // the phone-only 2x cap
+    ['phone', 320, 800],       // the phone-only 2x cap
+    ['tablet-7', 1200, 4000],  // the 7-inch long-side cap
+    ['tablet-10', 1440, 2560]  // the shipped 10-inch canvas -> accepted
   ]
   // `-B` plus `sys.dont_write_bytecode` keeps this import from creating a
   // `scripts/__pycache__/store-kit.*.pyc` side effect inside the real repo.
@@ -1485,30 +1810,45 @@ try {
   )
   if (Array.isArray(ruleVerdicts)) {
     check(
-      ruleVerdicts[0].length === 0,
-      'the per-kind rule accepts a 1080x3000 tablet asset (no 2x rule, short >= 1080, long <= 3840)'
+      ruleVerdicts[0].some((failure) => failure.includes('is not 16:9 or 9:16')) &&
+        !ruleVerdicts[0].some((failure) => failure.includes('more than 2x')),
+      'the rule rejects the retired 1200x1920 tablet canvas for its 5:8 ratio, not for a 2x cap'
     )
     check(
-      ruleVerdicts[1].some((failure) => failure.includes('below the 1080px minimum')),
-      'the per-kind rule rejects a 720x1280 tablet for the 1080px short side'
+      ruleVerdicts[1].some((failure) => failure.includes('is not 16:9 or 9:16')),
+      'the aspect rule decides a tablet size that the 320..3840 window and the 2x cap both allow'
     )
     check(
-      ruleVerdicts[2].some((failure) => failure.includes('more than 2x')),
+      ruleVerdicts[2].some((failure) => failure.includes('below the 1080px minimum')) &&
+        !ruleVerdicts[2].some((failure) => failure.includes('is not 16:9 or 9:16')),
+      'the 10-inch rule rejects a 9:16 720x1280 for the 1080px short side only'
+    )
+    check(
+      ruleVerdicts[3].length === 0,
+      'the 7-inch rule accepts the same 9:16 720x1280 that the 10-inch rule rejects'
+    )
+    check(
+      ruleVerdicts[4].some((failure) => failure.includes('more than 2x')),
       'the per-kind rule rejects a 1080x3000 phone for the 2x cap that tablets are exempt from'
     )
     check(
-      ruleVerdicts[3].some((failure) => failure.includes('more than 2x')),
+      ruleVerdicts[5].some((failure) => failure.includes('more than 2x')),
       'the per-kind rule rejects a 320x800 phone for the 2x cap'
     )
     check(
-      ruleVerdicts[4].some((failure) => failure.includes('exceeds the 3840px maximum')),
+      ruleVerdicts[6].some((failure) => failure.includes('exceeds the 3840px maximum')),
       'the per-kind rule rejects a 1200x4000 tablet for the 3840px long-side cap'
+    )
+    check(
+      ruleVerdicts[7].length === 0,
+      'the per-kind rule accepts the shipped 1440x2560 10-inch canvas'
     )
   }
 
   // (7) Idea refresh replaces scaffold boilerplate with the recorded idea.
   const recordedIdea = 'A tide-chart notebook that records harbour water levels every morning.'
   setRecordedIdea(recordedIdea)
+  approveFixture()
   const firstRefresh = runStoreKit(['--render-only'])
   check(
     firstRefresh.status === 0,
@@ -1531,6 +1871,7 @@ try {
 
   const nextRecordedIdea = 'A hand-authored harbour log that outlives a generator refresh.'
   setRecordedIdea(nextRecordedIdea)
+  approveFixture()
   const secondRefresh = runStoreKit(['--render-only'])
   check(
     secondRefresh.status === 0,
@@ -1561,6 +1902,7 @@ try {
   const handWrittenSafety = '# Data safety — hand-written\n\n- Does the app collect data? **No**\n'
   writeFileSync(join(contractStoreDir, 'privacy.md'), handWrittenPolicy, 'utf8')
   writeFileSync(join(contractStoreDir, 'data-safety.md'), handWrittenSafety, 'utf8')
+  approveFixture()
   const policyRefresh = runStoreKit(['--render-only'])
   check(
     policyRefresh.status === 0 &&
@@ -1576,6 +1918,7 @@ try {
 
   const markedPolicy = '# Privacy policy — regenerated\n\n<!-- kiln:generated policy - delete this line to keep your own wording -->\n'
   writeFileSync(join(contractStoreDir, 'privacy.md'), markedPolicy, 'utf8')
+  approveFixture()
   const markedRefresh = runStoreKit(['--render-only'])
   check(
     markedRefresh.status === 0 &&
@@ -1621,7 +1964,11 @@ try {
   const directGradleWrapperAllowlist = new Map([
     ['lib/gradle.mjs', 'the single shared launcher: the one module allowed to name a wrapper'],
     ['selftest.mjs', "this check: its own pattern text and the fake 'gradlew' fixture for the JDK-pinning test"],
-    ['kiln-status.mjs', 'inventories scaffold wrapper paths with existsSync; it never launches a process']
+    ['kiln-status.mjs', 'inventories scaffold wrapper paths with existsSync; it never launches a process'],
+    [
+      'lib/lessons.mjs',
+      'parses lesson text, so `gradlew` is one of the program names it must recognise when a lesson cites its sensor; it imports no child_process and launches nothing'
+    ]
   ])
   const wrapperPattern = /\bgradlew\b/i
   const regexPrecedingWords = new Set([
@@ -2329,6 +2676,204 @@ if (visualQaRows.length === 0) {
 }
 check(visualQaProbe.status === 0, 'visual-qa discovery test exits 0')
 
+// `.cursor/rules/visual-identity.mdc` requires a drawn icon that reads at 48dp, and the icon the
+// owner rejected satisfied every gate the factory had, because none of them measured the mark:
+// `store-studio.py` composited a resampled gradient, two radial blooms, a 32px drafting grid at
+// alpha 12 and a glyph placed by hand-tuned pixel constants, and nothing could say so. The check
+// below drives `scripts/test-icon-design.py`, which measures the rendered pixels — stroke, counter,
+// optical offset, field texture, mask survival, 48dp contrast, determinism — and drives every one of
+// those sensors to failure with a mark built to break exactly it, so a sensor that stops working
+// fails here rather than passing quietly.
+//
+// No `--legacy-rev`: that flag loads `scripts/store-studio.py` from a git revision, which is the
+// pre-change renderer only until this rewrite is committed, and a check pinned to `HEAD` would invert
+// itself the moment it landed. The suite's in-process reproduction of the old field composition runs
+// unconditionally instead, which is why it was written to not depend on git history.
+section('an icon is measured, not eyeballed')
+const iconDesignProbe = spawnSync('python', [join(ROOT, 'scripts', 'test-icon-design.py')], {
+  cwd: ROOT,
+  encoding: 'utf8',
+  windowsHide: true
+})
+const iconDesignRows = `${iconDesignProbe.stdout || ''}${iconDesignProbe.stderr || ''}`
+  .split(/\r?\n/)
+  .filter((row) => /^\s*(PASS|FAIL)\s/.test(row))
+  .map((row) => row.trim())
+if (iconDesignRows.length === 0) {
+  check(
+    false,
+    `icon design test reported no verdict (exit ${iconDesignProbe.status ?? 'unknown'})`
+  )
+} else {
+  for (const row of iconDesignRows) {
+    const [status, ...rest] = row.split(/\s+/)
+    line(status === 'PASS' ? 'PASS' : 'FAIL', `icon design: ${rest.join(' ').trim()}`)
+  }
+}
+check(iconDesignProbe.status === 0, 'icon design test exits 0')
+
+// Play's release screen asks for a release name and release notes, and the pack carried neither, so
+// the first real upload reached that screen with no prepared text and no way to count it — and Play
+// enforces its 500-character cap by truncating the paste, not by refusing it. The check below drives
+// `scripts/test-release-notes.py`, which generates a real pack and then mutates it to prove every
+// rule can fail; the half that matters is the generator refusing to overwrite a written note, since a
+// regenerated pack replacing real release text with a prompt is worse than having no file at all.
+section('the release screen has its two fields prepared')
+const releaseNotesProbe = spawnSync('python', [join(ROOT, 'scripts', 'test-release-notes.py')], {
+  cwd: ROOT,
+  encoding: 'utf8',
+  windowsHide: true
+})
+const releaseNotesRows = `${releaseNotesProbe.stdout || ''}${releaseNotesProbe.stderr || ''}`
+  .split(/\r?\n/)
+  .filter((row) => /^(PASS|FAIL)\s/.test(row))
+if (releaseNotesRows.length === 0) {
+  check(false, `release-notes test reported no verdict (exit ${releaseNotesProbe.status ?? 'unknown'})`)
+} else {
+  for (const row of releaseNotesRows) {
+    const [status, ...rest] = row.split(/\s+/)
+    line(status === 'PASS' ? 'PASS' : 'FAIL', `release-notes: ${rest.join(' ').trim()}`)
+  }
+}
+check(releaseNotesProbe.status === 0, 'release-notes test exits 0')
+
+// A billing app's checklist named screenshots, declarations, signing and the first AAB upload, and
+// never named the three things that actually block a first launch: the one-time product, its
+// purchase option, and the tester's license-testing entry. All three are Play *console* state, so no
+// pack document described them and no gate could see them - the owner found them by uploading a
+// bundle, rolling out nothing, getting "not found" from the opt-in link, and nearly testing a
+// purchase against a product that did not exist. The check below drives
+// `scripts/test-checklist-products.py`, which is expected to FAIL against the old behaviour (it
+// does: 8 of its 19 legs fail with the billing gate removed), and whose second half matters just as
+// much - a non-billing slot must be told nothing about products it does not sell.
+section('a billing app is told to create and activate what it sells')
+const checklistProductsProbe = spawnSync(
+  'python',
+  [join(ROOT, 'scripts', 'test-checklist-products.py')],
+  {
+    cwd: ROOT,
+    encoding: 'utf8',
+    windowsHide: true
+  }
+)
+const checklistProductsRows = `${checklistProductsProbe.stdout || ''}${checklistProductsProbe.stderr || ''}`
+  .split(/\r?\n/)
+  .filter((row) => /^(PASS|FAIL)\s/.test(row))
+if (checklistProductsRows.length === 0) {
+  check(
+    false,
+    `checklist-products test reported no verdict (exit ${checklistProductsProbe.status ?? 'unknown'})`
+  )
+} else {
+  for (const row of checklistProductsRows) {
+    const [status, ...rest] = row.split(/\s+/)
+    line(status === 'PASS' ? 'PASS' : 'FAIL', `checklist-products: ${rest.join(' ').trim()}`)
+  }
+}
+check(checklistProductsProbe.status === 0, 'checklist-products test exits 0')
+
+// The owner performed the first Play Console upload of a real slot **by hand**, answering
+// page-by-page questions in chat: what to put in the privacy-policy URL field, yes/no for each of
+// the ten App-content declarations, what the credentials dialog wants, why «Create release» asked
+// for the bundle a second time. Every question was a stall, and none of the answers lived in the
+// generated pack, so the next slot would stall in exactly the same places. The check below drives
+// `scripts/test-console-answers.py`, which generates a real pack and then mutates it to prove every
+// rule can fail. The follow-up facts the owner walked out of the product wizard are covered by the
+// same suite: with the product-form literals not emitted at all, 27 of its legs fail; with the price
+// rendered the way `economics.json` stores it - dot-decimal, which the console's price field rejects -
+// 5 legs fail; and disabling the validation hookup still fails the seven drift legs. All four
+// observations are recorded in `harness/lessons.md` for 2026-09-29. The completion statement is
+// measured the same way, because it exists to stop one specific misreading - the owner read the
+// wizard's `Шаг N из M` strip as a completion counter and took a saved declaration for an unfinished
+// one: with the warning worded as "a guide, not a progress indicator" instead of "not a completion
+// counter" 1 of 250 legs fails; with a branch's `skippedSteps` emptied 4 fail; with the note not
+// emitted for the branch 1 fails; and with the note's `{steps}` placeholder removed the generator
+// refuses outright rather than printing a sentence that names no step.
+section('the first console upload has its answers prepared')
+const consoleAnswersProbe = spawnSync('python', [join(ROOT, 'scripts', 'test-console-answers.py')], {
+  cwd: ROOT,
+  encoding: 'utf8',
+  windowsHide: true
+})
+const consoleAnswersRows = `${consoleAnswersProbe.stdout || ''}${consoleAnswersProbe.stderr || ''}`
+  .split(/\r?\n/)
+  .filter((row) => /^(PASS|FAIL)\s/.test(row))
+if (consoleAnswersRows.length === 0) {
+  check(
+    false,
+    `console-answers test reported no verdict (exit ${consoleAnswersProbe.status ?? 'unknown'})`
+  )
+} else {
+  for (const row of consoleAnswersRows) {
+    const [status, ...rest] = row.split(/\s+/)
+    line(status === 'PASS' ? 'PASS' : 'FAIL', `console-answers: ${rest.join(' ').trim()}`)
+  }
+}
+check(consoleAnswersProbe.status === 0, 'console-answers test exits 0')
+
+// The walkthrough and the sheet answer the same console form to two different readers - the owner
+// in Russian, the paste sheet in English - so both are rendered from `scripts/lib/console-form.json`
+// and neither may be hand-edited. A fact stated in two places is the drift this pair exists to
+// prevent: the check below regenerates the document from the model and compares it byte for byte, so
+// editing the document instead of the model fails. The commands it is expected to answer with are
+// recorded in `harness/lessons.md` for 2026-09-29: a single inserted line fails the check with the
+// first differing line named, and re-rendering restores it. The same check is what catches a
+// *renderer* that stops printing part of the document - with `completionSection()` no longer pushed -
+// it named `line 13: model="## 1. Состояние приложения ..." file="## Как читать, что декларация
+// заполнена"` and exited 1, while the sheet suite stayed green because the document on disk was
+// untouched. The pair is deliberate: the check owns the model-to-document direction, the suite's own
+// legs own a document that was edited by hand.
+section('the console walkthrough is the model, not a copy of it')
+const walkthroughProbe = spawnSync(
+  process.execPath,
+  [join(ROOT, 'scripts', 'console-walkthrough.mjs'), '--check'],
+  { cwd: ROOT, encoding: 'utf8', windowsHide: true }
+)
+const walkthroughRows = `${walkthroughProbe.stdout || ''}${walkthroughProbe.stderr || ''}`
+  .split(/\r?\n/)
+  .filter((row) => /^(PASS|FAIL)\s/.test(row))
+if (walkthroughRows.length === 0) {
+  check(false, `walkthrough check reported no verdict (exit ${walkthroughProbe.status ?? 'unknown'})`)
+} else {
+  for (const row of walkthroughRows) {
+    const [status, ...rest] = row.split(/\s+/)
+    line(status === 'PASS' ? 'PASS' : 'FAIL', `walkthrough: ${rest.join(' ').trim()}`)
+  }
+}
+check(walkthroughProbe.status === 0, 'walkthrough check exits 0')
+
+// The audience is the slot's decision and the walkthrough has no slot, so the guide prints the model's
+// own sentence for a slot that has declared none — filled in, never a branch. The check above only
+// proves the document agrees with the model it was rendered *from*, so a renderer that stopped printing
+// the sentence would still agree with a document regenerated without it. This leg reads the rendered
+// document itself, which is what makes it fail in that case; the sheet's half of the same sentence is
+// asserted in `scripts/test-console-answers.py`.
+const walkthroughDoc = readFileSync(join(ROOT, 'docs', 'play-console-walkthrough.md'), 'utf8')
+const consoleForm = JSON.parse(readFileSync(join(ROOT, 'scripts', 'lib', 'console-form.json'), 'utf8'))
+const refusalTemplate = String(consoleForm.targetAudience?.emptyChoiceRefusalRu || '')
+const audienceField = String(
+  (consoleForm.screens || []).find((screen) => screen.id === 'declaration-target-audience')?.slotKey || ''
+)
+const audienceBranches = Object.keys(consoleForm.targetAudience?.audiences || {}).join(', ')
+const filledRefusal = refusalTemplate
+  .replaceAll('{branches}', audienceBranches)
+  .replaceAll('{field}', audienceField)
+check(
+  refusalTemplate.includes('{field}') && refusalTemplate.includes('{branches}') && audienceField.length > 0,
+  'the model states the no-audience sentence with the field and the branches as placeholders, and the screen names the field they are filled from'
+)
+check(
+  walkthroughDoc.split(/\r?\n/).includes(`> ${filledRefusal}`),
+  'the guide prints that sentence filled in, so a slot that declared no audience is told so here as well as in its sheet'
+)
+const quotedTodos = walkthroughDoc
+  .split(/\r?\n/)
+  .filter((line) => line.startsWith('> TODO-HUMAN'))
+check(
+  quotedTodos.length > 0 && quotedTodos.every((line) => !/\{[a-zA-Z]+\}/.test(line)),
+  'every TODO-HUMAN line the guide quotes is filled in, so the renderer cannot push the model template at a reader'
+)
+
 // `about_support_email` shipped as `support@example.com` in the default resources and in eight
 // locale directories at once, while `store/listing.json` advertised the developer's real address -
 // and `about_app_name` and `common_date_placeholder` were duplicated the same way. `check-locales`
@@ -2358,6 +2903,83 @@ if (localeDedupRows.length === 0) {
   }
 }
 check(localeDedupProbe.status === 0, 'locale-dedup test exits 0')
+
+// Play requires the privacy policy in **two** places - the listing's public URL and inside the app -
+// and `AGENTS.md` stated that rule while nothing measured it, so `teacher-gradebook` shipped with
+// privacy prose and a support e-mail and no way to open the policy at all. The prose was right; the
+// sensor did not exist. The suite below drives `scripts/test-in-app-policy.mjs`, whose legs are the
+// defects that actually recurred plus the ones the naive implementation gets wrong (a hardcoded URL,
+// a URL that no Kotlin references, an opener living in a different file, a URL declared only under
+// `values-<locale>/`). Having the sensor is not enough on its own: `check-adaptive-icon.py` also
+// existed with nothing invoking it, so this probe is what keeps the sensor's own suite honest, and
+// `verify-slot.mjs` runs the sensor itself on every slot.
+section('the privacy policy is reachable from inside the app, not only from the listing')
+const inAppPolicyProbe = spawnSync(process.execPath, [join(ROOT, 'scripts', 'test-in-app-policy.mjs')], {
+  cwd: ROOT,
+  encoding: 'utf8',
+  windowsHide: true
+})
+const inAppPolicyRows = `${inAppPolicyProbe.stdout || ''}${inAppPolicyProbe.stderr || ''}`
+  .split(/\r?\n/)
+  .map((row) => row.trim())
+  .filter(Boolean)
+const inAppPolicySummary = inAppPolicyRows.find((row) => /^=== \d+ checks/.test(row))
+if (!inAppPolicySummary) {
+  check(false, `in-app policy suite reported no verdict (exit ${inAppPolicyProbe.status ?? 'unknown'})`)
+} else {
+  for (const row of inAppPolicyRows.filter((entry) => /^FAIL\s/.test(entry))) {
+    line('FAIL', `in-app policy: ${row.replace(/^FAIL\s+/, '')}`)
+  }
+  check(
+    inAppPolicyProbe.status === 0,
+    `in-app policy sensor: ${inAppPolicySummary.replace(/^===\s*/, '').replace(/\s*===$/, '')}`
+  )
+}
+
+// Two holders of one list is the shape that has bitten this factory before (`SCREEN_TARGETS` was
+// written once in `store-kit.py` and once in `store-studio.py`, and the copies disagreed while
+// nothing failed). The in-app policy sensor needs the reserved-host list in JavaScript, and the
+// Python generator needs it to say a pack is unfinished, so neither can import the other: the
+// duplication is checked instead of trusted. Moving a host in either file without the other fails
+// here rather than silently changing what "a real policy" means.
+section('the reserved documentation hosts are one list in two languages')
+const storeKitText = readFileSync(join(ROOT, 'scripts', 'store-kit.py'), 'utf8')
+const storeKitHosts = storeKitText.match(/^PLACEHOLDER_HOSTS\s*=\s*\(([\s\S]*?)\)/m)?.[1] ?? ''
+const storeKitHostList = [...storeKitHosts.matchAll(/"([^"]+)"/g)].map((match) => match[1]).sort()
+const sensorHostList = [...PLACEHOLDER_HOSTS].sort()
+check(
+  storeKitHostList.length > 0,
+  `scripts/store-kit.py still declares PLACEHOLDER_HOSTS in the shape this check reads (found ${storeKitHostList.length})`
+)
+check(
+  storeKitHostList.join(',') === sensorHostList.join(','),
+  `store-kit.py and in-app-policy.mjs agree on the reserved hosts (store-kit [${storeKitHostList.join(', ')}] vs sensor [${sensorHostList.join(', ')}])`
+)
+
+// A watchdog nobody runs is the defect it was built to catch, so `verify-slot.mjs` calls
+// `scripts/check-freshness.mjs` on every verification — slot or not. Its own suite is driven here for
+// the same reason: the mechanism is only real if an expired window makes the verdict UNVERIFIED and a
+// broken ledger cannot read as fresh. The ledger itself is about the factory, not about a slot, and
+// it is the one place where "this rule was true on this date" is recorded at all.
+section('a measured fact past its re-check window is stale, never fresh')
+const freshnessProbe = spawnSync(process.execPath, [join(ROOT, 'scripts', 'test-freshness.mjs')], {
+  cwd: ROOT,
+  encoding: 'utf8',
+  windowsHide: true
+})
+const freshnessRows = `${freshnessProbe.stdout || ''}${freshnessProbe.stderr || ''}`
+  .split(/\r?\n/)
+  .map((row) => row.trim())
+  .filter(Boolean)
+const freshnessSummary = freshnessRows.find((row) => /^\d+\/\d+ checks/.test(row))
+if (!freshnessSummary) {
+  check(false, `freshness suite reported no verdict (exit ${freshnessProbe.status ?? 'unknown'})`)
+} else {
+  for (const row of freshnessRows.filter((entry) => /^FAIL\s/.test(entry))) {
+    line('FAIL', `freshness: ${row.replace(/^FAIL\s+/, '')}`)
+  }
+  check(freshnessProbe.status === 0, `freshness watchdog: ${freshnessSummary}`)
+}
 
 // A journey asserts the literal text of the nodes it photographs, and those strings come from the
 // app's resources, which Android resolves against the *device's* language - not the listing's and
@@ -2676,6 +3298,208 @@ if (KEEP) {
   console.log(`\n  INFO      promise-gate sandbox kept at ${diffSandbox}`)
 } else {
   rmSync(diffSandbox, { recursive: true, force: true })
+}
+
+// The stop hook reminds the agent to show evidence after it changes `apps/` or `harness/`. Its own
+// text said "if this session changed apps/ or harness/" while the implementation emitted it
+// unconditionally, so it fired after every turn — including turns that answered a question and
+// edited nothing — and the owner read it as spam. A reminder that fires when nothing changed
+// cannot be told apart from one that fires when something did, which is the opposite of a gate.
+// The section below drives `scripts/test-stop-gate.mjs`, which is expected to FAIL against the
+// previous implementation: quiet turns were the defect, and nothing measured them.
+section('the stop gate fires on change, not on turns')
+const stopGateProbe = spawnSync(process.execPath, [join(ROOT, 'scripts', 'test-stop-gate.mjs')], {
+  cwd: ROOT,
+  encoding: 'utf8',
+  windowsHide: true
+})
+const stopGateRows = `${stopGateProbe.stdout || ''}${stopGateProbe.stderr || ''}`
+  .split(/\r?\n/)
+  .filter((row) => /^(PASS|FAIL)\s/.test(row))
+if (stopGateRows.length === 0) {
+  check(false, `stop-gate test reported no verdict (exit ${stopGateProbe.status ?? 'unknown'})`)
+} else {
+  for (const row of stopGateRows) {
+    const [status, ...rest] = row.split(/\s+/)
+    line(status === 'PASS' ? 'PASS' : 'FAIL', `stop-gate: ${rest.join(' ').trim()}`)
+  }
+}
+check(stopGateProbe.status === 0, 'stop-gate test exits 0')
+
+// ---------------------------------------------------------------------------------------------
+// A coverage check that cannot fail is not a check.
+//
+// `check-ui-coverage.mjs` printed a PASS for every slot except the one it was written against: a slot
+// with no ViewModel under `ui/` had nothing to compare and reported success, and a slot whose
+// ViewModels share none of the required table's names reported "0 reachable, 0 reported as notes" -
+// also success. Both are green lines produced by a check that structurally cannot go red, which an
+// independent review reproduced on `apps/2026-09-25-pipe-sizing` (a released slot whose operations the
+// table does not name). The two legs below are the two ways of checking nothing, and `verify-slot.mjs`
+// maps exit 2 to UNVERIFIED so neither can back a release claim. Without these legs the sensor could
+// regress to always-PASS and only a real slot would notice.
+section('a coverage check that cannot fail is not a check')
+// This section needs its own sandbox: the tree the earlier sections use is removed in their `finally`
+// (line-level detail that cost one debugging round: `mkdirSync` recreates the directories inside the
+// deleted path without complaining, and the sensor then fails to load, which reads as a red leg for
+// the wrong reason).
+const uiCoverageSandbox = createSandbox()
+try {
+  const uiCoverageSlot = `${slotDate}-uicoverage`
+  const uiCoverageDir = join(
+    uiCoverageSandbox,
+    'apps',
+    uiCoverageSlot,
+    'app',
+    'src',
+    'main',
+    'java',
+    'com',
+    'gexetr',
+    'uicoverage',
+    'ui'
+  )
+  mkdirSync(uiCoverageDir, { recursive: true })
+  writeFileSync(
+    join(uiCoverageDir, 'HomeScreen.kt'),
+    'package com.gexetr.uicoverage.ui\n\n@Composable\nfun HomeScreen() {}\n',
+    'utf8'
+  )
+  const runUiCoverage = () => {
+    const probe = spawnSync(
+      process.execPath,
+      [join(uiCoverageSandbox, 'scripts', 'check-ui-coverage.mjs'), '--slot', uiCoverageSlot],
+      { cwd: uiCoverageSandbox, encoding: 'utf8', windowsHide: true }
+    )
+    return `${probe.stdout || ''}${probe.stderr || ''}`
+  }
+  const noViewModelOutput = runUiCoverage()
+  check(
+    /UNVERIFIED/.test(noViewModelOutput),
+    'a slot with no ViewModel under ui/ is UNVERIFIED rather than PASS'
+  )
+  // The operations table names the shipped flows it knows about; a ViewModel whose operations it does
+  // not name measured nothing, so it is the same refusal rather than a clean bill of health.
+  writeFileSync(
+    join(uiCoverageDir, 'LedgerViewModel.kt'),
+    'package com.gexetr.uicoverage.ui\n\nclass LedgerViewModel {\n    fun startLedgerRun() {}\n}\n',
+    'utf8'
+  )
+  const unmatchedOutput = runUiCoverage()
+  check(
+    /UNVERIFIED/.test(unmatchedOutput),
+    'a ViewModel whose operations the table does not name is UNVERIFIED rather than PASS'
+  )
+} finally {
+  if (KEEP) {
+    console.log(`\n  INFO      ui-coverage sandbox kept at ${uiCoverageSandbox}`)
+  } else {
+    rmSync(uiCoverageSandbox, { recursive: true, force: true })
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Every regression suite the harness owns is executed, and a suite that is not says why.
+//
+// These files used to be invoked one at a time by hand, and six of them - `test-apk-provenance`,
+// `test-capture-publish`, `test-capture-assertions`, `test-codex-signals`, `test-play-scan`,
+// `test-play-reviews` - had been written, cited in `AGENTS.md` as evidence a release rests on, and
+// never run by the one command a session actually executes. That is this factory's most repeated
+// defect in another coat: a check that exists and is never run cannot be told apart from a check
+// that does not exist, and both read as green.
+//
+// The loop below therefore runs every `scripts/test-*` file it finds, except the ones with their own
+// section above (`DEDICATED_SUITES`) and the ones that name a reason (`SUITE_EXCLUSIONS`). A suite
+// added to `scripts/` tomorrow is picked up with no edit here, which is the safe direction: the
+// failure mode of a hand-maintained runner list is a new sensor that nothing ever runs.
+const DEDICATED_SUITES = new Set([
+  'test-capture-locale.mjs',
+  'test-checklist-products.py',
+  'test-console-answers.py',
+  'test-freshness.mjs',
+  'test-icon-design.py',
+  'test-in-app-policy.mjs',
+  'test-locale-dedup.mjs',
+  'test-release-notes.py',
+  'test-stop-gate.mjs',
+  'test-visual-qa-discovery.py'
+])
+
+// A suite excluded here must say why in the same breath, and a name that no longer exists on disk
+// fails the coverage check below - a stale exclusion is how an exclusion list stops meaning
+// anything. The bar for adding one is that the suite cannot run offline or without a device or local
+// captures - never that it is slow or inconvenient.
+const SUITE_EXCLUSIONS = new Map([
+  [
+    'test-store-studio-completeness.py',
+    'composes the full pack eleven times and reads store/captures/raw/, which is gitignored, so it cannot run on a clean checkout; it is a release-procedure step, listed in AGENTS.md'
+  ]
+])
+
+section('every regression suite the harness owns is executed')
+const suiteDirectory = join(ROOT, 'scripts')
+const diskSuites = readdirSync(suiteDirectory)
+  .filter((name) => /^test-.*\.(mjs|py)$/.test(name))
+  .sort()
+
+const staleExclusions = [...SUITE_EXCLUSIONS.keys()].filter((name) => !diskSuites.includes(name))
+check(
+  staleExclusions.length === 0,
+  `every suite named in SUITE_EXCLUSIONS exists on disk (stale: ${staleExclusions.join(', ') || 'none'})`
+)
+const mislabelled = [...DEDICATED_SUITES].filter((name) => SUITE_EXCLUSIONS.has(name))
+check(
+  mislabelled.length === 0,
+  `no suite is both dedicated and excluded (${mislabelled.join(', ') || 'none'})`
+)
+const dedicatedGone = [...DEDICATED_SUITES].filter((name) => !diskSuites.includes(name))
+check(
+  dedicatedGone.length === 0,
+  `every suite claimed to have its own section still exists (missing: ${dedicatedGone.join(', ') || 'none'})`
+)
+
+const genericSuites = diskSuites.filter(
+  (name) => !DEDICATED_SUITES.has(name) && !SUITE_EXCLUSIONS.has(name)
+)
+check(
+  genericSuites.length > 0,
+  `the runner found suites to execute (${genericSuites.length} of ${diskSuites.length} on disk)`
+)
+
+for (const name of diskSuites) {
+  if (SUITE_EXCLUSIONS.has(name)) {
+    line('SKIP', `${name} — ${SUITE_EXCLUSIONS.get(name)}`)
+    continue
+  }
+  if (DEDICATED_SUITES.has(name)) continue
+  const interpreter = name.endsWith('.py') ? 'python' : process.execPath
+  const probe = spawnSync(interpreter, [join(suiteDirectory, name)], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    windowsHide: true
+  })
+  const rows = `${probe.stdout || ''}${probe.stderr || ''}`
+    .split(/\r?\n/)
+    .map((row) => row.trim())
+    .filter(Boolean)
+  // The summary is the line the suite offers as one, not simply the last line it printed: a suite whose
+  // final output is a diagnostic (a dump excerpt, a device reading) would otherwise be reported as
+  // `test-capture-assertions.mjs: nearby: text="Material or system" ...`, which says the suite passed
+  // while showing something that looks like a failure.
+  const summaryRow =
+    rows.find((row) => /^\d+\/\d+ checks passed$/.test(row)) ||
+    rows.find((row) => /VERDICT:/.test(row)) ||
+    rows.find((row) => /PASSED|passed/.test(row)) ||
+    rows[rows.length - 1]
+  const summary = summaryRow || `exit ${probe.status ?? 'unknown'}`
+  if (probe.status === 0) {
+    line('PASS', `${name}: ${summary}`)
+  } else {
+    line('FAIL', `${name}: ${summary}`)
+    for (const row of rows.filter((entry) => /^(FAIL|ERROR)/i.test(entry)).slice(0, 5)) {
+      console.log(`            ${row}`)
+    }
+    failed += 1
+  }
 }
 
 console.log(`\nVERDICT: ${failed ? 'FAIL' : 'PASS'}`)

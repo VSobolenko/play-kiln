@@ -25,6 +25,7 @@
     <string name="about_privacy_title">設計からして非公開</string>
     <string name="about_privacy_body">アプリはオフラインで動作し、記録はこの端末の非公開ストレージに保存されます。アカウント、ログイン、分析、広告、開発者サーバーはありません。ファイルが外部に出るのは、システムのピッカーからエクスポートまたはバックアップしたときだけです。端末のバックアップが有効な場合、Android の自動バックアップがあなた自身の Google アカウントに記録をコピーすることがあります。</string>
     <string name="about_privacy_billing">Google Play Billing は購入通信と購入履歴を処理しますが、このアプリを通じてあなたのクラス記録を受け取ることはありません。</string>
+    <string name="about_privacy_policy_action">プライバシーポリシーを開く</string>
     <string name="about_averages_title">平均は計算の根拠を明示します</string>
     <string name="about_averages_body">すべての平均は、設定したカテゴリ、重み、丸め、未提出の扱いに従います。空欄や免除の課題が黙って0点に変わることはありません。使える評価がないカテゴリは名前を挙げて除外されます。</string>
     <string name="about_purchase_title">一度きりの永続アンロック</string>

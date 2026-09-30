@@ -51,6 +51,10 @@ from PIL import Image, ImageDraw
 from scipy import ndimage
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT / "scripts") not in sys.path:
+    sys.path.insert(0, str(ROOT / "scripts"))
+from lib import icon_design as design  # noqa: E402  the keyline grid, the stroke scale, the marks
+from lib import icon_qa  # noqa: E402  the icon measurements this report publishes
 LUMA = np.array([0.2126, 0.7152, 0.0722])
 
 
@@ -230,6 +234,16 @@ def section_rules(kit, out: dict) -> dict:
     }
 
     kind_to_mjs = {"phone": "PHONE_SCREENSHOTS", "tablet-7": "TABLET_7", "tablet-10": "TABLET_10"}
+
+    # The console's own per-field windows, measured live in the RU console on 2026-09-29 from each
+    # screenshot field's inline text (`Скриншоты для смартфона` / `... семидюймовых планшетов` /
+    # `... 10-дюймового планшета`, "каждая сторона ..."). These are the check's expectation - a
+    # check that cannot state what it expects cannot fail - and NOT a second source of truth for
+    # what the factory renders: `SCREEN_TARGETS`/`SCREENSHOT_LIMITS`/`SCREENSHOT_ASPECT_RATIOS` in
+    # store-kit.py remain that.
+    console_windows = {"phone": (320, 3840), "tablet-7": (320, 3840), "tablet-10": (1080, 7680)}
+    aspects = kit.SCREENSHOT_ASPECT_RATIOS
+
     divergences = []
     for kind, key in kind_to_mjs.items():
         table = py["SCREENSHOT_LIMITS"][kind]
@@ -240,8 +254,17 @@ def section_rules(kit, out: dict) -> dict:
             divergences.append(f"{kind}: play-assets.mjs max side {mjs[key]['maxSide']} "
                                f"vs store-kit.py max_long {table['max_long']} "
                                f"(store-kit is the stricter, documented intersection with Play's 3840px cap)")
-        if table["min_short"] < 320 or table["max_long"] > 3840:
-            divergences.append(f"{kind}: store-kit.py limit outside Play's hard 320..3840 window")
+        if (table["min_short"], table["max_long"]) != console_windows[kind]:
+            divergences.append(
+                f"{kind}: store-kit.py window is {table['min_short']}..{table['max_long']} but the "
+                f"console's own field accepts {console_windows[kind][0]}..{console_windows[kind][1]}")
+        width, height = py["SCREEN_TARGETS"][kind]["size"]
+        if not any(width * down == height * across or width * across == height * down
+                   for across, down in aspects):
+            divergences.append(
+                f"{kind}: factory target {width}x{height} is not "
+                + " or ".join(f"{across}:{down}" for across, down in aspects)
+                + " (the console's aspect rule for every screenshot field)")
 
     # What the slot gate actually enforces, read out of verify-slot.mjs rather than assumed.
     gate_source = (ROOT / "scripts" / "verify-slot.mjs").read_text(encoding="utf-8")
@@ -1342,135 +1365,155 @@ def section_palette(kit, studio, slot: Path, out: dict) -> dict:
 # ----------------------------------------------------------------------------- icon
 
 def section_icon(kit, studio, slot: Path, out: dict) -> dict:
+    """The listing icon: what the mark declares, what the pixels measure, and the difference.
+
+    The icon is built on the keyline system in `scripts/lib/icon_design.py` and measured by
+    `scripts/lib/icon_qa.py`, which is also the gate `store-studio.render_icon` refuses to write
+    past. This section publishes that one measurement together with the *declaration* the renderer
+    read, rather than deriving a second opinion from the same pixels - two implementations of one
+    measurement is how a report begins disagreeing with its gate, and the declaration is the half
+    the old section could not state at all: its geometry table was computed from hand-tuned pixel
+    constants that no longer exist, and it labelled ink with `luma > 215`, which misses every dark
+    role (the book's `ink_lift` spine) and so measured a mark the renderer never drew.
+
+    This stays a report: `visual-qa.py` exits 0 whenever it finishes, and the icon gate is
+    `store-studio.render_icon`, with `scripts/test-icon-design.py` as the regression suite.
+    """
     studio_config = json.loads((slot / "store" / "studio.json").read_text(encoding="utf-8"))
-    mark_name = studio_config.get("mark", "pipe")
-    definition = studio.MARK_REGISTRY[mark_name]
-    shape = definition["shape"]
+    mark_name = studio_config.get("mark") or design.DEFAULT_MARK
+    palette = studio.resolve_palette(studio_config.get("palette"))
     path = slot / "store" / "assets" / "icon-512.png"
     with Image.open(path) as image:
         icon = image.convert("RGBA")
-    canvas = 512
-    array = np.asarray(icon, dtype=np.float32)
-    luma = luminance(array)
+    array = np.asarray(icon, dtype=np.uint8)
+    canvas = int(array.shape[0])
     alpha = array[..., 3]
-    mark = luma > 215
-    amber = (array[..., 0] > 190) & (array[..., 1] > 110) & (array[..., 1] < 215) & (array[..., 2] < 130)
+    result = icon_qa.evaluate_icon(array, palette, mark=mark_name)
+    measured = result["measured"]
+    mark = icon_qa.mark_mask(array, None, palette, mark_name)
+    role_masks = icon_qa.role_masks(array, palette, mark_name, mark)
+    amber = role_masks.get("amber", np.zeros_like(mark))
     ys, xs = np.nonzero(mark)
-    mark_bbox = [int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1]
+    mark_bbox = ([int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1]
+                 if xs.size else None)
     center = (canvas - 1) / 2
 
     def dp(px: float) -> float:
-        return round(px / canvas * 108, 3)
+        return round(px / canvas * design.ADAPTIVE_VIEWPORT_DP, 3)
 
-    # Adaptive-icon masks.  Layers are 108dp; the launcher mask is a 72dp shape (circle or
-    # squircle), and 66dp is the guaranteed-visible safe zone.  All three are tested.
-    candidates = {
-        "store_full_bleed_square": ("square", canvas / 2),
-        "launcher_circle_72dp": ("ellipse", canvas * (72 / 108) / 2),
-        "launcher_squircle_72dp": ("rounded", canvas * (72 / 108) / 2, canvas * (72 / 108) * 0.25),
-        "safe_zone_circle_66dp": ("ellipse", canvas * (66 / 108) / 2),
-        "safe_zone_square_66dp": ("square", canvas * (66 / 108) / 2),
+    # The declaration: the geometry the renderer was handed, before any pixel existed. Everything
+    # here comes from `icon_design`, the same module the raster and the vector renderer read, so
+    # this cannot drift from what was drawn - it is the thing that was drawn.
+    viewport = design.ADAPTIVE_VIEWPORT_DP
+    declaration = {
+        "mark": mark_name,
+        "keyline": design.MARK_REGISTRY[mark_name]["keyline"],
+        "note": design.MARK_REGISTRY[mark_name]["note"],
+        "canvas_px": canvas,
+        "optical_anchor": [round(v, 5) for v in design.optical_anchor(mark_name)],
+        "circle_keyline_dp": round(design.KEYLINE_CIRCLE * viewport, 3),
+        "safe_radius_dp": design.ADAPTIVE_SAFE_RADIUS_DP,
+        "reach_dp": round(design.mark_reach_dp(mark_name), 3),
+        "silhouette_extent": round(design.mark_silhouette_extent(mark_name), 4),
+        "silhouette_bounds": [round(v, 5) for v in design.silhouette_bounds(mark_name)],
+        "stroke_scale_px": {weight: round(scale * canvas, 1)
+                            for weight, scale in design.STROKE.items()},
+        "min_feature_px": round(design.MIN_FEATURE * canvas, 1),
+        "min_feature_at_48dp_px": round(design.MIN_FEATURE * 48, 3),
+        "primitives": [
+            {"kind": primitive["kind"], "role": primitive["role"],
+             "reach_dp": round(design.primitive_reach(
+                 primitive, design.optical_anchor(mark_name)) * viewport, 3),
+             "extent_dp": [round(v * viewport, 2)
+                           for v in design.primitive_extent(primitive)],
+             **({"stroke": primitive["weight"],
+                 "stroke_px": round(design.stroke_weight(primitive["weight"]) * canvas, 1)}
+                if "weight" in primitive else {})}
+            for primitive in design.mark_primitives(mark_name)
+        ],
     }
+    # Raster against declaration: the renderer's fidelity, in the units the gate speaks. A nonzero
+    # difference here is the antialiased edge and the half-pixel the mask boundary sits on, not a
+    # design error - but if it ever grows past a pixel the pixels have stopped being the mark.
+    agreement = {
+        "reach_dp_delta": round(measured["mark_reach_dp"] - declaration["reach_dp"], 3),
+        "silhouette_extent_delta": round(measured["silhouette_extent"]
+                                        - declaration["silhouette_extent"], 4),
+        "optical_anchor_offset_px_delta": round(measured["optical_offset_px"], 3),
+        "inside_circle_keyline": measured["mark_reach_dp"] <= declaration["circle_keyline_dp"],
+    }
+
+    # Mask survival comes from `icon_qa`, which is also what the gate reads: the 72dp launcher
+    # circle and squircle, and the 66dp safe zone as a circle and as a square. The gate is the
+    # 66dp circle - the zone Android guarantees - and the rest is context for a reviewer.
     masks = {}
-    for name, spec in candidates.items():
-        keep = Image.new("L", (canvas, canvas), 0)
-        draw = ImageDraw.Draw(keep)
-        if spec[0] == "ellipse":
-            radius = spec[1]
-            draw.ellipse((center - radius, center - radius, center + radius, center + radius), fill=255)
-        elif spec[0] == "rounded":
-            side = spec[1] * 2
-            draw.rounded_rectangle((center - side / 2, center - side / 2, center + side / 2, center + side / 2),
-                                   radius=spec[2], fill=255)
-        else:
-            radius = spec[1]
-            draw.rectangle((center - radius, center - radius, center + radius, center + radius), fill=255)
-        keep_array = np.asarray(keep) > 127
-        clipped = int((mark & ~keep_array).sum()) + int((amber & ~keep_array).sum())
-        total = int(mark.sum() + amber.sum())
-        masked_rgb = Image.new("RGB", (canvas, canvas), (12, 14, 18))
-        masked_rgb.paste(icon.convert("RGB"), (0, 0), keep)
-        masked_luma = luminance(np.asarray(masked_rgb, dtype=np.float32))
-        masked_mark = masked_luma > 215
-        mys, mxs = np.nonzero(masked_mark)
+    for name, data in result["context"]["mask_survival"].items():
         masks[name] = {
-            "mask_extent_dp": round(spec[1] * 2 / canvas * 108, 2),
-            "mark_px": int(mark.sum()), "amber_px": int(amber.sum()),
-            "mark_px_clipped": clipped,
-            "mark_fraction_clipped": round(clipped / max(1, total), 5),
-            "mark_bbox_after_mask": [int(mxs.min()), int(mys.min()), int(mxs.max()) + 1, int(mys.max()) + 1]
-            if mxs.size else None,
+            "mask_extent_dp": round(data["mask_extent_fraction"] * design.ADAPTIVE_VIEWPORT_DP, 2),
+            **data,
         }
 
-    # The mark's own dp geometry, so the raster and the adaptive-icon vector can be compared.
+    # The mark's own pixel geometry, so the raster and the adaptive-icon vector can be compared.
     geometry = {
         "mark": mark_name,
+        "mark_px": int(mark.sum()),
+        "amber_px": int(amber.sum()),
         "mark_bbox_px": mark_bbox,
-        "mark_halfwidth_px": round(max(center - mark_bbox[0], mark_bbox[2] - 1 - center), 1),
-        "mark_halfwidth_dp": dp(max(center - mark_bbox[0], mark_bbox[2] - 1 - center)),
-        "mark_halfheight_dp": dp(max(center - mark_bbox[1], mark_bbox[3] - 1 - center)),
-        "raster_reach_dp": round(definition["reach_fraction"] *
-                                 definition["raster_half_extent_fraction"] * 108, 3),
-        "vector_reach_dp": round(definition["reach_fraction"] * studio.MARK_FIT_DP, 3),
-        "vector_safe_zone_radius_dp": studio.ADAPTIVE_SAFE_RADIUS_DP,
+        "mark_halfwidth_px": round(max(center - mark_bbox[0], mark_bbox[2] - 1 - center), 1)
+        if mark_bbox else None,
+        "mark_halfwidth_dp": dp(max(center - mark_bbox[0], mark_bbox[2] - 1 - center))
+        if mark_bbox else None,
+        "mark_halfheight_dp": dp(max(center - mark_bbox[1], mark_bbox[3] - 1 - center))
+        if mark_bbox else None,
+        "raster_reach_dp": measured["mark_reach_dp"],
+        "declared_reach_dp": declaration["reach_dp"],
     }
-    if mark_name == "pipe":
-        raster_unit = definition["raster_half_extent_fraction"] * canvas
-        geometry.update({
-            "ring_outer_radius_dp": dp((shape["ring_radius"] + shape["ring_width"] / 2) * raster_unit),
-            "ring_inner_radius_dp": dp((shape["ring_radius"] - shape["ring_width"] / 2) * raster_unit),
-            "caliper_halfspan_dp": dp((shape["span"] + shape["line_width"]) * raster_unit),
-            "caliper_line_width_dp": dp(shape["line_width"] * raster_unit),
-            "vector_ring_outer_dp": round((shape["ring_radius"] + shape["ring_width"] / 2) * studio.MARK_FIT_DP, 1),
-            "vector_ring_inner_dp": round((shape["ring_radius"] - shape["ring_width"] / 2) * studio.MARK_FIT_DP, 1),
-            "vector_caliper_halfspan_dp": round((shape["span"] + shape["line_width"]) * studio.MARK_FIT_DP, 1),
-            "vector_line_width_dp": round(shape["line_width"] * studio.MARK_FIT_DP, 1),
-        })
-        geometry["raster_minus_vector_ring_outer_dp"] = round(
-            geometry["ring_outer_radius_dp"] - geometry["vector_ring_outer_dp"], 3)
-        geometry["raster_minus_vector_caliper_halfspan_dp"] = round(
-            geometry["caliper_halfspan_dp"] - geometry["vector_caliper_halfspan_dp"], 3)
-    else:
-        geometry.update({
-            "page_half_width_dp": round(shape["page_half_width"] * definition["raster_half_extent_fraction"] * 108, 3),
-            "page_half_height_dp": round(shape["page_half_height"] * definition["raster_half_extent_fraction"] * 108, 3),
-            "binding_radius_dp": round(shape["binding_radius"] * definition["raster_half_extent_fraction"] * 108, 3),
-            "check_stroke_width_dp": round(shape["check_width"] * definition["raster_half_extent_fraction"] * 108, 3),
-            "vector_page_half_width_dp": round(shape["page_half_width"] * studio.MARK_FIT_DP, 3),
-            "vector_page_half_height_dp": round(shape["page_half_height"] * studio.MARK_FIT_DP, 3),
-            "vector_binding_radius_dp": round(shape["binding_radius"] * studio.MARK_FIT_DP, 3),
-            "vector_check_stroke_width_dp": round(shape["check_width"] * studio.MARK_FIT_DP, 3),
-        })
+    # Per-primitive geometry lives in `declaration["primitives"]`: the declared extents in dp, which
+    # is the same table the old hand-written per-mark branches here reported - except that it is
+    # read off the primitive list the renderers consume instead of being restated by hand, so a mark
+    # whose geometry changes cannot leave this section describing the previous shape.
 
+    # Legibility at the size a launcher actually draws. The mask decides which pixels are the mark
+    # (NEAREST, because a resampled boolean edge is neither a mark nor a field), and the numbers
+    # are the ones a reviewer needs: does the mark still separate from its field, and is its
+    # thinnest stroke still a line rather than a smear.
     small = {}
     for target in (48, 96):
-        rendered = icon.resize((target, target), Image.Resampling.LANCZOS)
-        small_luma = luminance(np.asarray(rendered.convert("RGB"), dtype=np.float32))
-        centre = (target - 1) / 2
-        band = small_luma[int(centre) - 1:int(centre) + 2]
-        # the field the mark is drawn on: four corner patches, away from the ring and the caliper
-        inset = max(2, round(target * 0.04))
-        patch = max(2, round(target * 0.16))
-        corners = [small_luma[inset:inset + patch, inset:inset + patch],
-                   small_luma[inset:inset + patch, target - inset - patch:target - inset],
-                   small_luma[target - inset - patch:target - inset, inset:inset + patch],
-                   small_luma[target - inset - patch:target - inset, target - inset - patch:target - inset]]
-        corner_medians = [round(float(np.median(c)), 1) for c in corners]
-        field = float(np.median(np.concatenate([c.ravel() for c in corners])))
+        scaled = np.asarray(icon.convert("RGB").resize((target, target), Image.Resampling.LANCZOS),
+                            dtype=np.float64)
+        scaled_mask = np.asarray(
+            Image.fromarray((mark * 255).astype(np.uint8)).resize(
+                (target, target), Image.Resampling.NEAREST)) > 127
+        scaled_luma = luminance(scaled)
+        inside = scaled_luma[scaled_mask]
+        outside = scaled_luma[~scaled_mask]
+        rows, cols = np.nonzero(scaled_mask)
         small[target] = {
-            "centre_row_peak_luma": round(float(np.percentile(band, 99.5)), 1),
-            "centre_row_min_luma": round(float(band.min()), 1),
-            "field_corner_median_lumas": corner_medians,
-            "field_median_luma": round(field, 1),
-            "peak_minus_field": round(float(np.percentile(band, 99.5)) - field, 1),
-            "mark_reach_px": round(definition["reach_fraction"] * definition["raster_half_extent_fraction"] * target, 2),
+            "mark_px": int(scaled_mask.sum()),
+            "mark_fraction": round(float(scaled_mask.mean()), 4),
+            "mark_median_luma": round(float(np.median(inside)), 1) if inside.size else None,
+            "field_median_luma": round(float(np.median(outside)), 1) if outside.size else None,
+            "mark_extent_px": int(max(np.ptp(rows), np.ptp(cols))) + 1 if rows.size else 0,
+            "min_feature_px": round(measured["thinnest_stroke_px"] * target / canvas, 3),
+            "contrast_ratio": icon_qa.downscale_contrast(array, mark, target)["ratio"],
         }
     out["icon"] = {
         "path": path.relative_to(slot).as_posix(),
-        "gradient_probe_rgb": {"top": [int(v) for v in array[2, 256, :3]],
-                               "left_middle": [int(v) for v in array[256, 8, :3]],
-                               "bottom": [int(v) for v in array[509, 256, :3]]},
-        "mark_alpha": {"min": int(alpha[mark].min()), "max": int(alpha[mark].max())} if mark.any() else None,
+        "design_gate": {
+            "verdict": result["verdict"],
+            "gated_legs": result["gated_legs"],
+            "failed_legs": result["failed_legs"],
+            "measured": measured,
+            "legs": result["legs"],
+            "gates": icon_qa.ICON_GATES,
+        },
+        "declaration": declaration,
+        "raster_vs_declaration": agreement,
+        "gradient_probe_rgb": {"top": [int(v) for v in array[2, canvas // 2, :3]],
+                               "left_middle": [int(v) for v in array[canvas // 2, 8, :3]],
+                               "bottom": [int(v) for v in array[canvas - 3, canvas // 2, :3]]},
+        "mark_alpha": {"min": int(alpha[mark].min()), "max": int(alpha[mark].max())}
+        if mark.any() else None,
         "geometry_dp": geometry,
         "masks": masks,
         "renders": small,
@@ -1657,12 +1700,29 @@ def main() -> int:
     if "icon" in wanted:
         icon = section_icon(kit, studio, slot, result)
         print("\n-- icon --")
-        print("geometry dp:", json.dumps(icon["geometry_dp"]))
+        gate = icon["design_gate"]
+        declaration = icon["declaration"]
+        print(f"design gate: verdict {gate['verdict']} gated={gate['gated_legs']} "
+              f"failed={gate['failed_legs'] or 'none'}")
+        for line in icon_qa.format_legs(gate):
+            print(line)
+        print(f"declaration: mark={declaration['mark']} keyline={declaration['keyline']} "
+              f"reach={declaration['reach_dp']}dp extent={declaration['silhouette_extent']} "
+              f"anchor={declaration['optical_anchor']} circle_keyline={declaration['circle_keyline_dp']}dp")
+        print(f"declaration strokes {declaration['stroke_scale_px']}px "
+              f"min_feature={declaration['min_feature_px']}px "
+              f"({declaration['min_feature_at_48dp_px']}px at 48dp)")
+        for primitive in declaration["primitives"]:
+            print(f"    {primitive['kind']:7} {primitive['role']:9} "
+                  f"reach={primitive['reach_dp']}dp extent=[{primitive['extent_dp'][0]}, "
+                  f"{primitive['extent_dp'][1]} .. {primitive['extent_dp'][2]}, "
+                  f"{primitive['extent_dp'][3]}]dp "
+                  f"{primitive.get('stroke', '')}{' ' + str(primitive.get('stroke_px')) + 'px' if primitive.get('stroke_px') else ''}")
+        print("raster vs declaration:", json.dumps(icon["raster_vs_declaration"]))
         print("gradient probes:", icon["gradient_probe_rgb"], "mark alpha:", icon["mark_alpha"])
         for name, data in icon["masks"].items():
-            print(f"mask {name:24} extent={data['mask_extent_dp']}dp mark_px={data['mark_px']} "
-                  f"amber_px={data['amber_px']} clipped_px={data['mark_px_clipped']} "
-                  f"frac={data['mark_fraction_clipped']} bbox_after={data['mark_bbox_after_mask']}")
+            print(f"mask {name:24} extent={data['mask_extent_dp']}dp "
+                  f"clipped_px={data['mark_px_clipped']} frac={data['mark_fraction_clipped']}")
         for target, data in icon["renders"].items():
             print(f"render {target}px {data}")
 

@@ -1,5 +1,8 @@
 package com.gexetr.teachergradebook.ui.about
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
@@ -11,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.gexetr.teachergradebook.BuildConfig
@@ -27,6 +31,8 @@ fun AboutScreen(
     unlocked: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val privacyPolicyUrl = stringResource(R.string.about_privacy_policy_url)
     ScreenShell(
         title = stringResource(R.string.about_title),
         onBack = onBack,
@@ -54,6 +60,19 @@ fun AboutScreen(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                TextButton(
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyUrl))
+                        try {
+                            context.startActivity(intent)
+                        } catch (_: ActivityNotFoundException) {
+                            // A device with no app that can open a web link must not crash this screen.
+                        }
+                    },
+                    modifier = Modifier.heightIn(min = 48.dp),
+                ) {
+                    Text(stringResource(R.string.about_privacy_policy_action))
+                }
             }
             Panel {
                 Text(stringResource(R.string.about_averages_title), style = MaterialTheme.typography.titleMedium)

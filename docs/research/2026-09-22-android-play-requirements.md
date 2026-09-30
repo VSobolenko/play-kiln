@@ -134,6 +134,52 @@ specified in `FACTS.md`.
 
 Sources: **NEEDS-VERIFICATION** — no official Play App Signing or key-rotation URL is present in `FACTS.md`.
 
+### Play App Signing "enhancements" — the three items on the upload screen (recorded 2026-09-28)
+
+Enrolling in Play App Signing unlocks a family of `.aab` **enhancements**, and Console presents them
+together on the upload screen. Verbatim:
+
+> "By letting Google sign the optimized distribution APKs generated from your app bundles, you gain
+> access to valuable services like automatic protection and automatic strings translation using
+> Gemini models."
+
+Source: <https://support.google.com/googleplay/android-developer/answer/9842756?hl=en>
+
+So a first upload shows the bundle as **signed by Google Play**, **automatic protection** enabled,
+and **automatic strings translation** not enabled — three rows of one list, not three findings about
+the app. The third is an **optional feature being offered**, not a defect in the app, its manifest or
+its listing. It is opt-in, reversible, and its absence blocks nothing.
+
+**Decision for a slot that ships its own translations: decline it.** Play's translation page states
+the consequence verbatim:
+
+> "You can select multiple languages to translate to. Play will automatically manage all translations
+> for languages you select. **Any existing translations for these languages will be overridden.** To
+> keep existing translations or to manage them yourself, do not select these languages."
+
+Source: <https://support.google.com/googleplay/android-developer/answer/9844778?hl=en>
+
+A PlayKiln slot that has `values-<locale>/` directories has reviewable, diffable, git-tracked
+translations. Turning the console feature on for those languages replaces them with machine output
+held only in Console. The factory's position is therefore:
+
+- **Decline it** for any language the slot already translates. `values-<locale>/` in the repository is
+  the source of truth, because a translation in source survives every release, is reviewable in a
+  diff, and cannot be wiped by a future upload.
+- Enabling it is only coherent **as a bootstrap** for a language the slot does not translate at all,
+  followed by reviewing the output and freezing it into `values-<locale>/` — never as the permanent
+  home of a translation.
+- Console-side edits are fragile: they are replaced by the next build and lost if the feature is
+  turned off, so they cannot be the record.
+
+**Ruled out, so nobody "fixes" them later:** Play auto-translates the *store listing* by default and
+that is unrelated to in-app strings; **no Play requirement links the app's resource languages to the
+languages declared on the listing**, so a single-language listing over a multi-language app is
+legitimate and adding listing languages to "clear" such a message would be wasted work; and the only
+*blocking* language error in this area is a bundle declaring unrecognized language codes, which a
+slot using real `values-<locale>/` codes cannot trigger. A slot's own `android:localeConfig` is a
+separate matter already covered by `scripts/check-locales.mjs`.
+
 ## 5. Play Console requirements
 
 ### Listing text and graphics
@@ -143,42 +189,134 @@ Sources: **NEEDS-VERIFICATION** — no official Play App Signing or key-rotation
 - Full description: at most **4000** characters.
 - Icon: 512×512, 32-bit PNG with alpha, sRGB, at most 1024 KB; do not draw Google's
   rounded mask or shadow.
-- Feature graphic: exactly 1024×500, JPEG or 24-bit PNG without alpha.
-- Phone screenshots: 2–8, JPEG or 24-bit PNG without alpha, at most 8 MB, each side
-  320–3840 px, long side no more than twice the short side; 1080×1920 is recommended.
-- Large-format eligibility: at least four screenshots with at least 1080 px on the
-  short side.
-- 7-inch and 10-inch tablet screenshots: 4–8 each, short edge at least 1080 px.
-  Play's page gives two long-edge rules that genuinely conflict for tablets. Its
+- Feature graphic: exactly 1024×500, JPEG or 24-bit PNG without alpha, at most 15 MB.
+- Screenshots — **measured live in the RU console on 2026-09-29**, on the app's
+  `Стандартная страница приложения` page, from each field's own inline strings. These
+  are the strings the console validates against, so they outrank the documentation
+  below wherever the two disagree:
+  - `Скриншоты для смартфона` (phone): 2–8 files, 16:9 or 9:16, each side 320–3840,
+    ≤ 8 MB.
+  - `Скриншоты для семидюймовых планшетов` (7-inch): up to 8 files, 16:9 or 9:16,
+    each side 320–3840, ≤ 8 MB. The 1080 px floor is **not** this field's rule.
+  - `Скриншоты для 10-дюймового планшета` (10-inch): up to 8 files, 16:9 or 9:16,
+    each side 1080–7680, ≤ 8 MB.
+  - `Скриншоты на компьютере` (Desktop) and `Скриншоты для Android XR`: **optional** —
+    neither carries an asterisk. The factory deliberately does **not** produce them
+    (owner's instruction, 2026-09-29): the pack is not required to fill them, so there
+    is no target, asset or check for either.
+- Play's own page gives two long-edge rules that genuinely conflict for tablets. Its
   general **Requirements** section says: "JPEG or 24-bit PNG (no alpha) Minimum
   dimension: 320px Maximum dimension: 3840px The maximum dimension of your
   screenshot can't be more than twice as long as the minimum dimension." Its
   device-specific **Large screens** section says: "Large screens: For Chromebook and
   tablets, you can add a minimum of 4 screenshots to demonstrate your in-app
   experience. Upload screenshots between 1,080 and 7,680px Use a 16:9 aspect ratio
-  for landscape and a 9:16 aspect ratio for portrait." Because the two statements
-  conflict for tablets, the factory deliberately enforces their intersection: the
-  conservative 3840 px long-edge cap plus the ≥ 1080 px short edge. Source:
+  for landscape and a 9:16 aspect ratio for portrait." The console's own field
+  strings above settle both questions for the factory: 16:9 or 9:16 is required in
+  every screenshot field, and the per-field windows are 320–3840 (phone, 7-inch) and
+  1080–7680 (10-inch). Source:
   <https://support.google.com/googleplay/android-developer/answer/9866151?hl=en>.
-  The factory's 1200×1920 and 1600×2560 tablet sets are a **5:8 DEVIATION** from the
-  recommended 9:16 portrait ratio, accepted 2026-09-24 for the same reason: the hard
-  Requirements caps are satisfied and the ratio affects only which large-screen
-  surfaces Play selects, not review eligibility.
 - Gated apps require review notes and usable demo access.
 
 Sources: <https://support.google.com/googleplay/android-developer/answer/9866151?hl=en>.
 
 PlayKiln's stricter output contract is 6 phone, 4 seven-inch tablet, and 4 ten-inch
-tablet screenshots per locale, plus the icon and feature graphic.
+tablet screenshots per locale — 9:16 in every set (`1080×1920` phone and 7-inch,
+`1440×2560` 10-inch) — plus the icon and feature graphic.
 
 Sources: **NEEDS-VERIFICATION** — this is a repository contract, not an external Play rule.
 
+#### The release screen's two fields (recorded 2026-09-28, after the first real upload)
+
+The release screen asks for a **release name** and **release notes**, and these are asked for at
+*upload* time rather than at listing time. The pack covered every other listing field and neither of
+these, so the first publish reached the screen with nothing prepared and no way to count the text —
+`store/release-notes.md` now carries both, and `scripts/store-kit.py` measures them.
+
+- **Release name** — an internal Play Console label. It is **not shown to any user**; it exists so
+  the console's release list can tell one build from another, and Play prefills it from the bundle's
+  `versionName`. The factory states it as `<versionName> (<versionCode>)` and checks it against
+  `dist/release-manifest.json`, because a name that disagrees with the uploaded bundle makes the
+  console list lie about which build is which — which is how the wrong rollout gets promoted.
+- **Release notes / "What's new"** — **shown to users** on the store page, unlike the release name.
+  Play puts every language in a **single text box** and separates them with a tag whose name is the
+  language, the tags on their own lines: "Add the description for your app's release between the
+  relevant language tags... make sure the language tags are on separate lines from the release
+  notes" (<https://support.google.com/googleplay/android-developer/answer/9859348?hl=en>).
+  `store/release-notes.md` therefore carries a fenced block in exactly that format, so the human
+  pastes it whole rather than reassembling it — and the block *is* the note, not a rendering of it,
+  so the string that is measured is the string that is pasted. Play caps each language at **500
+  characters** and enforces the cap by **truncating the paste** rather than refusing it, so a
+  too-long note ships as a half-sentence and nothing says so. The factory measures every note in the
+  block, including one for a language the listing does not declare. A language may be left out of the
+  block, in which case Play shows no note for it — but English text must never sit under a foreign
+  tag, because that claims a translation the listing does not have.
+
+The pack may still be complete without the file — its absence is reported as unfinished work rather
+than as a false claim — but a file that *exists* is held to its own text: an over-long note, a
+listing language with no note in the block, or a release name that disagrees with the bundle all fail.
+
 ### Data safety and privacy
 
-The Data safety form is mandatory even when the app collects no data. It must match
-the privacy policy and every third-party SDK. The privacy policy needs a public URL.
+The Data safety form is mandatory for **every** app on any track except internal testing, and is
+required even when the app collects nothing — an app that collects no data still needs a form and a
+privacy-policy link. It must match the privacy policy, the declared permissions, and every
+third-party SDK. Data collection by a bundled SDK is the developer's to declare, not the SDK
+vendor's, so a transitive dependency can create a declaration obligation nobody chose — which is
+how Play Billing's `datatransport` dependency forced a **Financial info → Purchase history** row
+into `teacher-gradebook`.
 
-Sources: **NEEDS-VERIFICATION** — no official Data safety or privacy-policy URL is present in `FACTS.md`.
+**"Collect" means transmitting data off the user's device.** Two consequences the factory must
+apply deliberately, because guessing either way is a false declaration:
+
+- **On-device access is not collection.** Data an app reads, writes and keeps only in local storage
+  does not need to be disclosed. A slot whose whole record is a local file is therefore not
+  collecting it, and must not over-declare it — `teacher-gradebook` holds class rosters, marks and
+  staff notes entirely on the device and declares none of it.
+- **But personal and sensitive data handled at all still carries the policy duties below**,
+  including a privacy policy inside the app.
+
+Sources: <https://support.google.com/googleplay/android-developer/answer/10787469> (definition of
+collect, the on-device and ephemeral exclusions, the SDK responsibility).
+
+### Privacy policy, and the part the factory kept missing
+
+A privacy policy is required in **two** places, and only one of them was ever checked here:
+
+1. **The store listing** needs a public HTTPS URL. Required for every app, including one that
+   collects nothing.
+2. **The app itself** must carry the policy. Play's User Data policy states the requirement for an
+   app that handles personal or sensitive user data as: *"Have a valid privacy policy in both the
+   app's store listing and within the app itself."*
+
+The factory validated only the URL: `store/listing.json.privacyPolicyUrl` had to be a real,
+reachable HTTPS page, and `scripts/publish-privacy.mjs` was written to make that true. Nothing
+checked the second half, so a slot could ship a perfect hosted policy that no user could open from
+the app — and `teacher-gradebook` did exactly that: its About screen explains how the app treats
+data in prose, but carries no link, no URL and no way to reach the policy. The prose is not a
+policy, and a user who wants the policy is told to leave and find it.
+
+The rule for a new slot is therefore: **if the listing declares a `privacyPolicyUrl`, the app must
+expose it.** A readable policy screen or a link that opens it satisfies this; a paragraph about
+privacy does not.
+
+### Prominent disclosure and consent — and when it is *not* required
+
+An in-app disclosure shown before consent or a runtime permission is required when the app's
+access, collection, use or sharing of personal and sensitive data **may not be within the user's
+reasonable expectation** — the policy's own example is data collected in the background while the
+user is not engaging with the app. When it applies, the disclosure must be inside the app, must not
+live only in the policy, must appear in normal use rather than behind a settings menu, and consent
+must be a distinct affirmative action (a tap or a tick) that navigating away does not grant.
+
+This is deliberately **not** a startup checkbox for every app. A slot that is foreground-only, asks
+for no runtime permission, and handles only what the user just typed into it does not trigger the
+requirement, and adding a consent gate to one is unnecessary friction — a launch-blocking dialog is
+also what Play's Disruptive Ads rules penalise when it is an ad. The trigger to record for future
+slots is *unexpected or background handling*, not *any data at all*.
+
+Sources: <https://support.google.com/googleplay/android-developer/answer/10144311> (User Data policy,
+"Personal and Sensitive User Data" and "Prominent Disclosure & Consent Requirement").
 
 ### Account deletion
 
@@ -202,10 +340,68 @@ production access. Plan about three weeks for the first launch.
 
 Sources: **NEEDS-VERIFICATION** — no official closed-testing URL is present in `FACTS.md`.
 
-### Declarations
+### First-publication declarations (the two checkboxes)
 
-Ads must be declared truthfully. Content rating and target-audience declarations are
-required before publish.
+Creating an app in Play Console ends with a **Declarations** box that must be acknowledged before
+the app exists:
+
+1. **"Developer Program Policies"** — an acknowledgement that the app and its store listing comply
+   with *all* Developer Program Policies, not one document. It is an umbrella acceptance: the
+   policies that actually bite a factory slot are named elsewhere in this file and in
+   `AGENTS.md` — Repetitive Content, User Data, Data safety accuracy, Deceptive Behaviour, Payments,
+   and Families.
+2. **"US export laws"** — see below. The same screen also asks for acceptance of the Play App
+   Signing Terms of Service.
+
+Both are the owner's to accept; no factory script can or should press them, because the second one
+is a certification about the developer's legal position, not a formality about the build.
+
+Sources: <https://support.google.com/googleplay/android-developer/answer/9859152> ("In the
+'Declarations' section: Acknowledge the 'Developer Program Policies' and 'US export laws'
+declarations. Accept the Play App Signing Terms of Service.").
+
+### Export compliance — why a Russian developer clicking the box is normal
+
+The declaration reads: *"I understand that my application may be subject to United States export
+laws, regardless of my location or nationality. I agree that I have complied with all such laws,
+including any requirements for software with encryption functions. I hereby certify that my
+application is authorized for export from the United States under these laws."*
+
+Google explains the mechanism, in its own words: the app is hosted on Google's servers, Google is a
+US company, and **the US government treats a download from those servers by someone outside the US
+as an export** — so the laws can apply to a developer who is not American and is not in America.
+Google blocks downloads to embargoed countries itself, so no factory action is needed for that part.
+
+Three details the factory should know before treating the box as boilerplate:
+
+- **"Encryption functions" does not mean the app wrote crypto code.** Google's page says the app may
+  use encryption, and *"even if your application doesn't contain a crypto library, it may call up
+  crypto functionality in another program."* A slot with no crypto import still uses HTTPS — through
+  Play Billing, or through any SDK — and `teacher-gradebook` is exactly that case: a code search for
+  `Cipher`, `KeyGenerator`, `EncryptedSharedPreferences`, `MessageDigest` and friends returns nothing,
+  yet the billing SDK's transport makes network requests.
+- **Accepting is the correct answer for a normal app.** Most commercial apps fall under the mass
+  market category (ECCN `5D992.c`), exportable to most destinations under License Exception ENC. The
+  box is not asking for a licence; it is asking the developer to certify compliance.
+- **A duty may survive the click.** Mass-market encryption items that use the exception can carry an
+  annual **self-classification report** to the US Bureau of Industry and Security. This is the one
+  item here the factory cannot settle from Play's documentation, so it is recorded as an open
+  obligation rather than a settled fact — see the label below.
+
+For future slots this is a **per-account, once-per-app** step, not per-release: it is acknowledged
+when the app is created. What changes per app is whether the app uses encryption at all, and the
+honest answer for anything shipping on Play today is yes.
+
+Sources: <https://support.google.com/googleplay/android-developer/answer/113770> (Play's export
+compliance page, including the quote above and Google's own statement that it cannot give legal
+advice). Classification and the annual-reporting obligation: **NEEDS-VERIFICATION** —
+<https://www.bis.doc.gov/index.php/policy-guidance/encryption> is the authority to read, and it is
+not in `FACTS.md`, so the factory records the possibility and does not assert the requirement.
+
+### Developer Program Policies
+
+Ads must be declared truthfully. Content rating and target-audience declarations are required
+before publish.
 
 Sources: **NEEDS-VERIFICATION** — no official declaration URLs are present in `FACTS.md`.
 

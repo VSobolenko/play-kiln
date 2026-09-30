@@ -23,6 +23,14 @@
  * `data-safety` writes a legal declaration, so it additionally requires
  * `--approve-declarations`: a human must have read the CSV before it is sent.
  *
+ * Every target is also gated on the owner's recorded release approval, and the gate runs before the
+ * credentials are read, before any network request, and before `--dry-run` prints anything. This is
+ * the script that talks to Play, so it is the one where an unapproved revision costs the most: a dry
+ * run that prints a plan for a revision nobody approved teaches the operator a plan that must not be
+ * followed, and the non-dry run uploads it. The check itself is `checkReleaseApproval` — the single
+ * source of truth — and the sentence it prints is built by `approvalRemediation` in that module, so
+ * the command here cannot differ from the command `prepare-release.mjs` tells the operator to run.
+ *
  * Docs: docs/research/2026-09-23-google-play-automation-surface.md
  */
 
@@ -31,15 +39,21 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 
+import { approvalRemediation, checkReleaseApproval } from './lib/release-approval.mjs'
+
 const ROOT = process.cwd()
 const API = 'https://androidpublisher.googleapis.com/androidpublisher/v3'
 const UPLOAD_API = 'https://androidpublisher.googleapis.com/upload/androidpublisher/v3'
 const SCOPE = 'https://www.googleapis.com/auth/androidpublisher'
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024
+const MAX_FEATURE_BYTES = 15 * 1024 * 1024
+// The exact canvases `scripts/store-kit.py` renders, so an upload cannot be attempted with a size
+// the pack does not produce. Phone and 7-inch are both 1080x1920 (the console's 9:16 rule), and
+// 10-inch is 1440x2560; `scripts/verify-slot.mjs` reads the same numbers from store-kit.py.
 const TARGETS = {
   phoneScreenshots: { prefix: 'phone', count: 6, width: 1080, height: 1920 },
-  sevenInchScreenshots: { prefix: 'tablet-7', count: 4, width: 1200, height: 1920 },
-  tenInchScreenshots: { prefix: 'tablet-10', count: 4, width: 1600, height: 2560 }
+  sevenInchScreenshots: { prefix: 'tablet-7', count: 4, width: 1080, height: 1920 },
+  tenInchScreenshots: { prefix: 'tablet-10', count: 4, width: 1440, height: 2560 }
 }
 
 /** Upload targets. Edit-based ones share one edit; the rest are standalone calls. */
@@ -65,6 +79,7 @@ function usage() {
   console.log('  --approve-declarations   required to send --only data-safety')
   console.log('  --dry-run                print the plan, make no network requests')
   console.log('')
+  console.log('Every target requires the owner\'s recorded release approval: node scripts/approve-release.mjs --check --slot <slug>')
   console.log('Requires PLAY_SERVICE_ACCOUNT_JSON, and one release AAB under apps/<slot>/dist/.')
 }
 
@@ -230,7 +245,7 @@ function validateStore(slotDir, listing) {
     const icon = path.join(base, 'icon-512.png')
     const feature = path.join(base, 'feature-graphic-1024x500.png')
     requirePng(icon, 512, 512, 6, 1024 * 1024)
-    requirePng(feature, 1024, 500, 2)
+    requirePng(feature, 1024, 500, 2, MAX_FEATURE_BYTES)
     uploadImages.push({ locale, imageType: 'icon', file: icon })
     uploadImages.push({ locale, imageType: 'featureGraphic', file: feature })
     for (const [imageType, target] of Object.entries(TARGETS)) {
@@ -242,7 +257,7 @@ function validateStore(slotDir, listing) {
     }
   }
   requirePng(path.join(store, 'assets', 'icon-512.png'), 512, 512, 6, 1024 * 1024)
-  requirePng(path.join(store, 'assets', 'feature-graphic-1024x500.png'), 1024, 500, 2)
+  requirePng(path.join(store, 'assets', 'feature-graphic-1024x500.png'), 1024, 500, 2, MAX_FEATURE_BYTES)
   return { store, locales, uploadImages }
 }
 
@@ -550,6 +565,22 @@ async function upload(plan, serviceAccount) {
 async function main() {
   const options = parseArgs(process.argv.slice(2))
   const slotDir = resolveSlot(options.slot)
+
+  // The release gate, and it runs first: before the pack is read, before the credentials file is
+  // opened, before any network request, and before --dry-run prints a plan. A dry run for an
+  // unapproved revision is not harmless — it prints a plan an operator would follow, for a revision
+  // the owner has not seen — so it waits behind the same gate as an upload. The refusal is
+  // checkReleaseApproval's own reason, which already names which half of the approval is stale
+  // (the app, or the authored store pack) and carries the command that records approval; the
+  // fallback keeps that one shared sentence present even if a future reason stops carrying it.
+  const approval = checkReleaseApproval(slotDir)
+  if (!approval.ok) {
+    const remedy = approvalRemediation(slotDir)
+    throw new BlockedError(
+      approval.reason.includes(remedy) ? approval.reason : `${approval.reason} — ${remedy}`
+    )
+  }
+
   const targets = options.targets
   const listing = readJson(path.join(slotDir, 'store', 'listing.json'), 'listing.json')
   if (!listing.applicationId || typeof listing.applicationId !== 'string') {

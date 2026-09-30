@@ -25,6 +25,7 @@
     <string name="about_privacy_title">Tasarımı gereği gizli</string>
     <string name="about_privacy_body">Uygulama çevrimdışı çalışır ve kaydınızı bu cihazdaki özel depolamaya yazar. Hesap, oturum açma, analiz, reklam ya da geliştirici sunucusu yoktur. Dosyalar yalnızca sistem seçicisi üzerinden dışa aktardığınızda ya da yedeklediğinizde cihazdan çıkar; cihaz yedeklemesi açıksa Android Otomatik Yedekleme kaydı kendi Google hesabınıza da kopyalayabilir.</string>
     <string name="about_privacy_billing">Google Play Faturalandırma satın alma trafiğini ve satın alma geçmişini yürütür. Bu uygulama üzerinden sınıf kaydınızı asla almaz.</string>
+    <string name="about_privacy_policy_action">Gizlilik politikasını aç</string>
     <string name="about_averages_title">Ortalamalar hesabını açıklar</string>
     <string name="about_averages_body">Her ortalama, sizin belirlediğiniz kategorilere, ağırlıklara, yuvarlamaya ve teslim edilmeyen ödev kuralına uyar. Boş ve muaf çalışma sessizce sıfıra çevrilmez; kullanılabilir notu olmayan kategoriler adlandırılır ve dışarıda bırakılır.</string>
     <string name="about_purchase_title">Tek kalıcı kilit açma</string>

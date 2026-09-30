@@ -12,6 +12,14 @@ It is deterministic and re-runnable, and it reads only from the slot: the raw ca
 `store/studio.json`. Nothing here invents UI - the screen inside every mock-up is the capture the
 app actually produced.
 
+The mark itself is not drawn here. `scripts/lib/icon_design.py` owns the construction grid, the
+stroke scale and the primitives, and renders them twice - as pixels for the 512px listing icon and
+as Android path data for the launcher - while `scripts/lib/icon_qa.py` measures the result and
+`render_icon` refuses to return an icon that fails a gated measurement. Both the launcher icon and
+the store icon therefore come out of one geometry, which is the property this module lost when the
+mark was hand-nudged pixel constants and the raster and the vector scaled it by two different
+numbers.
+
     python scripts/store-studio.py --slot pipe-sizing
     python scripts/store-studio.py --slot pipe-sizing --preview-circle
 """
@@ -19,12 +27,22 @@ app actually produced.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import math
 import re
+import sys
 from pathlib import Path
 
+import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
+
+# The mark's construction grid, stroke scale and primitives live in the design system, and the
+# measurements that decide whether the rendered mark is a designed mark live beside it. Both are
+# imported rather than restated: a second copy of the keyline is a second thing to drift.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lib import icon_design  # noqa: E402
+from lib import icon_qa  # noqa: E402
 
 # --------------------------------------------------------------------------------------
 # Design tokens
@@ -76,11 +94,33 @@ def apply_palette(palette: dict[str, tuple[int, int, int]]) -> None:
     CYAN_DEEP, PAPER, MUTED = palette["accent_deep"], palette["paper"], palette["muted"]
     BEZEL, BEZEL_RIM = palette["bezel"], palette["bezel_rim"]
 
-SCREEN_TARGETS = {
-    "phone": (6, (1080, 1920)),
-    "tablet-7": (4, (1200, 1920)),
-    "tablet-10": (4, (1600, 2560)),
-}
+def _load_store_kit_contract():
+    """The screenshot inventory, imported from `store-kit.py` rather than restated here.
+
+    `store-kit.py` is what renders and validates the pack, and it is also the file
+    `scripts/verify-slot.mjs` and `scripts/visual-qa.py` read the inventory out of. A second
+    literal copy of the sizes here could only drift: two lists of sizes are two answers to one
+    question, and the copy no gate reads is the one that silently keeps composing the wrong
+    canvases. The hyphen in the filename makes the module un-importable by name, so it is loaded
+    by path - and an already-loaded copy is reused, because `store-kit.py` itself loads this
+    module, and executing it twice would build a second, silently divergent module state.
+    """
+    path = (Path(__file__).resolve().parent / "store-kit.py").resolve()
+    for module in list(sys.modules.values()):
+        module_file = getattr(module, "__file__", None)
+        if module_file and Path(module_file).resolve() == path:
+            return module
+    spec = importlib.util.spec_from_file_location("store_kit_screen_contract", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load {path} for the screenshot inventory")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+_STORE_KIT = _load_store_kit_contract()
+SCREEN_TARGETS = _STORE_KIT.SCREEN_TARGETS
+SCREENSHOT_LIMITS = _STORE_KIT.SCREENSHOT_LIMITS
 
 # One raw capture per journey shot. The studio composes every screenshot target from exactly these,
 # so a missing one is a hard stop rather than a target to skip.
@@ -242,154 +282,110 @@ def wrap(draw: ImageDraw.ImageDraw, text: str, face: ImageFont.ImageFont, width:
 # --------------------------------------------------------------------------------------
 # The mark
 #
-# A pipe cross-section with a caliper across it: the annulus says "pipe", the dimension line
-# says "sizing". It is built from three primitives so the same geometry can drive the raster
-# icon and the adaptive-icon vector without the two drifting apart.
+# Two marks are registered: `pipe` is a section through a bore with a dimension line across it,
+# and `mark-book` is a bound, marked page. Both are built on the shared keyline system from a small
+# set of primitives, and both are rendered twice from that one description - as pixels for the
+# listing icon and as Android path data for the launcher - so the two cannot drift apart.
 # --------------------------------------------------------------------------------------
 
 
-# The mark is defined once, in fractions of its own half-extent, and each output scales that shape
-# to its own extent: the raster icon uses the full canvas, while the adaptive-icon vectors use the
-# 66dp safe zone, because a launcher mask crops outside it. Sharing the fractions keeps the *shape*
-# identical, which is the part that must not drift.
+# The mark, the construction grid and the stroke scale live in `scripts/lib/icon_design.py`, and
+# the measurements that say whether the result is a designed mark live in `scripts/lib/icon_qa.py`.
 #
-# The scale differs by design and that is not drift: an exact match would put the raster mark's
-# half-extent at 0.358 * 108 = 38.7dp, well outside the 33dp safe radius, so the caliper tips would
-# be clipped by a circular mask. `adaptive_mark_half_extent_dp()` enforces the fit so a future
-# geometry edit cannot silently reintroduce that.
-MARK_HALF_EXTENT_FRACTION = 0.358  # of the raster canvas; set by the caliper arrow tips
-MARK_SHAPE = {
-    "ring_radius": 0.205 / MARK_HALF_EXTENT_FRACTION,
-    "ring_width": 0.108 / MARK_HALF_EXTENT_FRACTION,
-    "span": 0.335 / MARK_HALF_EXTENT_FRACTION,
-    "line_width": 0.023 / MARK_HALF_EXTENT_FRACTION,
-    "tick_half": 0.082 / MARK_HALF_EXTENT_FRACTION,
-}
-ADAPTIVE_VIEWPORT_DP = 108.0
-ADAPTIVE_SAFE_RADIUS_DP = 33.0
+# They are not here, and that is the fix for this module's worst defect. The geometry used to be
+# per-mark absolute pixel constants (`MARK_SHAPE`, `BOOK_SHAPE`) nudged by hand, each output had its
+# own scale factor (`MARK_FIT_DP` for the vector, `MARK_HALF_EXTENT_FRACTION` for the raster), and
+# nothing checked either of them: the owner's verdict on the shipped icon was "bad and crooked, a
+# naive silly thing, not a designed mark". The mark is now built on one declared keyline system and
+# rendered by two renderers that read the same primitive list.
+#
+# Because this module renders the assets, this is also where the icon gate runs: `render_icon`
+# refuses to write an icon that fails a gated measurement. numpy and scipy arrive with that import,
+# as they already did for `scripts/visual-qa.py`'s icon section.
+
+ADAPTIVE_VIEWPORT_DP = icon_design.ADAPTIVE_VIEWPORT_DP
+ADAPTIVE_SAFE_RADIUS_DP = icon_design.ADAPTIVE_SAFE_RADIUS_DP
 # The launcher's *visible* mask: 72dp across inside the 108dp viewport. A preview that masks the
 # full 108dp canvas answers a question no launcher asks; see `adaptive_previews()`.
-ADAPTIVE_VISIBLE_RADIUS_DP = 36.0
-# Deliberately inside the safe radius: the caliper tips sit at the mark's half-extent, and some
-# launcher masks follow the safe circle closely, so a tangent mark would be shaved.
-MARK_FIT_DP = 30.0
-BOOK_SHAPE = {
-    "page_half_width": 0.585, "page_half_height": 0.815, "corner_radius": 0.10,
-    "spine_right": -0.285, "binding_x": -0.435, "binding_radius": 0.045,
-    "binding_y": (-0.40, 0.0, 0.40), "check_width": 0.085,
-    "check_points": ((-0.10, 0.02), (0.07, 0.21), (0.46, -0.26)),
-}
-CURRENT_MARK = "pipe"
+ADAPTIVE_VISIBLE_RADIUS_DP = icon_design.ADAPTIVE_VISIBLE_DP / 2
+
+CURRENT_MARK = icon_design.DEFAULT_MARK
 
 
-def mark_geometry(canvas: int) -> dict[str, float]:
-    """Mark geometry for a canvas, scaled to its full extent."""
-    unit = canvas * MARK_HALF_EXTENT_FRACTION
-    return {"center": 0.5 * canvas, **{name: value * unit for name, value in MARK_SHAPE.items()}}
+def resolve_mark(studio: dict) -> str:
+    """The slot's mark, validated against the design system's registry."""
+    mark = studio.get("mark") or icon_design.DEFAULT_MARK
+    icon_design.mark_primitives(mark)  # raises on an unknown mark
+    return mark
 
 
-def adaptive_mark_half_extent_dp(mark: str | None = None) -> float:
-    """How far the mark reaches from its centre, in adaptive-viewport dp."""
-    definition = MARK_REGISTRY[mark or CURRENT_MARK]
-    return definition["reach_fraction"] * MARK_FIT_DP
-
-
-def assert_adaptive_mark_fits() -> None:
-    """A mark that reaches outside the safe radius loses its tips to a circular mask."""
-    reach = adaptive_mark_half_extent_dp()
-    if reach > ADAPTIVE_SAFE_RADIUS_DP:
-        raise SystemExit(
-            f"BLOCKED: the adaptive icon mark reaches {reach:.1f}dp from centre, outside the "
-            f"{ADAPTIVE_SAFE_RADIUS_DP:.0f}dp safe radius; a circular launcher mask would clip the "
-            "caliper tips. Reduce MARK_FIT_DP or the shape fractions."
-        )
-
-
-def _draw_pipe(draw: ImageDraw.ImageDraw, canvas: int, colors: dict[str, tuple[int, int, int]]) -> None:
-    geometry = mark_geometry(canvas)
-    center = geometry["center"]
-    radius = geometry["ring_radius"]
-    width = geometry["ring_width"]
-
-    # The annulus. Drawn as a stroked ellipse so the stroke straddles `radius`.
-    draw.ellipse(
-        (center - radius, center - radius, center + radius, center + radius),
-        outline=colors["amber"],
-        width=round(width),
-    )
-    # A single sheen arc on the upper left reads as a cylindrical surface.
-    sheen_radius = radius - width * 0.18
-    draw.arc(
-        (center - sheen_radius, center - sheen_radius, center + sheen_radius, center + sheen_radius),
-        start=182, end=268, fill=colors["amber_pale"], width=max(2, round(width * 0.16)),
-    )
-
-    # The caliper: a dimension line through the bore with end ticks and outward arrowheads.
-    span = geometry["span"]
-    line_width = round(geometry["line_width"])
-    tick_half = geometry["tick_half"]
-    draw.line((center - span, center, center + span, center), fill=colors["paper"], width=line_width)
-    for direction in (-1, 1):
-        edge = center + direction * radius - direction * width / 2
-        draw.line((edge, center - tick_half, edge, center + tick_half), fill=colors["paper"], width=line_width)
-        tip = center + direction * (span + line_width)
-        base = center + direction * (span - line_width * 2.6)
-        half = tick_half * 0.72
-        draw.polygon(
-            [(tip, center), (base, center - half), (base, center + half)],
-            fill=colors["paper"],
-        )
-
-
-def _draw_book(draw: ImageDraw.ImageDraw, canvas: int, colors: dict[str, tuple[int, int, int]]) -> None:
-    center, unit, shape = canvas * 0.5, canvas * 0.44, BOOK_SHAPE
-    def box(left: float, top: float, right: float, bottom: float) -> tuple[float, float, float, float]:
-        return (center + left * unit, center + top * unit, center + right * unit, center + bottom * unit)
-    draw.rounded_rectangle(box(-shape["page_half_width"], -shape["page_half_height"],
-                               shape["page_half_width"], shape["page_half_height"]),
-                           radius=shape["corner_radius"] * unit, fill=colors["paper"])
-    draw.rounded_rectangle(box(-shape["page_half_width"], -shape["page_half_height"],
-                               shape["spine_right"], shape["page_half_height"]),
-                           radius=shape["corner_radius"] * unit, fill=colors["ink_lift"],
-                           corners=(True, False, False, True))
-    radius = shape["binding_radius"] * unit
-    for y in shape["binding_y"]:
-        x0, y0 = center + shape["binding_x"] * unit, center + y * unit
-        draw.ellipse((x0 - radius, y0 - radius, x0 + radius, y0 + radius), fill=colors["paper"])
-    points = [(center + x * unit, center + y * unit) for x, y in shape["check_points"]]
-    stroke = max(1, round(shape["check_width"] * unit))
-    draw.line(points, fill=colors["amber"], width=stroke, joint="curve")
-    cap = stroke / 2
-    for x, y in (points[0], points[-1]):
-        draw.ellipse((x - cap, y - cap, x + cap, y + cap), fill=colors["amber"])
-
-
-def draw_mark(draw: ImageDraw.ImageDraw, canvas: int, *, ring: tuple[int, int, int] | None = None,
-              ink: tuple[int, int, int] | None = None,
-              colors: dict[str, tuple[int, int, int]] | None = None, mark: str | None = None) -> None:
-    palette = dict(PALETTE_DEFAULTS if colors is None else colors)
-    if ring is not None:
-        palette["amber"] = ring
-    if ink is not None:
-        palette["paper"] = ink
-    MARK_REGISTRY[mark or CURRENT_MARK]["draw"](draw, canvas, palette)
+def mark_reach_dp(mark: str | None = None) -> float:
+    """How far the mark reaches from its optical anchor, in adaptive-viewport dp."""
+    return icon_design.mark_reach_dp(mark or CURRENT_MARK)
 
 
 def render_icon(listing: dict, studio: dict) -> Image.Image:
-    """512x512, full bleed and opaque: Play rejects a masked or transparent icon."""
-    canvas = 512
-    image = diagonal_gradient((canvas, canvas), INK, INK_LIFT, 122).convert("RGBA")
-    image = Image.alpha_composite(image, glow((canvas, canvas), (canvas * 0.74, canvas * 0.20),
-                                              canvas * 0.72, CYAN_DEEP, 96))
-    image = Image.alpha_composite(image, glow((canvas, canvas), (canvas * 0.22, canvas * 0.88),
-                                              canvas * 0.78, AMBER_DEEP, 88))
-    image = Image.alpha_composite(image, blueprint_grid((canvas, canvas), 32, 12))
-    draw = ImageDraw.Draw(image)
-    draw_mark(draw, canvas, colors={
-        "ink": INK, "ink_soft": INK_SOFT, "ink_lift": INK_LIFT, "amber": AMBER,
-        "amber_deep": AMBER_DEEP, "amber_pale": AMBER_PALE, "accent_deep": CYAN_DEEP,
-        "paper": PAPER, "muted": MUTED, "bezel": BEZEL, "bezel_rim": BEZEL_RIM})
+    """512x512, full bleed and opaque: Play rejects a masked or transparent icon.
+
+    The listing icon *is* the adaptive icon flattened: 512px of the 108dp layer, so the store
+    artwork and the launcher artwork are the same mark at the same size, drawn from the same
+    primitives. There is no second composition to keep in step.
+
+    The field is one exact linear ramp - the same ramp, at the same angle, the adaptive background
+    drawable declares - with no drafting grid and no radial blooms. Measured on the icon the owner
+    rejected: the 32px grid and the two glows left 1.40 luma of high-frequency energy in the field
+    and 2.49 luma of curvature against a best-fit plane, and at 48dp that is dirt. One ramp
+    measures 0.10 and 0.22.
+
+    Every rendered icon is measured before it is returned, and an icon that fails a gated
+    measurement stops the render with the failing legs printed: this is where the threshold gates.
+    """
+    mark = CURRENT_MARK
+    palette = {role: colour for role, colour in _palette_roles()}
+    field = icon_design.icon_field(icon_design.CANVAS, INK, INK_LIFT)
+    image = field.convert("RGBA")
+    image.alpha_composite(icon_design.render_mark(icon_design.CANVAS, mark, palette))
+    array = np.asarray(image, dtype=np.uint8)
+    result = icon_qa.evaluate_icon(array, palette, mark=mark,
+                                  field=np.asarray(field.convert("RGB"), dtype=np.float64))
+    _print_icon_legs(mark, result, label="icon-512")
+    if result["verdict"] != "PASS":
+        raise SystemExit(
+            f"BLOCKED: the icon for mark {mark!r} failed "
+            f"{len(result['failed_legs'])} measurement(s): {', '.join(result['failed_legs'])}. "
+            "An icon that does not measure as a designed mark is not written into the pack; fix "
+            "the mark's geometry in scripts/lib/icon_design.py - its keyline, its stroke scale, its "
+            "optical centre - rather than the threshold."
+        )
     return image
+
+
+def _palette_roles() -> list[tuple[str, tuple[int, int, int]]]:
+    """The resolved palette as (role, colour), which is what the design system draws with."""
+    return [("ink", INK), ("ink_soft", INK_SOFT), ("ink_lift", INK_LIFT),
+            ("amber", AMBER), ("amber_deep", AMBER_DEEP), ("amber_pale", AMBER_PALE),
+            ("accent_deep", CYAN_DEEP), ("paper", PAPER), ("muted", MUTED),
+            ("bezel", BEZEL), ("bezel_rim", BEZEL_RIM)]
+
+
+def _print_icon_legs(mark: str, result: dict, *, label: str) -> None:
+    """Print the icon's measurements once per process, then stay quiet.
+
+    `render_icon` runs three times per pack (the icon, and once per feature graphic), and the same
+    inputs produce byte-identical output by construction, so repeating the table three times only
+    makes the log harder to read. The verdict is recomputed every time either way - the FAIL below
+    is not cached, only the printing of a PASS is.
+    """
+    key = (mark, tuple(sorted(_palette_roles())))
+    if _REPORTED_ICONS.get(key):
+        return
+    _REPORTED_ICONS[key] = True
+    print(f"PASS studio - {label} measurements (mark {mark}): verdict {result['verdict']}")
+    for line in icon_qa.format_legs(result):
+        print(f"  studio{line}")
+
+
+_REPORTED_ICONS: dict[tuple, bool] = {}
 
 
 def render_feature(listing: dict, studio: dict, source: Image.Image | None) -> Image.Image:
@@ -569,118 +565,40 @@ def render_screenshot(size: tuple[int, int], shot: dict, source: Image.Image) ->
 # --------------------------------------------------------------------------------------
 # Adaptive-icon vectors
 #
-# Written from `mark_geometry` so the vector cannot drift from the raster icon. The viewport is
-# the 108dp adaptive canvas and the mark is held inside the 66dp safe zone.
+# Emitted from `icon_design.mark_layers()`, the same primitive list the raster mark is drawn from,
+# so the vector cannot drift from the raster icon: there is no second scale factor left to drift
+# with. The viewport is the 108dp adaptive canvas and the mark is fitted to the circle keyline,
+# which is what keeps it inside the 66dp safe zone under every launcher mask.
 # --------------------------------------------------------------------------------------
 
+BACKGROUND_GRADIENT_ANGLE = icon_design.FIELD_ANDROID_ANGLE
 
-def _ring_path(center: float, outer: float, inner: float) -> str:
-    return (
-        f"M{center - outer:.2f},{center:.2f}a{outer:.2f},{outer:.2f} 0 1,0 {outer * 2:.2f},0"
-        f"a{outer:.2f},{outer:.2f} 0 1,0 {-outer * 2:.2f},0Z"
-        f"M{center - inner:.2f},{center:.2f}a{inner:.2f},{inner:.2f} 0 1,1 {inner * 2:.2f},0"
-        f"a{inner:.2f},{inner:.2f} 0 1,1 {-inner * 2:.2f},0Z"
+
+def vector_layers(mark: str | None = None) -> list[dict]:
+    """The mark as path data, in the 108dp viewport, one entry per drawn path."""
+    return icon_design.mark_layers(mark or CURRENT_MARK)
+
+
+def _vector_path_xml(layers: list[dict], colors: dict[str, str]) -> str:
+    """The `<path>` elements for a set of layers, tinted with one colour each."""
+    return "\n".join(
+        f'    <path\n'
+        f'        android:fillColor="{colors.get(layer["role"], colors["paper"])}"\n'
+        + (f'        android:fillType="evenOdd"\n' if layer["fill_type"] == "evenOdd" else "")
+        + f'        android:pathData="{layer["data"]}" />'
+        for layer in layers
     )
 
 
-def _pipe_vector_paths(unit: float, colors: dict | None = None) -> dict[str, str]:
-    """Mark paths in the 108dp adaptive viewport, fitting the 66dp safe zone.
-
-    Derived from the same `MARK_SHAPE` fractions as the raster icon, so the outline is the same
-    shape; only the scale differs, and `assert_adaptive_mark_fits` bounds it.
-    """
-    center = ADAPTIVE_VIEWPORT_DP / 2
-    ring_radius = MARK_SHAPE["ring_radius"] * unit
-    ring_width = MARK_SHAPE["ring_width"] * unit
-    ring_outer = ring_radius + ring_width / 2
-    ring_inner = ring_radius - ring_width / 2
-    span = MARK_SHAPE["span"] * unit
-    line = MARK_SHAPE["line_width"] * unit
-    tick = MARK_SHAPE["tick_half"] * unit
-    arrow = 7.0
-    paths = {
-        "ring": _ring_path(center, ring_outer, ring_inner),
-        "line": (f"M{center - span:.2f},{center - line:.2f}H{center + span:.2f}"
-                 f"V{center + line:.2f}H{center - span:.2f}Z"),
-    }
-    ticks = []
-    for direction in (-1, 1):
-        edge = center + direction * ring_radius
-        ticks.append(f"M{edge - line:.2f},{center - tick:.2f}H{edge + line:.2f}"
-                     f"V{center + tick:.2f}H{edge - line:.2f}Z")
-    paths["ticks"] = "".join(ticks)
-    arrows = []
-    for direction in (-1, 1):
-        tip = center + direction * (span + line)
-        base = center + direction * (span - line * 2.6)
-        half = tick * 0.72
-        arrows.append(f"M{tip:.2f},{center:.2f}L{base:.2f},{center - half:.2f}"
-                      f"L{base:.2f},{center + half:.2f}Z")
-    paths["arrows"] = "".join(arrows)
-    _ = arrow
-    return paths
-
-
-def _rounded_rect_path(cx: float, cy: float, half_w: float, half_h: float, radius: float) -> str:
-    return (f"M{cx-half_w+radius:.2f},{cy-half_h:.2f}H{cx+half_w-radius:.2f}"
-            f"A{radius:.2f},{radius:.2f} 0 0,1 {cx+half_w:.2f},{cy-half_h+radius:.2f}"
-            f"V{cy+half_h-radius:.2f}A{radius:.2f},{radius:.2f} 0 0,1 {cx+half_w-radius:.2f},{cy+half_h:.2f}"
-            f"H{cx-half_w+radius:.2f}A{radius:.2f},{radius:.2f} 0 0,1 {cx-half_w:.2f},{cy+half_h-radius:.2f}"
-            f"V{cy-half_h+radius:.2f}A{radius:.2f},{radius:.2f} 0 0,1 {cx-half_w+radius:.2f},{cy-half_h:.2f}Z")
-
-
-def _check_polygon(points: tuple[tuple[float, float], ...], half_width: float) -> list[tuple[float, float]]:
-    def normal(a, b):
-        dx, dy = b[0] - a[0], b[1] - a[1]
-        length = math.hypot(dx, dy)
-        return (-dy / length * half_width, dx / length * half_width)
-    n1, n2 = normal(points[0], points[1]), normal(points[1], points[2])
-    join = ((n1[0] + n2[0]) / 2, (n1[1] + n2[1]) / 2)
-    return [(points[0][0]+n1[0], points[0][1]+n1[1]),
-            (points[1][0]+join[0], points[1][1]+join[1]),
-            (points[2][0]+n2[0], points[2][1]+n2[1]),
-            (points[2][0]-n2[0], points[2][1]-n2[1]),
-            (points[1][0]-join[0], points[1][1]-join[1]),
-            (points[0][0]-n1[0], points[0][1]-n1[1])]
-
-
-def _book_vector_paths(unit: float, colors: dict | None = None) -> dict[str, str]:
-    c, s = ADAPTIVE_VIEWPORT_DP / 2, BOOK_SHAPE
-    page = _rounded_rect_path(c, c, s["page_half_width"]*unit, s["page_half_height"]*unit,
-                              s["corner_radius"]*unit)
-    binding = ""
-    for y in s["binding_y"]:
-        x0, y0, r = c+s["binding_x"]*unit, c+y*unit, s["binding_radius"]*unit
-        circle = (f"M{x0-r:.2f},{y0:.2f}a{r:.2f},{r:.2f} 0 1,0 {2*r:.2f},0"
-                  f"a{r:.2f},{r:.2f} 0 1,0 {-2*r:.2f},0Z")
-        page += circle
-        binding += circle
-    left, right = c-s["page_half_width"]*unit, c+s["spine_right"]*unit
-    top, bottom, r = c-s["page_half_height"]*unit, c+s["page_half_height"]*unit, s["corner_radius"]*unit
-    spine = (f"M{left+r:.2f},{top:.2f}H{right:.2f}V{bottom:.2f}H{left+r:.2f}"
-             f"A{r:.2f},{r:.2f} 0 0,1 {left:.2f},{bottom-r:.2f}V{top+r:.2f}"
-             f"A{r:.2f},{r:.2f} 0 0,1 {left+r:.2f},{top:.2f}Z") + binding
-    scaled = tuple((c+x*unit, c+y*unit) for x, y in s["check_points"])
-    check = "M" + "L".join(f"{x:.2f},{y:.2f}" for x, y in _check_polygon(scaled, s["check_width"]*unit/2)) + "Z"
-    return {"page": page, "spine": spine, "binding": binding, "check": check}
-
-
-MARK_REGISTRY = {
-    "pipe": {"raster_half_extent_fraction": MARK_HALF_EXTENT_FRACTION, "reach_fraction": 1.0,
-             "draw": _draw_pipe, "vector_paths": _pipe_vector_paths, "shape": MARK_SHAPE},
-    "mark-book": {"raster_half_extent_fraction": 0.44,
-                  "reach_fraction": math.hypot(0.585, 0.815),
-                  "draw": _draw_book, "vector_paths": _book_vector_paths, "shape": BOOK_SHAPE},
-}
-
-
-def lasercut_paths(mark: str | None = None) -> dict[str, str]:
-    return MARK_REGISTRY[mark or CURRENT_MARK]["vector_paths"](MARK_FIT_DP, None)
-
-
 def write_vectors(res: Path, colors: dict[str, str]) -> list[Path]:
-    assert_adaptive_mark_fits()
-    paths = lasercut_paths()
+    """Write the adaptive background, foreground and monochrome drawables.
+
+    The background is one linear ramp and nothing else, which is the change that makes the launcher
+    icon the same picture as the store icon: it used to carry a translucent white polygon over the
+    gradient (`M0,92L58,34L86,62L108,40V108H0Z` at alpha 0.16), a second tonal field the 512px
+    listing icon never had. The two are one field now, from one declared angle.
+    """
+    layers = vector_layers()
     background = f"""<?xml version="1.0" encoding="utf-8"?>
 <!-- Generated by scripts/store-studio.py. Do not hand-edit: re-run the studio. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -692,41 +610,17 @@ def write_vectors(res: Path, colors: dict[str, str]) -> list[Path]:
     <path android:pathData="M0,0h108v108h-108z">
         <aapt:attr name="android:fillColor">
             <gradient
-                android:angle="304"
+                android:angle="{BACKGROUND_GRADIENT_ANGLE}"
                 android:endColor="{colors['ink_lift']}"
                 android:startColor="{colors['ink']}"
                 android:type="linear" />
         </aapt:attr>
     </path>
-    <path
-        android:fillAlpha="0.16"
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M0,92L58,34L86,62L108,40V108H0Z" />
 </vector>
 """
-    if CURRENT_MARK == "pipe":
-        foreground_paths = f'''    <path
-        android:fillColor="{colors['amber']}"
-        android:fillType="evenOdd"
-        android:pathData="{paths['ring']}" />
-    <path
-        android:fillColor="{colors['paper']}"
-        android:pathData="{paths['line']}{paths['ticks']}{paths['arrows']}" />'''
-        monochrome_paths = f'''    <path
-        android:fillColor="#FFFFFFFF"
-        android:fillType="evenOdd"
-        android:pathData="{paths['ring']}" />
-    <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="{paths['line']}{paths['ticks']}{paths['arrows']}" />'''
-    else:
-        foreground_paths = f'''    <path android:fillColor="{colors['paper']}" android:fillType="evenOdd" android:pathData="{paths['page']}" />
-    <path android:fillColor="{colors['ink_lift']}" android:fillType="evenOdd" android:pathData="{paths['spine']}" />
-    <path android:fillColor="{colors['paper']}" android:pathData="{paths['binding']}" />
-    <path android:fillColor="{colors['amber']}" android:pathData="{paths['check']}" />'''
-        monochrome_paths = f'''    <path android:fillColor="#FFFFFFFF" android:fillType="evenOdd" android:pathData="{paths['page']}" />
-    <path android:fillColor="#FFFFFFFF" android:fillType="evenOdd" android:pathData="{paths['spine']}" />
-    <path android:fillColor="#FFFFFFFF" android:pathData="{paths['check']}" />'''
+    foreground_paths = _vector_path_xml(layers, colors)
+    monochrome_colors = {role: "#FFFFFFFF" for role in colors}
+    monochrome_paths = _vector_path_xml(layers, monochrome_colors)
     foreground = f"""<?xml version="1.0" encoding="utf-8"?>
 <!-- Generated by scripts/store-studio.py. Do not hand-edit: re-run the studio. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -863,9 +757,7 @@ def render_slot(slot: Path, *, preview_circle: bool = False, identity_only: bool
     studio.update(json.loads(studio_path.read_text(encoding="utf-8")))
     palette = resolve_palette(studio.get("palette"))
     apply_palette(palette)
-    CURRENT_MARK = studio.get("mark", "pipe")
-    if CURRENT_MARK not in MARK_REGISTRY:
-        raise SystemExit(f"BLOCKED: unknown studio mark {CURRENT_MARK!r}; choose one of {', '.join(MARK_REGISTRY)}")
+    CURRENT_MARK = resolve_mark(studio)
 
     shots = load_shots(store)
     headlines = studio.get("headlines") or []
@@ -976,26 +868,25 @@ def render_slot(slot: Path, *, preview_circle: bool = False, identity_only: bool
 # Launcher-mask previews
 #
 # `store/captures/preview/` is evidence for a reviewer, not a Play asset, so it has to show what a
-# launcher actually draws. The shipped icon is the adaptive vector from `lasercut_paths()`, whose
-# foreground is fitted to a 30dp reach, and the real mask is the 72dp circle (36dp radius) inside
-# the 108dp viewport. The previous previews masked the 512px listing raster across the full canvas,
-# which measures 0.358 * 108 = 38.7dp of reach - so they drew a mark a real mask WOULD clip and
-# implied it was safe. These previews rasterise the same path data `write_vectors` writes.
+# launcher actually draws. The shipped icon is the adaptive vector from `vector_layers()`, fitted to
+# the circle keyline so its furthest ink sits inside the safe radius, and the real mask is the 72dp
+# circle (36dp radius) inside the 108dp viewport. The previous previews masked the 512px listing
+# raster across the full canvas, which measured 0.358 * 108 = 38.7dp of reach - so they drew a mark a
+# real mask WOULD clip and implied it was safe. These previews rasterise the same path data
+# `write_vectors` writes.
 # --------------------------------------------------------------------------------------
 
 PREVIEW_PX_PER_DP = 10
 PREVIEW_CANVAS_PX = round(ADAPTIVE_VIEWPORT_DP * PREVIEW_PX_PER_DP)  # 1080px for the 108dp canvas
 PREVIEW_OUTSIDE = (12, 14, 18, 255)  # what the launcher shows outside the mask
 PREVIEW_ARC_SAMPLES = 64
-# Mirrors the translucent shape in the background drawable that `write_vectors` emits.
-_PREVIEW_HIGHLIGHT_PATH = "M0,92L58,34L86,62L108,40V108H0Z"
 _PREVIEW_TOKEN = re.compile(r"([MmLlHhVvAaZz])|(-?\d*\.?\d+)")
 
 
 def _preview_arc(
     x1: float, y1: float, x2: float, y2: float, radius: float, large: float, sweep: float
 ) -> list[tuple[float, float]]:
-    """Sample a circular arc. `lasercut_paths()` only emits `a rx,rx`, so ry is `radius`."""
+    """Sample a circular arc. `mark_layers()` only emits `a rx,rx`, so ry is `radius`."""
     mx, my = (x1 + x2) / 2.0, (y1 + y2) / 2.0
     dxr, dyr = (x1 - x2) / 2.0, (y1 - y2) / 2.0
     chord = math.hypot(dxr, dyr)
@@ -1020,7 +911,7 @@ def _preview_arc(
 def _preview_subpaths(path_data: str, scale: float) -> list[list[tuple[float, float]]]:
     """Turn the studio's own vector path data into closed polygons, in canvas pixels.
 
-    Understands the command subset `lasercut_paths()` emits - `M/m`, `L/l`, `H/h`, `V/v`, `a` and
+    Understands the command subset `mark_layers()` emits - `M/m`, `L/l`, `H/h`, `V/v`, `a` and
     `Z/z` - including relative forms and repeated coordinates, so the preview cannot drift from the
     XML it mirrors. A non-circular arc raises instead of being drawn as the wrong shape.
     """
@@ -1082,7 +973,7 @@ def _preview_subpaths(path_data: str, scale: float) -> list[list[tuple[float, fl
             if abs(rx - ry) > 1e-6:
                 raise SystemExit(
                     f"BLOCKED: the preview cannot draw the elliptical arc rx={rx} ry={ry}; "
-                    "lasercut_paths() only emits circular arcs."
+                    "mark_layers() only emits circular arcs."
                 )
             x2, y2 = (x + ax, y + ay) if relative else (ax, ay)
             current.extend((px * scale, py * scale) for px, py in _preview_arc(x, y, x2, y2, rx, large, sweep))
@@ -1105,43 +996,46 @@ def _preview_mask(size: int, subpaths: list[list[tuple[float, float]]], *, even_
 
 
 def render_adaptive_icon() -> Image.Image:
-    """The shipped adaptive icon, rasterised from the vectors `write_vectors` writes."""
-    size = PREVIEW_CANVAS_PX
-    scale = size / ADAPTIVE_VIEWPORT_DP
-    image = diagonal_gradient((size, size), INK, INK_LIFT, 304).convert("RGBA")
-    highlight = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    ImageDraw.Draw(highlight).polygon(
-        [(px * scale, py * scale) for px, py in _preview_points(_PREVIEW_HIGHLIGHT_PATH)],
-        fill=(255, 255, 255, round(0.16 * 255)),
-    )
-    image = Image.alpha_composite(image, highlight)
+    """The shipped adaptive icon, rasterised from the vector paths `write_vectors` writes.
 
-    paths = lasercut_paths()
-    if CURRENT_MARK == "pipe":
-        ring = _preview_mask(size, _preview_subpaths(paths["ring"], scale), even_odd=True)
-        ink = _preview_mask(size, _preview_subpaths(
-            paths["line"] + paths["ticks"] + paths["arrows"], scale), even_odd=False)
-        image.paste(Image.new("RGBA", (size, size), AMBER + (255,)), (0, 0), ring)
-        image.paste(Image.new("RGBA", (size, size), PAPER + (255,)), (0, 0), ink)
-    else:
-        page = _preview_mask(size, _preview_subpaths(paths["page"], scale), even_odd=True)
-        spine = _preview_mask(size, _preview_subpaths(paths["spine"], scale), even_odd=True)
-        binding = _preview_mask(size, _preview_subpaths(paths["binding"], scale), even_odd=False)
-        check = _preview_mask(size, _preview_subpaths(paths["check"], scale), even_odd=False)
-        image.paste(Image.new("RGBA", (size, size), PAPER + (255,)), (0, 0), page)
-        image.paste(Image.new("RGBA", (size, size), INK_LIFT + (255,)), (0, 0), spine)
-        image.paste(Image.new("RGBA", (size, size), PAPER + (255,)), (0, 0), binding)
-        image.paste(Image.new("RGBA", (size, size), AMBER + (255,)), (0, 0), check)
+    The layer is the 108dp viewport, its field is the one declared ramp, and the mark comes from
+    `icon_design.mark_layers()` - the same path data that goes into the drawable. Nothing here is
+    re-derived from a second set of constants, which is what the previous version of this function
+    did: it hardcoded the old two-branch mark (a ring group or a page group) and drew the
+    translucent polygon the background drawable had, so the preview and the store icon could show
+    two different fields.
+    """
+    size = PREVIEW_CANVAS_PX
+    image = icon_design.icon_field(
+        size, INK, INK_LIFT, icon_design.FIELD_ANGLE_DEG).convert("RGBA")
+    image.alpha_composite(vector_raster(size))
     return image
 
 
 def _preview_points(path_data: str) -> list[tuple[float, float]]:
-    """Just the corner points of a polyline path (used for the background highlight)."""
+    """Every outline point of a path, as (x, y) in viewport units."""
     return [
         (px, py)
         for subpath in _preview_subpaths(path_data, 1.0)
         for px, py in subpath
     ]
+
+
+def vector_raster(size: int = PREVIEW_CANVAS_PX, mark: str | None = None) -> Image.Image:
+    """Rasterise `mark_layers()` alone, on a transparent layer, at `size` px.
+
+    Separate from `render_adaptive_icon` because the regression suite measures the raster and the
+    vector renderers against each other: this is the vector renderer's own output, with nothing
+    added, so a difference between the two cannot be excused as a field or a highlight.
+    """
+    layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    scale = size / ADAPTIVE_VIEWPORT_DP
+    for entry in icon_design.mark_layers(mark or CURRENT_MARK):
+        mask = _preview_mask(size, _preview_subpaths(entry["data"], scale),
+                             even_odd=entry["fill_type"] == "evenOdd")
+        colour = dict(_palette_roles())[entry["role"]]
+        layer.paste(Image.new("RGBA", (size, size), colour + (255,)), (0, 0), mask)
+    return layer
 
 
 def _under_mask(icon: Image.Image, keep: Image.Image) -> Image.Image:
@@ -1154,7 +1048,8 @@ def adaptive_previews() -> dict[str, Image.Image]:
     """What a launcher shows, plus the safe zone the checker asserts.
 
     The mask is the real 72dp circle / 72dp rounded square, not the 108dp canvas, and the mark is
-    the shipped adaptive foreground fitted to its 30dp reach.
+    the shipped adaptive foreground on its circle keyline, which reaches 31dp of the 33dp safe
+    radius.
     """
     size = PREVIEW_CANVAS_PX
     icon = render_adaptive_icon()
@@ -1171,7 +1066,7 @@ def adaptive_previews() -> dict[str, Image.Image]:
         radius=round(visible / 2), fill=255)
 
     # The 66dp safe zone: tint the band between it and the visible mask, so the margin the checker
-    # reports (`furthest reach 30.00dp`, `3.00dp inside the safe zone`) is visible in the image.
+    # reports is visible in the image.
     safe_radius = ADAPTIVE_SAFE_RADIUS_DP * PREVIEW_PX_PER_DP
     safe_disc = Image.new("L", (size, size), 0)
     ImageDraw.Draw(safe_disc).ellipse(

@@ -61,6 +61,14 @@ const DIAGNOSTIC_LINE = new RegExp(
     // documentation *about* authentication uses them. A test caught that. These two forms are what
     // the CLI actually prints when the session is unusable.
     String.raw`not logged in|codex login`,
+    // Codex's own plumbing. A tool call that cannot start is reported as `exec error:` or
+    // `execution error:`, and the CLI's log lines are timestamped, which puts the level *after* the
+    // timestamp so `^\s*ERROR` never matches them:
+    //   `2026-09-29T20:25:55Z ERROR codex_core::exec: exec error: windows sandbox: runner failed...`
+    // That timestamped shape is exactly the case that produced a false `DONE`: every command failed
+    // and the classifier saw no diagnostic line at all.
+    String.raw`(?:exec|execution) error\s*:`,
+    String.raw`windows sandbox\b`,
   ].join('|'),
   'i',
 );
@@ -72,6 +80,23 @@ const DIAGNOSTIC_LINE = new RegExp(
  * an everyday English word ("compact notation") and was a false-positive source on its own.
  */
 const SIGNALS = [
+  {
+    // The sandbox itself is broken, so no command can run at all.
+    //
+    // Observed 2026-09-29 on this machine, in both `read-only` and `workspace-write` mode: the
+    // Windows sandbox's restricted token cannot execute `pwsh.exe` from
+    // `%LOCALAPPDATA%\Microsoft\WindowsApps\`, which is an application-execution alias rather than a
+    // real file, so SpawnChild fails with `CreateProcessAsUserW failed: 1920` before the command
+    // starts. A worker in that state has read nothing and written nothing, so its zero exit code is
+    // not delivery — and the classifier previously called it `DONE`, because the failure line is
+    // timestamped and therefore never reached the signal scan. `danger-full-access` is the only
+    // working mode on a machine in this state; it is a diagnostic to report, not a mode to default to.
+    //
+    // This is the most specific wording of the failure, which is why it is first: the pattern names
+    // the sandbox runner and the Win32 call, so prose *about* the Windows sandbox cannot match it.
+    signal: 'SANDBOX_UNAVAILABLE',
+    pattern: /windows sandbox[^\n]*runner failed|createprocessasuserw failed|windows error 1920/,
+  },
   {
     signal: 'RATE_LIMITED',
     // "You've hit your usage limit. Upgrade to Pro" is the real phrasing observed in this repo.

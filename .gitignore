@@ -9,6 +9,13 @@ release-approval.json
 .env
 .env.*
 !.env.example
+# Promo codes for any slot's promotions, at any depth. A code is a free unlock of whatever
+# the slot sells, so a batch is a pile of giveaways and a repository history is the wrong
+# place for one. The slot's own `.gitignore` and the scaffold's both carry these two names;
+# this entry is the backstop for a code file that lands in the repository root instead, so
+# the protection does not depend on which folder the download happened to reach.
+promo-codes.csv
+promotion_codes.csv
 *.jks
 *.keystore
 google-services.json

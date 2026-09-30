@@ -79,6 +79,19 @@ check(
 );
 check('empty input yields no signal', diagnose(''), null);
 check('ordinary output yields no signal', diagnose('Wrote 3 files. All tests pass.'), null);
+// The sandbox failure is the newest signal, and it has the newest failure mode to guard against: a
+// document that *describes* the Windows sandbox must not be read as a worker that died in it, or
+// every note about this very defect would discard the work of whoever wrote it.
+check(
+  'a doc describing the Windows sandbox problem is not a failure',
+  diagnose('The Windows sandbox on this machine cannot spawn a child process, so the reviewer could not read the tree.'),
+  null,
+);
+check(
+  'a doc recommending danger-full-access is not a failure',
+  diagnose('Run the worker with `--sandbox danger-full-access`; the sandboxed modes fail with Win32 error 1920.'),
+  null,
+);
 
 console.log('\n=== recall: real errors must still be caught ===');
 
@@ -117,12 +130,53 @@ check(
   diagnose('You are not logged in. Run codex login to continue.'),
   'AUTH_ERROR',
 );
+// The false `DONE` of 2026-09-29, verbatim from the recorded probe transcript. Every command failed
+// before it started, the run exited 0, and the ledger recorded `DONE` — because the failure line is
+// timestamped (`2026-…Z ERROR …`) and the diagnostic gate only accepted a level at the line start.
+check(
+  'a timestamped sandbox spawn failure is SANDBOX_UNAVAILABLE',
+  diagnose(
+    '2026-09-29T20:25:55.590481Z ERROR codex_core::exec: exec error: windows sandbox: runner failed during SpawnChild: CreateProcessAsUserW failed: 1920 (Доступ к этому файлу из системы отсутствует.) | cwd=D:\\Python\\PlayKiln | creation_flags=525312 (Windows error 1920)',
+  ),
+  'SANDBOX_UNAVAILABLE',
+);
+check(
+  'the router wrapping the same failure is SANDBOX_UNAVAILABLE',
+  diagnose(
+    '2026-09-29T20:25:55.591395Z ERROR codex_core::tools::router: error=execution error: Io(Custom { kind: Other, error: "windows sandbox: runner failed during SpawnChild: CreateProcessAsUserW failed: 1920" })',
+  ),
+  'SANDBOX_UNAVAILABLE',
+);
+check(
+  'a bare CreateProcessAsUserW failure is SANDBOX_UNAVAILABLE',
+  diagnose('ERROR: CreateProcessAsUserW failed: 1920 | cmd=pwsh.exe'),
+  'SANDBOX_UNAVAILABLE',
+);
+// The gate was widened to consider `exec error:` lines, so it must not start inventing signals from
+// them: a tool call that failed for an ordinary reason is a defect in the task, not a run that could
+// not reach the repository. This is the precision half of the same change.
+check(
+  'an ordinary exec error is still not a signal',
+  diagnose('ERROR: exec error: spawn git ENOENT'),
+  null,
+);
 
 console.log('\n=== classification precedence ===');
 
 check('signal beats a zero exit code', classifyRun(0, 'ERROR: You\'ve hit your usage limit.'), 'blocked');
 check('a clean zero exit is done', classifyRun(0, 'Wrote 3 files.'), 'done');
 check('a non-zero exit with no signal is failed', classifyRun(1, 'spawn error: ENOENT'), 'failed');
+// The defect this signal exists for: a run that executed nothing, exited 0, and was recorded as
+// delivery. `blocked` is the honest verdict, and it keeps the file-on-disk check that `AGENTS.md`
+// demands in place instead of letting a label claim work that was never done.
+check(
+  'a run whose every command died in the sandbox is blocked, not done',
+  classifyRun(
+    0,
+    'I\'ll run the two read-only commands exactly as requested.\n2026-09-29T20:25:55.590481Z ERROR codex_core::exec: exec error: windows sandbox: runner failed during SpawnChild: CreateProcessAsUserW failed: 1920 (Windows error 1920)',
+  ),
+  'blocked',
+);
 
 console.log('\n=== replay over every recorded worker log ===');
 

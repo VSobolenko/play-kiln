@@ -25,6 +25,7 @@
     <string name="about_privacy_title">隐私始于设计</string>
     <string name="about_privacy_body">本应用可离线运行，并将你的记录写入本设备的私有存储。没有账号、登录、分析、广告，也没有开发者服务器。只有当你通过系统选择器导出或备份时，文件才会离开设备；如果启用了设备备份，Android 自动备份也可能将记录复制到你自己的 Google 账号。</string>
     <string name="about_privacy_billing">购买流量和购买记录由 Google Play 结算服务处理。它不会通过本应用获取你的班级记录。</string>
+    <string name="about_privacy_policy_action">打开隐私政策</string>
     <string name="about_averages_title">平均分会说明计算过程</string>
     <string name="about_averages_body">每个平均分都遵循你设置的类别、权重、取整方式和未交作业规则。空白和免修的作业绝不会被悄悄按零分处理；没有可用成绩的类别会被标明并排除在外。</string>
     <string name="about_purchase_title">一次永久解锁</string>

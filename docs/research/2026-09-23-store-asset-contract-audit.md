@@ -1,5 +1,12 @@
 # Store asset contract audit — 2026-09-23
 
+> **Superseded in part, 2026-09-29.** The screenshot targets this audit measured were
+> `1200×1920` and `1600×2560` (5:8). The factory's targets are now 9:16 — 7-inch
+> `1080×1920`, 10-inch `1440×2560` — because the console states "16:9 или 9:16" in
+> **every** screenshot field, measured live in the RU console on 2026-09-29. That change
+> is recorded in `AGENTS.md`; the findings and measurements below are kept as the
+> 2026-09-23 record of the contract as it then was.
+
 **Scope:** verify that the store assets `scripts/store-kit.py` actually generated for
 `apps/2026-09-22-smoke/` satisfy the byte-level contract the factory states in
 `AGENTS.md`, and independently check those assets against Play's own asset ranges.
@@ -43,7 +50,7 @@ store/assets/<locale>/tablet-10-01.png ... tablet-10-04.png
 
 The per-item contract table:
 
-| Item | Contract (quoted verbatim from `AGENTS.md`) |
+| Item | Contract (quoted verbatim from `AGENTS.md` **as it read on 2026-09-23**; the 7-inch and 10-inch rows changed on 2026-09-29 — see the note at the top) |
 |---|---|
 | Listing text | Title ≤ 30, short description ≤ 80, full description ≤ 4000 characters |
 | App icon | 512×512, 32-bit PNG with alpha, sRGB, ≤ 1024 KB; no drawn rounded mask or shadow |

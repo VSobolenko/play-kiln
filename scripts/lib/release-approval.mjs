@@ -26,12 +26,25 @@
  * script. `store/`, `dist/`, `captures/`, `build/` and machine-local state are excluded by
  * design: the release pipeline itself writes them *after* approval, so including them
  * would make the pipeline invalidate the very approval it is acting on.
+ *
+ * That exclusion left a hole of the same shape it was avoiding. `store/` is not all pipeline
+ * output: `store/listing.json`, `store/journey.json` and `store/studio.json` are files a human
+ * authors, and every public claim the pack makes is rendered from them, so an approval that did
+ * not cover them approved an app while leaving the description of the app free to change. On
+ * 2026-09-29 a review demonstrated it: approve a slot, rewrite the listing to describe a feature
+ * the build does not have, rewrite the journey so the screenshots assert different readings, then
+ * run `store-kit.py` and `media-capture.mjs` — every gate still returned ok. The authored half of
+ * the pack is therefore bound by a second digest over the authored files only, in
+ * `scripts/lib/pack-approval.mjs`, and an approval records both halves; a record that carries only
+ * the build half is a record from before this contract and is refused rather than read as complete.
  */
 
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+
+import { checkPackApproval, packDigest } from './pack-approval.mjs'
 
 /** Repository root, resolved from this file so the module works from any cwd. */
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
@@ -62,21 +75,100 @@ const EXCLUDED_DIRECTORY_NAMES = new Set([
 const EXCLUDED_ROOT_DIRECTORY_NAMES = new Set(['store', 'dist', 'captures', '.kiln'])
 
 /**
- * Files that do not describe the app the owner reviews: machine-local state, secrets, and
- * generated tooling metadata. Listed by name because none of them are build inputs at any
- * depth, and `.env` variants are matched by prefix below.
+ * A store-side renderer is not automatically outside the approval: run it before a capture and it
+ * will move this slot out from under a recorded approval.
+ *
+ * `store/` is excluded above because the release pipeline writes a pack *after* approval — but
+ * `scripts/store-studio.py` renders the launcher mark into `store/assets/` (excluded, no effect on
+ * the digest) **and** the adaptive-icon vectors into `app/src/main/res/**` (not excluded, compiled
+ * into the APK). On 2026-09-29 that file was 172 insertions / 300 deletions away from the version
+ * that rendered the committed assets, so those bytes are not reproducible from the working tree; the
+ * next `python scripts/store-studio.py --slot <slug>` may replace them, and what a reader then sees is
+ * not a renderer complaint but a gate refusing:
+ *
+ *   - `python scripts/store-kit.py --slot <slug> --validate-only` -> `FAIL provenance.json - <file>
+ *     does not match its recorded sha256 (<12 hex>…)`, one row per composed asset, because the images
+ *     on disk were replaced and `store/provenance.json` still records the previous run's hashes;
+ *   - `node scripts/approve-release.mjs --check --slot <slug>` -> `the app changed after the owner
+ *     approved it (<n> source file(s) approved, <n> now)` if the vectors moved, because they are build
+ *     inputs like any other resource. The two counts are equal there, and that is not a contradiction:
+ *     the gate reports how many files it hashed, and a replacement changes one of them.
+ *
+ * Neither is a bug in the module: it is the approval doing its job. The order that avoids it is the
+ * pipeline's own — approval, then `prepare-release.mjs`, then `media-capture.mjs` (which re-records
+ * `store/provenance.json` for the build it photographed), and only then a studio re-render. A slot
+ * that needs its vectors regenerated needs the owner's approval again, because the app changed.
  */
-const EXCLUDED_FILE_NAMES = new Set([
-  APPROVAL_FILENAME,
-  '.kiln-state.json',
-  'economics.json',
-  'capabilities.json',
-  'README.md',
-  '.gitignore',
-  '.gitattributes',
-  'keystore.properties',
-  'local.properties',
-  '.env'
+
+/**
+ * The criterion an entry has to satisfy, the reasons it may be satisfied for, and the list — one
+ * decision in three views, so the sentence a reader applies cannot contradict the names in force.
+ *
+ * It could, until 2026-09-29. The criterion was prose sitting above the list:
+ *
+ *   an entry may be excluded only if it cannot alter the built artifact or its signature.
+ *
+ * and two of the entries it sat above, `keystore.properties` and `local.properties`, are exactly
+ * the files that choose the key the APK is signed with and the SDK it is compiled against. The
+ * list was right and the sentence was wrong: what an approval is *about* is the revision the owner
+ * reviewed, and the machine's own configuration is not part of it. Two ways to make them agree were
+ * refused on the way: hashing the two files would have given one revision one digest per machine
+ * and voided every recorded approval the moment it was checked on another one — a guarantee bought
+ * with a gate that cannot be relied on — and deleting the two entries would have kept a sentence
+ * true that was never the rule. So the criterion is no longer prose to be re-derived: it *is* the
+ * closed set `EXCLUSION_REASONS`, `EXCLUDED_FILE_REASONS` maps every excluded name to one of them,
+ * and `EXCLUSION_CRITERION` is built from the set, so the sentence and the reasons the list uses
+ * cannot drift apart. `scripts/selftest.mjs` fails a name whose reason is not in the set, a reason
+ * no name uses, and a criterion that does not name every reason — the checks that would have caught
+ * the contradiction above.
+ *
+ * A name list is still the mechanism: a rule keyed on `.gitignore` would exempt whatever a slot
+ * happens to ignore next, and this list is the one place the exemption is decided. What changed is
+ * that an entry now has to name *which reason* it is exempt for, and the reasons are about different
+ * things — so a future reader adding a name argues against the reason, not against the list.
+ */
+export const EXCLUSION_REASONS = {
+  'machine-local':
+    "it is the machine's own configuration rather than the app's source, so its bytes differ between two machines that build the same revision (the SDK root, the path to the upload key, the slot's secrets), and hashing it would give one revision one digest per machine and leave a recorded approval unusable on the machine that did not record it. What it can change is not what the owner approved: the app's source is, and both `sign-release.mjs` and `prepare-release.mjs` read this configuration after approval — `prepare-release.mjs` verifies the built APK's certificate against the configured upload certificate and records `signing.fingerprint` in `dist/release-manifest.json`, so the signature is asserted against the artifact rather than against a file in the digest",
+  'not-read-by-the-build':
+    'no task of the build opens it, so it cannot change the compiled bytes or what signs them; the factory scripts that do read it decide a plan or render a document, and those run outside Gradle',
+  'the-record-itself':
+    'it is the approval record being checked, and hashing it would make writing a record change the digest that record states'
+}
+
+export const EXCLUSION_CRITERION =
+  'an entry may be excluded only for one of ' +
+  `${Object.keys(EXCLUSION_REASONS).map((reason) => `\`${reason}\``).join(', ')}; each is stated in ` +
+  '`EXCLUSION_REASONS` (`scripts/lib/release-approval.mjs`) and every excluded name carries one'
+
+/** Which reason each excluded name is excluded for: the list, keyed by name. */
+export const EXCLUDED_FILE_REASONS = new Map([
+  [APPROVAL_FILENAME, 'the-record-itself'],
+  ['.kiln-state.json', 'machine-local'],
+  // The SDK root and the upload key's path and password: this machine's, not the app's.
+  ['local.properties', 'machine-local'],
+  ['keystore.properties', 'machine-local'],
+  ['.env', 'machine-local'],
+  // The slot's plan and its capability registry are read by the economics gate and by the store
+  // pack, and by no Gradle task: the build's own capability list is compiled into the slot's
+  // Gradle files when the slot is scaffolded, not re-read from this file at build time.
+  ['economics.json', 'not-read-by-the-build'],
+  ['capabilities.json', 'not-read-by-the-build'],
+  // Documents and VCS configuration: an APK does not depend on any of them.
+  ['README.md', 'not-read-by-the-build'],
+  ['.gitignore', 'not-read-by-the-build'],
+  ['.gitattributes', 'not-read-by-the-build'],
+  // The batch of Play Console promo codes (`Monetize with Play -> Promotions -> Download codes`)
+  // minted for a reviewer, written beside the slot by the factory's promotions step and gitignored
+  // so a free unlock of what the slot sells never enters a commit — the capability never reads it,
+  // Play Billing takes its product IDs from the slot's Kotlin and the console, and no build task
+  // opens it. Counting it as a build input made the factory's own console step void the approval for
+  // the revision the owner had just reviewed: `--check` reported `236 now` against `235 approved`
+  // while the two trees differed by this one file. Both spellings are listed because the console
+  // exports `promotion_codes.csv` while the factory's notes call it `promo-codes.csv`, and the
+  // scaffold and root `.gitignore` cover the same two names.
+  ['promotion_codes.csv', 'not-read-by-the-build'],
+  ['promo-codes.csv', 'not-read-by-the-build']
 ])
 
 export class ReleaseApprovalError extends Error {}
@@ -91,8 +183,33 @@ export function slotSlug(slotDir) {
   return path.basename(path.resolve(slotDir)).replace(/^\d{4}-\d{2}-\d{2}-/, '')
 }
 
+/**
+ * The one sentence that tells a reader how to record an approval.
+ *
+ * It exists as a function rather than as a string built at each refusal so the command an operator
+ * is told to run is identical in `approve-release.mjs`, `prepare-release.mjs`, `media-capture.mjs`,
+ * `store-kit.py` and `play-upload.mjs`. The scripts that only print `checkReleaseApproval`'s reason
+ * already share it — this is the same sentence, exported so the uploader does not restate it.
+ */
+export function approvalRemediation(slotDir) {
+  return `node scripts/approve-release.mjs --slot ${slotSlug(slotDir)} --note "<the owner's own words>"`
+}
+
+/**
+ * Why a file is excluded from the digest, or `undefined` when it is a build input.
+ *
+ * The prefix rule for `.env` variants is stated here rather than in a second list so the reason a
+ * variant is excluded is the same object as the reason `.env` itself is: `exclusionReason('.env.local')`
+ * returns `machine-local` because `.env` does, and a reader asking why gets the same answer.
+ */
+export function exclusionReason(name) {
+  if (EXCLUDED_FILE_REASONS.has(name)) return EXCLUDED_FILE_REASONS.get(name)
+  if (name.startsWith('.env.')) return EXCLUDED_FILE_REASONS.get('.env')
+  return undefined
+}
+
 function isExcludedFile(name) {
-  return EXCLUDED_FILE_NAMES.has(name) || name.startsWith('.env.')
+  return exclusionReason(name) !== undefined
 }
 
 /**
@@ -129,18 +246,40 @@ function collectBuildInputs(root) {
 }
 
 /**
+ * A fresh SHA-256 for a file-set digest, and the one line that folds a file into it.
+ *
+ * Both are exported because a second digest has to exist: the approval now covers the *authored*
+ * store pack as well as the build inputs (`scripts/lib/pack-approval.mjs`), and two digests over
+ * two path sets must still hash a byte the same way. A copy of `hash.update(...)` at the second
+ * call site is exactly how the two would drift, and the drift would be invisible — both keep
+ * returning a digest, and only a re-approval ever shows that one of them stopped describing its
+ * own inputs. `key` is what the digest names the file by, deliberately separate from the path it
+ * is read from, because the shared build tree is keyed with its repo-relative prefix.
+ */
+export function newFileDigest() {
+  return createHash('sha256')
+}
+
+export function absorbFile(hash, label, key, absoluteFile) {
+  hash.update(`${label}:${key}\0`).update(readFileSync(absoluteFile)).update('\0')
+}
+
+/** The forward-slash relative path a digest names a file by, so a key can never carry a `\`. */
+export function digestKey(root, absoluteFile) {
+  return path.relative(path.resolve(root), path.resolve(absoluteFile)).split(path.sep).join('/')
+}
+
+/**
  * The digest an approval is bound to: every build input in the slot, plus the shared
  * capability tree. Path and bytes are both hashed, so a rename is a change, and the sort
  * makes the value independent of directory-read order.
  */
 export function releaseSourceDigest(slotDir, { root = ROOT } = {}) {
   const absoluteSlot = path.resolve(slotDir)
-  const hash = createHash('sha256')
+  const hash = newFileDigest()
   let files = 0
-  // `key` is what the digest names the file; it is separate from the path it is read from,
-  // because the shared tree is keyed with its repo-relative prefix.
   const scope = (label, absoluteFile, key) => {
-    hash.update(`${label}:${key}\0`).update(readFileSync(absoluteFile)).update('\0')
+    absorbFile(hash, label, key, absoluteFile)
     files += 1
   }
   for (const relative of collectBuildInputs(absoluteSlot)) {
@@ -162,14 +301,14 @@ function blocked(reason) {
 /**
  * Whether `slotDir` may enter the release phase.
  *
- * Returns `{ ok: true, record, digest }` or `{ ok: false, reason }`. The reason is a full
- * sentence that names the exact command which records approval, because a refusal a reader
- * cannot act on is how the previous gate this file replaces became prose nobody followed.
+ * Returns `{ ok: true, record, digest, files, packDigest, packFiles }` or `{ ok: false, reason }`.
+ * The reason is a full sentence that names which half of the approval is stale and the exact
+ * command that records approval, because a refusal a reader cannot act on is how the previous gate
+ * this file replaces became prose nobody followed.
  */
 export function checkReleaseApproval(slotDir, { root = ROOT } = {}) {
   const absoluteSlot = path.resolve(slotDir)
-  const slug = slotSlug(absoluteSlot)
-  const recordCommand = `node scripts/approve-release.mjs --slot ${slug} --note "<the owner's own words>"`
+  const recordCommand = approvalRemediation(absoluteSlot)
   const file = approvalPath(absoluteSlot)
 
   if (!existsSync(file)) {
@@ -200,15 +339,34 @@ export function checkReleaseApproval(slotDir, { root = ROOT } = {}) {
   }
 
   const current = releaseSourceDigest(absoluteSlot, { root })
+  // Two halves, two reasons. The approval is about the revision the owner reviewed, and that
+  // revision is two documents: the app (what the build reads) and the authored store pack (what
+  // Play is told). They move independently — a Kotlin edit does not touch the listing, and a
+  // listing edit does not touch a build input — so a refusal names the half that moved instead of
+  // the word "changed", and the reader knows which document to bring back for review.
+  const staleHalves = []
   if (record.sourceDigest !== current.digest) {
-    return blocked(
+    staleHalves.push(
       `the app changed after the owner approved it (${record.sourceFiles} source file(s) approved, ` +
-        `${current.files} now), so the approved revision no longer exists. Re-approve the revision you ` +
-        `actually reviewed: ${recordCommand}`
+        `${current.files} now)`
+    )
+  }
+  const pack = checkPackApproval(absoluteSlot, { record })
+  if (!pack.ok) staleHalves.push(pack.reason)
+  if (staleHalves.length > 0) {
+    return blocked(
+      `${staleHalves.join('; ')}. Re-approve the revision you actually reviewed: ${recordCommand}`
     )
   }
 
-  return { ok: true, digest: current.digest, record }
+  return {
+    ok: true,
+    digest: current.digest,
+    files: current.files,
+    packDigest: pack.digest,
+    packFiles: pack.files,
+    record
+  }
 }
 
 /**
@@ -226,6 +384,7 @@ export function writeReleaseApproval(slotDir, { note, root = ROOT, now = new Dat
     )
   }
   const source = releaseSourceDigest(absoluteSlot, { root })
+  const pack = packDigest(absoluteSlot)
   const record = {
     schemaVersion: APPROVAL_SCHEMA_VERSION,
     slot: slotSlug(absoluteSlot),
@@ -233,7 +392,10 @@ export function writeReleaseApproval(slotDir, { note, root = ROOT, now = new Dat
     approvedAt: now.toISOString(),
     note: words,
     sourceDigest: source.digest,
-    sourceFiles: source.files
+    sourceFiles: source.files,
+    packDigest: pack.digest,
+    packFiles: pack.files,
+    packInputs: pack.inputs
   }
   writeFileSync(approvalPath(absoluteSlot), `${JSON.stringify(record, null, 2)}\n`, 'utf8')
   return record
