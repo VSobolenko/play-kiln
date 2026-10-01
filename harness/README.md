@@ -10,7 +10,7 @@ Read **`ambition.md`** — the factory must surpass prior in-house harnesses.
 Two phases, with the owner's approval between them
 (`.cursor/rules/release-gate.mdc`).
 
-**Phase 1 — development (`/ship`)**
+**Phase 1 — development (`/forge` or `/ship`)**
 
 1. **Plan** — OpenSpec; human checkpoint (`context-layers` L1/L2)
 2. **Generate** — Cursor ∥ Codex peers (Build); SDD; optional Ralph
@@ -30,7 +30,7 @@ Two phases, with the owner's approval between them
 
 ## Commands
 
-`/ship` `/release` `/eval` `/review` `/ui-verify` `/diagnose` `/improve-harness`
+`/forge` `/ship` `/release` `/eval` `/review` `/ui-verify` `/diagnose` `/improve-harness`
 `/kiln-status` `/opsx-*`
 
 ## Health

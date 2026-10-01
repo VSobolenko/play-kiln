@@ -16,7 +16,15 @@ and review, and deliberately produces **no** signed artifacts, no store pack and
 because all of those are wasted work while the app can still change. Phase 2 produces them and
 refuses to run without the approval. The rule is `.cursor/rules/release-gate.mdc`.
 
-**Phase 1 — development, `/ship <idea>`**
+**Two ways in, one pipeline.** `/forge [<brief>]` is the whole factory from one command: recon picks
+the topic by measurement, presents it, and on the owner's approval the same phase-1 stages run and
+then phase 2 — stopping only at the checkpoints below, which are the owner's and are never skipped.
+`/ship <idea>` is the other door, for an idea already in hand. Both enter the identical pipeline and
+stop at the identical gates; `/forge` exists so the owner does not have to run recon and ship as two
+separate commands with a second decision in between. Its contract is
+`.cursor/commands/forge.md` — a chain of the existing stages, never a shortcut past them.
+
+**Phase 1 — development, `/forge` or `/ship <idea>`**
 
 | Order | Stage | Owner | Gate or output |
 |---:|---|---|---|

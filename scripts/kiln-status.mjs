@@ -210,7 +210,7 @@ const requiredHarnessFiles = [
   'DESIGN.md',
   '.cursor/mcp.json',
   '.cursor/hooks.json',
-  '.cursor/commands/ship.md',
+  '.cursor/commands/forge.md', '.cursor/commands/ship.md',
   '.cursor/commands/release.md',
   '.cursor/commands/eval.md',
   '.cursor/rules/release-gate.mdc',

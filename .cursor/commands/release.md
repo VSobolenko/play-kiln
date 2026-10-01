@@ -7,8 +7,10 @@ description: "PlayKiln phase 2: after the owner approves — build, sign, store 
 
 # /release — PlayKiln release phase
 
-The second half of the factory. Development (`/ship`) ends with an app the owner can look
-at; this phase turns an **approved** revision into a publish-ready slot.
+The second half of the factory. Development (`/forge` or `/ship`) ends with an app the owner can
+look at; this phase turns an **approved** revision into a publish-ready slot. `/forge` chains into
+this file automatically once the owner has approved the app — nothing here is skipped by arriving
+that way, and the gate below is checked either way.
 
 It runs only after the owner has explicitly approved the release in the current conversation.
 If he has not, **stop** and ask — do not record an approval to unblock yourself.

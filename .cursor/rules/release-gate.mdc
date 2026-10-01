@@ -10,7 +10,11 @@ The pipeline is now two phases with an explicit human gate between them. **Build
 screenshotting and store-pack assembly are release work and do not happen during
 development.**
 
-## Phase 1 — development (`/ship`)
+## Phase 1 — development (`/forge` or `/ship`)
+
+`/forge` is the whole pipeline from one command — its step A is the `research` and `ideation` row
+below — and `/ship` enters at the same place when the idea is already in hand. Both stop at the same
+two checkpoints; neither may skip one because the other ran the stage before it.
 
 The phase ends when there is an app the owner can look at:
 

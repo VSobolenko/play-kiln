@@ -9,7 +9,7 @@ are only part of it. This factory uses **all** project-level surfaces that matte
 | **DESIGN.md** | `/DESIGN.md` | Visual/UX always-on (Factory.ai-style) | Yes |
 | **Rules** | `.cursor/rules/*.mdc` | always / globs / intelligent / @manual | Yes |
 | **Skills** | `.cursor/skills/`, `.agents/skills/` | On-demand workflows | Yes |
-| **Commands** | `.cursor/commands/*.md` | User slash entry points | Yes (`/ship`, `/release`, `/eval`…) |
+| **Commands** | `.cursor/commands/*.md` | User slash entry points | Yes (`/forge`, `/ship`, `/release`, `/eval`…) |
 | **Custom subagents** | `.cursor/agents/*.md` | Isolated specialists (Planner/Generator/Evaluator…) | **Yes — required** |
 | **Hooks** | `.cursor/hooks.json` | Deterministic lifecycle gates | Expanded |
 | **MCP** | `.cursor/mcp.json` | External tools | Yes |
@@ -31,7 +31,7 @@ are only part of it. This factory uses **all** project-level surfaces that matte
 
 ## Subagents vs skills vs commands
 
-- **Command** — human starts a factory phase (`/ship` develops, `/release` ships after approval)
+- **Command** — human starts a factory phase (`/forge` finds the topic and builds it end to end, `/ship` develops an idea already in hand, `/release` ships after approval)
 - **Skill** — agent loads procedure when relevant
 - **Subagent** — separate context window for Planner / Generator / Evaluator / auditor
 

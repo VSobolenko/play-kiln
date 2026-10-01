@@ -7,9 +7,13 @@ description: "PlayKiln phase 1: one idea → isolated slot → dual-agent develo
 
 # /ship — PlayKiln development phase
 
-The factory's front door, and **only the first half of it**. One invocation takes an idea to
-an app the owner can install and judge: isolated slot, implementation, tests, source-level
-verification. It then **stops** and asks the owner to approve the release.
+The factory's front door when the idea is already in hand, and **only the first half of it**. One
+invocation takes an idea to an app the owner can install and judge: isolated slot, implementation,
+tests, source-level verification. It then **stops** and asks the owner to approve the release.
+
+Use **`/forge`** instead when there is **no idea yet**: it runs recon to choose the topic by
+measurement, and on the owner's approval continues into these same steps — then into `/release`.
+Nothing below changes when the work arrives through `/forge`: same stages, same gates, same stops.
 
 Building the signed artifacts, composing the store pack and capturing screenshots are release
 work: they happen in `/release`, on the owner's explicit word. Read
