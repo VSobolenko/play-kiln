@@ -24,8 +24,9 @@ Also activate Google skill when present:
 8. **GenAI** — if generative: reporting UI + not a thin wrapper
 9. **Artifact** — `bundleRelease` AAB for Play, produced by `scripts/prepare-release.mjs` in the
    `/release` phase; the approved revision is required before any signed artifact exists
-10. **Gate** — `node scripts/verify-slot.mjs --slot <slug>` in development;
-    `--strict-store --build` for release evidence
+10. **Gate** — `node scripts/verify.mjs --slot <slug> --build` is the whole gate: the source
+    checks plus `assembleDebug` in one process. A run without `--build` reports `UNVERIFIED`
+    (exit 2), because source-only evidence cannot prove the app builds.
 
 ## Do not invent tooling
 

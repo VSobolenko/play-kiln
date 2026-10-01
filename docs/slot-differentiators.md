@@ -3,7 +3,7 @@
 Every slot states **why this app is worth installing**, one promise at a time, in a file a program
 reads. This document is the specification; it is enforced by
 `scripts/check-differentiators.mjs`, `scripts/new-slot.mjs` refuses to create a slot without a
-valid contract, and `scripts/verify-slot.mjs` fails a slot whose promises are unresolved. All four
+valid contract, and `scripts/verify.mjs` fails a slot whose promises are unresolved. All four
 facts are stated here because a contract nobody reads is a convention, and a convention is what
 this file replaced.
 
@@ -91,7 +91,7 @@ rather than restated, because a second copy of a rule is a second thing to drift
 
 `deferred` is not an answer, it is a queue. `scripts/check-differentiators.mjs --allow-deferred`
 exists so a builder can read progress mid-flight; the slot gate does **not** pass that flag, so
-`scripts/verify-slot.mjs` fails while any promise is deferred, and the owner is never asked to
+`scripts/verify.mjs` fails while any promise is deferred, and the owner is never asked to
 approve a revision that has not accounted for its own reason list.
 
 ### `ownerDecision`
@@ -139,7 +139,7 @@ that lives only on the machine that ran the capture is not a proof.
 - **`scripts/check-differentiators.mjs --slot <slug>`** is the gate: schema, then the promises
   resolved against the slot's own files, then the `deferred` rule. It prints `VERDICT: PASS` or
   `VERDICT: BLOCKED` and exits non-zero on failure.
-- **`scripts/verify-slot.mjs` invokes it for every slot**, and turns on a declaration rather than
+- **`scripts/verify.mjs` invokes it for every slot**, and turns on a declaration rather than
   on a file being present — the file is looked for on disk *and* in git, so deleting
   `differentiators.json` in the working tree does not switch the check off. A slot with no contract
   at all predates this gate: it is reported `UNVERIFIED` (never PASS), on the same reasoning as

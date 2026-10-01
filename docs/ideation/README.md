@@ -60,7 +60,7 @@ This prints `SKIP` for the artifact resolution, because there is no slot to reso
 schema checks are not skipped. A `BLOCKED` verdict means the reason list is not proposable.
 
 Every promise is written `deferred`, and it stays deferred until the build makes it true. That is the
-mechanism: `scripts/verify-slot.mjs` fails while any promise is deferred, so the slot cannot be
+mechanism: `scripts/verify.mjs` fails while any promise is deferred, so the slot cannot be
 called done with the easy ten of twenty delivered and the rest quietly abandoned.
 
 > The five recipes recorded in `2026-09-26-five-recipes.md` and the proposals beside them predate

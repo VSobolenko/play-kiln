@@ -1,6 +1,6 @@
 # Google Play upload checklist — PlayKiln Smoke
 
-- [ ] Run `python scripts/store-kit.py --slot smoke --validate-only` and resolve every FAIL.
+- [ ] Run `python scripts/store/validate.py --slot smoke` and resolve every FAIL.
 - [ ] Replace synthetic screenshots with real captures when `graphics.md` marks them synthetic.
 - [ ] Compare listing claims and captions with the release build.
 - [ ] Replace placeholder contact email and privacy-policy URL in `listing.json`.

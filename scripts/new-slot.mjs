@@ -69,8 +69,9 @@ const excludedDirectories = new Set([
   'dist',
   // A Python bytecode cache is a build output: `scripts/__pycache__/*.pyc` is machine-local, binary
   // and gitignored. It is listed here rather than in one caller's filter because the predicate is the
-  // single answer to "what must not be copied", and `scripts/selftest.mjs` now walks the whole
-  // `scripts/` tree through it.
+  // single answer to "what must not be copied", and the `build.copyFilter` check
+  // (`scripts/core/build.mjs`) sweeps the repository through it and fails a recursive copy that
+  // decides for itself what must not be copied.
   '__pycache__'
 ])
 const excludedFiles = new Set(['local.properties', 'keystore.properties', '.DS_Store'])
@@ -477,7 +478,7 @@ function main() {
 
   console.log('\nNext:')
   line('INFO', 'implement the app')
-  line('INFO', `python scripts/store-kit.py --slot ${slug}`)
+  line('INFO', `python scripts/store/render.py --slot ${slug}`)
   line('INFO', `node scripts/check-economics.mjs --slot ${slug}`)
   line('INFO', `node scripts/check-differentiators.mjs --slot ${slug} --allow-deferred`)
   line('INFO', 'every promise in differentiators.json starts deferred; the slot is not done until each one is shipped, narrowed or dropped')
@@ -486,7 +487,7 @@ function main() {
     'signing requires the owner\'s explicit authorization; never run sign-release.mjs --generate without it'
   )
   line('INFO', `node scripts/prepare-release.mjs --slot ${slug}`)
-  line('INFO', `node scripts/verify-slot.mjs --slot ${slug} --strict-store`)
+  line('INFO', `node scripts/verify.mjs --slot ${slug}`)
 }
 
 function runCli() {
@@ -500,8 +501,10 @@ function runCli() {
   }
 }
 
-// Exported so scripts/selftest.mjs can exercise a real slot in a sandbox and reuse
-// the exact exclusion rules instead of re-implementing (and drifting from) them.
+// Exported so the `build.copyFilter` check (`scripts/core/build.mjs`) can reuse the exact exclusion
+// rules instead of re-implementing (and drifting from) them. That check is now the only consumer: the
+// sandbox run of a real slot that `scripts/selftest.mjs` used to drive went with the runner, and
+// `openspec/changes/reduce-factory-to-core/deletions.md` records it as an assertion with no successor.
 export { isExcludedScaffoldPath, parseArgs, walkFiles }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) runCli()

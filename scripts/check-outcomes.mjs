@@ -16,8 +16,8 @@
  *   node scripts/check-outcomes.mjs --slot-dir <path> [--registry <path>] [--json]
  *
  * `--slot-dir` and `--registry` exist so `scripts/test-outcomes.mjs` can drive this real gate against
- * throwaway slots, the same way `check-freshness.mjs --ledger` lets its suite avoid the repository
- * ledger. A slot run uses `--slot` alone.
+ * throwaway slots, the same way the fact-ledger check takes a `ledgerPath` so its own fixtures never
+ * touch the repository's ledger. A slot run uses `--slot` alone.
  *
  * Exit codes, matching this repository's convention (0 pass, 1 a verdict the caller must act on,
  * 2 UNVERIFIED / no evidence — never a pass):
@@ -97,7 +97,7 @@ function listAppDirs() {
 }
 
 /**
- * Resolve a slot the way `scripts/verify-slot.mjs` does: an exact directory name or a `<date>-<slug>`
+ * Resolve a slot the way `scripts/verify.mjs` does: an exact directory name or a `<date>-<slug>`
  * suffix, and only when exactly one candidate matches, so an ambiguous slug fails instead of
  * silently picking one.
  */

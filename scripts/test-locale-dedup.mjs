@@ -23,7 +23,7 @@
  */
 import { spawnSync } from 'node:child_process'
 import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
+import { SCRATCH_DIR } from './lib/scratch.mjs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
@@ -35,7 +35,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const CHECKER = process.env.PLAYKILN_CHECK_LOCALES
   ? path.resolve(process.env.PLAYKILN_CHECK_LOCALES)
   : path.join(ROOT, 'scripts', 'check-locales.mjs')
-const SANDBOX = mkdtempSync(path.join(tmpdir(), 'playkiln-locale-dedup-'))
+const SANDBOX = mkdtempSync(path.join(SCRATCH_DIR, 'playkiln-locale-dedup-'))
 const SLOT = path.join(SANDBOX, 'apps', 'fixture-slot')
 const RES = path.join(SLOT, 'app', 'src', 'main', 'res')
 

@@ -9,7 +9,7 @@
  * the **repository**, and nothing protected the shipped **APK**. A slot that compiled a provider key
  * into `app/src/main/` would pass every other gate and ship the credential. The measured exposure is
  * in `docs/research/2026-09-29-app-factory-prior-art.md` §3 row 8; the rule is
- * `.cursor/rules/client-side-secrets.mdc`; this script is the enforcement that rule names.
+ * `.cursor/rules/client-secrets.mdc`; this script is the enforcement that rule names.
  *
  * Usage:
  *   node scripts/check-client-secrets.mjs --slot <slug> [--json]
@@ -45,7 +45,7 @@ if (!slot) usage('--slot is required')
 if (slot.startsWith('--')) usage(`--slot needs a slot slug, got ${slot}`)
 
 /**
- * Resolves a slot the same way `verify-slot.mjs` does: an exact directory name, or a unique `-<slug>`
+ * Resolves a slot the same way `verify.mjs` does: an exact directory name, or a unique `-<slug>`
  * suffix. Two matches is ambiguous and is refused rather than guessed.
  */
 function resolveSlotDir(slug) {

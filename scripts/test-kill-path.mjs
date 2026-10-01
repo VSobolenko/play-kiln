@@ -3,17 +3,17 @@
  *
  * `scripts/kiln-status.mjs` derives its root from its own file location, so a fixture has to be a
  * small mirror of the repository rather than a directory the script is pointed at. This builds one
- * in the OS temp directory and drives the real script against it, which is what makes the claims
- * below observations instead of readings.
+ * in the project's own scratch directory — never the machine's system temp; see
+ * `.cursor/rules/workspace-hygiene.mdc`.
  */
 import { mkdtempSync, mkdirSync, cpSync, writeFileSync, readFileSync, rmSync, existsSync } from 'node:fs'
-import { tmpdir } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
+import { SCRATCH_DIR } from './lib/scratch.mjs'
 
 const repo = join(dirname(fileURLToPath(import.meta.url)), '..')
-const sandbox = mkdtempSync(join(tmpdir(), 'playkiln-kill-'))
+const sandbox = mkdtempSync(join(SCRATCH_DIR, 'playkiln-kill-'))
 let passed = 0
 let failed = 0
 

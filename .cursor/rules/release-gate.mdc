@@ -18,19 +18,19 @@ The phase ends when there is an app the owner can look at:
 - the slot, the Kotlin/Compose implementation, the tests,
 - unit tests through `node scripts/run-slot-tests.mjs --slot <slug>`,
 - a debug build the owner can install and inspect
-  (`node scripts/verify-slot.mjs --slot <slug> --build` compiles `assembleDebug`; the APK is
+  (`node scripts/verify.mjs --slot <slug> --build` compiles `assembleDebug`; the APK is
   `app/build/outputs/apk/debug/app-debug.apk`),
-- source-level gates: `node scripts/verify-slot.mjs --slot <slug>`.
+- source-level gates: `node scripts/verify.mjs --slot <slug>`.
 - **human checkpoint 1.5**: the owner installs the debug APK, reviews the UI and behaviour, and
   approves the release in his own words.
 
-Allowed in phase 1: `--init` drafts of `store/listing.json`, `verify-slot.mjs`, unit tests,
+Allowed in phase 1: `--init` drafts of `store/listing.json`, `verify.mjs`, unit tests,
 a **debug** build. Cheap and reversible.
 
 Forbidden in phase 1 — these are release actions and are now gated in code:
 
 - `node scripts/prepare-release.mjs` (release APK + AAB + signing + release manifest),
-- `python scripts/store-kit.py` in its rendering modes (icon, feature graphic, screenshot
+- `python scripts/store/render.py` in its rendering modes (icon, feature graphic, screenshot
   sets),
 - `node scripts/media-capture.mjs` (device screenshots),
 - generating or rotating a signing key (separately gated by `authorization.mdc`).
@@ -60,7 +60,7 @@ Rules for the recording step:
   publishing stay with the owner (`authorization.mdc`).
 
 The record is `apps/<slot>/release-approval.json`, gitignored, and the check is one module:
-`scripts/lib/release-approval.mjs`. `prepare-release.mjs`, `store-kit.py` and
+`scripts/lib/release-approval.mjs`. `prepare-release.mjs`, `scripts/store/render.py` and
 `media-capture.mjs` all call it, so it cannot be bypassed by invoking one of them directly.
 
 ## The record is bound to the revision, not the slot name
@@ -85,11 +85,11 @@ Runs only after the gate passes:
 
 1. `node scripts/prepare-release.mjs --slot <slug>` — one Gradle invocation: debug + release
    APK + AAB, signature verified, artifacts staged, `dist/release-manifest.json` written.
-2. `python scripts/store-kit.py --slot <slug>` — listing copy, icon, feature graphic and the
+2. `python scripts/store/render.py --slot <slug>` — listing copy, icon, feature graphic and the
    full screenshot inventory.
 3. `node scripts/media-capture.mjs --slot <slug>` when a device is attached; real captures
    beat synthetic ones, and any synthetic capture must be labelled as such.
-4. `node scripts/verify-slot.mjs --slot <slug> --strict-store --build`, then `/eval` and
+4. `node scripts/verify.mjs --slot <slug> --build`, then `/eval` and
    `play-auditor`.
 5. Update `registry/apps.json`, then **human checkpoint 2**: the owner uploads and publishes.
 

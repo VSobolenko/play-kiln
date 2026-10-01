@@ -12,7 +12,7 @@ Read and follow `harness/dual-agent.md`.
 - [ ] Assign Build / Store / Verify for this task (not forever)
 - [ ] If both write code → separate worktrees
 - [ ] Codex constraints that are not in `AGENTS.md` → `developer-instructions`
-- [ ] After any agent write → `node scripts/verify-slot.mjs` + read the diff
+- [ ] After any agent write → `node scripts/verify.mjs` + read the diff
 - [ ] Ledger updated under `.superpowers/sdd/<slug>/`
 - [ ] Disagreements → Ruling against OpenSpec + AGENTS.md
 

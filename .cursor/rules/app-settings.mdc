@@ -1,0 +1,207 @@
+---
+description: A settings surface is part of the app, not a feature request — language, theme and behaviour, persisted
+globs: apps/**,scaffold/**
+alwaysApply: false
+---
+
+# A settings surface is part of the app, not a feature request
+
+The owner reviewed the factory's first live app, `apps/2026-09-26-teacher-gradebook`, on 2026-09-30
+and said (translated) *"settings — well, I guess they should have been added."* Then: **do not repair
+that app — make sure the next apps cannot repeat it.** That app is frozen, and this rule is what
+replaces it.
+
+The measured starting position, re-measured in this tree:
+
+- `scaffold/android-compose/app/src/main/java/com/gexetr/scaffold/ui/` contains exactly
+  `PlayKilnApp.kt`, `about/AboutScreen.kt`, `home/{HomeScreen,HomeUiState,HomeViewModel}.kt` and
+  `theme/{Color,Theme,Type}.kt` — **no settings surface of any kind**, and every shipped slot copied
+  that shape. Nothing let the user change a theme, a language, or any preference.
+- The scaffold's `gradle/libs.versions.toml` declared `datastore = "1.2.1"` /
+  `androidx-datastore-preferences` and `app/build.gradle.kts` had
+  `implementation(libs.androidx.datastore.preferences)`, while **nothing in the repository used it** —
+  a declared dependency with zero consumers, which is the shape of a decision that was made and never
+  carried out.
+- `android:localeConfig` was already declared and `res/xml/locales_config.xml` already shipped, so
+  Android 13+ already offers a **system** per-app language picker for every slot — and no app offered
+  a route to it.
+- `scripts/core/` had no settings check at all, so every gate stayed green while the app shipped with
+  nowhere to change anything. A defect no program reads is a defect that ships.
+
+`scripts/core/settings.mjs` is the sensor, and it is the only thing that measures this rule.
+
+## Rules
+
+- **A settings surface exists, and it is a real destination.** A `@Composable` whose name ends in
+  `Screen` or `Route` and names Settings/Preferences, declared under a `settings/` or `preferences/`
+  package. Check id: **`settings.surface`**.
+- **The surface is reachable from inside the app.** A navigation entry point (`NavDisplay` / `NavHost`
+  / `NavEntry`) references it **and** something outside the settings files offers a way in — a
+  settings-named route, destination or callback. A route key with no affordance is a screen that
+  exists on disk and nowhere in the app. Check id: **`settings.reachable`**.
+- **The language row opens the picker the platform already has.** When `android:localeConfig` is
+  declared — it is, from the scaffold — the honest entry point is a route to Android's own per-app
+  language settings: `Settings.ACTION_APP_LOCALE_SETTINGS` with a `package:` data URI on API 33+, and
+  `Settings.ACTION_APPLICATION_DETAILS_SETTINGS` below it, because below API 33 there is no per-app
+  picker to open and the row must not pretend there is. An in-app picker is accepted only when it is
+  built on the published APIs *and* there is no declared `localeConfig`: `LocaleManager.applicationLocales`
+  guarded by `Build.VERSION.SDK_INT >= TIRAMISU` (an unguarded write is a silent no-op on API 26–32,
+  which is the worst shape of failure), or `AppCompatDelegate.setApplicationLocales` hosted in an
+  `AppCompatActivity` — which the scaffold's `ComponentActivity` is not. Never reimplement the locale
+  plumbing (`createConfigurationContext` / `applyOverrideConfiguration`) beside a declared
+  `localeConfig`: two writers for one language is how an app ends up in a language nobody chose.
+  Check id: **`settings.language`**.
+- **A theme choice, wired into the theme host.** The settings model declares a light/dark/system
+  preference and it reaches a host that declares or calls a `*Theme(…)` (or `isSystemInDarkTheme(…)`),
+  so choosing it changes something. Following the system is the default and one of the options, not
+  the only behaviour. Check id: **`settings.theme`**.
+- **At least one preference changes what the app *does*.** A value that is not about language or
+  appearance, read by app logic outside the settings surface and the data layer. A screen whose every
+  toggle changes how the app looks and none of them what it does is half a settings screen.
+  Check id: **`settings.behaviour`**.
+- **Every preference survives the process.** `preferencesDataStore` in the data layer (the dependency
+  is already declared, so this is its consumer), written through `edit { }` / `updateData { }`,
+  consumed by a ViewModel that hands the screen a `StateFlow`, with the screen naming no `DataStore`
+  type. A store declared inside the surface, or read directly by a composable, puts persistence in
+  the UI layer where it cannot be tested or previewed. Check id: **`settings.persistence`**.
+- **Every `R.string.<name>` the surface names is declared in the default resource file.** A reference
+  to a string nobody declares does not compile, and a name declared only in `values-<locale>/` is
+  Android's missing-default-resource error rather than a translation. This is the one string fact no
+  other rule owns — literals belong to `locale.hardcoded`, locale trees to `slot.locales`.
+  Check id: **`settings.strings`**.
+- **The scaffold carries the surface before any slot does.** `scaffold/android-compose/` is what every
+  new slot is copied from, so a finding there is the count of slots that would be born without
+  settings. The scaffold has no grandfathering, and these rows are **expected to be red until the
+  orchestrator wires the scaffold's own screen into `PlayKilnApp.kt`** — the wiring is the fix, and
+  the check is never weakened to make it pass. Check ids: the seven above, run against the scaffold.
+- **This rule and this module agree, or neither is trustworthy.** `settings.documented` fails if
+  `.cursor/rules/app-settings.mdc` stops naming `scripts/core/settings.mjs` or stops naming a check id.
+  A rule text that has drifted from its sensor is a rule nobody follows. Check id:
+  **`settings.documented`**.
+- **Applicability is derived, not hand-maintained.** The rule took effect **2026-09-30**. The slots
+  that already exist carry their findings as a printed note rather than a permanent red row through
+  `scripts/core/baseline.mjs` — a slot that is not a product (no `economics.json`), a killed slot, and
+  a slot created before that date. Every slot created from now on is gated. A note is not a pass.
+
+## What is required, and what is refused as padding
+
+Three categories are required, because each is a question the user actually asks and each is
+verifiable: **which language** (the system picker that already exists), **light or dark** (the two
+palettes the app already owns and can currently only reach by following the system), and **at least one
+behaviour preference** that a real code path reads. Anything beyond that has to earn its row.
+
+Refused, with the reason this line is drawn:
+
+- **A second in-app language picker while `android:localeConfig` is declared.** It would be a second
+  source of truth for one value, and the system picker is the one the platform, the launcher and the
+  app all agree on
+  (<https://developer.android.com/guide/topics/resources/app-languages>).
+- **A stored language tag in DataStore when the system already stores it.** Same defect, one layer down.
+- **"Clear cache"**, when the slot has no cache. A control with no observable effect teaches the user
+  that Settings is decoration.
+- **A notifications toggle**, when the slot posts no notification and declares no `POST_NOTIFICATIONS`.
+  A switch for a permission the app does not need is padding in the shape of a feature, and it
+  contradicts the permission-minimisation baseline.
+- **"Rate this app" / "Share"**, which are actions that leave the app rather than preferences that
+  change it. Nothing about the app's behaviour changes, so the sensor can never judge them.
+- **Animation speed, developer options, or any debug switch**, which are not user preferences.
+- **A settings search field for four groups.** Search earns its place in a long list; in a list of
+  four rows it is noise that has to be translated forever.
+- **A version/legal row that duplicates About.** The scaffold already has an About destination; two
+  places showing one fact is two places to update and one to forget.
+- **A privacy-policy row as a *settings* requirement.** The policy must be reachable from inside the
+  app (`AGENTS.md`, Play compliance floor), but the settings screen is not required to be where it
+  lives — that is a placement decision, not a preference.
+- **A settings screen with no preference read outside it.** That is theatre, and it is what
+  `settings.behaviour` exists to make unshippable.
+
+## What is banned
+
+- A settings surface that is a screen of switches nothing reads.
+- A route to settings that no affordance opens, or a `NavEntry` key with nothing pointing at it.
+- An in-app language picker beside a declared `localeConfig`, an unguarded
+  `LocaleManager.applicationLocales` write, `AppCompatDelegate.setApplicationLocales` in a host that
+  is not an `AppCompatActivity`, or `createConfigurationContext` / `applyOverrideConfiguration`
+  rebuilding the locale beside the framework's own machinery.
+- `preferencesDataStore(…)` declared inside the settings surface, a composable naming `DataStore`, or
+  a store with no writer (which can only ever return its defaults).
+- An `R.string.<name>` in a settings screen that no default resource file declares.
+- A dynamic-colour switch below API 31. The platform feature does not exist there, so the row must be
+  unavailable and say so rather than be a switch that silently does nothing
+  (<https://developer.android.com/develop/ui/views/theming/dynamic-colors>).
+- Weakening `settings.reachable` or the scaffold rows to make a wiring task look finished.
+- A second check for hardcoded copy or for touch targets: those belong to `locale.hardcoded` and
+  `uiux.a11y`. A duplicate is a second thing to drift, not extra safety.
+
+## Boundary
+
+This rule owns the **existence, reachability, contents and persistence** of the settings surface:
+that there is a place to change language, appearance and behaviour, that the app offers a route into
+it, that every preference it shows is read somewhere, and that the choices survive the process. It
+does **not** own the copy pipeline (`locale.*`, `.cursor/rules/localization.mdc`), the touch-target
+and accessible-name rules (`uiux.a11y`, `.cursor/rules/ui-ux-baseline.mdc`), the navigation host and
+the IME/inset behaviour (`uiux.navigation`, `uiux.insets`, same rule), or the palette and identity of
+the screen (`.cursor/rules/visual-identity.mdc`). Those produce the *shape* this surface is built
+from; this rule must not restate them, and they must not restate the four shapes here.
+
+The rows are shaped the way they are because of that boundary, not by preference: each row is one
+focus target with the whole row clickable and at least 48 dp tall, and the accessibility decisions
+are the ones the Compose accessibility guidance and `uiux.a11y` require
+(<https://developer.android.com/develop/ui/compose/accessibility>), so this rule states the pattern
+once and lets `uiux.a11y` measure it. The M3 list/switch/radio vocabulary is the published pattern
+for a settings list (<https://m3.material.io/components/switch/overview>), and the settings route is
+an ordinary key on the same back stack the host owns, so predictive back pops it like any other
+destination (`.agents/skills/android-official/navigation-navigation-3/SKILL.md`; the list also has to
+clear the system bars, `.agents/skills/android-official/system-edge-to-edge/SKILL.md`).
+
+## How it is verified
+
+```bash
+node scripts/verify.mjs                 # the invariants group runs settingsFixtures() and settingsProjectChecks()
+node scripts/verify.mjs --slot <slug>   # adds the ui group: the seven settings.* checks for one slot
+
+# the sensor on its own, in the shape a reviewer can paste
+node --input-type=module -e "import('./scripts/core/settings.mjs').then(m=>console.log(JSON.stringify(m.settingsFindings('apps/<slot>'),null,2)))"
+```
+
+- `scripts/core/settings.mjs` is the sensor. It reads Kotlin, XML and the build files **as source**,
+  never pixels and never Gradle; it spawns no process.
+- Findings are `file:line` strings, so a fix is a diff and not a reading. `settingsFindings()` is the
+  whole set; `settingsAudit()` keeps them per check id.
+- The check ids are `settings.surface`, `settings.reachable`, `settings.language`, `settings.theme`,
+  `settings.behaviour`, `settings.strings` and `settings.persistence` (each run against one slot, and
+  against the scaffold by `settingsProjectChecks()`), plus `settings.documented` for this file.
+- `settingsFixtures()` runs in the `invariants` group and drives every check with a synthetic tree
+  whose verdict is known — including the tree that must be clean, because a sensor that fires on
+  everything is as useless as one that fires on nothing.
+- The **DataStore** dependency is already declared, so this rule adds no dependency and needs no
+  justification beyond its use; the published pattern it follows — store in the data layer, a `Flow`
+  through a repository or ViewModel, `IOException` degraded to `emptyPreferences()` — is
+  <https://developer.android.com/topic/libraries/architecture/datastore>.
+
+## Deliberate under-approximations, named
+
+A static scan that guesses produces false positives, and a noisy gate is read past. These are
+**deliberately not taken**, and the reason is part of the rule:
+
+- **It cannot prove a preference reaches the pixels.** `settings.theme` proves the value is read in a
+  file that is a theme host; whether the resulting `ColorScheme` is used, or the switch looks right,
+  is not visible statically.
+- **A preference read by a branch that is never taken passes.** `settings.behaviour` proves the
+  identifier is read outside the surface and the data layer, not that the read changes what the user
+  sees. Pairing the read with an observable effect stays with the builder and the owner's review.
+- **A UI-state mirror is not the settings model.** A `data class` inside a `settings/` package is used
+  only when nothing outside such a package declares a settings value at all, so a screen holding its
+  own copy of `themeMode` cannot stand in for a persisted setting. The inverse is accepted: a value
+  declared in `data/` and never persisted would be missed, which is why `settings.persistence` asks
+  about the store separately.
+- **`settings.behaviour` cannot judge whether the behaviour is worth a setting.** It requires one
+  non-appearance, non-language preference that something reads; naming the *right* one is a design
+  decision, and the honest floor is one real one rather than a count.
+- **Whether a row is a single accessible target is `uiux.a11y`'s finding, not this module's.** The
+  screen is written so it is, and the sensor that measures it is not this one.
+- **The strings check reads the default resource file, not what the screen renders.** A resource
+  declared and never used, or a translated name with no default, is outside it.
+- **Nothing here checks back-stack correctness or predictive back.** The settings route is an ordinary
+  destination on the host's own back stack, and Navigation 3's own behaviour is measured by
+  `uiux.navigation` and by running the app, not by this scan.

@@ -1,6 +1,6 @@
 # Google Play upload checklist — Mark Book for Teachers
 
-- [ ] Run `python scripts/store-kit.py --slot teacher-gradebook --validate-only` and resolve every FAIL.
+- [ ] Run `python scripts/store/validate.py --slot teacher-gradebook` and resolve every FAIL.
 - [ ] Inspect every captured screen for personal or test data.
 - [ ] Compare listing claims and captions with the release build.
 - [ ] Replace placeholder contact email and privacy-policy URL in `listing.json`.

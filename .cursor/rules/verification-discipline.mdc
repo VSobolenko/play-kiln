@@ -12,8 +12,8 @@ style preferences; they are the fix.
 ## Never claim a script works until it ran
 
 - Writing a script is half the job. Run it on real input before reporting it done.
-- "The code looks correct" is not evidence. `node scripts/selftest.mjs` and
-  `node scripts/verify-slot.mjs` are evidence.
+- "The code looks correct" is not evidence. `node scripts/verify.mjs` is evidence, and the inline
+  fixture set each check carries is what makes its own claim falsifiable.
 - If a script cannot be run, say so explicitly instead of implying it works.
 
 ## Recursive copies must filter
@@ -61,7 +61,8 @@ style preferences; they are the fix.
 
 ## Every repeated defect earns a regression check
 
-- When a defect is fixed, add a check to `scripts/selftest.mjs` that fails on the
-  old behaviour, then confirm the check fails when you reintroduce the defect.
+- When a defect is fixed, add a check to the inline fixture set of the module that owns the rule
+  (`scripts/core/*.mjs`, run by `node scripts/verify.mjs`) that fails on the old behaviour, then
+  confirm the check fails when you reintroduce the defect.
 - A check that cannot fail is not a check. Verify the sensor before trusting it.
 - Record what happened in `harness/lessons.md` (symptom → root cause → fix class).

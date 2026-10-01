@@ -1,0 +1,117 @@
+---
+description: A slot is born multilingual, not translated later - localization is a build input
+globs: apps/**,scaffold/**
+alwaysApply: false
+---
+
+# A slot is born multilingual, not translated later
+
+The defect this rule fixes is ordering, not coverage. `apps/2026-09-26-teacher-gradebook` is
+localized — 11 languages, 518 keys each, `slot.locales` green — and the owner still said
+(translated) *"localization must always be there, from the start"*, then: **do not repair that app,
+make sure the next apps cannot repeat it.** The app is fine; the pipeline that produced it is not.
+A brand-new slot is copied from `scaffold/android-compose/`, that scaffold ships `res/values/` alone
+and a `locales_config.xml` naming `en` alone, so every new slot starts monolingual and translation
+becomes a catch-up task. Retrofitting eleven locale trees onto a finished UI is the most expensive
+way to do the cheapest part of the work, and it is where the placeholder trap below gets stepped in.
+
+Measured 2026-09-30, so nobody re-argues the wrong gap:
+
+- **`locales_config.xml` ⟷ `values-<locale>/` agreement is COVERED.** `scripts/core/policy.mjs`
+  `localeProblems()` fails both directions, and `scripts/check-locales.mjs` says the same at its
+  lines 247-268. Do not add a second check for it.
+- **Completeness is COVERED.** The same function fails per key on `is missing '<key>' … so it falls
+  back to English`, on a stale key, on a format-argument mismatch and on a missing plural category.
+- **A translation being a placeholder is OPEN**, and **a slot being born multilingual is OPEN** —
+  `localeProblems()`'s own fixture is *"a slot that declares no additional language is reported
+  honestly, not as a defect"*. Those two gaps are what `scripts/core/localization.mjs` owns, and
+  nothing else.
+
+`docs/localization-standards.md` is the standard; the citations live there.
+
+## Rules
+
+- **Localization is a build input, decided at stage 1, not at `/release`.** The locale set is chosen
+  with the identity and the promise list, before the UI is styled: the first screen is written
+  against resources from its first commit, and at least one language besides the default exists in
+  `res/values-<locale>/` before the slot is called done. A slot that ships monolingual has not
+  deferred a task, it has chosen a different product than the one the factory produces.
+- **Every user-facing string is a resource.** No prose literal reaches a composable:
+  `Text("Starter action complete")` is a string that no translator can reach and no pseudolocale can
+  stretch. `stringResource(R.string.…)` is the only route. Accessibility text counts — a
+  `contentDescription` in a literal is copy a screen reader reads in the wrong language.
+- **A `values-<locale>/` tree must contain a translation, not a copy and not a placeholder.**
+  Copying `res/values/` into `res/values-ru/` and intending to come back is the clone the sensor
+  fails; `TODO`, `[translate]`, `Lorem ipsum` and `U+FFFD` are the sentinels it fails. Half-finished
+  is a state to report in writing, never to make look finished.
+- **The repository is the source of truth for a translation.** `values-<locale>/` is git-tracked,
+  diffable and reviewable. Machine output may be a starting point only if a human reviews it and it
+  is frozen into `values-<locale>/`; it is never left living only in Play Console. This is the same
+  rule `AGENTS.md` states, and **Play Console's automatic string translation stays off for every
+  language the slot already translates** — enabling it *overrides* the git-tracked translations
+  ("Any existing translations for these languages will be overridden",
+  <https://support.google.com/googleplay/android-developer/answer/9844778?hl=en>), and switching the
+  feature back off discards them. Nothing here relaxes that rule; the placeholder sensor is its
+  build-side half, because a pasted machine translation in git is the same loss with a longer fuse.
+- **A pseudolocale is a device option, never a shipped language.** `en-XA` and `ar-XB` exist so the
+  layout can be tested against longer and mirrored text *before* a translation exists — Android's own
+  documented answer to "does the layout survive a longer language"
+  (<https://developer.android.com/guide/topics/resources/pseudolocales>). They are enabled from
+  **Settings → System → Developer options → Pseudolocales**, they are never declared in
+  `locales_config.xml`, and no `values-en-rXA/` tree is ever committed. A shipped pseudolocale offers
+  a debug language to real users; the sensor fails it.
+- **The pseudolocale test runs before the phase-1 review, not after the first translation.** With
+  `en-XA` on, every resource string is stretched and every hardcoded literal stays English and
+  unstretched — which is exactly how a hardcoded string becomes visible. A slot that cannot be
+  pseudolocale-tested has copy the translator will never see.
+- **Adding a language is a declaration plus a tree, in one change.** Never declare a locale ahead of
+  its `values-<locale>/`; `slot.locales` fails that, and correctly — the picker would offer a
+  language that changes nothing.
+- **Applicability is derived, not hand-maintained.** The rule took effect **2026-09-30**. A slot that
+  is not a product (`apps/2026-09-22-smoke`, `apps/2026-09-23-pipe-proof` — no `economics.json`), a
+  killed slot, and a slot created before that date carry their findings as a printed note rather than
+  a red row, through `scripts/core/baseline.mjs`. Every slot created from now on is gated.
+
+## What is banned
+
+- A slot whose `locales_config.xml` declares only its default language.
+- A `values-<locale>/` directory that is a copy of `values/`, or that contains a sentinel
+  (`TODO`, `[translate]`, `Lorem ipsum`, `U+FFFD`) instead of a translation.
+- User-facing prose compiled into a Kotlin literal — `Text("…")`, `contentDescription = "…"`.
+- An `en-XA` / `ar-XB` tag in `locales_config.xml`, or a committed `values-en-rXA/` /
+  `values-ar-rXB/` tree.
+- A second check for locale-config agreement or for key coverage. Both are owned; a duplicate is a
+  second thing to drift, not extra safety.
+- Enabling Play Console's automatic string translation for a language the slot already translates.
+
+## Boundary
+
+This rule owns the **translation pipeline** and the **born-multilingual shape**: where copy lives,
+how many languages a slot declares, and whether a declared tree is a real translation. It does not
+own **layout survival** — whether the longest locale's words fit a pill, a tab row or a headline, and
+whether the type scale and the strip remain legible under `en-XA`/`ar-XB` and under real translated
+lengths. That belongs to the text-layout and typography rule. This rule produces the *input* to that
+test (all copy in resources, pseudolocales enabled) and hands the *finding* over; it must not
+restate a layout constraint, and the layout rule must not restate the two shapes here.
+
+## How it is verified
+
+```bash
+node scripts/verify.mjs # the invariants group runs localizationFixtures() and localizationProjectChecks()
+node scripts/verify.mjs --slot <slug> # adds the ui group: the four locale.* checks for one slot
+
+# the sensor, on its own, in the shape a reviewer can paste
+node --input-type=module -e "import('./scripts/core/localization.mjs').then(m=>console.log(JSON.stringify(m.localizationFindings('apps/<slot>'),null,2)))"
+```
+
+- `locale.multilingual` — a slot declares and ships more than its default language.
+- `locale.placeholder` — a declared tree is a translation, not a copy or a sentinel.
+- `locale.hardcoded` — no user-facing prose is compiled into a composable.
+- `locale.pseudolocale` — no pseudolocale is declared or shipped.
+- `locale.scaffold.multilingual` / `locale.scaffold.hardcoded` — the **factory's** half:
+  `scaffold/android-compose/` must carry the shape, or every slot created from it is born wrong.
+  These are red until the scaffold ships a second language, deliberately: a check whose own false
+  green was its first observation is the failure mode this repository retired.
+
+A note is not a pass. A finding reported under `baseline.mjs`'s exemption is a defect that exists and
+is printed, and a `UNVERIFIED` verdict means the tree could not be read — never that it is clean.

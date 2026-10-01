@@ -15,7 +15,7 @@
  * Run: node scripts/test-in-app-policy.mjs
  */
 import fs from 'node:fs'
-import os from 'node:os'
+import { SCRATCH_DIR } from './lib/scratch.mjs'
 import path from 'node:path'
 import { evaluateInAppPolicy } from './lib/in-app-policy.mjs'
 
@@ -42,7 +42,7 @@ const OTHER_URL = 'https://example.invalid/some-other-policy'
  * what most of these cases are.
  */
 function makeSlot({ listing = null, values = {}, locales = {}, kotlin = {} } = {}) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kiln-in-app-policy-'))
+  const dir = fs.mkdtempSync(path.join(SCRATCH_DIR, 'kiln-in-app-policy-'))
   sandboxes.push(dir)
   if (listing !== null) {
     fs.mkdirSync(path.join(dir, 'store'), { recursive: true })
@@ -265,7 +265,7 @@ console.log('\n=== T13: a placeholder address is not a policy yet ===')
     kotlin: { 'Main.kt': screen() }
   })
   const { verdict, rows } = run(seeded)
-  check('store-kit.py\'s seeded placeholder is UNVERIFIED, not FAIL', verdict === 'UNVERIFIED', `verdict ${verdict}`)
+  check('the pack renderer\'s seeded placeholder is UNVERIFIED, not FAIL', verdict === 'UNVERIFIED', `verdict ${verdict}`)
   check(
     'and it says why, so nobody reads it as "policy handled"',
     rows.some((row) => row.status === 'UNVERIFIED' && /placeholder/.test(row.message)),

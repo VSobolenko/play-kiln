@@ -5,6 +5,7 @@
     <string name="home_about_action" translatable="true">About</string>
     <string name="home_intro" translatable="true">A focused starting point, ready to become your app.</string>
     <string name="home_idea_label" translatable="true">The idea</string>
+    <string name="home_pick_section" translatable="true">Choose a section to open it here.</string>
     <string name="home_primary_action" translatable="true">Try the starter action</string>
     <string name="home_primary_action_again" translatable="true">Run it again</string>
     <string name="home_status_ready" translatable="true">Ready when you are</string>
@@ -15,4 +16,25 @@
     <string name="about_back" translatable="true">Back</string>
     <string name="about_body" translatable="true">%1$s began as a PlayKiln starter: native Kotlin, Material 3, accessible controls, and a small architecture meant to be replaced by the real product.</string>
     <string name="about_privacy_note" translatable="true">This starter requests no permissions and sends no data.</string>
+
+    <!-- Settings. Every preference here is read by code outside the settings screen, because a
+         control that changes nothing teaches the user that Settings is decoration. -->
+    <string name="settings_title" translatable="true">Settings</string>
+    <string name="settings_back" translatable="true">Back</string>
+    <string name="settings_appearance_header" translatable="true">Appearance</string>
+    <string name="settings_theme_supporting" translatable="true">Choose how the app looks.</string>
+    <string name="settings_theme_system" translatable="true">Follow system</string>
+    <string name="settings_theme_light" translatable="true">Light</string>
+    <string name="settings_theme_dark" translatable="true">Dark</string>
+    <string name="settings_dynamic_color_title" translatable="true">Use wallpaper colours</string>
+    <string name="settings_dynamic_color_supported" translatable="true">Build the palette from the device wallpaper.</string>
+    <string name="settings_dynamic_color_unsupported" translatable="true">Not available on this version of Android.</string>
+    <string name="settings_language_header" translatable="true">Language</string>
+    <string name="settings_language_title" translatable="true">App language</string>
+    <string name="settings_language_summary" translatable="true">Choose the language this app uses.</string>
+    <string name="settings_language_summary_legacy" translatable="true">Change the language in Android settings.</string>
+    <string name="settings_language_unavailable" translatable="true">This device has no per-app language settings.</string>
+    <string name="settings_behaviour_header" translatable="true">Behaviour</string>
+    <string name="settings_haptics_title" translatable="true">Vibration feedback</string>
+    <string name="settings_haptics_summary" translatable="true">Vibrate when you run the main action.</string>
 </resources>

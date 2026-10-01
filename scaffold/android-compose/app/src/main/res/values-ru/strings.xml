@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">__APP_NAME__</string>
+    <string name="app_idea" translatable="true">__IDEA__</string>
+    <string name="home_about_action" translatable="true">О приложении</string>
+    <string name="home_intro" translatable="true">Собранная точка старта, готовая стать вашим приложением.</string>
+    <string name="home_idea_label" translatable="true">Идея</string>
+    <string name="home_pick_section" translatable="true">Выберите раздел, чтобы открыть его здесь.</string>
+    <string name="home_primary_action" translatable="true">Попробовать действие</string>
+    <string name="home_primary_action_again" translatable="true">Повторить</string>
+    <string name="home_status_ready" translatable="true">Готово, когда вы готовы</string>
+    <string name="home_status_complete" translatable="true">Действие выполнено</string>
+    <string name="home_snackbar_completed" translatable="true">Действие выполнено.</string>
+    <string name="home_snackbar_already_completed" translatable="true">Действие уже выполнено.</string>
+    <string name="about_title" translatable="true">Об этом приложении</string>
+    <string name="about_back" translatable="true">Назад</string>
+    <string name="about_body" translatable="true">%1$s начиналось как шаблон PlayKiln: нативный Kotlin, Material 3, доступные элементы управления и небольшая архитектура, предназначенная для замены настоящим продуктом.</string>
+    <string name="about_privacy_note" translatable="true">Шаблон не запрашивает разрешений и не отправляет данные.</string>
+
+    <string name="settings_title" translatable="true">Настройки</string>
+    <string name="settings_back" translatable="true">Назад</string>
+    <string name="settings_appearance_header" translatable="true">Внешний вид</string>
+    <string name="settings_theme_supporting" translatable="true">Выберите, как выглядит приложение.</string>
+    <string name="settings_theme_system" translatable="true">Как в системе</string>
+    <string name="settings_theme_light" translatable="true">Светлая</string>
+    <string name="settings_theme_dark" translatable="true">Тёмная</string>
+    <string name="settings_dynamic_color_title" translatable="true">Цвета обоев</string>
+    <string name="settings_dynamic_color_supported" translatable="true">Построить палитру по обоям устройства.</string>
+    <string name="settings_dynamic_color_unsupported" translatable="true">Недоступно в этой версии Android.</string>
+    <string name="settings_language_header" translatable="true">Язык</string>
+    <string name="settings_language_title" translatable="true">Язык приложения</string>
+    <string name="settings_language_summary" translatable="true">Выберите язык, который использует приложение.</string>
+    <string name="settings_language_summary_legacy" translatable="true">Измените язык в настройках Android.</string>
+    <string name="settings_language_unavailable" translatable="true">На этом устройстве нет настроек языка для приложений.</string>
+    <string name="settings_behaviour_header" translatable="true">Поведение</string>
+    <string name="settings_haptics_title" translatable="true">Виброотклик</string>
+    <string name="settings_haptics_summary" translatable="true">Вибрировать при выполнении основного действия.</string>
+</resources>

@@ -50,7 +50,7 @@ identity and need an explicit instruction in the current conversation
 ## 2. Store pack
 
 ```bash
-python scripts/store-kit.py --slot <slug>
+python scripts/store/render.py --slot <slug>
 ```
 
 Writes listing copy, privacy, data-safety, review notes, icon, feature graphic and both
@@ -70,7 +70,7 @@ installed **release** build — `media-capture.mjs` proves that chain and refuse
 ## 4. Verify and grade
 
 ```bash
-node scripts/verify-slot.mjs --slot <slug> --strict-store --build
+node scripts/verify.mjs --slot <slug> --build
 node scripts/check-economics.mjs --slot <slug>
 node scripts/kiln-status.mjs
 ```
@@ -92,7 +92,7 @@ node scripts/play-upload.mjs --slot <slug>   # only after the first manual uploa
 - Never commit, never push, never upload, never publish without an explicit instruction in
   the current conversation.
 - Never generate or rotate a signing key on your own initiative.
-- Evidence before "done": `verify-slot` output plus a read diff, never a self-report.
+- Evidence before "done": `verify.mjs` output plus a read diff, never a self-report.
 - Report the release phase's elapsed wall clock separately from development time.
 
 ## Output

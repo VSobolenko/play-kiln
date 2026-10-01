@@ -1,6 +1,6 @@
 # Store pack
 
-Run `scripts/store-kit.py` from the PlayKiln repository root to generate and validate the complete Google Play store pack for a slot. Agents edit `store/listing.json` as the single source of truth; generated listing Markdown and graphics metadata must not become competing sources.
+Run `scripts/store/render.py` from the PlayKiln repository root to generate the complete Google Play store pack for a slot, and `scripts/store/validate.py` to validate it. Agents edit `store/listing.json` as the single source of truth; generated listing Markdown and graphics metadata must not become competing sources.
 
 The finished pack contains:
 

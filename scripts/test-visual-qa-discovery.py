@@ -28,6 +28,8 @@ import importlib.util
 import pathlib
 import sys
 import tempfile
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from lib.scratch import SCRATCH_DIR
 
 HERE = pathlib.Path(__file__).resolve().parent
 VISUAL_QA = pathlib.Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else HERE / "visual-qa.py"
@@ -83,7 +85,7 @@ def main() -> int:
         print(f"\nVERDICT: {'FAIL' if failures else 'PASS'}")
         return 1
 
-    with tempfile.TemporaryDirectory(prefix="pk-visual-qa-discovery-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="pk-visual-qa-discovery-", dir=SCRATCH_DIR) as tmp:
         slot = pathlib.Path(tmp)
         expected = write_palette(slot, "com.gexetr.zetaslot")
         check(
@@ -138,7 +140,7 @@ val Character = '/'
         else:
             check(False, "two candidate themes fail closed instead of grading an arbitrary one")
 
-    with tempfile.TemporaryDirectory(prefix="pk-visual-qa-empty-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="pk-visual-qa-empty-", dir=SCRATCH_DIR) as tmp:
         try:
             module.theme_dir(pathlib.Path(tmp))
         except SystemExit as error:
@@ -149,7 +151,7 @@ val Character = '/'
         else:
             check(False, "a slot with no Color.kt fails closed and names the file it wanted")
 
-    with tempfile.TemporaryDirectory(prefix="pk-visual-qa-kotlin-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="pk-visual-qa-kotlin-", dir=SCRATCH_DIR) as tmp:
         slot = pathlib.Path(tmp)
         expected = write_palette(slot, "com.example.kotlinroot", "kotlin")
         try:

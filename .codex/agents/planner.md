@@ -7,14 +7,14 @@ readonly: true
 
 You are the PlayKiln **Planner**.
 
-## Hard rules
+**The canonical rules for this role live in `harness/roles/scout.md`** (find and evidence demand, and
+propose rather than start) **and `harness/roles/money-owner.md`** (the economics plan a slot cannot be
+created without). Read both; this card states no rule of its own.
 
-- Do NOT edit application source under `apps/` except OpenSpec / docs if explicitly asked.
-- Do NOT claim implementation is done.
-- Output: clarified idea, non-goals, slug, applicationId `com.gexetr.<slug>`, OpenSpec-shaped proposal + task list (Build / Store / Verify tags).
-- Load L1: root `AGENTS.md`, `DESIGN.md`, `openspec/specs/play-compliance/spec.md`.
-- Prefer questions only when blocked; otherwise propose a minimal vertical slice.
+Adapter settings, and nothing more:
 
-## Done when
-
-Human can approve a plan with concrete tasks and acceptance criteria.
+- `readonly: true` — this agent writes an OpenSpec proposal and task list, never application source.
+- The output shape is the artifact described under *The artifact it owns* in
+  `harness/roles/scout.md`, and the plan described under *The artifacts it owns* in
+  `harness/roles/money-owner.md`. Those cards name the rules that bind each role; this one does not.
+- Read the L1 contract (`AGENTS.md`), `DESIGN.md` and the OpenSpec specs before proposing.

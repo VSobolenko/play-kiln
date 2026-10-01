@@ -22,7 +22,7 @@ different documents (`checklist.md` vs `release-notes.md`) with independent defe
 failure should name the file that owns the rule instead of blurring a shared verdict line.
 
 An earlier change in this repository let a suite print FAIL rows while exiting 0, and a verifier
-caught it. This suite exits non-zero the moment a leg fails, and `scripts/selftest.mjs` reads that
+caught it. This suite exits non-zero the moment a leg fails, and the verifier reads that
 exit code. `validate_store` prints its own PASS/FAIL rows, so its output is captured instead of
 leaked - the rows this process writes are only its own verdicts.
 
@@ -35,15 +35,20 @@ import io
 import sys
 import tempfile
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lib.scratch import SCRATCH_DIR
 
-# Keep the import of `store-kit.py` from writing a `scripts/__pycache__` entry.
+# Keep the import of `scripts/store/render.py` from writing a `scripts/__pycache__` entry.
 sys.dont_write_bytecode = True
 
 ROOT = Path(__file__).resolve().parents[1]
 
-spec = importlib.util.spec_from_file_location("store_kit", ROOT / "scripts" / "store-kit.py")
+spec = importlib.util.spec_from_file_location("store_render", ROOT / "scripts" / "store" / "render.py")
 assert spec and spec.loader
 kit = importlib.util.module_from_spec(spec)
+# Registered before execution: the renderer declares dataclasses, and Python 3.13 cannot create one
+# whose module is absent from `sys.modules` (`dataclasses._is_type` looks up `cls.__module__`).
+sys.modules.setdefault("store_render", kit)
 spec.loader.exec_module(kit)
 
 results: list[tuple[bool, str]] = []
@@ -91,7 +96,7 @@ def make_slot(declarations: list[str], *, billing: bool, extra_sources: dict | N
     reference that must not parse. Returns ``(slot, store, listing)``. The Kotlin file always
     exists, so "no declaration" is a real absence rather than a missing app directory.
     """
-    slot = Path(tempfile.mkdtemp(prefix="checklist-products-"))
+    slot = Path(tempfile.mkdtemp(prefix="checklist-products-", dir=SCRATCH_DIR))
     source = slot / SOURCE_RELATIVE
     source.parent.mkdir(parents=True)
     source.write_text(
@@ -122,19 +127,28 @@ def checklist_text(store: Path) -> str:
     return (store / "checklist.md").read_text(encoding="utf-8")
 
 
-def validated(store: Path, listing: dict) -> tuple[bool, str]:
-    """`validate_store`'s verdict and its captured stdout.
-
-    `validate_store` returns a single bool, so the legs read its *report* rather than an internal
-    list: the printed PASS/FAIL row is what a human sees, and asserting on it keeps the check tied to
-    the output the defect lived in. The stdout is captured because the suite's own rows are the only
-    rows it may print - a leaked `FAIL ` row would be re-emitted by `selftest.mjs` as a factory
-    failure for a leg that passed.
-    """
-    buffer = io.StringIO()
-    with contextlib.redirect_stdout(buffer):
-        ok = kit.validate_store(store, listing, ["en-US"], skip_provenance=True)
-    return ok, buffer.getvalue()
+# --- A recorded loss: the pack validator's `billing` row has no successor -------------------------
+#
+# Six legs used to live here, and they were not about the checklist: they asserted the **pack
+# validator's** `PASS billing` / `FAIL billing` rows (`validate_store(billing enabled but no
+# declared product ID)`), and that the failure sentence was built from `PRODUCT_ID_DECLARATION`
+# rather than restated by hand. That rule existed in exactly one place, `scripts/store-kit.py`,
+# which `reduce-factory-to-core` §5.3 deletes, and the replacement validator
+# (`scripts/store/validate.py`) reads the **pack** — assets, listing text, provenance — and prints
+# no billing row at all. The legs are therefore removed rather than re-pointed, because a leg that
+# asserts a row no program prints is a leg that cannot fail.
+#
+# What survives and is still checked below: every checklist leg, including the two that name the
+# real product IDs a billing slot's Kotlin declares (`render.declared_product_ids`) and the legs
+# that prove a non-billing slot is handed no selling steps. `scripts/store/render.py` also carries
+# the invariant the FAIL row encoded — a billing-enabled slot with no declared ID produces a
+# checklist whose product list is empty, which is visible in the generated text.
+#
+# The missing rule needs a home with the review it deserves: as a further row in
+# `scripts/store/validate.py` (which moves that program's measured verdict, 73 PASS / 8 FAIL on
+# `teacher-gradebook`, so the pin has to be re-measured with it) or as a check in `scripts/core/`,
+# which is where the per-run gate lives. Until then the rule is unenforced, and this note is the
+# record of it rather than a silent deletion.
 
 
 # --- The extractor reads real Kotlin, not a guess ------------------------------------------------
@@ -281,42 +295,9 @@ check(
     and "License testing" not in text,
     "a non-billing slot's checklist carries no product or license-tester step, even when its source declares one",
 )
-_, output = validated(store, listing)
-check(
-    "PASS billing" not in output and "FAIL billing" not in output,
-    "a non-billing slot is not measured against the billing product rule",
-)
-
-# --- Billing with no declared ID is a reported failure -------------------------------------------
-
-
-slot, store, listing = make_slot([], billing=True)
-_, output = validated(store, listing)
-check(
-    any(row.startswith("FAIL billing") for row in output.splitlines()),
-    "billing enabled with no declared product ID is reported as a FAIL row",
-)
-check(
-    any(
-        row.startswith("FAIL billing") and kit.PRODUCT_ID_DECLARATION.pattern in row
-        for row in output.splitlines()
-    ),
-    "the failure message is built from the declaration rule itself, not restated by hand",
-)
-
-slot, store, listing = make_slot([literal("harbour_unlock")], billing=True)
-_, output = validated(store, listing)
-check(
-    not any(row.startswith("FAIL billing") for row in output.splitlines()),
-    "a billing slot that declares a product ID is not failed for it",
-)
-check(
-    any(
-        row.startswith("PASS billing") and "harbour_unlock" in row
-        for row in output.splitlines()
-    ),
-    "the declared product IDs are printed as a PASS row naming them",
-)
+# The pack validator's billing rows are recorded as a loss above; these three legs asserted them.
+# Their subject — a non-billing slot is handed no products it does not sell — is still covered by
+# the checklist legs that follow.
 
 failed = sum(1 for ok, _ in results if not ok)
 print(f"\n{len(results) - failed}/{len(results)} checks passed")

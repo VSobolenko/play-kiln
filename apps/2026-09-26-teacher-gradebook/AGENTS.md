@@ -30,7 +30,7 @@ Play floors, and isolation.
 From repo root:
 
 ```bash
-node scripts/verify-slot.mjs --slot teacher-gradebook
+node scripts/verify.mjs --slot teacher-gradebook
 ```
 
 Eval report: `.kiln/eval.md` (written by `/eval`).

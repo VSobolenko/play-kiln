@@ -10,7 +10,7 @@
  */
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
-import { tmpdir } from 'node:os'
+import { SCRATCH_DIR } from './lib/scratch.mjs'
 import path from 'node:path'
 import process from 'node:process'
 
@@ -178,7 +178,7 @@ refuses(
  *        allowlist: only paths that cannot change the built APK may differ. Defaulting to "rebuild"
  *        for anything unlisted is what keeps a new build input from being silently ignorable. */
 {
-  const repo = mkdtempSync(path.join(tmpdir(), 'kiln-buildin-'))
+  const repo = mkdtempSync(path.join(SCRATCH_DIR, 'kiln-buildin-'))
   const git = (...args) => spawnSync('git', args, { cwd: repo, encoding: 'utf8' })
   git('init', '-q')
   git('config', 'user.email', 'test@example.invalid')
@@ -284,7 +284,7 @@ refuses(
  *        true and attested a capture to a tree whose sources were gone. Every case below except the
  *        controls returned the wrong answer before `--no-renames` was added. */
 {
-  const repo = mkdtempSync(path.join(tmpdir(), 'kiln-rename-'))
+  const repo = mkdtempSync(path.join(SCRATCH_DIR, 'kiln-rename-'))
   const git = (...args) => spawnSync('git', args, { cwd: repo, encoding: 'utf8' })
   git('init', '-q')
   git('config', 'user.email', 'test@example.invalid')

@@ -17,7 +17,8 @@
  */
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
-import { hostname, tmpdir } from 'node:os'
+import { SCRATCH_DIR } from './lib/scratch.mjs'
+import { hostname } from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { pathToFileURL } from 'node:url'
@@ -47,7 +48,7 @@ function check(label, condition, detail) {
 }
 
 function sandbox() {
-  return mkdtempSync(path.join(tmpdir(), 'kiln-slot-lock-'))
+  return mkdtempSync(path.join(SCRATCH_DIR, 'kiln-slot-lock-'))
 }
 
 function cleanup(dir) {

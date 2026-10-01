@@ -47,9 +47,9 @@ const UPLOAD_API = 'https://androidpublisher.googleapis.com/upload/androidpublis
 const SCOPE = 'https://www.googleapis.com/auth/androidpublisher'
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024
 const MAX_FEATURE_BYTES = 15 * 1024 * 1024
-// The exact canvases `scripts/store-kit.py` renders, so an upload cannot be attempted with a size
+// The exact canvases `scripts/store/render.py` renders, so an upload cannot be attempted with a size
 // the pack does not produce. Phone and 7-inch are both 1080x1920 (the console's 9:16 rule), and
-// 10-inch is 1440x2560; `scripts/verify-slot.mjs` reads the same numbers from store-kit.py.
+// 10-inch is 1440x2560; `scripts/verify.mjs` reads the same numbers from render.py.
 const TARGETS = {
   phoneScreenshots: { prefix: 'phone', count: 6, width: 1080, height: 1920 },
   sevenInchScreenshots: { prefix: 'tablet-7', count: 4, width: 1080, height: 1920 },

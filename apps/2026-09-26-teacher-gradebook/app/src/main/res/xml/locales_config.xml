@@ -8,7 +8,7 @@
       the translations now exist, so the list is real rather than aspirational.
 
       Adding a locale here without adding its `values-<locale>/` directory is the defect this comment
-      exists to prevent. `scripts/verify-slot.mjs` checks the two agree.
+      exists to prevent. `scripts/verify.mjs` checks the two agree.
 
       Translation is not a fallback chain: a string missing from one locale falls back to English
       per-string, so a partial translation degrades to English words rather than to a blank or a crash.

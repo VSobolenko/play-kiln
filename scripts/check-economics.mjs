@@ -72,7 +72,7 @@ function listAppDirs() {
 }
 
 /**
- * Resolve a slot the way `scripts/verify-slot.mjs` does: an exact directory name or
+ * Resolve a slot the way `scripts/verify.mjs` does: an exact directory name or
  * a `<date>-<slug>` suffix, and only when exactly one candidate matches, so an
  * ambiguous slug fails instead of silently picking one.
  */

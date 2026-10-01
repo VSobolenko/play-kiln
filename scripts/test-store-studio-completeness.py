@@ -2,7 +2,7 @@
 
 The defect these exist for: `render_slot` used to `continue` past a missing or unreadable raw
 capture, leaving the PREVIOUS run's composed asset in place. The resulting pack mixed two capture
-runs, yet `store-kit --validate-only` and `verify-slot --strict-store` both reported OK because
+runs, yet `store-kit --validate-only` and `verify.mjs` both reported OK because
 neither looks at where the pixels came from. A solid red frame at the right dimensions was accepted
 as a real screenshot the same way.
 
@@ -11,12 +11,36 @@ is never touched.
 """
 from __future__ import annotations
 
+import atexit
 import importlib.util
 import json
 import shutil
 import sys
 import tempfile
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lib.scratch import SCRATCH_DIR
+
+# Every copy `sandbox()` has made this run, removed when the process ends.
+#
+# This is not tidiness: each copy is the whole slot, measured at 0.41 GB on 2026-10-01, and the suite
+# makes several per run. Left behind, repeated runs accumulated 20 copies and 8.2 GB — and until
+# 2026-10-01 they were written to the machine's *system* temp directory, which is what the owner
+# reported as a filled temp folder and a machine that took 30 seconds to five minutes to become
+# usable. That measurement is why `.cursor/rules/workspace-hygiene.mdc` exists, and why the copies now
+# live under the repository's own scratch directory.
+#
+# `atexit` rather than a `finally` around each leg: a leg that raises must still clean up, and the
+# sandbox is referenced from several call sites, so the process, not the call site, owns the lifetime.
+_SANDBOXES: list[Path] = []
+
+
+def _remove_sandboxes() -> None:
+    for parent in _SANDBOXES:
+        shutil.rmtree(parent, ignore_errors=True)
+
+
+atexit.register(_remove_sandboxes)
 
 ROOT = Path(__file__).resolve().parent.parent
 SLOT = ROOT / "apps" / "2026-09-25-pipe-sizing"
@@ -39,6 +63,9 @@ def load_studio():
     spec = importlib.util.spec_from_file_location("store_studio", ROOT / "scripts" / "store-studio.py")
     assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)
+    # Registered before execution: store-studio.py declares dataclasses, and Python 3.13 cannot
+    # create one whose module is not in `sys.modules` (see `scripts/store-studio.py`'s loader).
+    sys.modules.setdefault("store_studio", module)
     spec.loader.exec_module(module)
     return module
 
@@ -51,7 +78,8 @@ def sandbox() -> Path:
     studio rather than in the harness, so retry until the copied manifests parse.
     """
     for _ in range(5):
-        target = Path(tempfile.mkdtemp(prefix="studio-sandbox-")) / SLOT.name
+        target = Path(tempfile.mkdtemp(prefix="studio-sandbox-", dir=SCRATCH_DIR)) / SLOT.name
+        _SANDBOXES.append(target.parent)
         shutil.copytree(SLOT, target)
         try:
             for name in ("journey.json", "studio.json", "listing.json"):
@@ -139,7 +167,7 @@ def main() -> int:
           str(studio.EXPECTED_COMPOSED_ASSETS))
 
     # 6. The exact attack from the review: a solid colour rectangle of the right dimensions, which
-    #    both store-kit --validate-only and verify-slot --strict-store accepted as a real shot.
+    #    both store-kit --validate-only and verify.mjs accepted as a real shot.
     from PIL import Image as PILImage
 
     slot = sandbox()

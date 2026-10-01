@@ -138,7 +138,7 @@ function defaultLanguage(slot) {
         .toLowerCase()
       if (/^[a-z]{2,3}$/.test(tag)) return tag
     } catch {
-      // A malformed listing is store-kit's business, not this check's; fall through to the default.
+      // A malformed listing is scripts/store/render.py's business, not this check's; fall through to the default.
     }
   }
   return 'en'

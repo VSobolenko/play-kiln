@@ -1,0 +1,133 @@
+---
+description: The UI/UX baseline every slot is born with — Navigation 3, adaptive layout, text that can grow, motion, accessible names, IME insets
+globs: apps/**,scaffold/**
+alwaysApply: false
+---
+
+# The interface is a build input, not a coat of paint
+
+The owner reviewed the factory's first live app, `apps/2026-09-26-teacher-gradebook`, on 2026-09-30
+and said (translated) that the interface was crude, that it did not use modern technologies, and that
+**"strings wrap badly, like two words spread over seven lines."** Then: **do not repair that app —
+make sure the next apps cannot repeat it.** That app is frozen. This rule is what replaces it.
+
+The measured starting position, re-measured in this tree:
+
+- `scaffold/android-compose/…/ui/PlayKilnApp.kt` **already** imports `androidx.navigation3.ui.NavDisplay`
+  and calls `NavDisplay(` at line 51 — and then hands it a hand-rolled `SnapshotStateList` and a
+  `listSaver` (lines 21–49) instead of the back stack Navigation 3 owns.
+- Every shipped slot copied that. `apps/2026-09-26-teacher-gradebook/…/ui/PlayKilnApp.kt:87` is the
+  same `mutableStateListOf` / `listSaver` pair. The cost is not style: Navigation 3 keys its
+  transitions, its predictive-back continuity, its scene strategies and its deep-link handling off
+  the back stack it is given, so a hand-rolled list makes all four inert at once.
+- `WindowSizeClass`, `currentWindowAdaptiveInfo`, `ListDetailSceneStrategy` and the rest of the
+  adaptive vocabulary appeared **nowhere in this repository**. A five-destination app with a list and
+  a detail screen
+  (`Destination.Classes → Destination.Classroom → Destination.Student → Destination.GradeSheet`)
+  rendered the detail *instead of* the list on a tablet, in one column stretched to a width no text
+  was set for.
+- `ClassroomScreen.kt:145` and `Brand.kt:440` clamp a label with `maxLines = 1` and no `overflow`,
+  which is `TextOverflow.Clip` — the default. `Average.kt:266` puts a `TextButton` holding a label
+  inside `Modifier.size(width = 96.dp, height = 48.dp)`. Those are boxes that cannot grow, and at a
+  font scale above 1.0 they are the mechanism behind the sentence the owner read.
+- Neither the slot nor the scaffold declares `android:windowSoftInputMode="adjustResize"` or applies
+  the IME inset, while `ClassroomTabs.kt:445` shows a text field the keyboard can cover.
+
+`docs/ui-ux-standards.md` is the standard, with the citations. `scripts/core/uiux.mjs` is the sensor,
+and it is the only thing that measures this rule.
+
+## Rules
+
+- **Navigation is hosted by Navigation 3, on the back stack Navigation 3 owns.** `NavDisplay` with
+  `rememberNavBackStack(…)`, `NavEntry` per destination, and a saved state the host understands. A
+  `rememberSaveable` + `mutableStateListOf` + `listSaver` back stack is the defect this rule exists
+  for. Check id: **`uiux.navigation`**.
+- **A slot with more than one destination reads the window size class.** At least one of
+  `currentWindowAdaptiveInfo()` / `WindowSizeClass` / `calculateWindowSizeClass`, or a scene strategy
+  (`ListDetailSceneStrategy`, `SupportingPaneSceneStrategy`), or `NavigationSuiteScaffold`, or
+  `GridCells.Adaptive`. A list that opens a detail destination must state its two-pane policy.
+  Check id: **`uiux.adaptive`**.
+- **Text can wrap, and it can grow.** No fixed `Modifier.width` / `height` / `size` on an element that
+  holds text, and no `maxLines = 1` without an `overflow`. Text is sized by the Material 3 type
+  scale, never shrunk to fit a box; a container grows around its label instead of clipping it.
+  Check id: **`uiux.text-layout`**.
+- **A multi-screen slot animates.** One of `NavDisplay`'s own transitions, `AnimatedContent`,
+  `AnimatedVisibility`, `Crossfade`, `animateContentSize`, `SharedTransitionLayout`, `AnimatedPane`,
+  `updateTransition`, `Animatable`, `animateItem` or `animate*AsState`. An instant swap has nothing
+  for predictive back to preview. Check id: **`uiux.motion`**.
+- **Every interactive element has a name, and every target is at least 48 dp.** An `Icon`/`Image`
+  passes a label or an explicit `null`; a clickable element carries a `Text`, a non-null
+  `contentDescription` or an `onClickLabel`; nothing declares an extent below `48.dp`.
+  Check id: **`uiux.a11y`**.
+- **Edge-to-edge, and the keyboard is placed.** `enableEdgeToEdge()` in the activity — mandatory at
+  `targetSdk 36` — plus, whenever the slot shows a text field, `adjustResize` in the manifest **and**
+  an IME inset (`imePadding()`, `fitInside(WindowInsetsRulers.Ime…)` or `WindowInsets.ime`). The IME
+  is not a system bar and `Scaffold`'s default insets do not carry it. Check id: **`uiux.insets`**.
+- **The scaffold carries all of the above before any slot does.** `scaffold/android-compose/` is what
+  every new slot is copied from, so a finding there is the count of slots that would be born with the
+  defect. Check id: **`uiux.scaffold`** — this check is expected to be **red** until the orchestrator
+  wires the scaffold, and it must never be weakened to make it pass.
+- **This rule and this module agree, or neither is trustworthy.** `uiux.rule` fails if
+  `.cursor/rules/ui-ux-baseline.mdc` stops naming a check id, if `docs/ui-ux-standards.md` stops
+  citing one of the sources the rules rest on, or if a vendored skill a citation points at is
+  deleted. A rule text that has drifted from its sensor is a rule nobody follows.
+  Check id: **`uiux.rule`**.
+
+## What is banned
+
+- A hand-rolled back stack behind `NavDisplay`, and a navigation host driven by a list it does not own.
+- `Modifier.width(96.dp)` / `Modifier.size(...)` / `Modifier.height(...)` around a label, a chip, a
+  pill, a button caption or a table cell.
+- `maxLines = 1` with no `overflow` — which renders as `TextOverflow.Clip` and cuts a glyph in half.
+- Shrinking a font, or a `fontSize` below the type scale, to make a string fit a box the layout chose.
+- A single-column layout for a list and its detail on a tablet or an unfolded phone.
+- A hard cut between screens where a transition belongs.
+- An icon-only control with no accessible name, and a declared touch target below 48 dp.
+- A text field the keyboard can cover, and an app that does not go edge-to-edge at `targetSdk 36`.
+- Weakening `uiux.scaffold` to make a wiring task look finished. The scaffold is the point.
+
+## How it is verified
+
+```bash
+node scripts/verify.mjs                       # runs `uiux.project` in the `invariants` group
+node scripts/verify.mjs --slot <slug>         # runs the six `uiux.*` slot checks, in the `ui` group
+node --input-type=module -e "import('./scripts/core/uiux.mjs').then(m=>console.log(m.uiuxFindings('apps/<slot>')))"
+node --input-type=module -e "import('./scripts/core/uiux.mjs').then(m=>console.log(m.textLayoutFindings('apps/<slot>')))
+```
+
+- `scripts/core/uiux.mjs` is the sensor; it reads Kotlin and XML source, **never pixels, never Gradle**.
+  It runs no build and spawns no process.
+- Findings are `file:line` strings, so a fix is a diff and not a reading. `uiuxFindings()` is the
+  whole set; `textLayoutFindings()` is the wrapping/typography subset the owner's review was about.
+- Applicability is derived by `scripts/core/baseline.mjs`, not restated here: a slot created before
+  `2026-09-30` (the four that already exist), a pipeline proof with no `economics.json`, and a killed
+  slot carry the finding as a **note** inside a PASS; a slot created from today is gated. A finding
+  that exists and is not reported would read exactly like a finding that is not there, so the note is
+  printed either way.
+- `uiuxFixtures()` runs in the `invariants` group and drives every sensor with a synthetic slot tree
+  whose verdict is known, so a sensor that has stopped being able to fail is visible in the same
+  report as the slots it judges.
+
+## Deliberate under-approximations, named
+
+A static scan that guesses produces false positives, and a noisy gate is read past. These proxies are
+**deliberately not taken**, and the reason is part of the rule:
+
+- **A `Text` with no `maxLines` is not a finding.** An unclamped `Text` in a filling or weighted
+  container wrapping onto three lines is correct behaviour and is not in scope; the rule fires only on
+  `maxLines = 1` *without* an `overflow`.
+- **`contentDescription = null` is accepted, not flagged.** Whether an icon is decorative depends on
+  the screen around it. Rule `uiux.a11y` fires on an `Icon`/`Image` with **no `contentDescription`
+  argument at all**, which is the provable half.
+- **A declared extent below 48 dp is checked; an undeclared one is not.** A target that is too small
+  because it was never declared cannot be seen statically. `uiux.a11y` catches the declared number,
+  which is the case that is provable.
+- **A span that already uses `weight(` is skipped by `uiux.text-layout`.** A weighted child is
+  flexible by construction, so firing there would be noise. This under-approximates: a fixed extent
+  inside a weighted child is missed.
+- **`widthIn` / `heightIn` are not fixed extents.** `heightIn(min = 48.dp)` is the *correct* idiom for
+  a touch target, and a rule that fired on it would punish the fix for `uiux.a11y`.
+- **The scan cannot see a wrapped string.** It names the statically visible *causes* of forced
+  wrapping — a box that cannot grow, a clamp that cannot indicate truncation. `docs/ui-ux-standards.md`
+  says this in the same words, and the manual half (a `@PreviewFontScales` render, a real device at a
+  200 % font scale) stays with the builder and the owner.

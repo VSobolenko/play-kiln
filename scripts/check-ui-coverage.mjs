@@ -5,7 +5,7 @@
  * Five UI screens were restyled in parallel, and one of them dropped the add/edit controls for notes
  * and parent contacts while leaving the read-only list in place. Nothing caught it: the removed code
  * was inside files the compiler still accepted, the domain tests exercise `RecordBookEditor` directly
- * so every edit operation still passes, and `verify-slot.mjs` checks form - it builds, it finds the
+ * so every edit operation still passes, and `verify.mjs` checks form - it builds, it finds the
  * store pack complete, it reads the manifest - none of which can see a button that no longer exists.
  *
  * The signal this script uses is a dangling ViewModel operation. A ViewModel method that no screen
@@ -27,7 +27,7 @@
  * slot with no ViewModel under `ui/` printed "nothing to check", and a slot whose ViewModels share none
  * of these names printed "0 reachable, 0 reported as notes". An independent review reproduced it on
  * `apps/2026-09-25-pipe-sizing` — a green line for a check that structurally cannot go red, printed by
- * `verify-slot.mjs` for every slot unconditionally. That is precisely what
+ * `verify.mjs` for every slot unconditionally. That is precisely what
  * `.cursor/rules/verification-discipline.mdc` forbids ("a check that cannot fail is not a check"), so
  * the two ways of checking nothing are now `UNVERIFIED` (exit 2) rather than `PASS`: the honest
  * statement is "this check cannot speak for this slot", and it stops a release from being called green
@@ -146,7 +146,7 @@ function main() {
     // This used to be a PASS. It is not one: with no ViewModel under `ui/` there is no operation to
     // compare against any claim, so the check has measured nothing and must not be read as a clean
     // result. Exit 2 is the repository's convention for exactly this ("measured once, unverified
-    // now"), and `verify-slot.mjs` turns it into UNVERIFIED rather than a green line.
+    // now"), and `verify.mjs` turns it into UNVERIFIED rather than a green line.
     console.log(
       `UNVERIFIED ui-coverage - ${path.basename(slot)} declares no ViewModel under ui/, so nothing ` +
         'about the listing\'s claims could be checked. Point REQUIRED at this slot\'s own operations ' +

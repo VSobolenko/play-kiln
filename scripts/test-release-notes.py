@@ -23,13 +23,18 @@ import re
 import sys
 import tempfile
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lib.scratch import SCRATCH_DIR
 
 ROOT = Path(__file__).resolve().parents[1]
 LIMIT = 500
 
-spec = importlib.util.spec_from_file_location("store_kit", ROOT / "scripts" / "store-kit.py")
+spec = importlib.util.spec_from_file_location("store_render", ROOT / "scripts" / "store" / "render.py")
 assert spec and spec.loader
 kit = importlib.util.module_from_spec(spec)
+# Registered before execution: the renderer declares dataclasses, and Python 3.13 cannot create one
+# whose module is absent from `sys.modules` (`dataclasses._is_type` looks up `cls.__module__`).
+sys.modules.setdefault("store_render", kit)
 spec.loader.exec_module(kit)
 
 results: list[tuple[bool, str]] = []
@@ -60,7 +65,7 @@ COMPLIANCE = {
 
 def build_slot(locales: list[str], manifest: dict | None) -> tuple[Path, Path, Path]:
     """A temp slot with a generated store pack, returning (slot, store, notes path)."""
-    slot = Path(tempfile.mkdtemp(prefix="release-notes-"))
+    slot = Path(tempfile.mkdtemp(prefix="release-notes-", dir=SCRATCH_DIR))
     store = slot / "store"
     store.mkdir(parents=True)
     listing = kit.default_listing(META, locales, COMPLIANCE)
@@ -167,7 +172,7 @@ check(len(kit.validate_release_notes(store3, "1.2.3 (7)", {}, [])) > 0, "release
 # The format is Play's, because the block is pasted verbatim into the console. These legs pin the
 # format down: tags name the locale, they sit on their own lines, and the body may span lines.
 
-plain = Path(tempfile.mkdtemp(prefix="release-notes-parse-")) / "release-notes.md"
+plain = Path(tempfile.mkdtemp(prefix="release-notes-parse-", dir=SCRATCH_DIR)) / "release-notes.md"
 plain.write_text(
     "# Notes\n\n**Use:** `4.5.6 (8)`\n\n## What's new\n\n"
     "```text\n"
@@ -188,7 +193,7 @@ check(
 # Play's documented requirement is that the tags sit on their own lines. An inline tag is therefore
 # not recognised, and the locale is reported missing rather than silently mis-parsed — which is what
 # makes this a real rule rather than a formatting preference.
-inline = Path(tempfile.mkdtemp(prefix="release-notes-inline-")) / "release-notes.md"
+inline = Path(tempfile.mkdtemp(prefix="release-notes-inline-", dir=SCRATCH_DIR)) / "release-notes.md"
 inline.write_text(
     "# Notes\n\n**Use:** `4.5.6 (8)`\n\n```text\n<en-US>The first release.</en-US>\n```\n",
     encoding="utf-8",
@@ -202,7 +207,7 @@ check(
 
 # Text outside any fence is prose about the notes, not the notes. Only the pasted block counts, so a
 # stray mention of a locale in the surrounding explanation cannot be mistaken for a note.
-stray = Path(tempfile.mkdtemp(prefix="release-notes-stray-")) / "release-notes.md"
+stray = Path(tempfile.mkdtemp(prefix="release-notes-stray-", dir=SCRATCH_DIR)) / "release-notes.md"
 stray.write_text(
     "# Notes\n\n**Use:** `4.5.6 (8)`\n\nNever write English under a `<fr-FR>` tag.\n\n"
     "```text\n<en-US>\nThe first release.\n</en-US>\n```\n",

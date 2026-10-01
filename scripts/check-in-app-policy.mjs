@@ -26,7 +26,7 @@ function usage(error) {
   process.exit(2)
 }
 
-/** Resolves a slot the same way `verify-slot.mjs` does: an exact directory name, or a unique `-<slug>`
+/** Resolves a slot the same way `verify.mjs` does: an exact directory name, or a unique `-<slug>`
  *  suffix. Two matches is ambiguous and is refused rather than guessed. */
 function resolveSlotDir(slug) {
   const appsDir = path.join(root, 'apps')

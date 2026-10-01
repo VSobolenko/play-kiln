@@ -10,7 +10,7 @@ description: How to run the PlayKiln factory and a slot's Android build. Use whe
 ```bash
 node scripts/setup-mcp.mjs
 node scripts/check-economics.mjs --slot <slug>          # money gate: plan vs enabled capabilities
-node scripts/verify-slot.mjs
+node scripts/verify.mjs
 ```
 
 Creating a slot requires an approved economics plan **and** a promise contract, and both come first:

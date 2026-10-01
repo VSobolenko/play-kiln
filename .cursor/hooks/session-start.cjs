@@ -47,7 +47,7 @@ const extra = [
   '`node scripts/approve-release.mjs --slot <slug> --note "<the owner\'s own words>"`.',
   'Commands: /ship <idea> (develop; also continues existing work), /release <slug>, /eval, /kiln-status, /improve-harness.',
   'Agents: planner, generator, evaluator, play-auditor, android-debugger.',
-  'Gate: node scripts/verify-slot.mjs — never self-PASS. Never record an approval yourself.',
+  'Gate: node scripts/verify.mjs — never self-PASS. Never record an approval yourself.',
   'Full contract: AGENTS.md · DESIGN.md · .cursor/rules/release-gate.mdc · harness/cursor-surface.md'
 ].join('\n')
 

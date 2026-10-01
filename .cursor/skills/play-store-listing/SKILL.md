@@ -6,8 +6,8 @@ description: Produce Google Play listing assets and copy for a PlayKiln slot (ti
 # Play Store listing pack
 
 Release-phase work. Rendering assets and capturing screenshots requires the owner's recorded
-approval (`.cursor/rules/release-gate.mdc`); drafting copy with `store-kit.py --init` and
-validating an existing pack with `--validate-only` are safe during development.
+approval (`.cursor/rules/release-gate.mdc`); drafting copy with `scripts/store/render.py --init` and
+validating an existing pack with `scripts/store/validate.py` are safe during development.
 
 Create `apps/<slot>/store/`:
 

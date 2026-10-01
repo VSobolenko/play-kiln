@@ -14,8 +14,8 @@ export const FEATURE_GRAPHIC = Object.freeze({ width: 1024, height: 500, formats
 // page): "Соотношение сторон изображения должно составлять 16:9 или 9:16". Phone, 7-inch and
 // 10-inch share the sentence, so it is one constant here rather than a per-kind key.
 //
-// `store-kit.py` -> `SCREENSHOT_ASPECT_RATIOS` remains the authoritative copy (it is what renders
-// and validates the pack, and what `scripts/verify-slot.mjs` reads); this export exists so a
+// `scripts/store/render.py` -> `SCREENSHOT_ASPECT_RATIOS` remains the authoritative copy (it is what
+// renders and validates the pack, and what `scripts/verify.mjs` reads); this export exists so a
 // caller of this library applies the same rule rather than trusting `maxAspectRatio: 2`, which is
 // Play's weaker general-Requirements cap and never the console's aspect requirement.
 export const SCREENSHOT_ASPECT_RATIOS = Object.freeze([Object.freeze([16, 9]), Object.freeze([9, 16])])
@@ -25,9 +25,9 @@ export const SCREENSHOT_ASPECT_RATIOS = Object.freeze([Object.freeze([16, 9]), O
 // `min` is the LOWEST count the factory accepts, not Play's absolute floor of 2.
 // Play's general Requirements section allows as few as 2 phone screenshots, but
 // its large-screen section requires "a minimum of 4 screenshots", and the factory
-// ships 6 (`scripts/store-kit.py` -> `SCREEN_TARGETS["phone"]`). Keeping the
-// weaker reading here while `scripts/verify-slot.mjs` enforced 4 meant the library
-// and the gate disagreed; `scripts/store-kit.py` is authoritative for this rule.
+// ships 6 (`scripts/store/render.py` -> `SCREEN_TARGETS["phone"]`). Keeping the
+// weaker reading here while `scripts/verify.mjs` enforced 4 meant the library
+// and the gate disagreed; `scripts/store/render.py` is authoritative for this rule.
 // Source: https://support.google.com/googleplay/android-developer/answer/9866151?hl=en
 export const PHONE_SCREENSHOTS = Object.freeze({
   min: 4,
@@ -56,7 +56,7 @@ if (PHONE_SCREENSHOTS.largeFormat.minCount !== PHONE_SCREENSHOTS.min) {
 // a caption, a device mock-up — so its luminance varies and it carries many
 // colours. A solid fill, a one-colour placeholder, or a frame whose render failed
 // has neither, yet every dimension/mode/format check calls it valid. Both
-// `store-kit --validate-only` and `verify-slot --strict-store` accepted a solid
+// `store-kit --validate-only` and `verify.mjs` accepted a solid
 // red 1080x1920 PNG as a screenshot because nothing ever looked at a pixel; these
 // floors close that hole.
 //

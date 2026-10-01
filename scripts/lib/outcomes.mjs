@@ -50,9 +50,9 @@ export const OPTIONAL_COUNT_FIELDS = Object.freeze(['refundCount', 'ratingCount'
  * The four verdicts `scripts/check-outcomes.mjs` can print.
  *
  * `NO-DATA` and `TOO-EARLY` are honest refusals rather than passes: a slot nobody has measured and
- * a slot whose window is still open are both unjudgeable, and `scripts/check-freshness.mjs` already
- * established the convention in this repository that "measured once, unverified now" exits 2 and
- * can never be read as green.
+ * a slot whose window is still open are both unjudgeable, and the fact ledger
+ * (`scripts/core/facts.mjs`) already established the convention in this repository that
+ * "measured once, unverified now" is reported as `UNVERIFIED` and can never be read as green.
  */
 export const VERDICTS = Object.freeze({
   NO_DATA: 'NO-DATA',

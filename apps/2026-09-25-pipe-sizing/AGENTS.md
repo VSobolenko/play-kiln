@@ -30,7 +30,7 @@ Play floors, and isolation.
 From repo root:
 
 ```bash
-node scripts/verify-slot.mjs --slot pipe-sizing
+node scripts/verify.mjs --slot pipe-sizing
 ```
 
 Eval report: `.kiln/eval.md` (written by `/eval`).

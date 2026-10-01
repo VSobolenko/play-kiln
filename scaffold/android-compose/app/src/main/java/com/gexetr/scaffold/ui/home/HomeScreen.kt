@@ -28,6 +28,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -41,6 +43,8 @@ import com.gexetr.scaffold.ui.theme.PlayKilnTheme
 @Composable
 fun HomeRoute(
     onNavigateToAbout: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+    hapticsEnabled: Boolean,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(),
 ) {
@@ -49,6 +53,8 @@ fun HomeRoute(
         state = state,
         onEvent = viewModel::onEvent,
         onAboutClick = onNavigateToAbout,
+        onSettingsClick = onNavigateToSettings,
+        hapticsEnabled = hapticsEnabled,
         modifier = modifier,
     )
 }
@@ -60,8 +66,11 @@ fun HomeScreen(
     onEvent: (HomeEvent) -> Unit,
     modifier: Modifier = Modifier,
     onAboutClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
+    hapticsEnabled: Boolean = false,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val haptics = LocalHapticFeedback.current
     val snackbarText = when (state.snackbarMessage) {
         HomeSnackbarMessage.ActionCompleted -> stringResource(R.string.home_snackbar_completed)
         HomeSnackbarMessage.AlreadyCompleted -> {
@@ -89,14 +98,25 @@ fun HomeScreen(
                     ) {
                         Text(stringResource(R.string.home_about_action))
                     }
+                    TextButton(
+                        onClick = onSettingsClick,
+                        modifier = Modifier.heightIn(min = 48.dp),
+                    ) {
+                        Text(stringResource(R.string.settings_title))
+                    }
                 },
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) { innerPadding ->
+    ) {         innerPadding ->
         HomeContent(
             state = state,
-            onEvent = onEvent,
+            onPrimaryAction = {
+                // The one preference that changes what the app *does* rather than how it looks.
+                // `settings.behaviour` fails a toggle nothing reads, and this is where it is read.
+                if (hapticsEnabled) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                onEvent(HomeEvent.PrimaryActionClicked)
+            },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
@@ -109,7 +129,7 @@ fun HomeScreen(
 @Composable
 private fun HomeContent(
     state: HomeUiState,
-    onEvent: (HomeEvent) -> Unit,
+    onPrimaryAction: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val statusText = stringResource(
@@ -163,7 +183,7 @@ private fun HomeContent(
             modifier = Modifier.semantics { stateDescription = statusText },
         )
         Button(
-            onClick = { onEvent(HomeEvent.PrimaryActionClicked) },
+            onClick = onPrimaryAction,
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 48.dp),

@@ -14,7 +14,7 @@
  * 24.3 % exposed system prompts; an independent scan found secrets in **35 % of 50,000 Play apps**
  * collected Aug–Oct 2025 (18,908 secrets, 1,802 verified live — Stripe keys, GitHub tokens, AI API
  * keys); and roughly **1 in 4 AI-generated code samples** carries a confirmed OWASP vulnerability.
- * The rule is `.cursor/rules/client-side-secrets.mdc` and the gate is
+ * The rule is `.cursor/rules/client-secrets.mdc` and the gate is
  * `scripts/check-client-secrets.mjs`.
  *
  * What this module claims, and what it cannot
@@ -680,7 +680,7 @@ export function googleServicesFiles(slotDir) {
  *
  * A slot with no `app/src/main/` is `UNVERIFIED`, never `PASS`: there is nothing to scan, and "nothing
  * was scanned" must not be readable as "nothing was found" — the same distinction `--build` makes in
- * `verify-slot.mjs`.
+ * `verify.mjs`.
  */
 export function scanSlot(slotDir, options = {}) {
   const { entries: exemptions, errors: exemptionErrors } = loadExemptions(slotDir)

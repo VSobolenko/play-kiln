@@ -1,6 +1,8 @@
 # Factory capability: shared capabilities
 
-## Purpose    8|Reused functionality must be implemented **once** and consumed by many slots, so
+## Purpose
+
+Reused functionality must be implemented **once** and consumed by many slots, so
 the factory does not rediscover the same integration bugs and Play-policy answers in
 every app. Capabilities are versioned artifacts, never shared source trees.
 

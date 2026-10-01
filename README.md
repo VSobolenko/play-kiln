@@ -23,10 +23,10 @@ node scripts/kiln-status.mjs
 | 1 | Approve the plan and its price | Human checkpoint 1 |
 | 1 | `/ship` → `scripts/new-slot.mjs --economics <path> --differentiators <path>` | Factory |
 | 1 | Codex workers implement | Factory |
-| 1 | Unit tests plus `verify-slot.mjs --build` (debug APK, no signing) | Factory |
+| 1 | Unit tests plus `verify.mjs --build` (debug APK, no signing) | Factory |
 | 1 | **Install the debug APK and approve the release** | Human checkpoint 1.5 |
-| 2 | `/release` → `prepare-release.mjs` → `store-kit.py` → `media-capture.mjs` | Factory |
-| 2 | `verify-slot.mjs --strict-store --build` → `/eval` | Factory |
+| 2 | `/release` → `prepare-release.mjs` → `store/render.py` → `media-capture.mjs` | Factory |
+| 2 | `verify.mjs --build` → `/eval` | Factory |
 | 2 | Legal declarations, first upload, publish | Human checkpoint 2 |
 | 2 | Earn, or hit the plan's kill criteria and get archived | Human checkpoint |
 
@@ -49,7 +49,7 @@ node scripts/approve-release.mjs --revoke --slot <slug>   # always safe
 ```
 
 The approval is bound to a digest of the app's build inputs, so editing the app after approving
-it invalidates the approval automatically — `prepare-release.mjs`, `store-kit.py`'s rendering
+it invalidates the approval automatically — `prepare-release.mjs`, `store/render.py`'s rendering
 paths and `media-capture.mjs` all refuse until you approve the revision you actually reviewed.
 The rule is [`.cursor/rules/release-gate.mdc`](.cursor/rules/release-gate.mdc).
 
@@ -67,10 +67,14 @@ created under `apps/<date>-<slug>/` with a unique `com.gexetr.<slug>`
 The factory tests itself, so a broken script cannot reach a slot:
 
 ```bash
-node scripts/selftest.mjs   # runs new-slot.mjs against a temp sandbox and asserts the contract
+node scripts/verify.mjs              # every project-wide check, in one process
+node scripts/verify.mjs --slot <slug> # the same, plus the slot's pack, icon, apk and project checks
 ```
 
-It also runs automatically inside `scripts/verify-slot.mjs`.
+Every check and every surviving regression suite, with the exact command that runs it, is listed in
+[`docs/factory-checks.md`](docs/factory-checks.md). The knowledge lives there rather than in a runner:
+the old `scripts/selftest.mjs` was itself a test runner running test runners, and it was retired on
+2026-09-30 (`openspec/changes/reduce-factory-to-core/`).
 
 Read the agent contract in [`AGENTS.md`](AGENTS.md), the Russian operator brief in
 [`MISSION.md`](MISSION.md), and the live-release handoff in

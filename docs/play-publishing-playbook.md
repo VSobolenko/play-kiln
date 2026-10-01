@@ -53,7 +53,7 @@ store/listing.json and listing.md
 store/assets/icon-512.png
 store/assets/feature-graphic-1024x500.png
 6 phone + 4 seven-inch + 4 ten-inch screenshots per locale
-green verify-slot --strict-store --build
+green verify.mjs --build
 accepted /eval
 ```
 
@@ -130,8 +130,7 @@ unattended. `NEEDS-VERIFICATION` marks a claim nobody has measured.
 
 **Field-level detail is deliberately not restated here.** Page paths, field names, character caps,
 asset dimensions, the exact string to paste, and which slot value feeds which field are owned by the
-generated [`docs/play-console-walkthrough.md`](play-console-walkthrough.md) (rendered from
-`scripts/lib/console-form.json`) and by the slot's own `store/console-answers.md`. This ladder
+human checklist [`docs/play-console-checklist.md`](play-console-checklist.md). This ladder
 sequences those screens; it does not duplicate them. Numbers quoted here (`Выполнено: 2 из 5`,
 `Отправить 12 изменений на проверку`) are console *forms* — another app prints other numbers.
 
@@ -153,9 +152,9 @@ sequences those screens; it does not duplicate them. Numbers quoted here (`Вы�
 
 - *Where:* `Магазин → Основная информация о магазине` (`/main-store-listing`), the five required
   image fields (icon, feature graphic, and the phone / 7-inch / 10-inch screenshot sets). Their
-  names, dimensions, counts and caps are the walkthrough's *Магазин — тексты и контакт* section.
+  names, dimensions, counts and caps are the checklist's *Магазин — тексты и контакт* section.
 - *What the human does:* uploads the files. The pack already **renders** every one of them
-  (`scripts/store-kit.py`) and `scripts/media-capture.mjs` already **produces** the screenshots, but
+  (`scripts/store/render.py`) and `scripts/media-capture.mjs` already **produces** the screenshots, but
   the upload itself cannot be done by the sandboxed browser the factory drives: the field is a
   hidden `input[type=file]` that only appears after `Добавить объекты`, and
   `DOM.setFileInputFiles` is denied by the browser sandbox. A human — or a driver that owns the
@@ -321,11 +320,12 @@ sequences those screens; it does not duplicate them. Numbers quoted here (`Вы�
 | 8 | `Проверка на наличие распространенных проблем` | `[verify]` |
 | 9 | `Изменения на проверке` / `На рассмотрении` | `[verify]` |
 
-**One contradiction to resolve, flagged rather than edited here.** The generated console model
-(`scripts/lib/console-form.json`) still says of the submit button that "сама отправка остаётся
+**One contradiction to resolve, flagged rather than edited here.** The archived console model
+(`docs/play-console-observations.json`, the frozen reading of the deleted `scripts/lib/console-form.json`)
+still says of the submit button that "сама отправка остаётся
 человеческим действием", and its `unreachable` entry `submit-dialog` records the confirm dialog as
 never read. Both were true of the 2026-09-29 18:11 reading and were falsified by the same day's
-later walk: the dialog was opened and read, and the press was performed from the console. The model
+later walk: the dialog was opened and read, and the press was performed from the console. The archive
 is owned elsewhere; this ladder records what was measured so the two do not stay in conflict.
 
 Sources: observed-console-2026-09-29 (the live RU walk of `com.gexetr.teachergradebook`: dashboard
@@ -390,11 +390,11 @@ listing that described a paid app, and no way to take money at all — every gat
 `scripts/lib/capabilities.mjs` reads that slot file and the selected
 `capabilities/<id>/capability.json` manifests. It derives the permission and collected
 data-type unions, bundled SDKs, ads presence, consent requirement, and purchase-authority
-requirement. `store-kit.py` writes those facts into `listing.json`, `data-safety.md`,
+requirement. `scripts/store/render.py` writes those facts into `listing.json`, `data-safety.md`,
 `privacy.md`, and `review-notes.md`; these fields are generated compliance evidence, not
 free-form answers.
 
-Before submission, run `node scripts/verify-slot.mjs --slot <slug> --strict-store
+Before submission, run `node scripts/verify.mjs --slot <slug>
 --build`. The strict gate compares the derived permissions with the build's merged
 manifest, rejects ads or collected-data omissions in the store pack, and rejects a
 `SERVER_COST` catalog without documented authority. Unknown capability IDs fail with
@@ -436,16 +436,19 @@ shown for that account; those account-specific rules are **NEEDS-VERIFICATION**.
 
 Sources: **NEEDS-VERIFICATION** — no official testing or production-access URL is present in `FACTS.md`.
 
-> **The ordered first-upload walkthrough is a generated document.**
-> [`docs/play-console-walkthrough.md`](play-console-walkthrough.md) (Russian) walks the console form
+> **The ordered first-upload walkthrough is a human checklist, not a rendered document.**
+> [`docs/play-console-checklist.md`](play-console-checklist.md) walks the console form
 > in the order the console presents it — the dashboard state, the ten `Контент приложения`
 > declarations, the credentials dialog, release creation, the publishing overview, and the billing
-> steps — and names where each literal value comes from. It is rendered from
-> `scripts/lib/console-form.json` by `node scripts/console-walkthrough.mjs`; the exact string to
-> paste for a given slot is printed by that same model into the slot's own
-> `store/console-answers.md` at pack-render time. Edit the model, never the document:
-> `node scripts/console-walkthrough.mjs --check` fails on a hand edit, and
-> `python scripts/test-console-answers.py` is the regression suite for the sheet.
+> steps — and names where each literal value comes from.
+>
+> The rendered document this replaced, `docs/play-console-walkthrough.md`, and its renderer
+> `scripts/console-walkthrough.mjs` were deleted by `reduce-factory-to-core` §5.2; the console model
+> they read survives only as the frozen reading
+> [`docs/play-console-observations.json`](play-console-observations.json), which no program reads.
+> The slot-level sheet `store/console-answers.md` was dropped by the same change (§14.7); the exact
+> string to paste for a given slot now comes from the slot's own pack
+> (`store/listing.json`, `store/listing.md`, `store/data-safety.md`, `store/release-notes.md`).
 
 ### 9.1 Internal testing, and the two links that are not the same link — recorded 2026-09-29
 

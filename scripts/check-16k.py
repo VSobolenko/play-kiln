@@ -32,6 +32,8 @@ import sys
 import tempfile
 import zipfile
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lib.scratch import SCRATCH_DIR
 
 PAGE_16K = 16384
 ELF_MAGIC = b"\x7fELF"
@@ -227,7 +229,7 @@ def selftest() -> int:
     # writer chooses. The ELF passes and the alignment does not, so the only complaint the run may
     # produce is about the offset. That is what makes this check discriminate rather than merely
     # reject: if the alignment branch were dead, the expected failure would not appear.
-    with tempfile.TemporaryDirectory(prefix="pk-check16k-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="pk-check16k-", dir=SCRATCH_DIR) as tmp:
         archive_path = Path(tmp) / "probe.apk"
         with zipfile.ZipFile(archive_path, "w", zipfile.ZIP_STORED) as archive:
             archive.writestr("lib/arm64-v8a/libprobe.so", elf_with_load_align(16384))

@@ -1,10 +1,10 @@
 # Play Console answers — Mark Book for Teachers
 
-<!-- kiln:generated console answers - regenerated on every store-kit.py write; edit the pack, not this file -->
+<!-- kiln:retained console answers - written by the retired store-kit.py sheet generator, no longer regenerated; edit the pack, not this file -->
 
-Every screen the Play Console asks for on a first upload, in console order, with the exact string to put in each field and the reason behind it. Regenerated from this slot's own pack on every `store-kit.py` run: editing this file changes nothing, so fix the pack and regenerate.
+Every screen the Play Console asks for on a first upload, in console order, with the exact string to put in each field and the reason behind it. It was regenerated from this slot's own pack on every `store-kit.py` run, which `reduce-factory-to-core` §5.2 deleted: this file is now a **retained artifact** of that generator and is no longer rewritten, so treat it as a reading, not as something to regenerate.
 
-`docs/play-console-walkthrough.md` is the same walk in Russian, rendered from the same model (`scripts/lib/console-form.json`), so the two cannot disagree about the form.
+`docs/play-console-walkthrough.md` was the same walk in Russian, rendered from the same model (`scripts/lib/console-form.json`); both the document and its renderer were deleted by `reduce-factory-to-core` §5.2, and the model survives only as the frozen reading `docs/play-console-observations.json`, which no program reads. The human counterpart is now `docs/play-console-checklist.md`.
 
 - Console labels are the Russian ones you will see in the console; the values are what to type. Review instructions are English because the console demands English for them.
 - A line marked `TODO-HUMAN` is not pasteable yet: it names what the pack is missing.
@@ -109,7 +109,7 @@ Console path: `Контент приложения → Реклама` (`.../app
 
 | Console field (as shown) | Limit | What to type | Why |
 |---|---:|---|---|
-| Реклама (Ads) | — | Нет, мое приложение не содержит рекламу | The declaration has to match the shipped build: verify-slot.mjs --strict-store compares it with the enabled capabilities and fails when they disagree. (from `listing.ads.containsAds`) |
+| Реклама (Ads) | — | Нет, мое приложение не содержит рекламу | The declaration has to match the shipped build: verify.mjs compares it with the enabled capabilities and fails when they disagree. (from `listing.ads.containsAds`) |
 
 Press `Сохранить` (Save) to save this screen.
 
@@ -576,7 +576,7 @@ Press `Сохранить` (Save) to save this screen.
 
 ## Machine-readable claims — do not paste
 
-`store-kit.py --validate-only` reads this block and fails when it disagrees with `listing.json`, so a sheet left behind by an older pack cannot pass as current.
+The retired `store-kit.py --validate-only` read this block and failed when it disagreed with `listing.json`, so a sheet left behind by an older pack could not pass as current. That reader is gone with the monolith; the block is retained as the record of what was pasted, and nothing checks it now.
 
 ```kiln-console-claims
 {

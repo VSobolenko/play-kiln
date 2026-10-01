@@ -23,7 +23,7 @@
 
 import { spawnSync } from 'node:child_process'
 import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
+import { SCRATCH_DIR } from './lib/scratch.mjs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
@@ -49,7 +49,7 @@ function check(ok, label) {
 
 /** A fresh fixture workspace, so no leg can inherit another leg's watermark. */
 function workspace() {
-  return mkdtempSync(path.join(tmpdir(), 'stop-gate-'))
+  return mkdtempSync(path.join(SCRATCH_DIR, 'stop-gate-'))
 }
 
 /** Write a file and give it an explicit age, so mtime comparisons never depend on timing. */

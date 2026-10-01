@@ -28,8 +28,8 @@ A slot is not styled until all of these are true.
   full `palette` (every role the renderer draws with), the per-shot `headlines` and `kickers`, the
   `featureTagline` and the `featurePill`. It is not optional and it is not documentation: it is what
   the launcher icon, the adaptive-icon vectors, the feature graphic and the store compositions are
-  rendered from, and `store-kit.py` refuses to render rather than silently falling back to the
-  generic pack. Decide the identity at stage 1, not during `/release`.
+  rendered from, and `scripts/store/render.py` refuses to render rather than silently falling back
+  to the generic pack. Decide the identity at stage 1, not during `/release`.
 - **The palette is one source of truth, shared with the app.** The colours in `studio.json` are the
   colours in the slot's `ui/theme/Color.kt`. A store pack whose palette drifted from the app's own
   theme is a screenshot of a different app; `scripts/visual-qa.py`'s `palette` section measures the
@@ -77,7 +77,7 @@ reusing a slot's identity. Derive a new one per slot from that slot's own subjec
 
 ## How it is verified
 
-- `store/studio.json` is a declaration: `scripts/verify-slot.mjs` treats a pack that declares it as
+- `store/studio.json` is a declaration: `scripts/verify.mjs` treats a pack that declares it as
   composed and requires `store/provenance.json` to bind the committed assets to a recorded build,
   so `rm store/studio.json store/provenance.json` cannot drop the check.
 - `python scripts/visual-qa.py --slot <slug>` measures the shipped pixels independently: palette
@@ -92,6 +92,6 @@ None of these can say the app is beautiful. They can say the app's declared iden
 the build, the one in the pack, and the one in the pixels — and they can say two slots do not have
 the same one. `visual-qa.py` is a **report, not a gate**: it prints per-asset PASS/FAIL rows for
 Play's own asset rules and a `stability` verdict, but it exits 0 whenever it finishes, so a clean
-run is evidence to read, never an approval — the objective gates are `scripts/verify-slot.mjs`, and
+run is evidence to read, never an approval — the objective gates are `scripts/verify.mjs`, and
 the judgement that separates a distinctive style from an ugly one stays with the owner, at the
 phase-1 review and the phase-2 approval; this rule's job is to ensure there is something to judge.

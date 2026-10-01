@@ -16,7 +16,7 @@
  * The four claims, in the order they are checked
  * ---------------------------------------------
  *   1. The store pack declares a `privacyPolicyUrl`. A pack that declares none has nothing to mirror
- *      and is reported as inapplicable — not as a pass, and not as a failure. `scripts/store-kit.py`
+ *      and is reported as inapplicable — not as a pass, and not as a failure. `scripts/store/render.py`
  *      owns whether a pack must carry one.
  *   2. That exact URL is baked into the app as a **default-locale string resource** under `values/`.
  *      A URL typed into Kotlin fails, because a translated app cannot localise an address and a
@@ -60,17 +60,20 @@ export const OPENERS = Object.freeze([
 /**
  * Hosts reserved for documentation by RFC 2606 / RFC 6761.
  *
- * A pack whose policy URL still points at one of these has no hosted policy yet: `scripts/store-kit.py`
- * seeds every new `listing.json` with `https://example.com/privacy` and reports such a value as
- * *unfinished* in the generated human-checks list. So a placeholder is not a policy the app can be
- * required to mirror, and this module answers `UNVERIFIED` rather than `FAIL` for one — which also
- * means it can never be read as green.
+ * A pack whose policy URL still points at one of these has no hosted policy yet: the pack renderer
+ * (`scripts/store/render.py`) seeds every new `listing.json` with `https://example.com/privacy` and
+ * reports such a value as *unfinished* in the generated human-checks list. So a placeholder is not a
+ * policy the app can be required to mirror, and this module answers `UNVERIFIED` rather than `FAIL`
+ * for one — which also means it can never be read as green.
  *
- * `scripts/store-kit.py` holds the same list (`PLACEHOLDER_HOSTS`), because a Python generator and a
- * Node sensor cannot import each other. Two holders of one list is the shape that has bitten this
- * factory before, so `scripts/selftest.mjs` asserts the two agree and fails if either moves: the
- * duplication is checked rather than trusted. Adding a host here without adding it there — or the
- * reverse — is a self-test failure, not a silent divergence.
+ * The Python half of the factory holds the same list — `scripts/store/model.py` reads
+ * `placeholderHosts` from `scripts/lib/play-assets.json`, the one source of truth for every Play
+ * asset rule, and `scripts/store/render.py` and `validate.py` use it. Two holders of one list is the
+ * shape that has bitten this factory before, so the agreement between this literal and the JSON
+ * **must** be asserted; since `scripts/selftest.mjs` was deleted (2026-09-30) nothing asserts it any
+ * more. That is a live hole, recorded as a finding in
+ * `openspec/changes/reduce-factory-to-core/deletions.md` §7 rather than trusted: adding a host here
+ * and not in the JSON — or the reverse — is now a silent divergence.
  */
 export const PLACEHOLDER_HOSTS = Object.freeze([
   'example.com',
@@ -83,7 +86,7 @@ export const PLACEHOLDER_HOSTS = Object.freeze([
 
 /**
  * True when a URL cannot yet be a real hosted policy: a reserved documentation host, an unparseable
- * address, or a scheme that is not http(s). Mirrors `scripts/store-kit.py`'s own predicate, including
+ * address, or a scheme that is not http(s). Mirrors `scripts/store/render.py`'s own predicate, including
  * its treatment of a non-https scheme as unfinished.
  */
 export function isPlaceholderPolicyUrl(url) {
@@ -204,9 +207,9 @@ export function evaluateInAppPolicy(slotDir, { root = path.dirname(path.dirname(
   }
 
   // A placeholder address is not a policy yet. This branch exists because the factory's own scaffold
-  // tripped the check: `store-kit.py` seeds every new pack with `https://example.com/privacy`, so every
+  // tripped the check: `scripts/store/render.py` seeds every new pack with `https://example.com/privacy`, so every
   // freshly scaffolded slot suddenly had a "policy" the app could not open. Failing there would have
-  // been wrong twice over — the pack is unfinished rather than broken, and `store-kit.py` already says
+  // been wrong twice over — the pack is unfinished rather than broken, and `scripts/store/render.py` already says
   // so. `UNVERIFIED` keeps the case out of both green and red, which is the honest verdict for it.
   if (isPlaceholderPolicyUrl(url)) {
     return {
@@ -215,7 +218,7 @@ export function evaluateInAppPolicy(slotDir, { root = path.dirname(path.dirname(
       rows: [
         {
           status: 'UNVERIFIED',
-          message: `the pack's privacyPolicyUrl is still a placeholder (${url}), so there is no hosted policy for the app to open yet; store-kit.py reports this pack unfinished`
+          message: `the pack's privacyPolicyUrl is still a placeholder (${url}), so there is no hosted policy for the app to open yet; scripts/store/render.py reports this pack unfinished`
         },
         { status: 'NOTE', message: 'a real hosted HTTPS URL in store/listing.json makes this check decide, and then the app must be able to open it' }
       ],

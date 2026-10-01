@@ -19,7 +19,7 @@
  */
 import { spawnSync } from 'node:child_process'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
+import { SCRATCH_DIR } from './lib/scratch.mjs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
@@ -28,7 +28,7 @@ import { VERDICTS, evaluateOutcomes, parseOutcomes, todayIso } from './lib/outco
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(SCRIPT_DIR, '..')
 const CHECKER = path.join(SCRIPT_DIR, 'check-outcomes.mjs')
-const SANDBOX = mkdtempSync(path.join(tmpdir(), 'kiln-outcomes-'))
+const SANDBOX = mkdtempSync(path.join(SCRATCH_DIR, 'kiln-outcomes-'))
 
 let checks = 0
 let failures = 0

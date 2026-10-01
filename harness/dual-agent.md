@@ -78,7 +78,7 @@ credentials, or a changed product decision, stop and ask the human.
 ## Acceptance and adjudication
 
 - Read the actual diff; do not trust summaries.
-- Run `node scripts/verify-slot.mjs --slot <slug> --strict-store` for a publishable
+- Run `node scripts/verify.mjs --slot <slug>` for a publishable
   slot and any narrower tests required by the change.
 - Verify signed release artifacts through `scripts/prepare-release.mjs` evidence.
 - A Verify-role FAIL returns to the current implementer once with exact evidence.

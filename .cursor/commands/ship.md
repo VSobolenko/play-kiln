@@ -82,7 +82,7 @@ no build output was copied and
 no template token or old package survived; if it reports FAIL, fix the scaffold before
 implementing anything.
 
-Every promise in `differentiators.json` starts `deferred`, and `verify-slot.mjs` fails while any
+Every promise in `differentiators.json` starts `deferred`, and `verify.mjs` fails while any
 promise is still deferred. Resolve each one as you build: `shipped` with a proof that exists in the
 slot, or `narrowed`/`dropped` in writing — with the owner's own words when the promise was `core`.
 
@@ -109,7 +109,7 @@ cheap and reversible:
 
 ```bash
 node scripts/run-slot-tests.mjs --slot <slug>          # unit tests
-node scripts/verify-slot.mjs --slot <slug> --build     # source gates + assembleDebug
+node scripts/verify.mjs --slot <slug> --build     # source gates + assembleDebug
 ```
 
 `--build` compiles with `assembleDebug` only; it does not sign or produce a release artifact.
@@ -119,10 +119,10 @@ not PASS — read the diff by hand.
 A debug APK the owner can install is the expected output
 (`app/build/outputs/apk/debug/app-debug.apk`). Installing it is how the owner judges the UI.
 
-**Do not run any release step here.** `prepare-release.mjs`, `store-kit.py` rendering and
+**Do not run any release step here.** `prepare-release.mjs`, `scripts/store/render.py` rendering and
 `media-capture.mjs` all refuse until the owner approves, and trying to work around that
-refusal is the failure this phase exists to prevent. `store-kit.py --init` (draft copy) and
-`--validate-only` stay open and are fine to use.
+refusal is the failure this phase exists to prevent. `scripts/store/render.py --init` (draft copy) and
+`scripts/store/validate.py` stay open and are fine to use.
 
 ### 5. Stop and request the owner's approval
 
@@ -145,7 +145,7 @@ your own confidence as approval.
 
 ## Guardrails
 
-- Evidence before "done": never accept Cursor or Codex self-reports without `verify-slot.mjs`
+- Evidence before "done": never accept Cursor or Codex self-reports without `verify.mjs`
   output plus a read diff.
 - Never run the release phase inside `/ship`. If the owner asks for a publish-ready build,
   that is `/release`.
@@ -158,7 +158,8 @@ your own confidence as approval.
 - Never carry an example the owner gave forward as the topic.
 - Keep slots isolated; improve the **root** harness when the same failure repeats
   (`.cursor/rules/verification-discipline.mdc`).
-- Fixing a factory defect means adding a check to `scripts/selftest.mjs` and confirming it
+- Fixing a factory defect means adding a check to the inline fixture set of the module that
+  owns the rule (`scripts/core/*.mjs`, run by `node scripts/verify.mjs`) and confirming it
   fails before the fix.
 - Report the development phase's actual elapsed wall clock. The one-hour target is a
   direction; never cite it as met.

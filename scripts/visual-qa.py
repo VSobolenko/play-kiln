@@ -7,7 +7,7 @@ from the pixels on disk, and every claim states what would have falsified it.
 Sections
 --------
 rules        the Play limits, parsed out of ``scripts/lib/play-assets.mjs`` and imported
-             from ``store-kit.py``, plus the divergences between the two
+             from ``render.py``, plus the divergences between the two
 attribution  which renderer produced each shipped asset (byte comparison of both candidates)
 inventory    size, mode, alpha, byte budget, locale-copy identity, sha256 revision
 fidelity     is the screen region inside each mock-up the real raw capture?  The region is
@@ -55,6 +55,8 @@ if str(ROOT / "scripts") not in sys.path:
     sys.path.insert(0, str(ROOT / "scripts"))
 from lib import icon_design as design  # noqa: E402  the keyline grid, the stroke scale, the marks
 from lib import icon_qa  # noqa: E402  the icon measurements this report publishes
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lib.scratch import SCRATCH_DIR
 LUMA = np.array([0.2126, 0.7152, 0.0722])
 
 
@@ -115,7 +117,7 @@ def resize_bilinear(raw: np.ndarray, size: tuple[int, int]) -> np.ndarray:
 
 
 def cover_transform(raw: np.ndarray, target: tuple[int, int]) -> np.ndarray:
-    """store-kit.cover(): scale to fill, then centre-crop."""
+    """render.cover(): scale to fill, then centre-crop."""
     height, width = raw.shape[:2]
     target_w, target_h = target
     scale = max(target_w / width, target_h / height)
@@ -165,7 +167,7 @@ def theme_dir(slot: Path) -> Path:
 def input_files(root: Path, slot: Path) -> list[Path]:
     """Every file whose content a measurement in this tool depends on."""
     store = slot / "store"
-    files = [root / "scripts" / "store-studio.py", root / "scripts" / "store-kit.py",
+    files = [root / "scripts" / "store-studio.py", root / "scripts" / "render.py",
              root / "scripts" / "lib" / "play-assets.mjs",
              store / "studio.json", store / "journey.json", store / "listing.json"]
     files += sorted((store / "captures" / "raw").glob("*.png"))
@@ -240,7 +242,7 @@ def section_rules(kit, out: dict) -> dict:
     # `... 10-дюймового планшета`, "каждая сторона ..."). These are the check's expectation - a
     # check that cannot state what it expects cannot fail - and NOT a second source of truth for
     # what the factory renders: `SCREEN_TARGETS`/`SCREENSHOT_LIMITS`/`SCREENSHOT_ASPECT_RATIOS` in
-    # store-kit.py remain that.
+    # render.py remain that.
     console_windows = {"phone": (320, 3840), "tablet-7": (320, 3840), "tablet-10": (1080, 7680)}
     aspects = kit.SCREENSHOT_ASPECT_RATIOS
 
@@ -249,14 +251,14 @@ def section_rules(kit, out: dict) -> dict:
         table = py["SCREENSHOT_LIMITS"][kind]
         if mjs[key]["minSide"] != table["min_short"]:
             divergences.append(f"{kind}: play-assets.mjs min side {mjs[key]['minSide']} "
-                               f"vs store-kit.py min_short {table['min_short']}")
+                               f"vs render.py min_short {table['min_short']}")
         if mjs[key]["maxSide"] != table["max_long"]:
             divergences.append(f"{kind}: play-assets.mjs max side {mjs[key]['maxSide']} "
-                               f"vs store-kit.py max_long {table['max_long']} "
-                               f"(store-kit is the stricter, documented intersection with Play's 3840px cap)")
+                               f"vs render.py max_long {table['max_long']} "
+                               f"(render.py is the stricter, documented intersection with Play's 3840px cap)")
         if (table["min_short"], table["max_long"]) != console_windows[kind]:
             divergences.append(
-                f"{kind}: store-kit.py window is {table['min_short']}..{table['max_long']} but the "
+                f"{kind}: render.py window is {table['min_short']}..{table['max_long']} but the "
                 f"console's own field accepts {console_windows[kind][0]}..{console_windows[kind][1]}")
         width, height = py["SCREEN_TARGETS"][kind]["size"]
         if not any(width * down == height * across or width * across == height * down
@@ -266,8 +268,8 @@ def section_rules(kit, out: dict) -> dict:
                 + " or ".join(f"{across}:{down}" for across, down in aspects)
                 + " (the console's aspect rule for every screenshot field)")
 
-    # What the slot gate actually enforces, read out of verify-slot.mjs rather than assumed.
-    gate_source = (ROOT / "scripts" / "verify-slot.mjs").read_text(encoding="utf-8")
+    # What the slot gate actually enforces, read out of verify.mjs rather than assumed.
+    gate_source = (ROOT / "scripts" / "verify.mjs").read_text(encoding="utf-8")
     gate_lower = "PHONE_SCREENSHOTS.largeFormat.minCount" in gate_source
     enforced = {
         "phone": {
@@ -284,12 +286,12 @@ def section_rules(kit, out: dict) -> dict:
                           "factory_target": py["SCREEN_TARGETS"][kind]["count"]}
     if gate_lower:
         divergences.append("phone: play-assets.mjs allows PHONE_SCREENSHOTS.min = "
-                           f"{int(mjs['PHONE_SCREENSHOTS']['min'])} but scripts/verify-slot.mjs enforces "
+                           f"{int(mjs['PHONE_SCREENSHOTS']['min'])} but scripts/verify.mjs enforces "
                            "PHONE_SCREENSHOTS.largeFormat.minCount = "
                            f"{int(mjs['PHONE_SCREENSHOTS']['largeFormatMinCount'])}; the two disagree and "
                            "the gate is the stricter, so 4-8 is the rule the factory ships against")
 
-    out["rules"] = {"play_assets_mjs": mjs, "store_kit_py": py, "divergences": divergences,
+    out["rules"] = {"play_assets_mjs": mjs, "render_py": py, "divergences": divergences,
                     "enforced": enforced}
     return out["rules"]
 
@@ -317,7 +319,7 @@ def section_attribution(kit, studio, slot: Path, out: dict) -> dict:
     delegation["load_studio_renderer_returned"] = "renderer" if renderer is not None else None
     delegation["stdout"] = [line for line in buffer.getvalue().splitlines() if line.strip()]
 
-    tmp = Path(tempfile.mkdtemp(prefix="pk-visual-qa-"))
+    tmp = Path(tempfile.mkdtemp(prefix="pk-visual-qa-", dir=SCRATCH_DIR))
     try:
         kit.render_icon(tmp / "icon-generic.png", listing)
         kit.render_feature(tmp / "feature-generic.png", listing, listing.get("defaultLocale", "en-US"))
@@ -1542,7 +1544,7 @@ def main() -> int:
         raise SystemExit(f"BLOCKED: slot '{options.slot}' resolved to {[m.name for m in matches]}")
     slot = matches[0]
 
-    kit = load_module("pk_store_kit", root / "scripts" / "store-kit.py")
+    kit = load_module("pk_store_render", root / "scripts" / "store" / "render.py")
     studio = load_module("pk_store_studio", root / "scripts" / "store-studio.py")
     manifest_before = hash_manifest(root, slot)
     result: dict = {"slot": slot.name, "root": str(root),
@@ -1559,7 +1561,7 @@ def main() -> int:
             print(f"{kind:9} play-allowed {data['play_assets_min']}-{data['play_assets_max']} "
                   f"gate-lower-bound={data['verify_slot_gate_lower_bound']} "
                   f"factory target {data['factory_target']}")
-        print("store_kit limits:", rules["store_kit_py"]["SCREENSHOT_LIMITS"])
+        print("render limits:", rules["render_py"]["SCREENSHOT_LIMITS"])
         for line in rules["divergences"]:
             print("divergence:", line)
 

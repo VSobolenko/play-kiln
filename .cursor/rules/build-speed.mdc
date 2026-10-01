@@ -20,8 +20,9 @@ the loop slower than it needed to be.
  and configuration are also paid each time.
 - Use `runGradleTasks()` from `scripts/lib/gradle.mjs`. Do not call `gradlew`
  directly from a script.
-- `scripts/selftest.mjs` asserts this contract with a fake process. Do not weaken
- that check to make a change pass.
+- `scripts/core/build.mjs`'s `build.fixtures` asserts this contract with a fake process, run by
+  `node scripts/verify.mjs`. Do not weaken
+  that check to make a change pass.
 
 ## Never disable the daemon
 

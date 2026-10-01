@@ -2,265 +2,233 @@
   {
     "id": "play-listing-text-caps",
     "claim": "A Play store listing's app name is capped at 30 characters, its short description at 80, and its full description at 4000.",
-    "source": "Play Console `Основная информация о магазине` field caps, carried by the console-form model in `scripts/lib/console-form.json` (`listing.title`, `listing.shortDescription`, `listing.fullDescription`) and measured by `scripts/store-kit.py` via `listing_limits()`; https://support.google.com/googleplay/android-developer/answer/9859152?hl=en",
+    "source": "Play Console `Основная информация о магазине` field caps, carried by the archived console reading in `docs/play-console-observations.json` (`listing.title`, `listing.shortDescription`, `listing.fullDescription`) and measured by `scripts/store/model.py` via `listing_limits()`; https://support.google.com/googleplay/android-developer/answer/9859152?hl=en",
     "sourceKind": "vendor-docs",
     "verifiedAt": "2026-09-29",
     "verifiedBy": "vendor-page",
     "expiresAfterDays": 180,
     "whereUsed": [
       "AGENTS.md",
-      "scripts/lib/console-form.json",
-      "scripts/store-kit.py",
+      "docs/play-console-observations.json",
+      "scripts/store/model.py",
       "docs/research/2026-09-22-android-play-requirements.md"
     ],
-    "enforcedBy": {
-      "script": "scripts/store-kit.py",
-      "probe": "--validate-only"
-    }
+    "enforcedBy": "assets"
   },
   {
     "id": "play-icon-asset-spec",
     "claim": "The store icon must be a 512x512 32-bit PNG with alpha, in sRGB, at most 1024 KB, and must not carry a drawn rounded mask or shadow.",
-    "source": "docs/research/2026-09-22-android-play-requirements.md §5 `Listing text and graphics`; enforced by `scripts/store-kit.py` (`MAX_ICON_BYTES`) and reported by `scripts/visual-qa.py`; https://support.google.com/googleplay/android-developer/answer/9866151?hl=en",
+    "source": "docs/research/2026-09-22-android-play-requirements.md §5 `Listing text and graphics`; enforced by `scripts/store/model.py` (`MAX_ICON_BYTES`) and reported by `scripts/visual-qa.py`; https://support.google.com/googleplay/android-developer/answer/9866151?hl=en",
     "sourceKind": "vendor-docs",
     "verifiedAt": "2026-09-29",
     "verifiedBy": "vendor-page",
     "expiresAfterDays": 180,
     "whereUsed": [
       "AGENTS.md",
-      "scripts/store-kit.py",
+      "scripts/store/model.py",
       "scripts/visual-qa.py"
     ],
-    "enforcedBy": {
-      "script": "scripts/store-kit.py",
-      "probe": "--validate-only"
-    }
+    "enforcedBy": "assets",
+    "gap": "partial only: `pack.media` asserts the 512x512 geometry, the alpha-carrying PNG form and the 1024 KB cap, but the \"no drawn rounded mask and no shadow\" half is measured only by `scripts/visual-qa.py`'s icon section, which is a report that exits 0 rather than a gate, so nothing fails if a mask is baked into the shipped icon."
   },
   {
     "id": "play-feature-graphic-spec",
     "claim": "The feature graphic must be exactly 1024x500, either JPEG or 24-bit PNG without alpha, and at most 15 MB.",
-    "source": "docs/research/2026-09-22-android-play-requirements.md §5 `Listing text and graphics`; enforced by `scripts/store-kit.py` (`MAX_FEATURE_BYTES`); https://support.google.com/googleplay/android-developer/answer/9866151?hl=en",
+    "source": "docs/research/2026-09-22-android-play-requirements.md §5 `Listing text and graphics`; enforced by `scripts/store/model.py` (`MAX_FEATURE_BYTES`); https://support.google.com/googleplay/android-developer/answer/9866151?hl=en",
     "sourceKind": "vendor-docs",
     "verifiedAt": "2026-09-29",
     "verifiedBy": "vendor-page",
     "expiresAfterDays": 180,
     "whereUsed": [
       "AGENTS.md",
-      "scripts/store-kit.py"
+      "scripts/store/model.py"
     ],
-    "enforcedBy": {
-      "script": "scripts/store-kit.py",
-      "probe": "--validate-only"
-    }
+    "enforcedBy": "assets",
+    "gap": "partial only: `pack.media` asserts the 1024x500 geometry and the 15 MB cap, but the \"JPEG or 24-bit PNG without alpha\" half is not asserted — the pack ships PNG and nothing reads its alpha channel or would accept a JPEG."
   },
   {
     "id": "play-screenshot-aspect-rule",
     "claim": "Every Play Console screenshot field states the same ratio rule in its own inline text: «Соотношение сторон изображения должно составлять 16:9 или 9:16».",
-    "source": "RU console `Стандартная страница приложения`, the inline string on the phone, 7-inch and 10-inch screenshot fields, read live 2026-09-29; recorded as the single constant `SCREENSHOT_ASPECT_RATIOS` in `scripts/store-kit.py` and asserted for every screenshot kind by `screenshot_rule_failures`; https://support.google.com/googleplay/android-developer/answer/9866151?hl=en",
+    "source": "RU console `Стандартная страница приложения`, the inline string on the phone, 7-inch and 10-inch screenshot fields, read live 2026-09-29; recorded as the single constant `SCREENSHOT_ASPECT_RATIOS` in `scripts/store/model.py` and asserted for every screenshot kind by `screenshot_rule_failures`; https://support.google.com/googleplay/android-developer/answer/9866151?hl=en",
     "sourceKind": "play-console",
     "verifiedAt": "2026-09-29",
     "verifiedBy": "live-console",
     "expiresAfterDays": 180,
     "whereUsed": [
       "AGENTS.md",
-      "scripts/store-kit.py",
+      "scripts/store/model.py",
       "scripts/lib/play-assets.mjs",
-      "scripts/verify-slot.mjs",
+      "scripts/core/assets.mjs",
       "docs/research/2026-09-22-android-play-requirements.md"
     ],
-    "enforcedBy": {
-      "script": "scripts/store-kit.py",
-      "probe": "--validate-only"
-    }
+    "enforcedBy": "assets"
   },
   {
     "id": "play-screenshot-count-and-size-windows",
     "claim": "The screenshot fields' windows differ per kind: phone takes 2..8 files with each side 320..3840, the 7-inch field up to 8 files with each side 320..3840, and the 10-inch field up to 8 files with each side 1080..7680.",
-    "source": "RU console `Стандартная страница приложения` fields «Скриншоты для смартфона», «Скриншоты для семидюймовых планшетов» and «Скриншоты для 10-дюймового планшета» read live 2026-09-29; recorded per kind as `SCREENSHOT_LIMITS` in `scripts/store-kit.py`; https://support.google.com/googleplay/android-developer/answer/9866151?hl=en",
+    "source": "RU console `Стандартная страница приложения` fields «Скриншоты для смартфона», «Скриншоты для семидюймовых планшетов» and «Скриншоты для 10-дюймового планшета» read live 2026-09-29; recorded per kind as `SCREENSHOT_LIMITS` in `scripts/store/model.py`; https://support.google.com/googleplay/android-developer/answer/9866151?hl=en",
     "sourceKind": "play-console",
     "verifiedAt": "2026-09-29",
     "verifiedBy": "live-console",
     "expiresAfterDays": 180,
     "whereUsed": [
       "AGENTS.md",
-      "scripts/store-kit.py",
+      "scripts/store/model.py",
       "scripts/lib/play-assets.mjs",
-      "scripts/verify-slot.mjs"
+      "scripts/core/assets.mjs"
     ],
-    "enforcedBy": {
-      "script": "scripts/store-kit.py",
-      "probe": "--validate-only"
-    }
+    "enforcedBy": "assets"
   },
   {
     "id": "play-screenshot-byte-cap",
     "claim": "Each screenshot must be at most 8 MB, in every screenshot field.",
-    "source": "RU console screenshot-field inline strings read live 2026-09-29 (`<= 8 MB` on all three fields); recorded as `MAX_PNG_BYTES` and applied per asset kind by `scripts/store-kit.py`; https://support.google.com/googleplay/android-developer/answer/9866151?hl=en",
+    "source": "RU console screenshot-field inline strings read live 2026-09-29 (`<= 8 MB` on all three fields); recorded as `MAX_PNG_BYTES` and applied per asset kind by `scripts/store/model.py`; https://support.google.com/googleplay/android-developer/answer/9866151?hl=en",
     "sourceKind": "play-console",
     "verifiedAt": "2026-09-29",
     "verifiedBy": "live-console",
     "expiresAfterDays": 180,
     "whereUsed": [
       "AGENTS.md",
-      "scripts/store-kit.py"
+      "scripts/store/model.py"
     ],
-    "enforcedBy": {
-      "script": "scripts/store-kit.py",
-      "probe": "--validate-only"
-    }
+    "enforcedBy": "assets"
   },
   {
     "id": "play-screenshot-canvas-targets",
     "claim": "The factory ships 9:16 canvases at 1080x1920 for the phone set (6 frames) and the 7-inch set (4 frames) and at 1440x2560 for the 10-inch set (4 frames), per locale.",
-    "source": "The factory's own output contract, declared once as `SCREEN_TARGETS` in `scripts/store-kit.py` and stated in AGENTS.md's store-pack contract; the three targets sit inside every per-field size window and inside the console's 16:9-or-9:16 rule (see `play-screenshot-aspect-rule`)",
+    "source": "The factory's own output contract, declared once as `SCREEN_TARGETS` in `scripts/store/model.py` and stated in AGENTS.md's store-pack contract; the three targets sit inside every per-field size window and inside the console's 16:9-or-9:16 rule (see `play-screenshot-aspect-rule`)",
     "sourceKind": "repo-measurement",
     "verifiedAt": "2026-09-29",
     "verifiedBy": "measured-in-repo",
     "expiresAfterDays": 180,
     "whereUsed": [
       "AGENTS.md",
-      "scripts/store-kit.py",
+      "scripts/store/model.py",
       "scripts/lib/play-assets.mjs",
-      "scripts/verify-slot.mjs",
+      "scripts/core/assets.mjs",
       "scripts/store-studio.py",
       "scaffold/android-compose/store/README.md"
     ],
-    "enforcedBy": {
-      "script": "scripts/store-kit.py",
-      "probe": "--validate-only"
-    }
+    "enforcedBy": "assets"
   },
   {
     "id": "play-screenshot-desktop-xr-optional",
     "claim": "The Desktop and Android XR screenshot fields carry no asterisk — they are optional — so on the owner's instruction of 2026-09-29 the pack produces no target, asset or check for them.",
-    "source": "RU console `Стандартная страница приложения` rows `Скриншоты на компьютере` and `Скриншоты для Android XR`, read live 2026-09-29; recorded as `desktopShots` / `androidXrShots` with `ownerDecision: true` in `scripts/lib/console-form.json` and stated in AGENTS.md's store-pack contract",
+    "source": "RU console `Стандартная страница приложения` rows `Скриншоты на компьютере` and `Скриншоты для Android XR`, read live 2026-09-29; recorded as `desktopShots` / `androidXrShots` with `ownerDecision: true` in `docs/play-console-observations.json` and stated in AGENTS.md's store-pack contract",
     "sourceKind": "play-console",
     "verifiedAt": "2026-09-29",
     "verifiedBy": "live-console",
     "expiresAfterDays": 180,
     "whereUsed": [
       "AGENTS.md",
-      "scripts/lib/console-form.json",
-      "scripts/store-kit.py",
+      "docs/play-console-observations.json",
+      "scripts/store/model.py",
       "docs/research/2026-09-22-android-play-requirements.md"
     ],
-    "enforcedBy": {
-      "script": "scripts/lib/console-form.json",
-      "probe": null
-    }
+    "enforcedBy": null,
+    "gap": "nothing asserts this non-goal: the decision that the Desktop and Android XR screenshot fields are deliberately not produced lives in AGENTS.md's store-pack contract and in docs/play-console-checklist.md prose, and no repository program fails if a pack ships such an asset. The console reading that measured the two fields as optional is archived in docs/play-console-observations.json, which no program reads."
   },
   {
     "id": "play-release-notes-multilang-block",
     "claim": "Play puts every release note in one text box, separated by a language tag on its own line (`<en-US>` … `</en-US>`), caps each language at 500 characters, and enforces the cap by truncating the paste silently rather than refusing it.",
-    "source": "https://support.google.com/googleplay/android-developer/answer/9859348?hl=en (\"make sure the language tags are on separate lines from the release notes\"); docs/research/2026-09-22-android-play-requirements.md §`The release screen's two fields`, recorded 2026-09-28 after the first real upload; measured by `scripts/store-kit.py` as `MAX_RELEASE_NOTE_CHARS`",
+    "source": "https://support.google.com/googleplay/android-developer/answer/9859348?hl=en (\"make sure the language tags are on separate lines from the release notes\"); docs/research/2026-09-22-android-play-requirements.md §`The release screen's two fields`, recorded 2026-09-28 after the first real upload; measured by `scripts/store/model.py` as `MAX_RELEASE_NOTE_CHARS`",
     "sourceKind": "vendor-docs",
     "verifiedAt": "2026-09-29",
     "verifiedBy": "vendor-page",
     "expiresAfterDays": 180,
     "whereUsed": [
       "AGENTS.md",
-      "scripts/store-kit.py",
+      "scripts/store/model.py",
       "docs/play-publishing-playbook.md",
-      "scripts/lib/console-form.json"
+      "docs/play-console-observations.json"
     ],
-    "enforcedBy": {
-      "script": "scripts/store-kit.py",
-      "probe": "--validate-only"
-    }
+    "enforcedBy": "assets"
   },
   {
     "id": "play-release-name-is-version-label",
     "claim": "The release name is an internal Play Console label that is never shown to a user and that the console prefills from the bundle's versionName, so the pack states it as `<versionName> (<versionCode>)` and checks it against the release manifest.",
-    "source": "The first real upload of `apps/2026-09-26-teacher-gradebook` on 2026-09-29, where attaching the bundle prefilled the name `0.1.0 (1)`: harness/lessons.md (2026-09-29 entry) and docs/research/2026-09-22-android-play-requirements.md §`The release screen's two fields`; checked and rendered by `scripts/store-kit.py` (`parse_release_notes`) into `store/console-answers.md`",
+    "source": "The first real upload of `apps/2026-09-26-teacher-gradebook` on 2026-09-29, where attaching the bundle prefilled the name `0.1.0 (1)`: harness/lessons.md (2026-09-29 entry) and docs/research/2026-09-22-android-play-requirements.md §`The release screen's two fields`; checked and rendered at the time by `scripts/store-kit.py` (`parse_release_notes`), a script this change deleted, into `store/console-answers.md`, a sheet it removed with its generator; the contract now lives in `scripts/store/model.py` and is applied by `scripts/store/render_documents.py` and `scripts/store/validate.py`",
     "sourceKind": "play-console",
     "verifiedAt": "2026-09-29",
     "verifiedBy": "live-console",
     "expiresAfterDays": 180,
     "whereUsed": [
       "AGENTS.md",
-      "scripts/store-kit.py",
+      "scripts/store/render_documents.py",
       "harness/lessons.md"
     ],
     "enforcedBy": {
-      "script": "scripts/store-kit.py",
-      "probe": "--validate-only"
+      "script": "scripts/store/render_documents.py",
+      "probe": "release-manifest.json"
     }
   },
   {
     "id": "play-app-content-declarations",
     "claim": "A fresh app's `Контент приложения` page lists ten App-content declarations, one row each, and the count is a list of work that falls as the declarations are answered rather than a property of the app.",
-    "source": "RU console `Контент приложения` — both tabs and all ten rows with their actions — read live 2026-09-29, recorded by `observed`/`declarationsSummary` in `scripts/lib/console-form.json`, where the ten screens marked `declaration: true` are that list",
+    "source": "RU console `Контент приложения` — both tabs and all ten rows with their actions — read live 2026-09-29, recorded by `observed`/`declarationsSummary` in `docs/play-console-observations.json`, where the ten screens marked `declaration: true` are that list",
     "sourceKind": "play-console",
     "verifiedAt": "2026-09-29",
     "verifiedBy": "live-console",
     "expiresAfterDays": 180,
     "whereUsed": [
       "AGENTS.md",
-      "scripts/lib/console-form.json",
-      "docs/play-console-walkthrough.md",
-      "scripts/store-kit.py"
+      "docs/play-console-observations.json",
+      "docs/play-console-checklist.md",
+      "scripts/store/model.py"
     ],
-    "enforcedBy": {
-      "script": "scripts/lib/console-form.json",
-      "probe": null
-    }
+    "enforcedBy": null,
+    "gap": "no program asserts this: the ten App-content declarations are a live Play Console page behind a login. The reading is archived in docs/play-console-observations.json and the know-how in docs/play-console-checklist.md, so nothing in the repository fails if the console's list of declarations changes."
   },
   {
     "id": "play-first-publication-declarations",
     "claim": "The two first-publication certifications — Developer Program Policies and US export laws — live in the dashboard's `Заявки` dialog, are accepted once per app rather than once per release, and are the owner's own attestation.",
-    "source": "RU console `.../app-dashboard` → dialog `Заявки`, both sections read live 2026-09-29 21:52 +03:00, recorded as `screens[publishing].subscreens.declarations-dialog` in `scripts/lib/console-form.json`; https://support.google.com/googleplay/android-developer/answer/9859152 and https://support.google.com/googleplay/android-developer/answer/113770",
+    "source": "RU console `.../app-dashboard` → dialog `Заявки`, both sections read live 2026-09-29 21:52 +03:00, recorded as `screens[publishing].subscreens.declarations-dialog` in `docs/play-console-observations.json`; https://support.google.com/googleplay/android-developer/answer/9859152 and https://support.google.com/googleplay/android-developer/answer/113770",
     "sourceKind": "play-console",
     "verifiedAt": "2026-09-29",
     "verifiedBy": "live-console",
     "expiresAfterDays": 365,
     "whereUsed": [
       "AGENTS.md",
-      "scripts/lib/console-form.json",
-      "docs/play-console-walkthrough.md",
+      "docs/play-console-observations.json",
+      "docs/play-console-checklist.md",
       "docs/research/2026-09-22-android-play-requirements.md"
     ],
-    "enforcedBy": {
-      "script": "scripts/lib/console-form.json",
-      "probe": null
-    }
+    "enforcedBy": null,
+    "gap": "nothing can check this: the two first-publication certifications are the owner's own attestation in the Play Console `Заявки` dialog, made once per app. The reading is archived in docs/play-console-observations.json and the step is recorded in docs/play-console-checklist.md; no repository program can observe a console attestation."
   },
   {
     "id": "play-release-country-list-required",
     "claim": "A release must name at least one country or region; the console refuses to save the release otherwise with «Для этого типа версии не выбраны страны и регионы. Добавьте хотя бы одну страну или регион.», and the factory's default is to leave every country and region ticked.",
-    "source": "RU console release form, the single error raised by the review step, recorded 2026-09-29 in harness/lessons.md (2026-09-29 entry) and rendered into docs/play-console-walkthrough.md from `screens[release].subscreens.country-availability` in `scripts/lib/console-form.json`",
+    "source": "RU console release form, the single error raised by the review step, recorded 2026-09-29 in harness/lessons.md (2026-09-29 entry) and kept in docs/play-console-checklist.md from `screens[release].subscreens.country-availability` in `docs/play-console-observations.json`",
     "sourceKind": "play-console",
     "verifiedAt": "2026-09-29",
     "verifiedBy": "live-console",
     "expiresAfterDays": 180,
     "whereUsed": [
-      "scripts/lib/console-form.json",
-      "scripts/store-kit.py",
-      "docs/play-console-walkthrough.md",
+      "docs/play-console-observations.json",
+      "scripts/store/model.py",
+      "docs/play-console-checklist.md",
       "harness/lessons.md"
     ],
-    "enforcedBy": {
-      "script": "scripts/lib/console-form.json",
-      "probe": null
-    }
+    "enforcedBy": null,
+    "gap": "no program reads the console release form: the required country/region list is a live Play Console field. The reading is archived in docs/play-console-observations.json and the rule is recorded in docs/play-console-checklist.md, so nothing in the repository fails if a future release names no country or region."
   },
   {
     "id": "eu-geo-blocking-regulation-2018-302",
     "claim": "Regulation (EU) 2018/302 article 3(1) forbids unjustified geo-blocking of users in the EU by nationality, place of residence or place of establishment, and the console carries it as an informational notice whose obligation lands on the release's country list rather than on any field of the pack.",
-    "source": "https://eur-lex.europa.eu/eli/reg/2018/302/oj/eng, Article 3 `Access to online interfaces` (1); the console's own notice, transcribed live 2026-09-29 on `Обзор публикации`, recorded as `screens[publishing].subscreens.eu-geo-blocking-notice` in `scripts/lib/console-form.json`; https://support.google.com/googleplay/android-developer/answer/6223646?hl=en",
+    "source": "https://eur-lex.europa.eu/eli/reg/2018/302/oj/eng, Article 3 `Access to online interfaces` (1); the console's own notice, transcribed live 2026-09-29 on `Обзор публикации`, recorded as `screens[publishing].subscreens.eu-geo-blocking-notice` in `docs/play-console-observations.json`; https://support.google.com/googleplay/android-developer/answer/6223646?hl=en",
     "sourceKind": "eu-legislation",
     "verifiedAt": "2026-09-29",
     "verifiedBy": "primary-legislation",
     "expiresAfterDays": 365,
     "whereUsed": [
-      "scripts/lib/console-form.json",
-      "docs/play-console-walkthrough.md",
-      "scripts/store-kit.py",
+      "docs/play-console-observations.json",
+      "docs/play-console-checklist.md",
+      "scripts/store/model.py",
       "harness/lessons.md"
     ],
-    "enforcedBy": {
-      "script": "scripts/lib/console-form.json",
-      "probe": null
-    }
+    "enforcedBy": null,
+    "gap": "no program can observe a console notice or a release's country list: the obligation rests on the live country/region list, which the repository does not hold. The reading is archived in docs/play-console-observations.json and the position is recorded in docs/play-console-checklist.md; nothing fails if a slot narrows access by nationality, residence or establishment."
   },
   {
     "id": "play-auto-string-translation-overrides",
@@ -291,7 +259,7 @@
       "docs/research/2026-09-20-android-play-ai-agents.md"
     ],
     "enforcedBy": {
-      "script": "scripts/verify-slot.mjs",
+      "script": "scripts/core/assets.mjs",
       "probe": null
     }
   },

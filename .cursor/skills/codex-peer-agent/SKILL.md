@@ -20,7 +20,7 @@ Codex is a full agent harness on a different model family. In PlayKiln it is a
 1. **Prevent** — durable rules in `AGENTS.md`; task-local rules in
    `developer-instructions`.
 2. **Contain** — code writes in a git worktree when parallel with Cursor.
-3. **Verify** — `node scripts/verify-slot.mjs` + read the diff. Self-report ≠ evidence.
+3. **Verify** — `node scripts/verify.mjs` + read the diff. Self-report ≠ evidence.
 4. **Reject** — `codex-reply` on the same `threadId` with concrete failures.
 
 ## Tools

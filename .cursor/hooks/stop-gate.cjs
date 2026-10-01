@@ -36,7 +36,7 @@
  *
  * Missing or unstamped baseline: the hook writes one and stays quiet. It cannot attribute the
  * changes it did not observe, and guessing "yes" is what produced the original spam. The real
- * evidence gate is `scripts/verify-slot.mjs`, which is unaffected either way — this is a nudge.
+ * evidence gate is `scripts/verify.mjs`, which is unaffected either way — this is a nudge.
  *
  * Disable with env PLAYKILN_STOP_FOLLOWUP=0.
  */
@@ -163,7 +163,7 @@ function main() {
   emit({
     followup_message:
       `PlayKiln stop gate: this session changed ${changed.length} file(s) under apps/ or harness/ — ` +
-      `${describe(changed)}. Confirm evidence (\`node scripts/verify-slot.mjs\` and/or \`/eval\`). ` +
+      `${describe(changed)}. Confirm evidence (\`node scripts/verify.mjs\` and/or \`/eval\`). ` +
       'If already reported with stdout, reply DONE.'
   })
 }

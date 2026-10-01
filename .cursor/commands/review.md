@@ -23,7 +23,7 @@ Build role.
 3. **Objective evidence**
 
    ```bash
-   node scripts/verify-slot.mjs
+   node scripts/verify.mjs
    ```
 
    Plus Gradle for touched slots. Report real stdout. UNVERIFIED ≠ pass.

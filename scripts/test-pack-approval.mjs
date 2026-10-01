@@ -7,7 +7,7 @@
  * That exclusion is right for pipeline output and wrong for the files a human authors. A review
  * demonstrated it on 2026-09-29 — approve a slot, rewrite `store/listing.json` to describe a feature
  * the build does not have and `store/journey.json` to photograph different readings, then run
- * `store-kit.py` and `media-capture.mjs`; every gate returned ok, and the artifact nobody
+ * `scripts/store/render.py` and `media-capture.mjs`; every gate returned ok, and the artifact nobody
  * re-approved was the one carrying every public claim.
  *
  * Every case below is a claim, and the suite is built so it cannot pass by refusing everything or by
@@ -20,7 +20,7 @@
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import { tmpdir } from 'node:os'
+import { SCRATCH_DIR } from './lib/scratch.mjs'
 import path from 'node:path'
 import process from 'node:process'
 
@@ -77,7 +77,7 @@ function pngBytes(width, height, colorType) {
  * inside the real `apps/` while other writers are active.
  */
 function createFixture() {
-  const root = mkdtempSync(path.join(tmpdir(), 'kiln-pack-approval-'))
+  const root = mkdtempSync(path.join(SCRATCH_DIR, 'kiln-pack-approval-'))
   const slug = 'fake-slot'
   const slot = path.join(root, 'apps', `2026-09-29-${slug}`)
   const store = path.join(slot, 'store')

@@ -12,5 +12,5 @@ Sit on the loop, not in it:
 3. Do the smallest next action; update ledger; exit
 4. Outer driver (`/ship` controller) re-invokes until acceptance or cap
 
-Pair with computational sensors (`verify-slot`) as back-pressure. Do not infinite-loop
+Pair with computational sensors (`verify.mjs`) as back-pressure. Do not infinite-loop
 without a human-visible cap (default 8 iterations) and ledger Ruling on exit.

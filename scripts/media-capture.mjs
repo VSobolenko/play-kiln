@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Capture a six-step store journey with ADB, then delegate framing to store-kit.py. */
+/** Capture a six-step store journey with ADB, then delegate framing to scripts/store/render.py. */
 
 import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
@@ -743,7 +743,7 @@ function main() {
   if (!approval.ok) block(approval.reason)
   const store = path.join(slotDir, 'store')
   const listingPath = path.join(store, 'listing.json')
-  if (!existsSync(listingPath)) block(`missing ${listingPath}; run python scripts/store-kit.py --slot ${options.slot} --init`)
+  if (!existsSync(listingPath)) block(`missing ${listingPath}; run python scripts/store/render.py --slot ${options.slot} --init`)
   const listing = loadJson(listingPath, 'listing')
   if (!listing.applicationId) block(`${listingPath} has no applicationId`)
 
@@ -867,24 +867,24 @@ function main() {
     if (!python) block('Python was not found; set PYTHON or add python to PATH')
     // `--skip-provenance` because the record on disk during this render describes the *previous* run's
     // captures by construction: this run replaces them, and the record naming the new ones is written
-    // below. store-kit answers that flag with UNVERIFIED and exit 2 rather than `STORE-KIT: OK`, so this
+    // below. render.py answers that flag with UNVERIFIED and exit 2 rather than `STORE-KIT: OK`, so this
     // deferred state cannot be mistaken for a pass - including here, where it is the only accepted
     // non-zero status and every other one still blocks.
-    const render = spawnSync(python, ['scripts/store-kit.py', '--slot', options.slot, '--skip-provenance'], {
+    const render = spawnSync(python, ['scripts/store/render.py', '--slot', options.slot, '--skip-provenance'], {
       cwd: ROOT,
       encoding: 'utf8',
       stdio: 'inherit'
     })
-    if (render.error) block(`store-kit framing failed to run: ${render.error.message}`)
+    if (render.error) block(`store framing failed to run: ${render.error.message}`)
     if (render.status !== 0 && render.status !== 2) {
-      block(`store-kit framing failed with exit code ${render.status ?? 'unknown'}`)
+      block(`store framing failed with exit code ${render.status ?? 'unknown'}`)
     }
     const observed = loadJson(path.join(rawDir, 'installed-build.json'), 'installed build')
     writeProvenance(store, slotDir, options.slot, listing, observed)
     // Confirm the pack now describes itself: this is the pass that checks the hashes written above
     // against the assets on disk, so a render that did not produce what the record claims stops here.
     // No deferral is accepted at this point, and the record must be present, not merely tolerated.
-    const confirm = spawnSync(python, ['scripts/store-kit.py', '--slot', options.slot, '--validate-only'], {
+    const confirm = spawnSync(python, ['scripts/store/validate.py', '--slot', options.slot], {
       cwd: ROOT,
       encoding: 'utf8',
       stdio: 'inherit'

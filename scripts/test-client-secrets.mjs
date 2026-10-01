@@ -20,7 +20,7 @@
  * Run: node scripts/test-client-secrets.mjs
  */
 import fs from 'node:fs'
-import os from 'node:os'
+import { SCRATCH_DIR } from './lib/scratch.mjs'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
@@ -48,7 +48,7 @@ function check(name, condition, detail) {
  * that leaves `app/src/main/` out on purpose is the UNVERIFIED case.
  */
 function makeSlot(files = {}) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'kiln-client-secrets-'))
+  const dir = fs.mkdtempSync(path.join(SCRATCH_DIR, 'kiln-client-secrets-'))
   sandboxes.push(dir)
   for (const [relative, body] of Object.entries(files)) {
     const target = path.join(dir, relative.split('/').join(path.sep))

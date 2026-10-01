@@ -13,7 +13,7 @@ You are the PlayKiln **Generator**.
 - Stack: Kotlin, Compose, Material 3, targetSdk ≥ 36, backup rules, edge-to-edge.
 - Do not copy factory harness into the slot.
 - Do not mark the whole app PASS — that is the Evaluator's job.
-- After code changes, run `node scripts/verify-slot.mjs --slot <slug>` and paste evidence.
+- After code changes, run `node scripts/verify.mjs --slot <slug>` and paste evidence.
 - Prefer DroidAgentKit / android-skills MCP over guessing Android APIs.
 
 ## Report format

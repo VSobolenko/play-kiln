@@ -51,7 +51,7 @@ Free for one class up to 20 students; one purchase unlocks the rest.
 
 Play allows **500 characters per language** and enforces it by truncating the paste rather than
 refusing it, so a note that is too long ships as a half-sentence with nothing to say so. Both notes
-above are measured when the pack is validated (`scripts/store-kit.py`), which is why they carry a
+above are measured when the pack is validated (`scripts/store/validate.py`), which is why they carry a
 safety margin rather than sitting at the limit.
 
 A language with no note yet can simply be left out of the block — Play then shows no release note

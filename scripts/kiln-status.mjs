@@ -218,9 +218,11 @@ const requiredHarnessFiles = [
   '.cursor/agents/generator.md',
   '.cursor/agents/evaluator.md',
   '.cursorignore',
-  'scripts/verify-slot.mjs',
+  'scripts/verify.mjs',
   'scripts/new-slot.mjs',
-  'scripts/selftest.mjs',
+  'scripts/verify.mjs',
+  'scripts/core/index.mjs',
+  'scripts/core/facts.mjs',
   'scripts/lib/namespaces.mjs',
   'scripts/lib/gradle.mjs',
   'scripts/lib/java.mjs',
@@ -230,16 +232,14 @@ const requiredHarnessFiles = [
   'scripts/lib/release-approval.mjs',
   'scripts/lib/pack-approval.mjs',
   'scripts/sign-release.mjs',
-  'scripts/store-kit.py',
+  'scripts/store/model.py',
+  'scripts/store/render.py',
+  'scripts/store/validate.py',
   'scripts/lib/play-assets.mjs',
   'scripts/check-in-app-policy.mjs',
   'scripts/lib/in-app-policy.mjs',
   'scripts/check-client-secrets.mjs',
   'scripts/lib/client-secrets.mjs',
-  'scripts/check-freshness.mjs',
-  'scripts/lib/freshness.mjs',
-  'scripts/check-lessons.mjs',
-  'scripts/lib/lessons.mjs',
   'scripts/check-outcomes.mjs',
   'scripts/lib/outcomes.mjs',
   'scripts/lib/slot-lock.mjs',
@@ -258,7 +258,7 @@ const requiredHarnessFiles = [
   '.cursor/rules/verification-discipline.mdc',
   '.cursor/rules/build-speed.mdc',
   '.cursor/rules/visual-identity.mdc',
-  '.cursor/rules/client-side-secrets.mdc',
+  '.cursor/rules/client-secrets.mdc',
   '.cursor/rules/differentiator-contract.mdc',
   '.cursor/rules/authorization.mdc'
 ]
@@ -536,27 +536,30 @@ for (const name of slotNames) {
   }
 }
 
-section('Factory self-test')
-const selftestFile = join(root, 'scripts', 'selftest.mjs')
-if (!existsSync(selftestFile)) {
-  line('FAIL', 'scripts/selftest.mjs is missing')
+section('Factory checks')
+// The self-test was retired with the meta-runner chain: one entry point runs every check in one
+// process, so the health summary asks that entry point instead of spawning a runner of runners.
+const verifyFile = join(root, 'scripts', 'verify.mjs')
+if (!existsSync(verifyFile)) {
+  line('FAIL', 'scripts/verify.mjs is missing')
 } else {
-  const selftest = spawnSync(process.execPath, [selftestFile], {
+  const verify = spawnSync(process.execPath, [verifyFile], {
     cwd: root,
     encoding: 'utf8',
     shell: false,
-    timeout: 120_000,
+    timeout: 300_000,
     windowsHide: true
   })
-  const selftestOutput = `${selftest.stdout || ''}${selftest.stderr || ''}`
-  if (selftest.status === 0) {
-    const passes = selftestOutput.split(/\r?\n/).filter((item) => item.trim().startsWith('PASS')).length
-    line('PASS', `factory scripts honour their contract (${passes} checks)`)
+  const verifyOutput = `${verify.stdout || ''}${verify.stderr || ''}`
+  const verifyRows = verifyOutput.split(/\r?\n/).map((item) => item.replace(/^\uFEFF/, '').trim())
+  const passes = verifyRows.filter((item) => item.startsWith('PASS ')).length
+  if (verify.status === 0) {
+    line('PASS', `the factory's checks hold (${passes} row(s) PASS)`)
   } else {
-    line('FAIL', 'factory self-test failed — run `node scripts/selftest.mjs` for detail')
-    for (const failure of selftestOutput.split(/\r?\n/).filter((item) => item.trim().startsWith('FAIL')).slice(0, 6)) {
-      console.log(`         ${failure.trim()}`)
-    }
+    // Exit 2 is not a pass either: an UNVERIFIED row is a check that could not decide.
+    line('FAIL', `factory checks did not pass (exit ${verify.status}) — run \`node scripts/verify.mjs\` for detail`)
+    const interesting = verifyRows.filter((item) => item.startsWith('FAIL ') || item.startsWith('UNVERIFIED '))
+    for (const row of interesting.slice(0, 6)) console.log(`         ${row}`)
   }
 }
 

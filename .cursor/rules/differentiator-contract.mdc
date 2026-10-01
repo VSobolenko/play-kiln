@@ -18,7 +18,7 @@ The binding specification is `docs/slot-differentiators.md`; the gate is
   and is written into the slot before the first line of UI. A list written afterwards contains only
   what was built, which is the survivorship bias this whole mechanism exists to defeat.
 - **Every promise starts `deferred`, and `deferred` fails the slot gate.** It is a queue, not a
-  status. `scripts/verify-slot.mjs` must never be run with `--allow-deferred`; that flag exists for
+  status. `scripts/verify.mjs` must never be run with `--allow-deferred`; that flag exists for
   a builder reading progress, not for a completion.
 - **A promise ends `shipped`, `narrowed` or `dropped`.** `shipped` and `narrowed` need a `proof`
   that resolves inside the slot and still contains the symbol the promise names. A promise proved by
@@ -41,11 +41,11 @@ The binding specification is `docs/slot-differentiators.md`; the gate is
 - `node scripts/check-differentiators.mjs --slot <slug>` — schema, artifact resolution, the
   `deferred` rule, and a printed report of every `narrowed`/`dropped` promise with the reason and
   the owner's words, so a silent scope cut cannot hide inside a JSON file the owner never opens.
-- `node scripts/verify-slot.mjs --slot <slug> --build` — runs the above for every slot, and treats
+- `node scripts/verify.mjs --slot <slug> --build` — runs the above for every slot, and treats
   the contract as declared once it is on disk **or** in git, so deleting the file does not switch
   the check off.
-- `node scripts/selftest.mjs` — drives the real checker over synthetic slots, including the legs
-  that must fail: a promise whose proof symbol was removed, a `core` promise dropped with no owner
-  words, and a promise left `deferred`.
+- `node scripts/verify.mjs --slot <slug>` — drives the real checker over real and synthetic slots,
+  including the inline fixture legs that must fail: a promise whose proof symbol was removed, a
+  `core` promise dropped with no owner words, and a promise left `deferred`.
 
 A gate that cannot fail is not a gate. The three failing legs exist to prove this one can.

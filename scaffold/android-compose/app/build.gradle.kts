@@ -9,6 +9,10 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
+    // Navigation 3's `rememberNavBackStack` stores the back stack through its own serializer, so the
+    // destination keys are `@Serializable`. The configuration is the one the published reference slot
+    // already runs; see `.cursor/rules/ui-ux-baseline.mdc`.
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.baselineprofile)
 }
 
@@ -23,6 +27,9 @@ if (hasReleaseKeystore) {
 android {
     namespace = "com.gexetr.scaffold"
     compileSdk = 37
+    // Pinned by AGENTS.md "Required toolchain" and declared here so the pin is read from the
+    // artifact rather than left as prose no program enforces.
+    buildToolsVersion = "36.0.0"
 
     defaultConfig {
         applicationId = "com.gexetr.scaffold"
@@ -124,9 +131,11 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material3.adaptive.navigation3)
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.serialization.core)
     implementation(libs.androidx.profileinstaller)
 
     debugImplementation(libs.androidx.compose.ui.tooling)

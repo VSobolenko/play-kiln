@@ -10,7 +10,7 @@
  */
 import { spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
+import { SCRATCH_DIR } from './lib/scratch.mjs'
 import path from 'node:path'
 import process from 'node:process'
 
@@ -44,7 +44,7 @@ function sameSet(a, b) {
 }
 
 function sandbox() {
-  return mkdtempSync(path.join(tmpdir(), 'kiln-publish-'))
+  return mkdtempSync(path.join(SCRATCH_DIR, 'kiln-publish-'))
 }
 
 /** A pid that is not alive: a child that has already exited and been reaped by `spawnSync`. */

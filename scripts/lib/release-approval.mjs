@@ -33,7 +33,7 @@
  * not cover them approved an app while leaving the description of the app free to change. On
  * 2026-09-29 a review demonstrated it: approve a slot, rewrite the listing to describe a feature
  * the build does not have, rewrite the journey so the screenshots assert different readings, then
- * run `store-kit.py` and `media-capture.mjs` — every gate still returned ok. The authored half of
+ * run `scripts/store/render.py` and `media-capture.mjs` — every gate still returned ok. The authored half of
  * the pack is therefore bound by a second digest over the authored files only, in
  * `scripts/lib/pack-approval.mjs`, and an approval records both halves; a record that carries only
  * the build half is a record from before this contract and is refused rather than read as complete.
@@ -86,7 +86,7 @@ const EXCLUDED_ROOT_DIRECTORY_NAMES = new Set(['store', 'dist', 'captures', '.ki
  * next `python scripts/store-studio.py --slot <slug>` may replace them, and what a reader then sees is
  * not a renderer complaint but a gate refusing:
  *
- *   - `python scripts/store-kit.py --slot <slug> --validate-only` -> `FAIL provenance.json - <file>
+ *   - `python scripts/store/validate.py --slot <slug>` -> `FAIL provenance.json - <file>
  *     does not match its recorded sha256 (<12 hex>…)`, one row per composed asset, because the images
  *     on disk were replaced and `store/provenance.json` still records the previous run's hashes;
  *   - `node scripts/approve-release.mjs --check --slot <slug>` -> `the app changed after the owner
@@ -118,9 +118,12 @@ const EXCLUDED_ROOT_DIRECTORY_NAMES = new Set(['store', 'dist', 'captures', '.ki
  * true that was never the rule. So the criterion is no longer prose to be re-derived: it *is* the
  * closed set `EXCLUSION_REASONS`, `EXCLUDED_FILE_REASONS` maps every excluded name to one of them,
  * and `EXCLUSION_CRITERION` is built from the set, so the sentence and the reasons the list uses
- * cannot drift apart. `scripts/selftest.mjs` fails a name whose reason is not in the set, a reason
- * no name uses, and a criterion that does not name every reason — the checks that would have caught
- * the contradiction above.
+ * cannot drift apart. `scripts/selftest.mjs` used to fail a name whose reason is not in the set, a
+ * reason no name uses, and a criterion that does not name every reason — the checks that would have
+ * caught the contradiction above. That suite went with the meta-runner chain on 2026-09-30 and those
+ * three assertions have **no successor**: they are recorded as a finding in
+ * `openspec/changes/reduce-factory-to-core/deletions.md` §7, because the set is now unguarded and a
+ * reader must not take this paragraph for a check that runs.
  *
  * A name list is still the mechanism: a rule keyed on `.gitignore` would exempt whatever a slot
  * happens to ignore next, and this list is the one place the exemption is decided. What changed is
@@ -188,7 +191,7 @@ export function slotSlug(slotDir) {
  *
  * It exists as a function rather than as a string built at each refusal so the command an operator
  * is told to run is identical in `approve-release.mjs`, `prepare-release.mjs`, `media-capture.mjs`,
- * `store-kit.py` and `play-upload.mjs`. The scripts that only print `checkReleaseApproval`'s reason
+ * `scripts/store/render.py` and `play-upload.mjs`. The scripts that only print `checkReleaseApproval`'s reason
  * already share it — this is the same sentence, exported so the uploader does not restate it.
  */
 export function approvalRemediation(slotDir) {
@@ -215,7 +218,7 @@ function isExcludedFile(name) {
 /**
  * Every file that is a build input under `root`, as forward-slash relative paths.
  *
- * Symbolic links are skipped, matching `verify-slot.mjs`: a link can point outside the tree,
+ * Symbolic links are skipped, matching `verify.mjs`: a link can point outside the tree,
  * and hashing through one would make the digest depend on something the approval does not
  * name.
  */

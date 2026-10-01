@@ -17,7 +17,7 @@ info → Purchase history**, exactly as Play expects for a billing-only app.
 ## Data types
 
 This is the table the Play Console form is filled from. The **Collected** cell reads exactly `Yes`
-or `No`, because `scripts/verify-slot.mjs` reads this file back and compares it with the app's
+or `No`, because `scripts/verify.mjs` reads this file back and compares it with the app's
 declared capabilities — a hand-written answer the gate cannot parse is indistinguishable from a
 missing one.
 

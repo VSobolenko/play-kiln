@@ -166,7 +166,7 @@ function captureLock(lockPath, record) {
  * the two renames of `publishCaptures`, and both wipe and rewrite the single `staging/`, so a
  * published `raw/` can become a mixture of two journeys - the capture-time form of the mixed-pack
  * failure the studio already refuses at composition. It also closes the operator window after a
- * mid-swap kill: while `raw/` is absent, running `store-kit.py` directly would re-render synthetic
+ * mid-swap kill: while `raw/` is absent, running `scripts/store/render.py` directly would re-render synthetic
  * screens over the committed assets, and a lock makes re-running the capture the only action that can
  * proceed.
  *

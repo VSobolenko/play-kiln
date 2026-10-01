@@ -1,0 +1,90 @@
+---
+description: Never write outside the repository; a factory process puts its scratch in .kiln/scratch
+alwaysApply: true
+---
+
+# The system belongs to the owner, the repository belongs to the work
+
+The owner's instruction, recorded 2026-10-01 after a Gradle build filled his machine's temp directory
+and a session took 30 seconds to five minutes to become usable: **a factory process may make as much
+mess as it likes inside this project, and must not write into the system outside it at all.** He said
+he will not be watching, and that cleaning up inside the project is not required. The prohibition
+outside it is absolute.
+
+This is a different failure from the ones the rest of `harness/lessons.md` records. Those cost the
+factory time. This one cost the owner's machine, which is not the factory's to spend.
+
+## The rule
+
+- **Every temporary file a factory-spawned process writes goes to `.kiln/scratch/` in this
+  repository.** It is gitignored with all of `.kiln/`, it is disposable, and deleting it at any
+  moment — including mid-build — is always safe. No permission is needed to use it, and none is
+  needed to leave it dirty.
+- **Never write to the system temp directory** — `%TEMP%` / `%TMP%` on Windows, `$TMPDIR` elsewhere —
+  and never to any other path outside the repository. Not for a build, not for a download, not for a
+  probe, not for a screenshot, not for a log.
+- **`scripts/lib/scratch.mjs` and `scripts/lib/scratch.py` are the only modules that decide where
+  temporary files go.** The JavaScript module exports `SCRATCH_DIR`, `scratchDirFor(name)` and
+  `scratchEnv(env, name)`; the Python module exports `SCRATCH_DIR` and `scratch_dir(prefix)`. A JS
+  spawner passes its environment through `scratchEnv`; a Python call passes `dir=SCRATCH_DIR` to
+  `tempfile.mkdtemp()` or `tempfile.TemporaryDirectory()`. Neither language re-derives the repository
+  root, and neither sets `TEMP`/`TMP`/`TMPDIR` by itself. This is the "one source of truth, imported —
+  never restated" rule of `.cursor/rules/verification-discipline.mdc`, applied to the filesystem.
+- **A new spawner adopts it before it ships.** `scripts/lib/gradle.mjs` is the route every Gradle
+  build already takes, so wiring it there covers every build at once. A future tool that shells out
+  to something heavy (a compiler, a packer, a device tool) routes through `scratchEnv` or
+  `dir=SCRATCH_DIR` for the same reason.
+- **A build artifact is not scratch.** `build/`, `dist/` and `captures/` stay where they are, inside
+  the slot, because those are the pipeline's own outputs and its gates read them. This rule governs
+  *temporary* files — the compiler daemon sessions, worker jars and working sets nobody reads back.
+
+## What is deliberately not redirected, and why
+
+- **`GRADLE_USER_HOME`.** It is the shared dependency cache — measured on this machine at
+  `E:\Programm\Android\.gradle` — not scratch. Moving it per repository would re-download every
+  dependency for every slot, which is the exact cost `.cursor/rules/build-speed.mdc` exists to
+  prevent. A cache is not a mess: it is bounded, shared on purpose, and read again by the next build.
+- **`build/` and `dist/`.** They are inside the repository already, which is where the rule wants
+  output to be; `.gitignore` covers them and each slot's pipeline reads them.
+
+## The one honest limit
+
+**A reused Gradle daemon keeps the environment it was first started with.** A daemon that began
+before this rule existed continues writing to the old location until it is stopped, and a build that
+reuses it cannot redirect it. `--no-daemon` is *not* an acceptable fix: it is the forbidden flag that
+costs the measured 6.3 s → 2.3 s regression `build-speed.mdc` records. The remedy is to stop a stale
+daemon once (`Stop-Process` on the Gradle JVM, or the wrapper's own `--stop`), not to fork a fresh one
+per build. This limit is written down rather than papered over, because a rule that claims more than
+it delivers is the failure mode `verification-discipline.mdc` names.
+
+## How it is verified
+
+`build.scratch` is a check in `scripts/core/build.mjs`, run by `node scripts/verify.mjs` in the
+`invariants` group. It reads the repository and fails when:
+
+- `.kiln/scratch/` does not exist, is not inside the repository, or is not gitignored;
+- `scripts/lib/scratch.mjs` stops exporting `scratchEnv`, or stops setting `TEMP`, `TMP` and `TMPDIR`
+  together, or derives its root from anywhere but its own file location;
+- `scripts/lib/scratch.py` is missing or stops defining `SCRATCH_DIR`;
+- `scripts/lib/gradle.mjs` stops routing its spawn environment through `scratchEnv` — the wiring that
+  makes the rule true rather than asserted;
+- any module under `scripts/` names `os.tmpdir()` / `tmpdir()` as a write target, which is how the
+  system temp directory gets chosen by accident;
+- any Python file under `scripts/` calls `tempfile.mkdtemp()`, `tempfile.TemporaryDirectory()` or
+  `tempfile.gettempdir()` without `dir=SCRATCH_DIR`, reported as a `file:line`.
+
+Its inline fixtures drive each of those with a synthetic tree whose verdict is known, because the
+lesson this repository keeps re-learning is that **a rule only a document asserts is a rule nobody
+follows** (`AGENTS.md`, self-learning loop). The prose above is what a builder reads; the check is
+what makes it so.
+
+The measured state this rule was written into, so the size of the change is auditable rather than
+implied: **14 JavaScript fixture sandboxes** (four of them running on every `verify.mjs` — the
+`manifest`, `uiux`, `settings` and `localization` checks) and **11 Python `tempfile` calls across six
+scripts** used the system temp directory, and all 25 now use `SCRATCH_DIR`. The rule caught those by
+being written as a sweep of the whole `scripts/` tree rather than as a note about the one file that
+had been observed misbehaving.
+
+The rule does not, and cannot, observe a process it did not spawn. A tool the agent runs by hand, a
+provider SDK's own cache, or a browser's download directory is outside any sensor here — the
+instruction to keep them inside `.kiln/scratch/` is the agent's obligation, not the check's finding.

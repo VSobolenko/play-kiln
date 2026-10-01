@@ -18,11 +18,11 @@ It runs twice in a slot's life, against different evidence:
   screenshots do not exist yet, so their absence is not a finding.
 - **Phase 2 (`/release`)** — the same rubric against the release evidence: signed APK and AAB,
   release manifest, strict store-pack PASS, rendered assets and screenshots
-  (`verify-slot --slot <slug> --strict-store --build`).
+  (`verify.mjs --slot <slug> --build`).
 
 ## Rubric (score each 0–5; ship bar = all ≥ 4)
 
-1. **Builds** — `verify-slot` PASS; `assembleDebug` evidence or BLOCKED with cause
+1. **Builds** — `verify.mjs` PASS; `assembleDebug` evidence or BLOCKED with cause
 2. **Architecture** — Kotlin/Compose conventions; no harness fork inside slot
 3. **Play compliance** — targetSdk≥36, backup rules, store pack drafts
 4. **UX** — edge-to-edge/insets; no blank primary screen
@@ -34,7 +34,7 @@ It runs twice in a slot's life, against different evidence:
 ## Steps
 
 1. Scope the slot (`apps/<dir>/`) and OpenSpec change.
-2. Run `node scripts/verify-slot.mjs --slot <slug>` — capture output.
+2. Run `node scripts/verify.mjs --slot <slug>` — capture output.
 3. Prefer DroidAgentKit MCP for lint/doctor when available; else Gradle.
 4. Dispatch independent reviewers (`/review`) and/or Codex peer Verify read-only.
 5. Write `apps/<slot>/.kiln/eval.md` with scores, findings, and **PASS / FIX / KILL**.

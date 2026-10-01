@@ -88,8 +88,9 @@ hours**. So the target and the practice are about fivefold apart, and that gap i
 - Keep phase 1 free of release work. `.cursor/rules/release-gate.mdc` already forbids the
   signed build, the store pack and the screenshots until the owner approves a revision, so the
   cheapest cut is structural: nothing is rendered or signed for an app that is about to change.
-- Inside phase 2, skip `media-capture.mjs` when no device is attached and let `store-kit.py`
-  compose the asset set instead of a verified live-device journey; label the captures synthetic
+- Inside phase 2, skip `media-capture.mjs` when no device is attached and let
+  `scripts/store/render.py` compose the asset set instead of a verified live-device journey; label
+  the captures synthetic
   in `store/review-notes.md`.
 - Run staging gates with `--skip-build` and do the single authoritative `--build` at the end.
 - Cut scope, not verification: fewer screens and a narrower job decided **before** the build, never a
@@ -98,7 +99,7 @@ hours**. So the target and the practice are about fivefold apart, and that gap i
 What that means for how you spend the time:
 
 - **Report the actual elapsed wall clock**, per stage where practical. A budget nobody measures is a
-  slogan, and `scripts/verify-slot.mjs` already reports elapsed time for Gradle tasks — extend that
+  slogan, and `scripts/verify.mjs` already reports elapsed time for Gradle tasks — extend that
   habit to the whole slot in the handoff.
 - **Never cite the one-hour target as if it had been met.** It is a direction. The fastest measured
   slot is still measured in hours, and an unachievable budget is worse than no budget because it

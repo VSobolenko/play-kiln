@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://playkiln.local/schema/capability.schema.json",
   "title": "PlayKiln capability manifest",
-  "description": "Machine-readable description of what a capability artifact brings into a slot: SDKs, permissions, collected data and its test double. scripts/capability-registry.mjs and scripts/store-kit.py read these files to generate the Play Data safety answers, so they must stay truthful.",
+  "description": "Machine-readable description of what a capability artifact brings into a slot: SDKs, permissions, collected data and its test double. scripts/capability-registry.mjs and scripts/store/render.py read these files to generate the Play Data safety answers, so they must stay truthful.",
   "type": "object",
   "required": [
     "schemaVersion",
@@ -66,7 +66,7 @@
     },
     "permissions": {
       "type": "array",
-      "description": "Manifest permissions the artifact declares. Anything dangerous needs a justification here or verify-slot fails.",
+      "description": "Manifest permissions the artifact declares. Anything dangerous needs a justification here or verify.mjs fails.",
       "items": {
         "type": "object",
         "required": ["name", "why", "dangerous"],

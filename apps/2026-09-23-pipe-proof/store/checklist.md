@@ -1,6 +1,6 @@
 # Google Play upload checklist — PlayKiln Pipe Proof
 
-- [ ] Run `python scripts/store-kit.py --slot pipe-proof --validate-only` and resolve every FAIL.
+- [ ] Run `python scripts/store/validate.py --slot pipe-proof` and resolve every FAIL.
 - [ ] Replace synthetic screenshots with real captures when `graphics.md` marks them synthetic.
 - [ ] Compare listing claims and captions with the release build.
 - [ ] Replace placeholder contact email and privacy-policy URL in `listing.json`.

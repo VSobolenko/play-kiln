@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "_comment": "The single source of truth for every Play asset window, byte cap, character limit and icon geometry value. Both languages read this file: scripts/core/*.mjs and scripts/store/*.py. No program restates a value from here - see .cursor/rules/verification-discipline.mdc and the factory-core spec requirement 'one check, one fact, one command'. Provenance for every value is requirements-preservation.md in openspec/changes/reduce-factory-to-core/.",
+  "_measuredAt": "2026-09-29",
+  "_measuredFrom": "Google Play Console, RU locale, app's Standartnaya stranitsa prilozheniya page, per-field inline strings - not the documentation",
+
+  "icon": {
+    "width": 512,
+    "height": 512,
+    "maxBytes": 1048576,
+    "format": "png",
+    "alpha": true,
+    "_rule": "512x512, 32-bit PNG with alpha, sRGB, at most 1024 KB; no drawn rounded mask or shadow"
+  },
+
+  "featureGraphic": {
+    "width": 1024,
+    "height": 500,
+    "maxBytes": 15728640,
+    "alpha": false,
+    "formats": ["jpeg", "png"],
+    "_rule": "Exactly 1024x500, JPEG or 24-bit PNG without alpha, at most 15 MB"
+  },
+
+  "aspectRatios": [[16, 9], [9, 16]],
+  "_aspectRule": "The console states this sentence in EVERY screenshot field: 'Соотношение сторон изображения должно составлять 16:9 или 9:16'. Compared by integer cross-multiplication so an exactly-9:16 canvas is never a float near-miss.",
+
+  "screens": {
+    "phone": {
+      "ship": 6,
+      "min": 4,
+      "max": 8,
+      "targetWidth": 1080,
+      "targetHeight": 1920,
+      "minShortSide": 320,
+      "maxLongSide": 3840,
+      "maxRatio": 2,
+      "maxBytes": 8388608,
+      "_field": "Скриншоты для смартфона: 2..8 files, each side 320..3840, <= 8 MB",
+      "_note": "min is 4, not Play's absolute floor of 2: the large-screen section requires a minimum of 4."
+    },
+    "tablet-7": {
+      "ship": 4,
+      "min": 4,
+      "max": 8,
+      "targetWidth": 1080,
+      "targetHeight": 1920,
+      "minShortSide": 320,
+      "maxLongSide": 3840,
+      "maxRatio": null,
+      "maxBytes": 8388608,
+      "_field": "Скриншоты для семидюймовых планшетов: <= 8 files, each side 320..3840, <= 8 MB",
+      "_note": "The laxer of the two tablet windows; the 1080px floor belongs to the 10-inch field."
+    },
+    "tablet-10": {
+      "ship": 4,
+      "min": 4,
+      "max": 8,
+      "targetWidth": 1440,
+      "targetHeight": 2560,
+      "minShortSide": 1080,
+      "maxLongSide": 7680,
+      "maxRatio": null,
+      "maxBytes": 8388608,
+      "_field": "Скриншоты для 10-дюймового планшета: <= 8 files, each side 1080..7680, <= 8 MB",
+      "_note": "Genuinely different from tablet-7. A single blanket predicate got one of them wrong and rejected a legal asset."
+    }
+  },
+  "_maxRatio": "Requirements 'no more than twice as long as the minimum dimension' cap. It is NOT the aspect rule, which applies to all three kinds separately.",
+
+  "listing": {
+    "title": 30,
+    "shortDescription": 80,
+    "fullDescription": 4000,
+    "_countedAs": "code points"
+  },
+
+  "releaseNote": {
+    "maxChars": 500,
+    "_note": "Play truncates silently rather than refusing, and DOES show release notes on the store page. Every note in the paste block is measured, including one for a language the listing does not declare."
+  },
+
+  "nonDegenerate": {
+    "minLuminanceStdDev": 6,
+    "minScreenshotColours": 12,
+    "_calibrated": "2026-09-25 against all 86 committed assets: least-structured real screenshot sd 45.15, fewest-coloured real screenshot 114 colours, flattest asset of any kind (a real icon) sd 52.00. A solid colour measures sd 0.00 and one colour."
+  },
+
+  "locales": {
+    "default": "en-US",
+    "additional": ["ru-RU"]
+  },
+
+  "imageTypes": {
+    "phone": "phoneScreenshots",
+    "tablet-7": "sevenInchScreenshots",
+    "tablet-10": "tenInchScreenshots",
+    "feature-graphic": "featureGraphic",
+    "icon": "icon"
+  },
+
+  "placeholderHosts": ["example.com", "example.org", "example.net", "example.edu", "localhost", "invalid"],
+
+  "contactEmail": "v.sobolenko.vs@gmail.com",
+  "_contactEmailNote": "The developer account's monitored public support address. Not a secret; it does not belong in .env.",
+
+  "iconGeometry": {
+    "canvas": 512,
+    "adaptiveViewportDp": 108,
+    "visibleDp": 72,
+    "safeDp": 66,
+    "safeRadiusDp": 33,
+    "marginDp": 18,
+    "markClearanceDp": 2,
+    "circleKeyline": 0.287037,
+    "portrait": [0.344444, 0.459259],
+    "strokeRegular": 0.03125,
+    "strokeBold": 0.046875,
+    "minFeatureAt48dpPx": 1.5,
+    "opticalTolerance": 0.02,
+    "minReachRatio": 0.75,
+    "supersample": 4,
+    "fieldAngleDeg": 45,
+    "fieldAndroidAngle": 315,
+    "_strokeNote": "16px and 24px at 512. 16px is 3.375dp in the 108dp viewport and 1.5px at 48dp - the floor at which a launcher cell shows a line rather than a grey smear.",
+    "_fieldNote": "Pillow measures clockwise from 0=right; Android measures counter-clockwise from 0=left-to-right. 45 and 315 are the same direction."
+  }
+}

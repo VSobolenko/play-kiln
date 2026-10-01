@@ -29,7 +29,7 @@
  *      wrapper's own `GRADLE_USER_HOME` lock mid-write (recorded in
  *      `harness/lessons.md`, 2026-09-26, and `.cursor/rules/build-speed.mdc`).
  *
- * `spawn` is injectable so `scripts/selftest.mjs` can assert the one-invocation
+ * `spawn` is injectable so `scripts/test-slot-lock.mjs` can assert the one-invocation
  * contract with a fake process instead of trusting this comment.
  */
 
@@ -37,6 +37,7 @@ import { spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { candidateJavaHomes, MIN_MAJOR_SUPPORTED, resolveJavaHome } from './java.mjs'
+import { scratchEnv } from './scratch.mjs'
 import { withSlotLock } from './slot-lock.mjs'
 
 /** Tasks that produce every artifact `prepare-release.mjs` stages into `dist/`. */
@@ -72,15 +73,15 @@ function normalizeTasks(tasks) {
  * `javaHome` controls JDK selection: omit it to resolve automatically **and to
  * fail closed** when nothing supported resolves, pass an explicit path to force
  * one, or pass `null` to inherit the ambient environment unchanged — the explicit
- * test-only skip that `scripts/selftest.mjs` exercises.
+ * test-only skip that `scripts/test-slot-lock.mjs` exercises.
  *
  * Two seams exist for the regression tests, and neither is a production dodge:
- * `spawn` replaces the process this module would launch (`scripts/selftest.mjs`
+ * `spawn` replaces the process this module would launch (`scripts/test-slot-lock.mjs`
  * drives the one-invocation contract that way), and when a caller has replaced
  * the spawner there is no Gradle process for a JDK to pin, so the JDK
  * precondition is not enforced on that path; `javaResolver` replaces the JDK
  * resolver, so the fail-closed throw can be driven offline. Every production
- * caller — `verify-slot.mjs`, `prepare-release.mjs`, `run-slot-tests.mjs` — uses
+ * caller — `verify.mjs`, `prepare-release.mjs`, `run-slot-tests.mjs` — uses
  * the default spawner and the real resolver, so neither seam can be reached from
  * a factory route.
  *
@@ -115,7 +116,10 @@ export function runGradleTasks(
     throw unresolvedJavaError({ env, platform })
   }
 
-  const spawnEnv = resolved?.home ? { ...env, JAVA_HOME: resolved.home } : { ...env }
+  // The build's scratch goes inside the repository, never into the machine's
+  // system temp directory — see `scripts/lib/scratch.mjs` for the rule and for
+  // the one honest limit (a reused daemon keeps its original temp).
+  const spawnEnv = scratchEnv(resolved?.home ? { ...env, JAVA_HOME: resolved.home } : { ...env })
 
   const started = Date.now()
   // One lease per slot, around the process only. The second consumer of a slot

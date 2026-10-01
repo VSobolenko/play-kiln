@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """PlayKiln store studio - the composed visual identity for a slot's store presence.
 
-The generic `store-kit.py` renderer draws a gradient with the device screen pasted into a
+The generic renderer (`scripts/store/render.py`) draws a gradient with the device screen pasted into a
 rounded rectangle. That is honest but plain: it is a screencap with a caption, and a store
 listing made of screencaps does not attract anyone. This module renders the assets the way a
 modern Play listing does it - a branded composition with a benefit-led headline, a real device
@@ -94,33 +94,44 @@ def apply_palette(palette: dict[str, tuple[int, int, int]]) -> None:
     CYAN_DEEP, PAPER, MUTED = palette["accent_deep"], palette["paper"], palette["muted"]
     BEZEL, BEZEL_RIM = palette["bezel"], palette["bezel_rim"]
 
-def _load_store_kit_contract():
-    """The screenshot inventory, imported from `store-kit.py` rather than restated here.
+def _load_pack_model():
+    """The screenshot inventory, imported from the pack's model rather than restated here.
 
-    `store-kit.py` is what renders and validates the pack, and it is also the file
-    `scripts/verify-slot.mjs` and `scripts/visual-qa.py` read the inventory out of. A second
-    literal copy of the sizes here could only drift: two lists of sizes are two answers to one
-    question, and the copy no gate reads is the one that silently keeps composing the wrong
-    canvases. The hyphen in the filename makes the module un-importable by name, so it is loaded
-    by path - and an already-loaded copy is reused, because `store-kit.py` itself loads this
-    module, and executing it twice would build a second, silently divergent module state.
+    `scripts/store/model.py` is the pack's single limit resolver: it loads every window and byte cap
+    from `scripts/lib/play-assets.json`, the file `scripts/lib/play-assets.mjs` reads too, and it is
+    what both the renderer and the validator import. A second literal copy of the sizes here could
+    only drift: two lists of sizes are two answers to one question, and the copy no gate reads is
+    the one that silently keeps composing the wrong canvases. The store directory is not a package,
+    so the module is loaded by path - and an already-loaded copy is reused, because
+    `scripts/store/render.py` loads the same file and executing it twice would build a second,
+    silently divergent module state.
     """
-    path = (Path(__file__).resolve().parent / "store-kit.py").resolve()
+    path = (Path(__file__).resolve().parent / "store" / "model.py").resolve()
     for module in list(sys.modules.values()):
         module_file = getattr(module, "__file__", None)
         if module_file and Path(module_file).resolve() == path:
             return module
-    spec = importlib.util.spec_from_file_location("store_kit_screen_contract", path)
+    spec = importlib.util.spec_from_file_location("pack_model", path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot load {path} for the screenshot inventory")
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    # Register before executing: `model.py` declares frozen dataclasses, and a dataclass whose
+    # module is absent from `sys.modules` cannot be created on Python 3.13 — `dataclasses._is_type`
+    # does `sys.modules.get(cls.__module__).__dict__` for a `KW_ONLY` field and raises
+    # `AttributeError: 'NoneType' object has no attribute '__dict__'`. Registering also makes the
+    # `__file__` de-duplication above find this module on a second call instead of loading a copy.
+    sys.modules.setdefault("pack_model", module)
+    try:
+        spec.loader.exec_module(module)
+    except BaseException:
+        sys.modules.pop("pack_model", None)
+        raise
     return module
 
 
-_STORE_KIT = _load_store_kit_contract()
-SCREEN_TARGETS = _STORE_KIT.SCREEN_TARGETS
-SCREENSHOT_LIMITS = _STORE_KIT.SCREENSHOT_LIMITS
+_MODEL = _load_pack_model()
+SCREEN_TARGETS = _MODEL.screenshot_targets()
+SCREENSHOT_LIMITS = _MODEL.screenshot_windows()
 
 # One raw capture per journey shot. The studio composes every screenshot target from exactly these,
 # so a missing one is a hard stop rather than a target to skip.
@@ -131,7 +142,7 @@ EXPECTED_COMPOSED_ASSETS = 4 + sum(count for count, _ in SCREEN_TARGETS.values()
 
 # A capture that is (near) uniform cannot be a photograph of this app's UI. Every gate in the# factory reads dimensions, mode and byte size, which accept a solid colour rectangle of the right
 # size - and one was accepted as `en-US/phone-01.png` by both `store-kit --validate-only` and
-# `verify-slot --strict-store`. The thresholds sit far below any real screen (the six committed
+# `verify.mjs`. The thresholds sit far below any real screen (the six committed
 # captures carry 1101-1395 distinct colours with a luminance spread of 252), so they reject a blank
 # or solid frame without putting a real one at risk.
 MIN_CAPTURE_COLOURS = 64
@@ -712,7 +723,7 @@ def load_raw(store: Path, index: int) -> Image.Image | None:
     result of an interrupted copy, and treating it as "missing" is how a pack once got composed
     from two different capture runs while every gate still reported OK: the skipped target kept the
     PREVIOUS run's file, and the result passed both `store-kit --validate-only` and
-    `verify-slot --strict-store`.
+    `verify.mjs`.
     """
     for candidate in (f"{index:02d}.png", f"phone-{index:02d}.png"):
         path = store / "captures" / "raw" / candidate

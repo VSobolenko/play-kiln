@@ -14,16 +14,16 @@
  *
  * The hole that made this file necessary was demonstrated on 2026-09-29: approve a slot, rewrite
  * `store/listing.json` to describe a feature the build does not have and `store/journey.json` to
- * photograph different readings, then run `store-kit.py` and `media-capture.mjs`. Every gate
+ * photograph different readings, then run `scripts/store/render.py` and `media-capture.mjs`. Every gate
  * returned ok — the one artifact nobody re-approved being the one that carries every public claim.
  *
  * Which files are in it
  * ---------------------
  * The closed list is `AUTHORED_PACK_INPUTS`, and the digest is over nothing else. That boundary is
  * the whole difficulty of this module, because the *other* half of `store/` is written by the
- * pipeline: `store/assets/**`, `store/provenance.json`, `store/console-answers.md`,
- * `store/checklist.md`, `store/graphics.md` and `store/release-notes.md` are produced by
- * `store-kit.py` and `media-capture.mjs` during the release run itself. A digest that covered them
+ * pipeline: `store/assets/**`, `store/provenance.json`, `store/checklist.md`, `store/graphics.md`
+ * and `store/release-notes.md` are produced by
+ * `scripts/store/render.py` and `media-capture.mjs` during the release run itself. A digest that covered them
  * would refuse every release for a pack nobody changed — the trap `release-approval.mjs` documents
  * for the build half, repeated here — so `scripts/test-pack-approval.mjs` asserts the boundary from
  * both sides: editing an authored input voids the approval, and rewriting every pipeline-owned file

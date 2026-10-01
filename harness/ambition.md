@@ -19,7 +19,7 @@ implements.
 | Domain skill *count* | High (Expo+product) | Lower (correctly) | Depth > fake count |
 | Dual-model peers | Codex reviewer-ish | Peers declared | PGE + peers |
 | Android agent MCP | None | None | **android-skills + DroidAgentKit** |
-| Computational sensors | verify-changes | verify-slot (Play gates) | + inventory, doctor, eval rubric |
+| Computational sensors | verify-changes | verify.mjs (Play gates) | + inventory, doctor, eval rubric |
 | Context layering L1/L2/L3 | Implicit | Weak | Explicit skill |
 | Harness self-improve | Informal | Informal | `/improve-harness` |
 | Nested AGENTS per app | No | No | Slot `AGENTS.md` |
