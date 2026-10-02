@@ -10,8 +10,11 @@ import { buildChecks, buildFixtures, checkCopyFilter, checkNamespaceSweep, check
 import { checkConfig } from './config.mjs'
 import { checkFactLedger, factFixtures } from './facts.mjs'
 import { checkAdaptiveIcon, iconFixtures } from './icon.mjs'
-import { harnessChecks, harnessFixtures } from './harness.mjs'
+import { ICON_IDS, iconsChecks, iconsFixtures } from './icons.mjs'
+import { groundedClaimsFixtures, harnessChecks, harnessFixtures, rulesFixtures } from './harness.mjs'
 import { manifestChecks, manifestFixtures } from './manifest.mjs'
+import { deviceChecks, deviceFixtures } from './device.mjs'
+import { namingChecks, namingFixtures } from './naming.mjs'
 import { policyChecks, policyFixtures } from './policy.mjs'
 import { checkHarnessRefFixtures, checkHarnessRefs, checkSecretFixtures, checkSize, slotChecks } from './project.mjs'
 
@@ -29,6 +32,25 @@ import { uiuxChecks, uiuxFixtures, uiuxProjectChecks } from './uiux.mjs'
 const asVerdicts = (value) => (Array.isArray(value) ? value : [value])
 
 /**
+ * The icon legs, declared literally because `checkIdsFromRegistry` reads the registry as text and a
+ * fact can therefore only name an id that appears here as a literal `id:`. `ICON_IDS` stays the
+ * sensor's own list; the assertion below turns a drift between the two into a load-time failure
+ * rather than a fact that quietly stops being enforced.
+ */
+const ICON_REPORTS = [
+  { id: 'icons.mark' },
+  { id: 'icons.launcher' },
+  { id: 'icons.provenance' },
+  { id: 'icons.licence' },
+  { id: 'icons.offline' },
+  { id: 'icons.deprecated' },
+  { id: 'icons.tint' }
+]
+if (ICON_REPORTS.map((report) => report.id).join() !== ICON_IDS.join()) {
+  throw new Error('the icon group reports list has drifted from ICON_IDS in scripts/core/icons.mjs')
+}
+
+/**
  * Every check, in report order.
  *
  * `needsSlot` marks a check that requires a slot to inspect. A run without `--slot` still evaluates
@@ -44,14 +66,19 @@ export const CHECKS = Object.freeze([
       checkAssetFixtures(),
       checkReleaseNoteFixtures(),
       iconFixtures(),
+      ...asVerdicts(iconsFixtures()),
       sixteenKbFixtures(),
       buildFixtures(),
       factFixtures(),
       harnessFixtures(),
       manifestFixtures(),
       policyFixtures(),
+      ...asVerdicts(namingFixtures()),
+      ...asVerdicts(deviceFixtures()),
       checkHarnessRefFixtures(),
       checkHarnessRefs(),
+      rulesFixtures(),
+      groundedClaimsFixtures(),
       checkSecretFixtures(),
       checkToolchainPins(),
       checkNamespaceSweep(),
@@ -70,11 +97,32 @@ export const CHECKS = Object.freeze([
     ]
   },
   { id: 'assets', needsSlot: true, run: (slotDir) => packChecks(slotDir) },
-  { id: 'icon', needsSlot: true, run: (slotDir) => [checkAdaptiveIcon(slotDir)] },
+  {
+    // Iconography, both halves of the split the owner asked for: the launcher mark a slot owns
+    // outright, and the UI-icon sets it borrows from a licence-cleared library.
+    //
+    // `reports` is written out literally rather than derived from the sensor's `ICON_IDS`, and that
+    // is deliberate: `checkIdsFromRegistry` reads this file as *text*, so a fact may only name a leg
+    // whose id appears here as a literal `id:`. Deriving it would look like one source of truth and
+    // would put every leg out of the ledger's reach. The assertion beside `ICON_REPORTS` is what
+    // stops the two lists drifting, because this duplication is the price of being nameable.
+    id: 'icon',
+    needsSlot: true,
+    reports: ICON_REPORTS,
+    run: (slotDir) => [checkAdaptiveIcon(slotDir), ...iconsChecks(slotDir)]
+  },
   { id: 'apk', needsSlot: true, run: (slotDir) => apkChecks(slotDir) },
   { id: 'build', needsSlot: true, run: (slotDir) => buildChecks(slotDir) },
   { id: 'manifest', needsSlot: true, run: (slotDir) => manifestChecks(slotDir) },
-  { id: 'policy', needsSlot: true, run: (slotDir) => policyChecks(slotDir) },
+  // `slot.naming` sits with `slot.differentiators`: both are decisions the slot recorded before it
+  // was built, and both are read the same way — the contract on disk against the pack it produced.
+  // `slot.device` sits here for the same reason: it reads a record the agent wrote about its own run
+  // on the phone, so "I tested it on the device" is a claim that resolves to a file rather than prose.
+  {
+    id: 'policy',
+    needsSlot: true,
+    run: (slotDir) => [...policyChecks(slotDir), ...namingChecks(slotDir), ...deviceChecks(slotDir)]
+  },
   { id: 'project', needsSlot: true, run: (slotDir) => slotChecks(slotDir) },
   // The UI baseline, added 2026-09-30 after the owner's review of the first live app. Slot-scoped,
   // and honest about applicability: `baseline.mjs` turns a finding into a FAIL only for a slot the
@@ -82,6 +130,12 @@ export const CHECKS = Object.freeze([
   {
     id: 'ui',
     needsSlot: true,
+    // The ids this group reports inside its rows. A fact may legitimately be enforced by one sensor
+    // rather than by the group as a whole — "edge-to-edge is mandatory at targetSdk" is `uiux.insets`
+    // and not `ui` — and `checkIdsFromRegistry` reads every `id:` in this file, so a reported id is
+    // declared here for the same reason the group's own id is: the ledger may name a function that
+    // really runs, and it is this entry that runs it. `uiux.platform` joined on 2026-10-02.
+    reports: [{ id: 'uiux.insets' }, { id: 'uiux.platform' }],
     run: (slotDir) => [...uiuxChecks(slotDir), ...settingsChecks(slotDir), ...localizationChecks(slotDir)]
   }
 ])

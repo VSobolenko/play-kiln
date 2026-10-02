@@ -16,10 +16,10 @@ Recorded so later sessions do not re-litigate them.
 
 | Decision | Choice | Consequence |
 |---|---|---|
-| Monetization model | **Per app, chosen from a spectrum** (§3), never a fixed default. **Purchases (IAP) are emphasised over ads**; ads remain available | Every slot's plan must name its archetype and justify it (§3.6). A slot that leads with ads must also answer "what does a rewarded view unlock" *before* its UI is designed |
-| Why purchases lead | The owner's own past commercial success came from apps **without ads but with in-app purchases of content and elements** | Purchase-led is the starting hypothesis for a new slot, not a mandate; an app with nothing to sell is still an ads app |
+| Monetization model | **Per app, chosen from a spectrum** (§3), never a fixed default. **No model is emphasised over another** — purchase, consumable, ads and hybrid are equally first-class | Every slot's plan must name its archetype, show which alternatives it considered, and justify the choice in revenue terms (§3.6, `docs/slot-economics.md`). A slot that leads with ads must also answer "what does a rewarded view unlock" *before* its UI is designed |
+| Why there is no house default | The owner's past commercial success came from apps **without ads but with in-app purchases of content and elements**, and that history was written down as "purchase-led is the starting hypothesis" — which then **became** the default it was never meant to be: every proposal, recipe and plan in this repository chose `purchase_led_single_unlock` | The history is evidence that purchases *can* work, not a prior that they *will*. It is one data point about one owner's catalogue, not a finding about a new app's audience. State a preference only when the app's own evidence produces it |
 | Purchase kinds in scope | **One-time unlocks** and **spendable consumables (token/credit packs)** — an open-ended in-app store, not only "remove ads"; ads as a parallel stream | Packs are consumables, never entitlements (§3.2); "remove ads" is a one-time unlock (§3.1) |
-| Subscriptions | **Deferred** | No subscription billing until a slot proves it has recurring value; the billing capability still supports them, unused (§3.3) |
+| Subscriptions | **Banned** (owner, 2026-10-01) | Out of scope: recurring entitlement needs server-side validation plus a renewal/refund/cancellation/grace-period lifecycle, which makes the slot a server project. `subscription` is not in `ARCHETYPES`, so a plan naming it fails `check-economics.mjs` (§3.3) |
 | Child-directed apps | **No ads by default; paid app, IAP, or policy-compliant ads** | The archetype cannot be a factory-wide constant: a child-directed ads configuration must satisfy the Families ads regime, while no ads remains the low-risk product choice (§3.5) |
 | Remote configuration | **Firebase Remote Config** | Ad unit ids, feature flags, pack grants, and experiment arms change without a release; needs a Firebase project and `google-services.json` per slot (both gitignored) |
 | App verification | **On a real device/emulator, after an AdMob account exists** | The ads and billing adapters are compiled and unit-tested but **not** yet verified against live services |
@@ -262,7 +262,7 @@ days, a balance that multiplies itself on every cold start.
 |---|---|---|---|---|
 | Remove ads, pro feature, one module | One-time (non-consumable) | acknowledge | A permanent entitlement | Play — `restore()` recovers it after reinstall |
 | Token / credit / generation packs | One-time (consumable) | **consume** | A spendable balance, held until spent | Our server for `SERVER_COST` packs; the device cache only for `LOCAL` packs (§3.7) |
-| Recurring access | Subscription | acknowledge + lifecycle status | Access while active, including grace period | Play — subscription status |
+| ~~Recurring access~~ | ~~Subscription~~ — **out of scope** (§3.3) | — | Not sold by any slot; the capability models the lifecycle and no slot may ship it | — |
 | Watching a rewarded video | Not billing | — | A one-time in-app reward | Local, and deliberately disposable |
 | Paid app (no ads, no IAP) | Store listing price | — | The app itself | Play |
 
@@ -320,15 +320,31 @@ ownership.
   later — and a `SERVER_COST` pack the authority will not confirm is `NotAuthorized`, with
   no credit granted.
 
-### 3.3 Subscriptions — deferred, and when they become correct
+### 3.3 Subscriptions — banned
 
-**Deferred for now.** The billing capability already models the subscription lifecycle
-(`SubscriptionStatus.ACTIVE`, `GRACE_PERIOD`, `ON_HOLD`, `PAUSED`, `CANCELED`, `EXPIRED`,
-with `GRACE_PERIOD` counted as active on purpose so a paying user is not cut off during a
-payment retry), and `Entitlements` already treats an active subscription as ownership. No
-slot uses any of it yet.
+**Out of scope: the owner banned subscriptions on 2026-10-01.** *We drop subscriptions immediately —
+that is the one thing we will not do, there are too many nuances. So a subscription is forbidden.
+Everything else is fine.*
 
-A subscription becomes the correct model only when **all** of these hold:
+This supersedes the earlier "deferred" position, and supersedes everything below that described when
+a subscription "becomes correct": the mechanism is not waiting for a slot to prove recurring value,
+it is not available to propose at all. `subscription` was removed from `ARCHETYPES` in
+`scripts/lib/slot-economics.mjs`, so a plan naming it fails `parseEconomics`,
+`requiredCapabilitiesFor` and `node scripts/check-economics.mjs`, with no exemption path. The
+contract is `docs/slot-economics.md`.
+
+The reason is cost, not taste. A subscription is *recurring* revenue, so the entitlement has to be
+re-established continuously: server-side validation, plus a renewal, refund, cancellation,
+grace-period and failed-payment lifecycle honoured on a schedule the client does not control. The
+billing capability already models that lifecycle — `SubscriptionStatus.ACTIVE`, `GRACE_PERIOD`,
+`ON_HOLD`, `PAUSED`, `CANCELED`, `EXPIRED`, with `GRACE_PERIOD` counted as active on purpose so a
+paying user is not cut off during a payment retry, and `Entitlements` treating an active subscription
+as ownership — and that is exactly the point: the model is complete, and completing it in production
+is a server project with a billing backend. This factory builds slots, not servers, and the
+one-hour budget has no room for one.
+
+The three conditions below are kept as the record of why the position moved from *deferred* to *out
+of scope*, not as a gate that may be satisfied:
 
 - the value genuinely **recurs** — fresh content each period, an ongoing service, storage,
   live data;
@@ -337,9 +353,9 @@ A subscription becomes the correct model only when **all** of these hold:
 - the slot can carry the extra obligations: renewal-terms disclosure, cancellation, refund
   handling, and stricter review.
 
-Until a slot demonstrates that, a subscription adds review burden, churn, and paywall
-disclosure duties without adding revenue. Deferred is not forbidden: revisit this section
-when a slot's retention actually suggests recurring value.
+A slot meeting all three still ships with the server-side lifecycle above, and is therefore a server
+project. It is not proposed. The `billing` capability stays available for one-time and consumable
+purchases, which is what the factory uses it for.
 
 ### 3.4 Ads as a parallel revenue stream
 
@@ -351,10 +367,12 @@ Ads are not removed from the toolbox. They are one of several streams, and they 
   (figures and sources in §2), so the design question — *what does a rewarded view unlock?*
   — must be answered **before UI design**, not bolted on after.
 - If the honest answer is "nothing worth unlocking", that is a signal the app is a poor ads
-  fit and may instead have something to sell as a purchase (§3.6).
-- Ads and purchases are not mutually exclusive inside one app, but they need an **order**:
-  purchases lead where there is something to sell; ads lead only for a utility with nothing
-  to sell, with a one-time "remove ads" unlock as the natural upsell.
+  fit — but a poor fit for ads is not evidence for a purchase. Ask the next question in §3.6
+  rather than reaching for the purchase shape by default.
+- Ads and purchases are not mutually exclusive inside one app, and the **order** between them
+  is read off the app, not assumed: consumables lead where there is something worth buying
+  repeatedly, ads lead for a utility with nothing to sell (a one-time "remove ads" unlock is
+  the natural upsell), and neither has a standing claim on the other.
 - Consent and declaration obligations apply as soon as the ads capability is bundled — even
   if no ad is ever shown (`capabilities/ads/capability.json`), see §6.
 
@@ -392,13 +410,15 @@ Applied in order, before UI design:
    no ads as the low-risk default, or explicitly design and verify a Families-compliant ad
    configuration; paid app and IAP remain available options.
 2. **Does the app have something worth selling repeatedly** — content, credits, generations,
-   or a service call that costs real money to serve? → **purchases lead.** Model it as
-   one-time unlocks (§3.1) plus consumable packs (§3.2). Ads, if used at all, are secondary.
+   or a service call that costs real money to serve? → **repeat sales.** Model it as consumable
+   packs (§3.2) plus one-time unlocks (§3.1). Ads, if used at all, are secondary.
 3. **Is it a pure utility with nothing to sell repeatedly?** → **ads lead**, with a one-time
    "remove ads" / "pro" unlock as the upsell (§3.1). If there is nothing worth watching a
-   rewarded video for, prefer the unlock over rewarded inventory.
-4. **Is there genuine recurring value?** → a subscription may be the right model (§3.3);
-   otherwise defer.
+   rewarded video for, prefer the unlock over rewarded inventory. This is a finished product
+   shape, not a failure to design a purchase.
+4. **Is there genuine recurring value?** → **nothing to decide: subscriptions are banned**
+   (§3.3). Recurring value is not a reason to build the app and may not be sold as one. Find
+   the one-off shape, or do not build it.
 5. **Write the archetype sentence into the slot plan.** Same discipline as §1.2's
    distinctness sentence: if the archetype cannot be stated in one sentence with a named
    product list, the monetization is not designed yet.
@@ -411,12 +431,17 @@ Resulting archetypes:
 | Purchase-led, single unlock | Utility with one premium capability | One-time non-consumable |
 | Ads-led utility | Nothing to sell; volume is plausible | Ads including rewarded, plus a "remove ads" unlock |
 | Purchase-only, no ads | Child-directed or ad-hostile audience | A low-risk product choice: paid app or IAP (§3.5) |
-| Subscription | Recurring value proven | Deferred (§3.3) |
+| ~~Subscription~~ | **Banned** — on no row | Not available; a plan naming it fails the economics gate (§3.3) |
 
 The purchase-led rows are not a guess about the market; they encode the owner's own
-commercial history — apps **without ads but with in-app purchases of content and elements**
-— as the factory's starting hypothesis. An app that genuinely has nothing to sell is still an
-ads app, and §2's arithmetic is what tells us whether that can reach $1,000/month.
+commercial history — apps **without ads but with in-app purchases of content and elements**.
+That history was previously written here as "the factory's starting hypothesis", and writing it
+that way is exactly how it stopped being a hypothesis: every plan, recipe and proposal this
+repository produced chose `purchase_led_single_unlock`, because the doctrine told the agent that
+was where to start. The history is now recorded as **evidence that purchases can work**, not as a
+prior that they will — see `docs/slot-economics.md`, *"There is no default archetype"*. An app that
+genuinely has nothing to sell is still an ads app, and §2's arithmetic is what tells us whether that
+can reach $1,000/month.
 
 ### 3.7 The security asymmetry: who decides what the user owns
 
@@ -468,18 +493,20 @@ ads app, and §2's arithmetic is what tells us whether that can reach $1,000/mon
 |---|---|---|---|
 | Ads (banner/interstitial) | Low per user, needs scale | Weak on its own | Revenue too small without volume |
 | Ads + rewarded video | Medium–high | Good **only when there is something worth unlocking** | Needs a real unlock; poor fit for a utility with none |
-| Consumable packs (tokens, credits, generations) | High when the app has something worth selling repeatedly — but a high-LTV pack can still be a thin-margin one: the multiple of unit cost is not the margin (§2.2) | **Leading choice for content/service apps** — the owner's proven shape | Fulfilment cost must be controlled; money-costing credit needs a server authority (§3.7) |
+| Consumable packs (tokens, credits, generations) | High when the app has something worth selling repeatedly — but a high-LTV pack can still be a thin-margin one: the multiple of unit cost is not the margin (§2.2) | **Strong for content/service apps** — the owner's own proven shape | Fulfilment cost must be controlled; money-costing credit needs a server authority (§3.7) |
 | One-time IAP ("remove ads", "pro") | Medium, one-off | Strong for any app with a premium capability; the natural ads upsell | Small converting share (~1–3 % — **UNVERIFIED**; no source read in this session) |
-| Subscription | Highest | Weak for utilities; needs proven recurring value | Deferred (§3.3); stricter review and churn |
+| Subscription | **Banned.** | — | Out of scope (owner, 2026-10-01): a server-side renewal, refund, cancellation and grace-period lifecycle makes the slot a server project (§3.3) |
 | Affiliate / lead-gen | Can beat ads per user | Niche-dependent | Only works in specific verticals |
 | Paid app | — | Viable as a no-ads product choice for child-directed or ad-hostile audiences (§3.5); otherwise effectively dead | No discovery |
 
-Recommendation: **choose per app, and let purchases lead.** Where the app has something
-worth selling repeatedly — content, credits, generations, an AI assistant the user pays to
-talk to — model it as consumable packs plus a one-time unlock, and treat ads as optional.
+Recommendation: **choose per app, and derive the choice from the app's own evidence.** Where the
+app has something worth selling repeatedly — content, credits, generations, an AI assistant the user
+pays to talk to — model it as consumable packs plus a one-time unlock, and treat ads as optional.
 Where the app is a pure utility with nothing to sell, ads lead and a one-time "remove ads"
-unlock is the upsell. Subscriptions stay deferred until a slot shows recurring value. Never
-make any one of these the factory default.
+unlock is the upsell. Subscriptions are out of scope entirely (§3.3). Never
+make any one of these the factory default: the "starting hypothesis" this section used to
+state is precisely how a default formed without anyone choosing it, and the archetype mix is
+expected to differ from slot to slot.
 
 Affiliate deserves a deliberate look in verticals where it pays per action rather
 than per impression (finance, travel, shopping, VPN), because there it can exceed ad
@@ -502,9 +529,9 @@ enforced contract disagree, the contract wins, because it is the thing a program
    unlock.
 2. **One config-driven façade per stream.** Ads behind something like
    `Monetization.showRewarded("unlock_export")` with placements, formats, and frequency caps
-   in one per-slot file; billing behind a per-slot `BillingCatalog` declaring unlocks, packs,
-   and (later) subscriptions — so placement and pricing can be tuned without re-architecting
-   app code.
+   in one per-slot file; billing behind a per-slot `BillingCatalog` declaring unlocks and
+   consumable packs — so placement and pricing can be tuned without re-architecting
+   app code. Subscriptions are out of scope and are not part of that catalog (§3.3).
 3. **Remote configuration is mandatory** (Firebase Remote Config), otherwise every
    monetization experiment costs a full release cycle. This is the difference between
    measuring and guessing.

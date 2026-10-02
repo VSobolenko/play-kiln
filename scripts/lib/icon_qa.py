@@ -46,9 +46,15 @@ from PIL import Image, ImageDraw
 from scipy import ndimage
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from lib import colours  # noqa: E402  the one colour-maths implementation, shared with visual-qa
 from lib import icon_design as design  # noqa: E402
 
-LUMA = np.array([0.2126, 0.7152, 0.0722])
+# These names are kept as aliases of the shared primitives so `store-studio.py`, `visual-qa.py` and
+# `test-icon-design.py` can keep importing them from here, while the body lives in one module.
+LUMA = colours.LUMA
+luminance = colours.relative_luminance
+srgb_to_linear = colours.srgb_to_linear
+contrast_ratio = colours.contrast_ratio
 
 CANVAS = design.CANVAS
 MARK_DELTA = 12.0  # a pixel this far from the field is mark; below it is compression noise
@@ -216,22 +222,6 @@ LEG_ORDER = tuple(ICON_GATES)
 # --------------------------------------------------------------------------------------
 # Small numeric helpers
 # --------------------------------------------------------------------------------------
-
-
-def luminance(array: np.ndarray) -> np.ndarray:
-    return array[..., :3].astype(np.float64) @ LUMA
-
-
-def srgb_to_linear(channel) -> np.ndarray:
-    value = np.asarray(channel, dtype=np.float64) / 255.0
-    return np.where(value <= 0.04045, value / 12.92, ((value + 0.055) / 1.055) ** 2.4)
-
-
-def contrast_ratio(rgb_a, rgb_b) -> float:
-    la = float(srgb_to_linear(np.asarray(rgb_a, dtype=np.float64)) @ LUMA)
-    lb = float(srgb_to_linear(np.asarray(rgb_b, dtype=np.float64)) @ LUMA)
-    hi, lo = max(la, lb), min(la, lb)
-    return (hi + 0.05) / (lo + 0.05)
 
 
 def _plane_fit(pixels_xy: np.ndarray, values: np.ndarray) -> np.ndarray:

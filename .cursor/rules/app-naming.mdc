@@ -1,0 +1,108 @@
+---
+description: The name is derived and recorded at recon, never invented from the builder's head — the naming contract and its gate
+alwaysApply: true
+---
+
+# A name is derived, not invented
+
+An app called `Calculator` is the failure this rule exists to stop. The owner's complaint, recorded
+2026-10-01: the agent building a utility "that I already hate" names it after its category, because
+the category word is the first thing in its head, and every later stage then treats that thirty-second
+decision as a given. A generic name is a **commercial** defect before it is a policy one: the title is
+the strongest text-ranking field on Play, the bare category word is the head term a 1 B+-install
+incumbent already owns, so the app is unsearchable at the one query it was named for, carries nothing
+a user can prefer, and has no brand that can compound. The name is decided **at recon, recorded, and
+derived** — like the promise list and the money plan, it is a build input, not a decoration applied at
+the end.
+
+The binding specification is `docs/app-naming.md`; the evidence is
+`docs/research/2026-10-01-play-title-policy-and-aso.md` and
+`docs/research/2026-10-01-app-naming-methodology.md`.
+
+## Rules
+
+- **The name is decided at recon, not after the build.** It lives in
+  `docs/ideation/plans/<slug>.naming.json`, is validated by `scripts/new-slot.mjs`, and is written
+  into the slot root as `naming.json` — beside `economics.json` and `differentiators.json`, before
+  the first line of UI. The record is authored with the proposal, exactly as the promise contract is.
+  A name written afterwards justifies only what was built.
+- **A name is never invented; it arrives as a field.** The record carries **at least 5 scored
+  candidates spanning at least 3 archetypes**, plus **at least one rejected alternative with its
+  reason**, and includes the bare category word as a negative control that loses to every serious
+  candidate. A single name with a defence is not a derivation, and a field that eliminated nothing
+  was not generated. Score each survivor 0–5 on the seven weighted dimensions in `docs/app-naming.md`;
+  require **≥ 70/100 with no dimension below 2.5**, and return to the field rather than defend the
+  candidate that is left.
+- **The rejection list is the enforcement surface, not advice.** Never propose a name that is a pure
+  generic word or bare category noun (*Calculator*, *Notes*, *QR Scanner*, *Flashlight*, *Converter*);
+  a `My` / `Simple` / `Easy` / `Pro` / `Free` / `Best` prefix or suffix; the factory's own name
+  (*PlayKiln* or any variant); a number-only or emoji name; a name that promises a capability the app
+  does not have; a name that collides with a competitor's; ALL CAPS, repeated symbols or a stylised
+  misspelling; keyword stuffing; a name that fails the radio test (a listener cannot type it after
+  hearing it once); a name with no room for the job noun or that overflows 30 characters in a longer
+  locale; a name that needs a pronunciation guide or has more than one plausible spelling; a homophone
+  trap; a name with an unexpected or culturally sensitive meaning in a declared locale; a name that
+  duplicates another slot's head term; a name that only works in English; or a name that copies an
+  incumbent's title with one word swapped. The full list is `docs/app-naming.md` § "The rejection
+  list", and all sixteen are checked.
+- **The name satisfies Play's rules, measured, not paraphrased.** The title is **30 characters or
+  less, and full-width characters count the same as half-width** (Play Console Help; the Metadata
+  policy and the best-practices page both repeat the cap). A title may not carry emoji, emoticons or
+  repeated special characters; ALL CAPS unless it is the brand; keyword spam; another app's or
+  entity's name; ranking or price text (`#1`, `Best of Play`, `10% off`, `Free`). Google states
+  itself that unnecessary keywords *"will not impact ranking and provides a bad user experience"*
+  (*Add preview assets*). Enforcement escalates rejection → removal → suspension → **account
+  termination, in which every app in the catalog is removed**; removals, suspensions and warnings all
+  count as strikes, and Google is not required to warn first. The quotes and their sources are in
+  `docs/app-naming.md` § "Play's actual rules".
+- **The name clears the same localisation bar the layout does, for the same reason.** The title is a
+  user-visible string with a per-language variant and a hard cap: Play's field note says *"You can add
+  one localized name per language"*, and *"the Metadata policy and our other policies apply to all
+  translations"*. `en` and `ru` are the minimum. Measure `<Carrier>: <Job noun>` in every declared
+  locale, keep **≥ 5 characters of slack**, and never let a machine translation name the app. A
+  carrier that only works because English is short is the name-shaped version of the localisation
+  defect `.cursor/rules/visual-identity.mdc` already fails.
+- **The slug, the `applicationId` and the store title derive from the one recorded decision, so they
+  cannot drift apart.** The chain is `name → slug → applicationId (com.gexetr.<slug>) → store title`;
+  the scaffold and the listing are read from the record, not from separate flags, exactly as the theme
+  and the store pack are both rendered from `store/studio.json`. The **`applicationId` is permanent
+  and cannot be reused** — changing it after publish makes Play treat the upload as a different app,
+  with no way to move installs, ratings or reviews. The **title stays editable** after publish, but by
+  then the carrier is the brand. Before the first upload everything is reversible; that is why this is
+  the last moment a name is free.
+- **The contract is not in the approval digest's exclusion list, and must not be added to it.**
+  Changing what the app is called changes what the owner is approving; that should lapse the approval,
+  not slip past it.
+- **Never edit a name to make it true, and never reword the rejection list to fit a favourite.** A
+  name that fails a hard check is eliminated regardless of its score; if the best candidate collides
+  or means something unfortunate in `ru`, the fix is to generate another candidate, not to lower a
+  bar.
+
+## How it is verified
+
+- `node scripts/verify.mjs` — the **`naming.fixtures`** check runs in the **`invariants`** group, in
+  the same process as every other core check, before any slot is read. Its inline fixtures drive the
+  checker over synthetic records whose verdict is known, and include the legs that must fail: a bare
+  category noun, a field spanning fewer than three archetypes, a title that overflows 30 characters in
+  `ru`, a record with no rejection, and a missing negative control.
+- `node scripts/verify.mjs --slot <slug>` — runs **`slot.naming`**, the per-slot half: schema, the
+  score floor and the seven dimensions, candidate count and archetype spread, the rejection patterns,
+  the measured per-locale title lengths against the cap and the slack, the `reconRef` file, the
+  collision record, and that `slug` and `applicationId` agree with the directory and
+  `registry/apps.json`.
+- **A deleted file is `UNVERIFIED`, and `UNVERIFIED` is never a pass.** The check treats the decision
+  as declared once it is on disk **or** in git, so deleting `naming.json` from the working tree does
+  not switch the check off; a slot with no record at all is reported `UNVERIFIED` naming the path.
+- A gate that cannot fail is not a gate. The failing fixture legs exist to prove this one can.
+
+## The honest limit
+
+No program can judge whether a name is **beautiful, clever or memorable** — a score of 82 is
+arithmetic, not taste. The gate proves only that the decision was **derived** (a scored field across
+several archetypes, an alternative rejected in writing) and **legal** (the rejections are absent; the
+title fits every declared locale inside Play's cap with slack; the slug, package and title are one
+decision). It cannot prove the name causes installs — no controlled experiment exists — and a clean
+Play search plus a registry screen is not trademark clearance. The judgement that separates a
+distinctive name from an ugly one stays with the **owner at checkpoint 1**, exactly as it does for the
+visual identity and the promise list. This gate's job is to make sure he is asked, with the reasoning
+on the table instead of a name an agent liked.

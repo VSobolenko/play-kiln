@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Only declare languages backed by matching res/values-<language>/ resources. A slot is born
+         multilingual: `ru` ships from the first commit, so translation is a step the build already
+         does rather than one retrofitted onto a finished UI. A pseudolocale (en-XA / ar-XB) is a
+         developer-options device setting and is never declared here. -->
+    <locale android:name="en" />
+    <locale android:name="ru" />
+</locale-config>

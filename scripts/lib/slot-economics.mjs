@@ -22,13 +22,14 @@ export const SCHEMA_VERSION = 1
 /** Minimum length of a free-text plan field; a one-word answer is not a plan. */
 export const MIN_PLAN_TEXT_LENGTH = 12
 
-/** The five archetypes, matching docs/monetization-strategy.md §3.6's table. */
+/** The four archetypes the factory offers. `subscription` is banned (owner, 2026-10-01): recurring
+ *  billing needs server-side validation and drags refund, cancellation and grace-period duties into
+ *  the slot. Its absence here is the enforcement — see docs/slot-economics.md. */
 export const ARCHETYPES = Object.freeze([
   'purchase_led_single_unlock',
   'purchase_led_repeat_sales',
   'ads_led_utility',
-  'purchase_only_no_ads',
-  'subscription'
+  'purchase_only_no_ads'
 ])
 
 /**
@@ -42,8 +43,7 @@ const ARCHETYPE_CAPABILITIES = Object.freeze({
   purchase_led_single_unlock: ['billing'],
   purchase_led_repeat_sales: ['billing'],
   ads_led_utility: ['ads'],
-  purchase_only_no_ads: [],
-  subscription: ['billing']
+  purchase_only_no_ads: []
 })
 
 /** The free-text plan fields, each required to read as a sentence rather than a label. */

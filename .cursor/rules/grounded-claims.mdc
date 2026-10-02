@@ -1,0 +1,90 @@
+---
+description: No claim without a source — every factual sentence carries the evidence that makes it true, and a recommendation names the alternative it rejected
+alwaysApply: true
+---
+
+# No claim without a source
+
+The owner's instruction, recorded 2026-10-02, after reading the work of nearly two slots: a scout said
+a pocket was good, the UI/UX work said the design was good, and **none of them answered with facts**.
+Each had answered from memory and presented the memory as a finding. That is the defect this rule
+stops, and it is the factory's most expensive one precisely because it is invisible — a confident
+sentence and a measured one look identical in a report, and only one of them is worth acting on.
+
+The rule is one sentence. **Before a factual sentence leaves you — in chat, in a report, in a proposal,
+in a review, in a code comment, in a decision — you must be able to name what you read or ran that
+makes it true. If you cannot name it, you do not know it, and you say so instead.**
+
+## The four labels, and what each one requires
+
+The factory already carries this vocabulary (`docs/ideation/README.md`, `docs/slot-differentiators.md`,
+`docs/research/measured-facts.json`). It is not decoration: the label is the difference between a claim
+a reader can check and a claim a reader must trust on faith.
+
+| Label | You may use it only when | What must accompany it |
+|---|---|---|
+| `MEASURED` | you ran a command, read a file, or observed the artifact **in this session** | the command and its observed output, or the `path:line` |
+| `ON RECORD` | a named source states it and you read that source | the source, and the number or quote it gave |
+| `INFERRED` | it follows from other labelled facts | the facts it follows from, and the step between them |
+| `UNVERIFIED` | you did not check it | the exact command or file that would decide it, and who can run it |
+
+`UNVERIFIED` is a **result**, not a failure. It is the honest answer to a question you could not
+settle, and it is strictly better than a confident sentence that turns out to be invented. What is
+forbidden is presenting an unverified claim under any other label.
+
+## What is banned
+
+- **An invented fact.** A path, a symbol, a line number, an API name, an artifact version, a price, a
+  policy quote, an install count or a test result you did not read. If you believe it but did not
+  check it, that is `UNVERIFIED` — never a stated fact.
+- **Filling a gap with the plausible default.** "The theme is probably Material 3", "that file should
+  hold the guard", "the build likely passed" — each is a guess wearing a fact's clothes. Go read it,
+  or label it.
+- **Paraphrasing a document as if citing it.** Name the file and the line. A summary of a source is an
+  inference *about* the source, not the source.
+- **A verdict on your own artifact.** "I built it well", "the tests are green", "this is ready" are
+  self-reports. `AGENTS.md` already forbids a builder's `PASS` about its own work and
+  `harness/roles/builder.md` repeats it; this rule extends that to **every** claim a worker makes
+  about anything it produced.
+- **A recommendation with no rejected alternative.** "This is the better choice" is not a decision
+  input. State what you chose, what you rejected, and the fact that separated them — the same
+  discipline `.cursor/rules/ideation-gate.mdc` requires of a monetization archetype and
+  `.cursor/rules/app-naming.mdc` requires of a name.
+- **"Probably", "should be", "seems", "I believe", "it works"** presented as fact rather than labelled
+  as an inference or left unverified.
+
+## How a claim is carried
+
+A worker's report is read by an orchestrator that cannot see the worker's session, so the evidence
+travels with the claim. Every report ends with a claim ledger:
+
+```text
+CLAIM                                        LABEL       EVIDENCE
+the Scaffold discards its innerPadding       MEASURED    Surface.kt:24
+predictive back is declared                  MEASURED    `rg enableOnBackInvokedCallback app/src/main/AndroidManifest.xml`
+the shelf pays                               MEASURED    enrich-market.mjs, cashbook 4.5★ / 145000 reviews
+the wedge will convert                       UNVERIFIED  no priced comparable found; needs one to decide
+```
+
+An orchestrator rejects a report whose rows carry no label, whose `MEASURED` row names no command and
+no `path:line`, or whose conclusion rests on a row labelled `UNVERIFIED`. **A conclusion is only as
+strong as its weakest load-bearing row.**
+
+## Where this is dispatched from
+
+A subagent never sees the orchestrator's conversation, so a rule it is not told to follow is a rule it
+cannot follow. **Every dispatch brief states this duty**, and the brief is where the claim ledger is
+required, because the worker cannot infer it (`.cursor/rules/parallel-execution.mdc`,
+`harness/dual-agent.md`).
+
+## The honest limit
+
+This rule is **behavioural**, and a behavioural rule is the easiest to violate and the hardest to
+detect. What a program can check is that the duty is *declared*: that this file loads
+(`alwaysApply: true`), that every role card under `harness/roles/` binds it, and that every agent card
+under `.cursor/agents/`, `.codex/agents/` and `.claude/agents/` points at it. That check is
+`harness.groundedClaims`, and it is why those cards cannot quietly drop the rule. What no program can
+check is whether one particular sentence was true — that is still a reader's job, which is exactly why
+the ledger is written down rather than implied: **a false claim beside its label is a claim a later
+reader can contradict.** The defect this rule was written from was invisible only because nothing was
+written down.

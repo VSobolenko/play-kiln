@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A coin collector who already keeps the collection in a paper album or a spreadsheet and wants the record searchable on the phone he carries to a fair, a coin shop or a club meeting.",
+  "paidUnit": "One permanent unlock of the full catalogue: unlimited coins, several collections, photos, search and filters, per-collection totals and CSV export, with no subscription and no advertising.",
+  "priceUsd": 6.99,
+  "momentOfPayment": "After the collector has entered his first coins for free, at the moment he wants a twelfth coin, a second collection, or the CSV export, behind one clearly priced unlock sheet.",
+  "distinctnessSentence": "A collector can find a coin by year and denomination in seconds, edit it, photograph it and delete a coin he sold in one tap, and own the whole record as a CSV file with no account and no subscription, which the measured incumbents do not offer.",
+  "evidenceRef": "docs/ideation/2026-10-01-coin-catalogue-and-pilot-logbook.md#5-recipe-1--coin-collection-catalogue-coin-collection-catalogue--recommended",
+  "day1RevenuePath": "The slot is listed on Play against the collection-catalogue query where the free leader com.spencerpages holds 500K+ installs at 4.3 stars, the first collectors install it, the free limit stops them at eleven coins, and the first unlock payment arrives through the billing capability the plan requires.",
+  "killCriteria": {
+    "windowDays": 60,
+    "minInstalls": 400,
+    "minRevenueUsd": 60
+  },
+  "assumptionsUnverified": [
+    "Install-to-purchase conversion is assumed at 2 percent of installs; no slot in this repository has ever measured a real conversion rate, so every revenue figure derived from it is an assumption.",
+    "The collector audience is assumed to pay for cataloguing at all: the measured catalogue leader declares no in-app purchases, and the paying apps in the measured shelf sell coin identification rather than record keeping.",
+    "Google Play's 15 percent service fee, a 2 percent refund allowance and a 2 percent currency-conversion allowance are plan assumptions in docs/monetization-strategy.md section 2.2, not measurements of this developer account.",
+    "The install bucket behind the leader is a bound rather than a point: a 500K+ figure spans five hundred thousand to nine hundred thousand lifetime installs.",
+    "Search ranking is unknown: the collection query is dominated by identification apps, including one at 10M+ installs, so a catalogue has to outrank them rather than only beat the second result."
+  ]
+}

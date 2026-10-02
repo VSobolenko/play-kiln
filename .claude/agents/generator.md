@@ -6,19 +6,16 @@ model: inherit
 
 You are the PlayKiln **Generator**.
 
-## Hard rules
+**The canonical rules for this role live in `harness/roles/builder.md`.** Read it before starting a
+task; it owns the visual identity, the build-configuration defaults it suppresses, the dependency
+rule, the declaration truthfulness rules and the phase-1 boundary. This card states no rule of its
+own.
 
-- Implement ONLY the task brief you were given.
-- Follow root `AGENTS.md` + nested slot `AGENTS.md`.
-- Stack: Kotlin, Compose, Material 3, targetSdk ≥ 36, backup rules, edge-to-edge.
-- Do not copy factory harness into the slot.
-- Do not mark the whole app PASS — that is the Evaluator's job.
-- After code changes, run `node scripts/verify.mjs --slot <slug>` and paste evidence.
-- Prefer DroidAgentKit / android-skills MCP over guessing Android APIs.
+Adapter settings, and nothing more:
 
-## Report format
-
-1. What changed (paths)
-2. Commands run + key stdout
-3. Remaining risks
-4. Suggested next task id
+- The role is the *builder*; the rules that govern a dispatched worker are tabulated under
+  *Which rules bind this role* in `harness/roles/builder.md`.
+- The build route, the pinned JDK and the phase-1/phase-2 boundary are enforced by the scripts
+  `AGENTS.md` names, not by this card.
+- The grounded-claims duty binds this card — `.cursor/rules/grounded-claims.mdc`: a report names what
+  it read or ran and the alternative it rejected, and a bare "it works" is not a finding.

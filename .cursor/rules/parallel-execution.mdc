@@ -1,4 +1,9 @@
-# Parallel execution discipline
+---
+description: The main chat orchestrates; substantial work runs as parallel subagents and workers
+alwaysApply: true
+---
+
+# Parallel execution discipline — the orchestrator contract
 
 The factory's limit is wall-clock time, not effort. Producing one app took ~26 hours of
 sequential work that was mostly independent, and the owner had to point it out twice. A
@@ -7,7 +12,70 @@ factory: the whole model depends on screening ideas and shipping slots faster th
 could alone.
 
 These rules exist because serial work was chosen by default, over and over, for tasks that had
-no dependency between them.
+no dependency between them. They were also, until 2026-10-01, enforced by nothing: this file had no
+YAML frontmatter, so Cursor's loader never attached it to any context and no session ever read it.
+That is fixed, and `harness.rules` in `scripts/core/harness.mjs` now fails if any rule under
+`.cursor/rules/` is in that state again.
+
+## The main chat orchestrates; it does not build
+
+The chat window is a **control plane, not a workbench**. Its job is four things: decompose the task
+into independent units, dispatch them, adjudicate what comes back against the repository on disk,
+and report. **Every substantial piece of work runs in a subagent or a worker.**
+
+The owner's instruction, recorded 2026-10-01 after he had asked for subagents repeatedly and
+watched one agent do everything serially: *"the chat is a place where only orchestration is laid
+down, and that is all. Everything else is done by subagents."*
+
+This is not only about speed. One context that both writes the code and judges it is the least
+verified configuration available — the factory already names that as the reason the worker loop
+exists (`AGENTS.md`) — and an orchestrator that quietly does the work itself has removed the
+independent check while leaving the report looking the same.
+
+**The test is one question: what did the main chat write?** If the answer is production code, a rule
+file, a store asset or a test, the work was not delegated. Legitimately the orchestrator's own:
+answering a direct question, reading a file to adjudicate a dispute, running the one authoritative
+verification, and editing the few lines a worker's diff needs to land. Everything else is a dispatch
+that did not happen.
+
+## Default to plural, not to one
+
+- **A whole slot is a dozen dispatches, not one.** Two independent units → two subagents in one
+  message; ten → ten. There is no upper limit to respect; there is a lower one to beat.
+- **One `Task` per message, awaited, is serial work wearing the word "subagent".** Parallel dispatch
+  is a property of the *message*, not of the tool: several `Task` calls in a single block run
+  concurrently. `run_in_background: true` is what lets them run while the orchestrator keeps working.
+- **"I will just do the quick part myself first" is how the loop never starts.** Dispatch first, then
+  read what you need to adjudicate.
+- **Never report "done" for work that was dispatched but has not returned.** Say what is running.
+
+## What a subagent is, and is not
+
+Five facts govern every dispatch, and each one has already cost this factory a wasted turn:
+
+- **A subagent does not see this conversation.** It receives its `prompt` and nothing else — no user
+  message, no prior steps, no tool results. A brief that assumes shared context returns a plausible
+  answer to the wrong question. Write it self-contained: the repo path, the exact deliverable, the
+  exact command that proves it, and the rule it must honour.
+- **Subagents cannot talk to each other. There is no channel between them.** The orchestrator is the
+  router and **the filesystem is the bus**: a worker's artifact, a ledger row under `.kiln/`, a
+  report the orchestrator hands to the next worker. "Let them talk to each other" means, concretely,
+  *route their outputs through a file or through the orchestrator*, never that two agents hold a
+  conversation. Two writers that must agree on one interface agree through a file neither owns.
+- **A brief that asks for a plan returns a plan.** A worker handed a design question will answer with
+  a proposed design and a request for approval, which looks like a worker failure and is a prompt
+  failure. State in the prompt that approval is not being sought, that the worker is already
+  authorised, and that it must run its commands and report observed output.
+- **A dispatch without a falsifiable deliverable cannot be verified.** Name the artifact and the one
+  observation that would prove it wrong. See the read-only-type trap below, and
+  `.cursor/rules/verification-discipline.mdc` — a worker's report is input to verification, never
+  proof.
+- **A brief that does not state the grounded-claims duty returns claims without evidence.** A subagent
+  never sees this conversation, so a rule it is not told to follow is a rule it cannot follow: every
+  brief names `.cursor/rules/grounded-claims.mdc` and requires the **claim ledger** its report must end
+  with — one `CLAIM / LABEL / EVIDENCE` row per factual claim, each `MEASURED` row naming the command
+  that produced it or the `path:line` it was read from, and `UNVERIFIED` an accepted answer rather
+  than a failure.
 
 ## Default to parallel
 
@@ -27,6 +95,25 @@ no dependency between them.
   each other, and the corruption looks like a mystery defect later.
 - Read-only work (reviews, audits, research) has no file conflict and should nearly always run
   in parallel with implementation.
+
+## What to dispatch, by stage
+
+A named plan, so "parallelise it" is not a mood. Every row is several `Task` calls in **one**
+message unless the row says otherwise.
+
+| Stage | Dispatch, concurrently | Why these units are independent |
+|---|---|---|
+| **Recon** | **two or more scouts** (`explore`) over different query sets or shelves, **plus a `money-owner`** pricing what comes back | the shelves do not overlap, and the price of a niche does not depend on which query surfaced it. The scouts never wait for each other; the money owner needs only one candidate to start |
+| **Propose** | a `planner` per candidate the owner shortlists | each proposal is a separate change with its own tasks |
+| **Build** | **one `generator` or Codex worker per bounded file list**, as many as there are disjoint units — UI, domain logic, tests, resources | parallel writers on one file corrupt each other, so the orchestrator partitions the file lists *before* dispatching, never after |
+| **Verify** | a `verifier` and a **separate** bug hunter (`bugbot` or a `generalPurpose` critic), in contexts other than the builder's | finding defects nobody claimed and testing claims somebody made are different jobs; collapsing them loses the first |
+| **Audit** | `play-auditor` (policy, Data safety, permissions) ∥ `security-review` ∥ `android-debugger` (runtime) | three different questions over the same tree, none of which writes |
+| **Release** | the store pack, the release notes and the review copy as separate writers; `evaluator` grading in parallel | disjoint file sets, and grading must not share a context with authoring |
+
+Two standing exceptions, both of them real: `evaluator` and `planner` are **read-only** in this
+build (confirmed twice by evidence, not by reading their descriptions — see below), so they report
+and the orchestrator writes. And **Gradle is serial per slot**: whatever the dispatch plan says, only
+one process may build in a given slot directory.
 
 ## Codex first, not last
 

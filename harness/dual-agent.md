@@ -13,9 +13,14 @@ is input to verification, never proof of completion.
 | **Verify** | Read-only diff review, commands, requirement challenges | Evidence and a PASS/FAIL/BLOCKED verdict |
 | **Adjudicate** | Resolve Build/Store/Verify disagreement against contracts | Ruling, evidence, cost if wrong, next owner |
 
-Cursor normally orchestrates and verifies; it may take any role when needed. Keep
+The orchestrator dispatches these roles and does not occupy one itself. `.cursor/rules/parallel-execution.mdc`
+states the contract; each role card in `harness/roles/` states when and how it is dispatched. Keep
 parallel writers on disjoint file lists or in separate worktrees. Read-only reviews
 may share a working directory.
+
+Taking a role personally is the exception, not a permitted mode: it is allowed only when the worker
+owners are blocked **and** the reason is stated where the evidence is reported. "It was quicker" is
+not a reason, and a session that edited code without dispatching has no worker to verify it.
 
 ## Worker lifecycle
 
@@ -38,6 +43,12 @@ node scripts/codex-run.mjs list
 4. `log` reads recent stdout and stderr when the final message is absent or unclear.
 5. `resume` continues the exact recorded Codex session with a new prompt.
 6. Verify the result with a diff and the relevant factory commands.
+
+Every worker report carries the **claim ledger** `.cursor/rules/grounded-claims.mdc` defines: one
+`CLAIM / LABEL / EVIDENCE` row per factual claim, each `MEASURED` row naming the command that produced
+it or the `path:line` it was read from, and `UNVERIFIED` used as the honest answer to a question the
+worker could not settle. A report without the ledger is not a handoff, because the orchestrator cannot
+see the session that produced it.
 
 Do not use the MCP `codex` tool for implementation or other long tasks. Its request
 can time out and lose the work. Reserve it for short dialogue; use
@@ -78,6 +89,8 @@ credentials, or a changed product decision, stop and ask the human.
 ## Acceptance and adjudication
 
 - Read the actual diff; do not trust summaries.
+- Reject a report with an unlabelled claim, a `MEASURED` row naming no command or `path:line`, or a
+  conclusion resting on an `UNVERIFIED` row (`.cursor/rules/grounded-claims.mdc`).
 - Run `node scripts/verify.mjs --slot <slug>` for a publishable
   slot and any narrower tests required by the change.
 - Verify signed release artifacts through `scripts/prepare-release.mjs` evidence.

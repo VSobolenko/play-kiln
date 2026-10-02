@@ -8,8 +8,9 @@ description: "PlayKiln phase 1: one idea → isolated slot → dual-agent develo
 # /ship — PlayKiln development phase
 
 The factory's front door when the idea is already in hand, and **only the first half of it**. One
-invocation takes an idea to an app the owner can install and judge: isolated slot, implementation,
-tests, source-level verification. It then **stops** and asks the owner to approve the release.
+invocation takes an idea to an app the agent has installed and exercised, which the owner then
+judges as a product: isolated slot, implementation, tests, source-level verification. It then
+**stops** and asks the owner to approve the release.
 
 Use **`/forge`** instead when there is **no idea yet**: it runs recon to choose the topic by
 measurement, and on the owner's approval continues into these same steps — then into `/release`.
@@ -90,15 +91,27 @@ Every promise in `differentiators.json` starts `deferred`, and `verify.mjs` fail
 promise is still deferred. Resolve each one as you build: `shipped` with a proof that exists in the
 slot, or `narrowed`/`dropped` in writing — with the owner's own words when the promise was `core`.
 
-### 3. Implement (dual-agent PGE)
+### 3. Implement — dispatch, do not type
 
 Follow `harness/dual-agent.md`, `.cursor/skills/pge-harness/SKILL.md`, and
-`.agents/skills/subagent-driven-development/SKILL.md`:
+`.agents/skills/subagent-driven-development/SKILL.md`.
 
-- **Planner** via the `planner` agent (step 1), **Build** via the `generator` subagent and/or
-  the Codex peer.
+**The orchestrator does not implement this step.** It partitions the work into bounded, disjoint file
+lists and dispatches **one worker per list, together, in a single message** — UI, domain logic, unit
+tests, resources, the store drafts. A queue of one worker awaited at a time is serial work with a
+worker's name on it, and it is the default this step exists to break
+(`.cursor/rules/parallel-execution.mdc`).
+
+- **Plan** via the `planner` agent. It is read-only in this build: it reports the proposal and the
+  orchestrator writes the file.
+- **Build** via `generator` subagents and/or Codex workers (`node scripts/codex-run.mjs`, several
+  backgrounded at once). Codex is a co-lead engineer, not a reviewer.
 - Ledger: `.superpowers/sdd/<slug>/progress.md`.
-- Parallel writers need disjoint files or separate worktrees.
+- **Partition before dispatching.** Two writers on one file corrupt each other, and the corruption
+  surfaces later as a mystery defect. Disjoint files or separate worktrees, decided up front.
+- **Keep a verifier's context separate** from the builder's: the context that wrote the code is the
+  least able to judge it.
+- Only one Gradle consumer per slot.
 - Stubborn stalls → `ralph-loop` (capped). Fix loops ≤ 5.
 - Evidence over self-reports.
 
@@ -120,8 +133,9 @@ node scripts/verify.mjs --slot <slug> --build     # source gates + assembleDebug
 Prefer DroidAgentKit MCP for lint / doctor / runtime checks when connected. `UNVERIFIED` is
 not PASS — read the diff by hand.
 
-A debug APK the owner can install is the expected output
-(`app/build/outputs/apk/debug/app-debug.apk`). Installing it is how the owner judges the UI.
+A debug APK the agent installs on the connected phone and drives itself is the expected output
+(`app/build/outputs/apk/debug/app-debug.apk`). What the owner judges is the product, on the evidence
+the agent observed there.
 
 **Do not run any release step here.** `prepare-release.mjs`, `scripts/store/render.py` rendering and
 `media-capture.mjs` all refuse until the owner approves, and trying to work around that
@@ -130,10 +144,16 @@ refusal is the failure this phase exists to prevent. `scripts/store/render.py --
 
 ### 5. Stop and request the owner's approval
 
-**CHECKPOINT 1.5 — the human reviews the app.** Report, then wait:
+**CHECKPOINT 1.5 — the human decides the product.** The agent has already installed the debug
+artifact on the attached phone and driven every screen itself; this report is the evidence of that
+run, and asking the owner to install, launch or verify the app is the defect this checkpoint exists
+to prevent. Report, then wait:
 
-- what the app does, and what to look at or tap,
-- how to install it (`adb install -r app/build/outputs/apk/debug/app-debug.apk`),
+- the agent ran the app on the connected device and what it observed there,
+- the exact screens exercised,
+- the device serial and the hash of the installed artifact, because the on-device run is evidenced by
+  them plus what was observed on screen — "it compiles" and "the tests are green" are not a
+  substitute (`.cursor/rules/device-testing.mdc`),
 - the verification output from step 4,
 - that the release (build, signing, store pack, screenshots) has **not** run.
 

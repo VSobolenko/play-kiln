@@ -522,6 +522,23 @@ export function factFixtureCases() {
     }
   ])
   cases.push([
+    'a check id reported from inside a group entry is declared too, so a fact can name the specific sensor',
+    () => {
+      // `reports` is how a group declares the sub-ids its rows carry (`ui` reports `uiux.insets` and
+      // `uiux.platform`). The reader already sees them, because they are `id:` fields like any other, and
+      // this case makes that a stated contract rather than an accident: a fact naming one is enforced,
+      // because the group that reports it is what `verify.mjs` runs.
+      const source = "  { id: 'ui', needsSlot: true, reports: [{ id: 'uiux.insets' }, { id: 'uiux.platform' }], run: () => [] }"
+      const ids = checkIdsFromRegistry(source)
+      for (const expected of ['ui', 'uiux.insets', 'uiux.platform']) {
+        if (!ids.includes(expected)) throw new Error(`the reader missed '${expected}': ${JSON.stringify(ids)}`)
+      }
+      const result = audit([fact({ id: 'edge-to-edge', enforcedBy: 'uiux.insets' })], { ids })
+      expectVerdict(result, 'PASS', 'a fact naming a reported sensor id')
+      expectDetail(result, 'by a core check id', 'a fact naming a reported sensor id')
+    }
+  ])
+  cases.push([
     'the registry reader does not mistake a longer key for an id declaration',
     () => {
       const ids = checkIdsFromRegistry("  valid: 'yes',\n  needsSlot: true,\n  id: 'assets'")

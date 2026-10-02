@@ -15,7 +15,9 @@ Two phases, with the owner's approval between them
 1. **Plan** — OpenSpec; human checkpoint (`context-layers` L1/L2)
 2. **Generate** — Cursor ∥ Codex peers (Build); SDD; optional Ralph
 3. **Observe** — `verify.mjs --build`, `run-slot-tests`, DroidAgentKit, Gradle
-4. **Approve** — the owner installs the debug APK and says yes; recorded by
+4. **Approve** — the agent has installed the debug APK on the connected phone and exercised the app
+   itself, and its observed evidence (device serial, artifact hash, what appeared) is the handoff; the
+   owner decides the product and says yes; recorded by
    `approve-release.mjs --note` and bound to a digest of the app's sources
 
 **Phase 2 — release (`/release`)**

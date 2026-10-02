@@ -402,11 +402,13 @@ never do without an instruction — is stated once in `.cursor/rules/authorizati
    uses: every slot uses encryption whether or not it imports crypto code, and the **annual BIS
    self-classification question is an open obligation**, not settled law.
 
-The release approval itself (checkpoint 2) precedes this ladder: the owner installs the debug APK,
-reviews the UI and behavior, and states the approval in his own words, which is recorded with
-`node scripts/approve-release.mjs --slot <slug> --note "<the owner's own words>"`. The rules for that
-record — the owner's own words only, never inferred, never recorded to unblock a step — are stated
-once in `.cursor/rules/release-gate.mdc`.
+The release approval itself (checkpoint 2) precedes this ladder: the agent has already installed the
+debug APK on the connected phone and exercised the app itself, the handoff carries its observed
+evidence (device serial, artifact hash, what appeared on screen), and the owner's act is the
+**product** decision — whether this is the app to ship — stated in his own words, which is recorded
+with `node scripts/approve-release.mjs --slot <slug> --note "<the owner's own words>"`. The rules for
+that record — the owner's own words only, never inferred, never recorded to unblock a step — are
+stated once in `.cursor/rules/release-gate.mdc`.
 
 ---
 

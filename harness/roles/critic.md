@@ -10,6 +10,20 @@ landing; a finding that nobody can reproduce is withdrawn rather than filed. It 
 rather than a phase: it runs against whatever landed most recently and keeps running, so the newest
 landing always has a hunter.
 
+## Dispatch
+
+The main chat orchestrates; the critic runs as a subagent (`Task`), never inline in the orchestrator.
+"Continuous" means **a fresh dispatch against each landing**, not a standing activity inside the main
+chat: the orchestrator launches one critic per landing, in its own context, and the next landing gets a
+new hunt. The critic writes nothing and edits no artifact, so it carries no file conflict and may run
+**in parallel with the builders and verifiers** of the next landing — but it must not contend for the
+slot's build, which is one consumer at a time.
+
+The critic returns to the orchestrator a **findings report, not a file edit**: a dated list naming the
+landing it judged, each defect's artifact, and the exact command that reproduces it — or, for a hunt that
+found nothing, the falsifiable claim that the hunt ran and came back empty. A finding whose command
+produces no observation is withdrawn, and the report says so.
+
 ## The artifact it owns
 
 A findings record: a dated list of defects, each naming the artifact it was observed in and the exact
@@ -35,10 +49,28 @@ A hunt that produces no finding is a `PASS` on the hunt, and it is still not a s
 landing is correct — it means this pass found nothing reproducible, and the next landing gets a new
 hunt. The findings go to the fixer, and the loop runs again on what the fixer produced.
 
+## How it reports — claims carry evidence
+
+Every factual sentence a critic returns names the artifact it was observed in and the command that
+reproduces it — a finding is that pair, not an opinion about the landing. The four labels (`MEASURED`,
+`ON RECORD`, `INFERRED`, `UNVERIFIED`) mean exactly what `.cursor/rules/grounded-claims.mdc` states,
+and this card cites them rather than redefining them. A suspected defect that cannot be reproduced is
+withdrawn as `UNVERIFIED`, never asserted as a `FAIL`, and a hunt that comes back empty is the
+falsifiable claim that it ran and found nothing. The report ends with the claim ledger:
+
+```text
+CLAIM                                        LABEL       EVIDENCE
+the Scaffold discards its innerPadding       MEASURED    Surface.kt:24
+predictive back is declared                  MEASURED    `rg enableOnBackInvokedCallback app/src/main/AndroidManifest.xml`
+the shelf pays                               MEASURED    enrich-market.mjs, cashbook 4.5★ / 145000 reviews
+the wedge will convert                       UNVERIFIED  no priced comparable found; needs one to decide
+```
+
 ## Which rules bind this role
 
 | Rule (subject) | Stated in |
 |---|---|
+| Every factual claim carries its evidence label and every recommendation names the alternative it rejected | `.cursor/rules/grounded-claims.mdc` |
 | A check that cannot fail is not a check; a verdict must name what would contradict it | `.cursor/rules/verification-discipline.mdc` |
 | A worker's report is input to verification, never proof; independent streams run together | `.cursor/rules/parallel-execution.mdc` |
 | A hunt for unclaimed defects is a separate pass from reproducing a claim, and a conflict is adjudicated against the artifact rather than averaged | `AGENTS.md` |

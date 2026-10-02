@@ -1,0 +1,17 @@
+{
+  "slug": "lawn-round-log",
+  "applicationId": "com.gexetr.lawnroundlog",
+  "appName": "Lawn Round Log",
+  "idea": "An offline lawn round log a solo mower owns outright: ordered customers, one-tap visits, owed balances and CSV export, unlocked once.",
+  "createdAt": "2026-10-01T18:24:47.021Z",
+  "scaffoldVersion": "android-compose-v1",
+  "status": "scaffolded",
+  "economics": {
+    "archetype": "purchase_led_single_unlock",
+    "priceUsd": 9.99
+  },
+  "differentiators": {
+    "promises": 5,
+    "core": 3
+  }
+}

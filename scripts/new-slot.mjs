@@ -3,7 +3,7 @@
  * Create an isolated Android Compose app slot under apps/.
  *
  * Usage:
- *   node scripts/new-slot.mjs --slug <slug> --name "<Title>" --idea "<one line>" --economics <plan.json> --differentiators <contract.json> [--date YYYY-MM-DD] [--package com.gexetr.<slug>] [--force]
+ *   node scripts/new-slot.mjs --slug <slug> --name "<Title>" --idea "<one line>" --economics <plan.json> --differentiators <contract.json> --naming <contract.json> [--date YYYY-MM-DD] [--package com.gexetr.<slug>] [--force]
  *
  * A slot cannot be scaffolded without a validated `economics.json` plan: the first
  * slot shipped with no revenue mechanism and every gate still returned PASS, so the
@@ -14,6 +14,13 @@
  * build only contains what was built. Both files are written before the first line of
  * UI, and `scripts/check-differentiators.mjs` refuses to call the slot done while any
  * promise in it is still deferred.
+ *
+ * A third recon contract, `naming.json`, is required for the same class of reason: the
+ * name is a product decision, derived from a scored field of candidates and written down
+ * before the UI, because the category word is the first thing an agent reaches for and it
+ * spends Play's strongest ranking field on the head term the incumbent already owns.
+ * `--slug` and `--name` are derived from that contract when omitted and must agree with it
+ * when supplied, so a caller cannot name the app twice.
  */
 
 import {
@@ -35,6 +42,7 @@ import {
 } from './lib/namespaces.mjs'
 import { parseEconomics } from './lib/slot-economics.mjs'
 import { parseDifferentiators } from './lib/slot-differentiators.mjs'
+import { parseNaming } from './lib/slot-naming.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const scaffold = join(root, 'scaffold', 'android-compose')
@@ -84,14 +92,23 @@ const excludedSuffixes = ['.apk', '.aab', '.ap_', '.jks', '.keystore', '.iml']
 // carrying one.
 const workerLogSegment = /^\.kiln-.*\.log$/i
 const usage =
-  'node scripts/new-slot.mjs --slug <slug> --name "<Title>" --idea "<one line>" --economics <plan.json> --differentiators <contract.json> [--date YYYY-MM-DD] [--package com.gexetr.<slug>] [--force]'
+  'node scripts/new-slot.mjs --slug <slug> --name "<Title>" --idea "<one line>" --economics <plan.json> --differentiators <contract.json> --naming <contract.json> [--date YYYY-MM-DD] [--package com.gexetr.<slug>] [--force]'
 
 function line(status, message) {
   console.log(`${status.padEnd(8)} ${message}`)
 }
 
 function parseArgs(argv) {
-  const values = new Set(['--slug', '--name', '--idea', '--date', '--package', '--economics', '--differentiators'])
+  const values = new Set([
+    '--slug',
+    '--name',
+    '--idea',
+    '--date',
+    '--package',
+    '--economics',
+    '--differentiators',
+    '--naming'
+  ])
   const flags = new Set(['--force'])
   const parsed = { force: false }
 
@@ -365,36 +382,100 @@ function loadDifferentiatorsPlan(file) {
   return result.value
 }
 
+/**
+ * Load and validate the required naming contract before anything is written.
+ *
+ * The name is the field the free-text `--name` used to set with nothing reading it, so an
+ * agent building a utility could ship `Calculator` — the bare category noun the owner names
+ * as the defect. The contract is the decision: the scored candidates it was chosen from, the
+ * rejected alternatives, and the title Play will rank. `scripts/check-naming.mjs` re-checks
+ * it at slot time and against the pack's own titles.
+ */
+function loadNamingPlan(file) {
+  const absolute = resolve(file)
+  if (!existsSync(absolute)) throw new Error(`Naming contract not found: ${absolute}`)
+  let raw
+  try {
+    raw = readFileSync(absolute, 'utf8')
+  } catch (error) {
+    throw new Error(`Naming contract could not be read: ${absolute} (${error.message})`)
+  }
+  let parsed
+  try {
+    parsed = JSON.parse(raw.replace(/^\uFEFF/, ''))
+  } catch (error) {
+    throw new Error(`Naming contract is not valid JSON: ${absolute} (${error.message})`)
+  }
+  const result = parseNaming(parsed)
+  if (!result.ok) {
+    for (const problem of result.errors) line('BLOCKED', problem)
+    throw new Error(`Naming contract is invalid: ${absolute}`)
+  }
+  line(
+    'PASS',
+    `naming contract valid: title "${result.value.title}", ` +
+      `${result.value.candidates.length} candidate(s), ${result.value.rejected.length} rejected`
+  )
+  return result.value
+}
+
 function main() {
   const options = parseArgs(process.argv.slice(2))
-  const slug = options.slug
-  const name = options.name?.trim()
   const idea = options.idea?.trim()
   const date = options.date || localDate()
 
-  if (!slug) throw new Error(`Missing required --slug\nUsage: ${usage}`)
-  if (slug.length < 2 || slug.length > 40 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
-    throw new Error('--slug must be lowercase kebab case and 2-40 characters long')
-  }
-  if (!name) throw new Error(`Missing required --name\nUsage: ${usage}`)
   if (!idea) throw new Error(`Missing required --idea\nUsage: ${usage}`)
   if (/\r|\n/.test(idea)) throw new Error('--idea must be one line')
   if (!validateDate(date)) throw new Error('--date must be a real date in YYYY-MM-DD format')
+  if (!existsSync(scaffold)) throw new Error(`Missing scaffold: ${scaffold}`)
+
+  // The three recorded decisions a slot cannot be scaffolded without. Each existence check runs
+  // before any contract is read, so a missing flag is named as the flag that is missing rather than
+  // as the first loader's parse failure.
+  if (!options.economics) throw new Error(`Missing required --economics <path>\nUsage: ${usage}`)
+  if (!options.differentiators) {
+    throw new Error(`Missing required --differentiators <path>\nUsage: ${usage}`)
+  }
+  if (!options.naming) throw new Error(`Missing required --naming <path>\nUsage: ${usage}`)
+
+  const economics = loadEconomicsPlan(options.economics)
+  const differentiators = loadDifferentiatorsPlan(options.differentiators)
+  const naming = loadNamingPlan(options.naming)
+
+  // The recorded naming decision is the single source of the name: `--slug` and `--name` may be
+  // omitted and are then derived from it, and a supplied value must agree with it rather than
+  // restate it, so a caller cannot state the name twice.
+  if (options.slug && options.slug !== naming.slug) {
+    throw new Error(
+      `--slug "${options.slug}" disagrees with the naming contract's slug "${naming.slug}"; the ` +
+        'recorded naming decision is the single source of the name, so the two must be identical'
+    )
+  }
+  const slug = options.slug || naming.slug
+  if (slug.length < 2 || slug.length > 40 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+    throw new Error('--slug must be lowercase kebab case and 2-40 characters long')
+  }
+
+  const suppliedName = options.name?.trim()
+  if (suppliedName && suppliedName !== naming.title) {
+    throw new Error(
+      `--name "${suppliedName}" disagrees with the naming contract's title "${naming.title}"; the ` +
+        'recorded naming decision is the single source of the name, so the two must be identical'
+    )
+  }
+  const name = suppliedName || naming.title
 
   const applicationId = options.package || applicationIdForSlug(slug)
   if (!applicationIdPattern.test(applicationId)) {
     throw new Error(`--package must match ${applicationIdPattern}`)
   }
-  assertApplicationIdIsFree(applicationId, slug)
-  if (!existsSync(scaffold)) throw new Error(`Missing scaffold: ${scaffold}`)
-
-  if (!options.economics) throw new Error(`Missing required --economics <path>\nUsage: ${usage}`)
-  const economics = loadEconomicsPlan(options.economics)
-
-  if (!options.differentiators) {
-    throw new Error(`Missing required --differentiators <path>\nUsage: ${usage}`)
+  if (options.package && applicationId !== naming.applicationId) {
+    throw new Error(
+      `--package "${applicationId}" disagrees with the naming contract's applicationId ` +
+        `"${naming.applicationId}"; the contract derives the applicationId from the slug that was approved`
+    )
   }
-  const differentiators = loadDifferentiatorsPlan(options.differentiators)
+  assertApplicationIdIsFree(applicationId, slug)
 
   const dirName = `${date}-${slug}`
   const destination = resolve(appsDir, dirName)
@@ -442,6 +523,14 @@ function main() {
     `${JSON.stringify(contract, null, 2)}\n`,
     'utf8'
   )
+  // The naming decision, written before the UI exists like the plan and the promise contract. It is
+  // copied verbatim rather than rewritten: it was validated and cross-checked against the command
+  // line above, so nothing here may become a second place the name is decided.
+  writeFileSync(
+    join(destination, 'naming.json'),
+    `${JSON.stringify(naming, null, 2)}\n`,
+    'utf8'
+  )
   const createdAt = new Date().toISOString()
   const state = {
     slug,
@@ -461,7 +550,7 @@ function main() {
     }
   }
   writeFileSync(join(destination, '.kiln-state.json'), `${JSON.stringify(state, null, 2)}\n`, 'utf8')
-  line('PASS', 'created dist/, economics.json, differentiators.json, and .kiln-state.json')
+  line('PASS', 'created dist/, economics.json, differentiators.json, naming.json, and .kiln-state.json')
 
   registerSlot({
     slug,
@@ -482,6 +571,7 @@ function main() {
   line('INFO', `node scripts/check-economics.mjs --slot ${slug}`)
   line('INFO', `node scripts/check-differentiators.mjs --slot ${slug} --allow-deferred`)
   line('INFO', 'every promise in differentiators.json starts deferred; the slot is not done until each one is shipped, narrowed or dropped')
+  line('INFO', `node scripts/check-naming.mjs --slot ${slug}`)
   line(
     'INFO',
     'signing requires the owner\'s explicit authorization; never run sign-release.mjs --generate without it'

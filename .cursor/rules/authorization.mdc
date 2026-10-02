@@ -1,3 +1,8 @@
+---
+description: Git, signing keys and publishing require the owner's explicit instruction in this conversation
+alwaysApply: true
+---
+
 # Git, signing, and publishing require explicit authorization
 
 The owner decides what enters history and what leaves the machine. An agent that commits, pushes,

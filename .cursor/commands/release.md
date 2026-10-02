@@ -17,6 +17,13 @@ If he has not, **stop** and ask — do not record an approval to unblock yoursel
 
 Read `.cursor/rules/release-gate.mdc` before starting.
 
+**Dispatch this phase too.** Release is several questions that do not depend on each other — the
+pack's copy, the release notes, the policy and Data-safety answers, the screenshots, and the grading —
+so run the writers in parallel over disjoint file lists, and put the grading (`evaluator`,
+`play-auditor`) in a context other than the one that authored. Two serializations here are real and
+were not chosen: step 0's gate must pass before anything is signed, and Gradle is one consumer per
+slot (`.cursor/rules/parallel-execution.mdc`).
+
 ## 0. Confirm the gate
 
 ```bash

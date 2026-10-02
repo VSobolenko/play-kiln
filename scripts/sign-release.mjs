@@ -16,6 +16,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { candidateJavaHomes, resolveJavaHome } from './lib/java.mjs'
+import { checkReleaseApproval } from './lib/release-approval.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -30,6 +31,26 @@ class SigningError extends Error {
 
 export function ensureSigning(slotDir, { generate = false, log = defaultLog } = {}) {
   const resolvedSlot = path.resolve(slotDir)
+
+  // Generating a key is the one irreversible step in this factory: it mints the app's permanent
+  // identity together with the password that unlocks it. Phase 1 ends with the app reviewable, so the
+  // owner's recorded approval comes first — the same boundary `prepare-release.mjs`,
+  // `store/render.py`, `media-capture.mjs` and `play-upload.mjs` all honour. This gate exists because
+  // it was missing: `.cursor/rules/authorization.mdc` records the violation it was written from — an
+  // agent generated a release signing key with a machine-chosen password, without being asked — and
+  // until now only prose stood between that and the key being minted again.
+  if (generate) {
+    const approval = checkReleaseApproval(resolvedSlot)
+    if (!approval.ok) {
+      log('BLOCKED', 'generating a signing key requires the release approval')
+      throw new SigningError(
+        `${approval.reason}; a signing key is the app's permanent identity and is never created ` +
+          'before the owner approves the app',
+        2
+      )
+    }
+  }
+
   const propertiesFile = path.join(resolvedSlot, 'keystore.properties')
   const applicationId = readApplicationId(resolvedSlot)
   const keytool = findKeytool()

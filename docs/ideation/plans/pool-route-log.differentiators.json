@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "slot": "pool-route-log",
+  "reconRef": "docs/ideation/2026-10-01-accountable-service-records.md#4-recipe-2--a-pool-route-service-record",
+  "claims": [
+    {
+      "id": "per-property-history",
+      "weight": "core",
+      "promise": "Each property's readings, the treatment actually applied and the notes accumulate into one history the technician reads on arrival, so the next visit starts from what the last one did.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-accountable-service-records.md#4-recipe-2--a-pool-route-service-record",
+        "finding": "The 2026-10-01 complaint run recorded a data-loss complaint on POOl360 at 2.3 stars and 10K-plus installs - 'opens a separate web browser to use the app. My templates are gone.' - and an inflexibility complaint on the professional Pool Pilot at 4.0 stars and 5K-plus installs: 'does not allow for custom mechanical set-up, also does not contain the options for specific pool traits.'"
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet; the promise is carried by the property entity and its visit history view."
+    },
+    {
+      "id": "visit-record-for-owner",
+      "weight": "core",
+      "promise": "The technician can hand the homeowner a per-visit service record showing the readings taken and the work actually done at that stop.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-accountable-service-records.md#4-recipe-2--a-pool-route-service-record",
+        "finding": "The 2026-10-01 complaint run read 3 critical reviews on the 1.8-star, 231-review, 50K-plus-install Pool Time ClearPool Expert, including 'using test strips, all it does is let me enter what I see on the strip. there are no recommendations based on my values.' and 'that's not very helpful if it doesn't also tell you how to fix'."
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet; the promise is carried by the service record screen and its share or print path."
+    },
+    {
+      "id": "reading-with-its-range",
+      "weight": "supporting",
+      "promise": "The measured value sits beside the ideal range the app used, so a reading is judged at the pool rather than only stored.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-accountable-service-records.md#4-recipe-2--a-pool-route-service-record",
+        "finding": "Across 15 reviews read in the 2026-10-01 pool complaint run, 9 were critical and 'accuracy' was a classified class, with the 1.8-star, 231-review incumbent's user writing that the app 'reads the strip and stops' with 'no recommendations based on my values'."
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet; the promise is carried by the reading model and the range table it is judged against, whose source is not yet selected."
+    },
+    {
+      "id": "no-account-no-web-view",
+      "weight": "supporting",
+      "promise": "The route opens with no account, no sign-in and no embedded browser, and the record is readable with no signal at the pump.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-accountable-service-records.md#4-recipe-2--a-pool-route-service-record",
+        "finding": "POOl360 at 2.3 stars and 10K-plus installs returned 2 broken-feature complaints plus an account complaint in the 2026-10-01 run: 'I have to log in multiple times each time i use it, doesn't save my info when i do. opens a separate web browser to use the app.'"
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet; the promise is carried by the absence of any auth or WebView path in the app."
+    }
+  ]
+}

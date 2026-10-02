@@ -31,11 +31,12 @@ separate commands with a second decision in between. Its contract is
 | 0 | `<idea>` from measured demand | Cursor, per `.cursor/rules/ideation-gate.mdc` | A proposal in `docs/ideation/` with measured demand evidence; never a topic carried over from an example |
 | 0.5 | Economic plan | Cursor + the **money owner** role (`.cursor/agents/money-owner.md`) | `economics.json` passing `scripts/check-economics.mjs`, plus **Human checkpoint 1:** approve the plan and its price |
 | 0.6 | Promise contract (recon's reason list) | Cursor | `differentiators.json` passing `scripts/check-differentiators.mjs`, authored from recon **before** the UI, so the reasons the app was chosen cannot be lost during the build; every promise starts `deferred` |
+| 0.7 | Naming contract (recon's derived name) | Cursor | `naming.json` passing `scripts/check-naming.mjs`, authored from recon **before** the UI beside the promise list: a scored field of candidates spanning at least three archetypes, the chosen name at ≥ 70/100, and at least one rejected alternative on the record, so an app cannot be named after its category; `new-slot.mjs` refuses to scaffold without it |
 | 1 | `/ship <idea>` | Cursor | Automatic after approval |
-| 2 | `scripts/new-slot.mjs --economics <path> --differentiators <path>` | Factory | Automatic isolated `apps/<date>-<slug>/` slot; **refuses to scaffold without a validated plan and a validated promise contract** |
+| 2 | `scripts/new-slot.mjs --economics <path> --differentiators <path> --naming <path>` | Factory | Automatic isolated `apps/<date>-<slug>/` slot; **refuses to scaffold without a validated plan, promise contract and naming contract**; `--slug` and `--name` are derived from the naming contract when omitted |
 | 3 | Implement | Codex workers, orchestrated by Cursor | Automatic code, tests, and app behavior; each promise moves from `deferred` to `shipped` with a proof, or to `narrowed`/`dropped` in writing |
 | 4 | Development verification | Factory + Cursor | `scripts/run-slot-tests.mjs --rerun` plus `scripts/verify.mjs --build`, which compiles `assembleDebug` and does not sign; **fails while any promise is still deferred**; a readable diff |
-| 5 | **Human checkpoint 1.5: approve the release** | Human | The owner installs the debug APK, reviews the UI and behavior, and states approval in his own words. Recorded with `scripts/approve-release.mjs --slot <slug> --note "<owner words>"`, bound to a digest of the app's build inputs |
+| 5 | **Human checkpoint 1.5: approve the release** | Human | The agent has already installed the debug APK on the attached phone and exercised every screen, so its observed on-device evidence (device serial, artifact hash, what appeared) is part of the handoff; the owner's act is the **product** decision — whether this is the app to ship — stated in his own words, never a test report the agent failed to produce. Recorded with `scripts/approve-release.mjs --slot <slug> --note "<owner words>"`, bound to a digest of the app's build inputs |
 
 **Phase 2 — release, `/release <slug>`** — every step below refuses to run without the approval
 from stage 5, and the approval lapses by itself if the app's sources change.
@@ -64,12 +65,34 @@ you whether the app is still the app recon chose. Stages 0, 0.5, 0.6 and 11 are 
 only stage 11 produces the answer. A slot that passes every gate and earns
 nothing is a failed slot, and the failure is in stage 0, not in verification.
 
+**Novelty is not an objective.** The owner's correction, recorded 2026-10-01 after a recon that chose
+its audiences by how empty the shelf looked: *our goal is to earn — if an app, by our calculations,
+will earn, we build it. We look at absolutely everything; there are no frames.* So **"this shelf
+already has competitors" is evidence of demand, not a reason to refuse**, and "nothing like this
+exists yet" is not a qualification. What a proposal must show is its **wedge in one sentence** — a
+difference in functionality or content — and its **revenue arithmetic**. The one distinctness
+constraint that is real is Play's Spam policy, and it is narrower than the factory was treating it: it
+forbids *mere reproduction* of another developer's app and **near-duplicates within our own
+catalogue**, not competing with an incumbent. `.cursor/rules/ideation-gate.mdc` § "The objective is
+revenue, not novelty"; the supply heuristic in `docs/niche-selection.md` §4 is a signal about where to
+look, never a test an idea must pass. A rejection must name a revenue reason.
+
 Stage 0 exists because the factory's first real slot inverted it: a topic was inherited from an
 example, the market was chosen on that inheritance, and the shipped app had
 `capabilities.json` of `{"schemaVersion": 1, "enabled": []}` — no billing, no ads, no revenue
 mechanism — while every gate returned PASS. That post-mortem is
 `docs/reviews/2026-09-26-slot-1-economics-postmortem.md`. The economics contract that now blocks
 it is `docs/slot-economics.md`.
+
+**Recon reads the market, never the factory's own output.** On 2026-10-01 a recon run reported on a
+slot that was mid-development, reading an experiment as though its incompleteness were a finding
+about demand. Slots under `apps/` are experiments in every stage at once — scaffolded, in progress,
+killed, published — and none of them is evidence about a market. Recon's only permitted view of the
+factory's own output is the *identity* of the jobs already taken (`id`, `name`, `idea` from
+`registry/apps.json`) plus the killed lists in `docs/research/`; it never opens `apps/**`, never
+inspects a slot and never reports on one. The same boundary holds in development, where `AGENTS.md`'s
+"slots never depend on each other" already forbids building a slot from a sibling's code. Rule:
+`.cursor/rules/ideation-gate.mdc` § "The factory is not the market".
 
 **Recon's reason list is a contract too.** Recon answers two questions, not one: whether an app
 can earn, and *why anyone would install it*. The second answer is a list of promises, and it is the
@@ -148,6 +171,22 @@ by `new-slot.mjs`, `verify.mjs`, and `kiln-status.mjs`; do not restate it.
 Cursor is the orchestrator and verifier. Codex is a co-lead engineer with its own
 worker channel and writes production code; it is not merely a reviewer.
 
+**The chat orchestrates; the work runs in subagents.** The chat window is a control plane: it
+decomposes, dispatches, adjudicates and reports. Its own writing is limited to answering, reading in
+order to adjudicate, running the one authoritative verification, and landing a worker's diff. Recon
+dispatches two or more scouts and a money owner at once; implementation dispatches one worker per
+disjoint file list, together, not one at a time. Several `Task` calls in a single message are what
+makes that parallel — one call awaited per turn is serial work wearing a worker's name on it. The
+contract is `.cursor/rules/parallel-execution.mdc`, and it also states the two honest limits: a
+subagent never sees this conversation, and subagents cannot talk to each other, so the orchestrator
+routes and the filesystem is the only bus.
+
+**A rule that cannot load is not a rule.** Four rules under `.cursor/rules/` carried no YAML
+frontmatter and were therefore attached to no context at all — including `parallel-execution.mdc`
+itself, which is why the discipline above had to be asked for repeatedly, and `authorization.mdc`'s
+signing gate. `harness.rules` in `scripts/core/harness.mjs` now fails when any rule has no
+frontmatter, no `description`, or neither `alwaysApply: true` nor `globs`.
+
 - Run long Codex tasks with `node scripts/codex-run.mjs`; the MCP `codex` tool is
   only for short dialogue because long MCP requests time out.
 - Give each worker a bounded role and file list. Parallel code writers must have
@@ -168,6 +207,10 @@ worker channel and writes production code; it is not merely a reviewer.
   because it matched prose” in `harness/lessons.md`.
 - Never accept Cursor or Codex self-reporting as proof. Run
   `scripts/verify.mjs` and read the diff before a PASS.
+- Never accept a claim without its evidence. Every worker report carries the claim ledger
+  `.cursor/rules/grounded-claims.mdc` defines, and a claim with no `MEASURED` command or `path:line`
+  is `UNVERIFIED`; the declared-duty sensor is `harness.groundedClaims` in `scripts/core/harness.mjs`
+  (`docs/grounded-claims.md`).
 - Adjudicate disagreements against OpenSpec, this file, and observable evidence.
 
 Worker ledger verdicts from `node scripts/codex-run.mjs list`:
@@ -399,9 +442,12 @@ was first a self-test that discovered and ran every suite, which grew into a run
 
 What the loop still cannot do, stated plainly in `docs/self-learning.md`: it does not browse Google
 Play by itself, so a policy change is noticed when an agent or the owner reads the page and re-dates the
-fact; and the two known unenforced positions — Play Console's automatic string translation overriding a
-git-tracked translation, and the AGP/Kotlin/Compose BOM version pins — are recorded there as gaps
-rather than closed.
+fact; and the one known unenforced position — Play Console's automatic string translation overriding a
+git-tracked translation — is recorded there as a gap rather than closed. The AGP/Kotlin/Compose BOM
+version pins are also only partly enforced: `uiux.platform` now fails a build file that declares an
+M3 Expressive / `MotionScheme` **alpha** artifact the pinned BOM does not carry, which closes the
+"reach for the alpha" half, but nothing yet asserts that the three pinned versions agree with each
+other, so that half remains a recorded gap rather than a check.
 
 ## Defaults to suppress
 
@@ -458,6 +504,8 @@ scripts/lib/slot-economics.mjs    the slot economics contract: parsing, validati
 scripts/check-economics.mjs       money gate: does the plan name a real revenue mechanism
 scripts/lib/slot-differentiators.mjs the promise contract: parsing, proof typing, delivery resolution
 scripts/check-differentiators.mjs promise gate: is every reason this app was chosen delivered or dropped
+scripts/lib/slot-naming.mjs       the naming contract: parsing, Play's title rules, candidate scoring, pack agreement
+scripts/check-naming.mjs          naming gate: is the shipped name derived rather than invented, legal, and the one the pack states
 scripts/check-locales.mjs         checks declared app languages against resource coverage
 scripts/test-locale-dedup.mjs     regression test: a non-translatable key is declared once
 scripts/check-adaptive-icon.py    checks launcher-mark fit inside adaptive-icon masks
@@ -473,6 +521,8 @@ scripts/core/baseline.mjs         when a new baseline rule applies, and to which
 scripts/core/uiux.mjs             UI baseline: navigation, adaptive layout, text layout, motion, a11y, insets
 scripts/core/settings.mjs         settings surface: it exists, it is reachable, its preferences act
 scripts/core/localization.mjs     born-multilingual: declared locales, real translations, no hardcoded prose
+scripts/core/naming.mjs           the naming contract check: derived rather than invented, legal, and the one the pack states
+scripts/core/device.mjs           the on-device run as a record: serial, artifact sha256 cross-checked against the built APK
 scripts/core/index.mjs            the check registry: every check the one entry point runs
 scripts/verify.mjs                the single verification entry point: one process, one report
 scripts/store/model.py            the pack's data model and every numeric limit, resolved once
@@ -521,8 +571,14 @@ node scripts/check-economics.mjs --slot <slug>           # money stage: plan vs 
 node scripts/check-outcomes.mjs --slot <slug>            # earn stage: dated readings vs the plan's own kill criteria
 node scripts/check-differentiators.mjs --slot <slug>     # promise gate: is every reason delivered or dropped
 node scripts/check-differentiators.mjs --slot <slug> --allow-deferred  # builder progress read, never completion
+node scripts/check-naming.mjs --slot <slug>              # naming gate: is the shipped name the derived, approved one
 node scripts/check-client-secrets.mjs --slot <slug>      # no client-side paid-API credential in the shipped app
 node scripts/check-in-app-policy.mjs --slot <slug>       # the declared policy is reachable from inside the app
+
+# `slot.naming` and `slot.device` are core checks with no separate entry point: both run in the
+# `policy` group of any `verify.mjs --slot`, and both report UNVERIFIED — never a pass — when the
+# record is absent. `slot.device` reads apps/<slot>/device-verification.json and cross-checks its
+# sha256 against the built debug APK, so a record describing a different build fails.
 
 # the UI baseline, added 2026-09-30 after the owner reviewed the first live app. In the `ui` group
 # of a slot run, and each sensor is also readable on its own; a finding is a `file:line`, never a look.

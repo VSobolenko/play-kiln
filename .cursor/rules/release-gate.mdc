@@ -1,3 +1,8 @@
+---
+description: Two phases, develop then release — release runs only on the owner's recorded approval
+alwaysApply: true
+---
+
 # Two phases: develop, then release on the owner's word
 
 The factory used to run one undivided pass — research, implement, build the signed APK and
@@ -21,12 +26,17 @@ The phase ends when there is an app the owner can look at:
 - research, ideation, `economics.json`, and **human checkpoint 1** (approve the plan),
 - the slot, the Kotlin/Compose implementation, the tests,
 - unit tests through `node scripts/run-slot-tests.mjs --slot <slug>`,
-- a debug build the owner can install and inspect
+- a debug build the agent installs on the connected phone and drives itself
   (`node scripts/verify.mjs --slot <slug> --build` compiles `assembleDebug`; the APK is
   `app/build/outputs/apk/debug/app-debug.apk`),
 - source-level gates: `node scripts/verify.mjs --slot <slug>`.
-- **human checkpoint 1.5**: the owner installs the debug APK, reviews the UI and behaviour, and
-  approves the release in his own words.
+- **human checkpoint 1.5**: the owner decides the **product** — whether this is the app to ship —
+  and approves the release in his own words. **Testing on the device is the agent's own work, done
+  before this checkpoint**: the agent runs the app, and the handoff carries the observed evidence —
+  the device serial, the hash of the installed artifact and what was tapped and what appeared —
+  because "it compiles" and "the tests are green" are not a substitute for it
+  (`.cursor/rules/device-testing.mdc`). This is not where the owner verifies the code, and a handoff
+  that asks him to install, launch or test the app is a failed checkpoint, not a satisfied one.
 
 Allowed in phase 1: `--init` drafts of `store/listing.json`, `verify.mjs`, unit tests,
 a **debug** build. Cheap and reversible.
@@ -35,9 +45,12 @@ Forbidden in phase 1 — these are release actions and are now gated in code:
 
 - `node scripts/prepare-release.mjs` (release APK + AAB + signing + release manifest),
 - `python scripts/store/render.py` in its rendering modes (icon, feature graphic, screenshot
-  sets),
+  sets), and `python scripts/store-studio.py` in any mode — the composed identity, which also
+  rewrites the app's own launcher vectors,
 - `node scripts/media-capture.mjs` (device screenshots),
-- generating or rotating a signing key (separately gated by `authorization.mdc`).
+- `node scripts/sign-release.mjs --generate` — generating a signing key, which mints the app's
+  permanent identity together with the password that unlocks it (`authorization.mdc` governs the
+  separate question of whether a key may be created at all).
 
 Phase 1 ends by **stopping and asking**. The report says the app is ready to review, names
 what to look at, and waits. It does not prepare the release "while I am here".
@@ -64,8 +77,18 @@ Rules for the recording step:
   publishing stay with the owner (`authorization.mdc`).
 
 The record is `apps/<slot>/release-approval.json`, gitignored, and the check is one module:
-`scripts/lib/release-approval.mjs`. `prepare-release.mjs`, `scripts/store/render.py` and
-`media-capture.mjs` all call it, so it cannot be bypassed by invoking one of them directly.
+`scripts/lib/release-approval.mjs`. Six entry points call it and refuse without it:
+`prepare-release.mjs`, `scripts/store/render.py`, `scripts/store-studio.py`, `media-capture.mjs`,
+`play-upload.mjs` and `scripts/sign-release.mjs --generate`. The last two were added on 2026-10-01,
+after an audit found this paragraph claiming more than the code delivered: the studio composed the
+whole store identity and rewrote the launcher vectors with no gate at all, and the signer minted a
+key with no gate — the violation `authorization.mdc` was written from.
+
+**What the gate still cannot stop, stated rather than implied.** A raw `./gradlew assembleRelease`
+signs once a key exists, and a direct in-process `import` of the leaf writers in `store/render.py`
+skips its check. Neither is a CLI entry point; catching them needs a sensor that reads a slot for
+release work with no approval behind it, and no such sensor exists yet. The gate is six doors, not
+a sealed room.
 
 ## The record is bound to the revision, not the slot name
 

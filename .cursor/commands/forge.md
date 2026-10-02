@@ -24,7 +24,7 @@ that `/ship` and `/release` run. What it removes is the owner having to open a s
       │
       ├─ C. Build ──────────── slot, code, tests, debug APK   (`.cursor/commands/ship.md`)
       │
-      ├─ D. CHECKPOINT 1.5 ─── STOP. The owner installs the APK and says it is good.
+      ├─ D. CHECKPOINT 1.5 ─── STOP. The agent has installed and tested the app on the phone; the owner confirms it is the product.
       │
       └─ E. Release ────────── signed artifacts, store pack, screenshots  (`.cursor/commands/release.md`)
 ```
@@ -57,6 +57,23 @@ anything on it. A brief that names a specific app the owner wants built is the o
 Run the **scout** role (`harness/roles/scout.md`) exactly as it is written, and follow
 `docs/ideation/README.md`. The scout's boundary is absolute: it writes only under `docs/ideation/`,
 starts no slot, and records no approval.
+
+**Dispatch before you read.** Recon is several subagents in **one** message, not a solo search:
+**two or more scouts** over different query sets or shelves, **plus a `money-owner`** that starts
+pricing the first candidate to come back. The orchestrator searches nothing and reads nothing itself
+until those are running, then adjudicates what they return. One scout, awaited, is serial work with a
+worker's name on it (`.cursor/rules/parallel-execution.mdc`).
+
+**Put the read boundary in the dispatch brief itself.** A subagent does not see this conversation, so
+this is not a reminder — it is the only place the scope is communicated:
+
+- Read the **market** (`scripts/scan-market.mjs`, `scan-titles.mjs`, `enrich-market.mjs`,
+  `scan-complaints.mjs`) and the killed lists in `docs/research/` and `docs/niche-selection.md`.
+- To avoid a duplicate job, read **only** `id`, `name` and `idea` from `registry/apps.json`.
+- **Never open `apps/**`**, never inspect a slot, and never report on a slot's completeness or stage.
+  Those are experiments, not market evidence, and a report about one is a report about this
+  repository wearing the costume of a report about demand
+  (`.cursor/rules/ideation-gate.mdc` — "The factory is not the market").
 
 Six rules decide whether this step is done, and they are the ones that have failed before:
 
@@ -103,17 +120,28 @@ Some evidence must be promoted before the slot can exist: the `evidenceRef` patt
 
 ## B. CHECKPOINT 1 — present, then stop
 
-Report, in the owner's language and without code:
+Report, in the owner's language and without code. **The decision he is making is a revenue decision**
+(`.cursor/rules/ideation-gate.mdc` § "The objective is revenue, not novelty"), so the report leads with
+it and never asks him to approve a novelty:
 
-- the job, and who pays, and **what exactly is bought** — plus the price and the moment of payment;
+- **the wedge in one sentence** — what a user gets here that the apps already on that shelf do not
+  give them, in **functionality or content**, never a new name or palette;
+- **the arithmetic, with the division shown** — the price, the deductions, the net per sale, and the
+  sales per month needed to clear the target. This is the number the decision rests on;
+- the job, who pays, and **what exactly is bought** — plus the price and the moment of payment;
+- **the incumbents as evidence, not as a warning list**: who earns there and how (installs, price,
+  ads, IAP). A populated shelf with money on display is a point in the proposal's favour, and the
+  weak mid-tier is the pocket — say so plainly instead of treating the competition as a defect;
 - the demand evidence, with its labels, and the hand-classified job share;
-- the arithmetic: the price, the deductions, the net per sale, and the sales per month to reach the
-  target, with the division shown;
 - the reasons this app wins (the promise contract), each with its weight;
 - the build estimate in agent hours, the permissions, the capabilities, and whether a server is
   required;
 - the three numeric kill criteria;
 - the honest unknowns, listed rather than omitted.
+
+If a candidate was **refused**, say why in revenue terms — an unrated demand reading, a price the
+market will not pay, no statable wedge, a build cost that eats the margin. "This category is already
+occupied" is not a refusal reason and must not appear as one.
 
 If recon produced more than one recipe, present them and name which one it recommends and why. If
 it produced exactly one, say so plainly and say what it refuses and why — a refusal with a reason is
@@ -136,6 +164,12 @@ else runs unchanged — step 2's scaffold, the implementation, the tests, the ve
 restate those steps here: that file is the single source of truth for phase 1, and a copy of it would
 drift.
 
+**Dispatch again here, not only at recon.** Implementation is **one worker per disjoint file list** —
+UI, domain logic, unit tests, resources, the store drafts — dispatched together, never one worker
+awaited in a queue. Partition the file lists *before* dispatching, because two writers on one file
+corrupt each other, and remember that only one Gradle consumer may hold a slot at a time
+(`.cursor/rules/build-speed.mdc`).
+
 Two things are specific to arriving through `/forge`:
 
 - **The slot inherits the recipe that was just approved.** `--slug`, `--name`, `--idea`, `--economics`
@@ -146,11 +180,33 @@ Two things are specific to arriving through `/forge`:
 - **The recon that produced the proposal is fresher than the recipe file.** If the shelf has moved
   since it was measured, say so at checkpoint 1 rather than after the build.
 
-## D. CHECKPOINT 1.5 — the owner looks at the app
+## D. CHECKPOINT 1.5 — the owner decides the product
 
-`/ship` ends here on its own, and `/forge` must stop here too. Report what the app does, what to tap,
-how to install it, and the verification output — then wait. Nothing is signed, packed or
-photographed until the owner approves the revision with his own words, recorded only through:
+`/ship` ends here on its own, and `/forge` must stop here too. **Testing on the device is the
+agent's own work, already done**: the debug APK has been installed on the attached phone and every
+screen driven there by the agent before this report exists. What is reported is what was
+**observed** — the device serial, the hash of the installed artifact, and what was tapped and what
+appeared — not instructions for installing or launching anything. The owner's decision is a
+**product** decision — is this the app we want to ship — never a test report the agent failed to
+produce. Asking the owner to install, launch or verify the app is the defect this checkpoint exists
+to prevent, not a way to satisfy it.
+
+**What he is handed is the finished app, not a prototype.** The revision he reviews is the whole job:
+every promise in `differentiators.json` resolved to `shipped`, `narrowed` or `dropped` — `verify.mjs`
+fails while one is still `deferred` — and every behaviour exercised on the physical phone
+(`.cursor/rules/device-testing.mdc`), never asserted from reading the code. That on-device run is
+evidence, not a claim: it carries the device serial, the hash of the installed artifact and what was
+observed on screen, because "it compiles" and "the tests are green" are not a substitute for it. A
+demo with two working buttons is a failed checkpoint even when it compiles, because this is where he
+decides the app is the app and he cannot decide that from a fragment.
+
+**What is deliberately absent is everything the next step pays for.** No screenshot, no store pack, no
+signing key, no release build — not as a shortcut, but because a concept he has not yet accepted makes
+all of it waste, and the answer to "should I do the release work while I am here" is always no. "I will
+just prepare the release in the meantime" is the exact sentence this checkpoint exists to refuse.
+
+Nothing is signed, packed or photographed until the owner approves the revision with his own words,
+recorded only through:
 
 ```bash
 node scripts/approve-release.mjs --slot <slug> --note "<the owner's own words>"
@@ -201,5 +257,5 @@ not publish, and it never performs the owner's legal declarations.
 **Debug build:** app/build/outputs/apk/debug/app-debug.apk
 **Verification:** <stdout evidence>
 
-**CHECKPOINT 1.5 — awaiting the owner's review of the installed app. Nothing is signed or packed.**
+**CHECKPOINT 1.5 — awaiting the owner's product decision, on an app the agent has already installed and exercised. Nothing is signed or packed.**
 ```

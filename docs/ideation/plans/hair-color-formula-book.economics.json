@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A working colourist - self-employed, chair-renting or employed - who buys their own reference tools rather than using the salon's booking software.",
+  "paidUnit": "One non-consumable unlock of the full formula book: unlimited clients, the complete per-client visit history and exportable client colour cards.",
+  "priceUsd": 9.99,
+  "momentOfPayment": "After the colourist has entered their third client and taps to add a fourth, or taps Export on a client card; the first three clients are free and fully functional.",
+  "distinctnessSentence": "A brand-agnostic formula book the colourist owns, which reproduces the exact shades and developer ratio used on a returning client without an account, a brand catalogue or a network.",
+  "evidenceRef": "docs/ideation/2026-10-01-accountable-service-records.md#3-recipe-1--a-colourists-own-formula-book",
+  "day1RevenuePath": "A colourist finds it in the store search for a colour formula app, records three clients free, taps to add a fourth, and buys the 9.99 dollar unlock through Play Billing.",
+  "killCriteria": {
+    "windowDays": 60,
+    "minInstalls": 2000,
+    "minRevenueUsd": 100
+  },
+  "assumptionsUnverified": [
+    "That a colourist pays 9.99 dollars once rather than keeping the salon's paper colour cards; the only on-shelf evidence of a paid mechanism is the IAP badge on an independent competitor at 10K+ installs and 40 reviews, which shows a mechanism exists and not that it earns.",
+    "That one-time in-app-purchase conversion lands in the 1 to 3 percent band used in the arithmetic; that band is carried from docs/monetization-strategy.md section 4, which labels it UNVERIFIED, so it is not a measurement of this niche.",
+    "That the two recent independent attempts at this exact job - one showing a 0+ install bucket and one at 10+ installs - failed on distribution rather than on the job being unwanted; nothing measured here separates those two causes.",
+    "That the professional sub-shelf has no weak rated incumbent to displace at all, since its only two rated apps sit at 4.4 stars; the recipe therefore rests on a content gap rather than on a badly built competitor."
+  ]
+}

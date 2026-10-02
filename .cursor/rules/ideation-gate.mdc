@@ -3,6 +3,121 @@ description: Always load PlayKiln ideation gate - the example is not the topic, 
 alwaysApply: true
 ---
 
+# The objective is revenue, not novelty
+
+The factory's objective function is **expected revenue**: how much this slot will earn, how soon, from
+whom. Every other property of an idea — novelty, elegance, how interesting it is to build, whether the
+category is "untouched" — is an input to that estimate or it is noise.
+
+The owner's correction, recorded 2026-10-01, after reading a recon proposal that had selected its
+audience by how empty the shelf looked: *our goal is to earn. If an app, by our calculations, will
+earn, then we build it. We look at absolutely everything. There are no frames.* He named the framing
+that must stop: *"such a thing does not exist, so we build it; such a thing already exists, so we will
+not"* — **that is not the rule, and it was never the rule.**
+
+## "A competitor exists" is evidence of demand, not a reason to refuse
+
+This is the correction that matters most, because the factory had it backwards and it cost the last
+recon its credibility.
+
+- **An occupied shelf is a good sign.** Money on display is the only cheap proof that a market pays.
+  A shelf with a 5M-install leader, priced incumbents and visible ad/IAP spend is evidence that
+  someone earns there; an empty shelf is evidence of nothing and is usually empty for a reason.
+- **The question is never "is it empty?" but "what wedge do we have, and will it pay?"** A weak
+  mid-tier (3.4★ at $19.99, 3.8★ at $3.99) is a *reachable pocket* — that is where a slot goes.
+- **Doing the same job as an existing app, but better, is a legitimate factory recipe.** So is a
+  narrower audience, a country, a sub-workflow, or a capability the leader does not have.
+
+**A rejection needs a revenue reason, not a novelty reason.** "This category is crowded" is not a
+rejection. "The incumbents monetize at a price the market will not pay", "the demand reading is
+unrated or absent", "we cannot state the wedge in one sentence", "the build cost eats the margin" —
+those are rejections, because each one is a statement about the money.
+
+## The one constraint that is not negotiable, and why it is narrow
+
+Being able to compete with an incumbent does **not** license shipping a clone. Google Play's Spam
+policy forbids *apps that merely provide the same experience as other apps already on Play*, and
+enforcement escalates to **account termination, which removes every app in the catalogue**
+(`docs/monetization-strategy.md` §1.2). That is not a taste constraint; it is the whole portfolio.
+
+It is also far narrower than the factory was treating it. The policy targets two distinct things:
+
+- **Mere reproduction of someone else's app** — prevented by a genuine capability or angle. The
+  policy's own lever is *functionality and content*, never naming or colour: *a rename plus a new
+  palette is the pattern to avoid; a new capability is not.*
+- **Internal near-duplicates** — several of our own slots with highly similar functionality, content
+  and experience. **This is the enforceable half and the one to police**, because it is observable in
+  our own catalogue and it is the failure a factory drifts into by default.
+
+So the rule is not "find an empty category". It is: **enter a paying category with a wedge that is
+real in functionality or content, and never ship two slots that one sentence can describe.**
+
+## What this changes in practice
+
+- The §4 heuristic of `docs/niche-selection.md` — *look for a job whose practitioner would never
+  build the app* — is a **supply signal, not an entry requirement**. It predicts weak incumbents, so
+  it is useful for finding a *pocket*; it is not a test an idea must pass, and a strong incumbent
+  with a wedge is an equally valid target. Selection by how well an idea satisfies that sentence is
+  what produced the 2026-10-01 recon.
+- **A proposal is judged by its revenue arithmetic**, not by how novel it is. The decision line is
+  the expected earning, with its division shown, against the build cost.
+- **Never refuse an idea for being similar to something on Play.** Refuse it for having no wedge, no
+  demand reading, no price anyone would pay, or for duplicating *our own* catalogue.
+
+# The factory is not the market
+
+The factory's own output is **never evidence about the market, and never a subject for recon.**
+
+The record: on 2026-10-01 a recon run reported on an app the factory had built, reading a slot in
+development as though its incompleteness were a finding about a product. The owner's instruction was
+blunt, and the reasoning is the whole rule: *the factory should not even know what it has produced.
+It is autonomous. Why is it looking at what we tried? That should not even reach its context.*
+
+`apps/<date>-<slug>/` holds **experiments in every stage at once** — scaffolded, in development,
+killed with a reason, published. A scaffolded slot is not a product; a killed slot is not a market
+verdict; a slot mid-build is not a defect report. Judging one produces a sentence that is about this
+repository and is dressed as a sentence about demand.
+
+## What recon may read of the factory's own output, and nothing else
+
+Exactly one thing, and only for one question:
+
+- **To avoid proposing a job twice**, read the *identity* of the jobs already taken from
+  `registry/apps.json` — `id`, `name`, `idea` — plus the killed list in
+  `docs/research/2026-09-24-market-decision.md` §3 and the dead zones in `docs/niche-selection.md`.
+
+**Not** the `status`, `reason`, `updatedAt` or lifecycle fields: recon has no question those answer,
+and they are how a killed slot's post-mortem reached a scout's report. **Never** the slot trees
+themselves: recon does not open `apps/**` at all, does not count their screens, does not compare
+their features, and does not report on their completeness. If a proposal's reasoning needs a slot's
+contents, the reasoning is about the factory and not about demand, and it is wrong.
+
+The same boundary holds in development, for the reason `AGENTS.md` already gives: *slots never depend
+on each other*. A slot is built from its own approved plan, its own promise contract and the shared
+harness at the repository root — never by reading a sibling slot, whose code is neither a standard
+nor a stable interface. Copying from one is a coupling the build does not record and a gate does not
+see.
+
+**A negative boundary needs a positive counterpart, or it is just a prohibition.** When recon needs
+to know whether a job is already taken, the answer comes from the registry's identity fields above
+and is a *name*, never an inspection. Being unable to answer "has this been tried?" would send recon
+straight back into `apps/`, so the permitted source is named here rather than left to judgement.
+
+## The one honest limit
+
+This is a **behavioural** rule, and the leak it was written from was in a scout's *spoken report*, not
+in its artifact — the two proposals that run produced were measurably clean, with zero references to
+`apps/` in `docs/ideation/`. So no file scan could have caught it, and none is claimed to. What can be
+checked is the artifact half:
+
+```bash
+rg -n "apps/[0-9]{4}-" docs/ideation/ && echo "a proposal is reading slot trees" || echo "clean"
+```
+
+That grep returning nothing is a necessary condition, never a sufficient one. The rule above is what
+the boundary actually rests on, and it is stated here rather than implied by the absence of an
+instruction — because an agent with no instruction and a directory it can read will read it.
+
 # The example is not the topic
 
 When the owner gives an example, it illustrates a **shape** — how big, how simple, how offline, how
@@ -24,9 +139,12 @@ money in it.
 - **Do not propose calculators, unit converters, generic arithmetic tools, or another app built
   around summing or converting numbers a user types in.** This category is explicitly burned. The
   only exception is a direct instruction from the owner naming that specific app.
-- **Do not propose the same job twice.** Google Play's Repetitive Content policy can terminate an
-  account and remove every app in the catalogue; see `docs/monetization-strategy.md` §1.2. Two
-  recipes that can be described with one sentence are one recipe.
+- **Do not propose the same job twice *within our own catalogue*.** Google Play's Repetitive Content
+  policy can terminate an account and remove every app in the catalogue; see
+  `docs/monetization-strategy.md` §1.2. Two of *our* recipes that one sentence can describe are one
+  recipe. This is a constraint on our own catalogue — it is **not** a reason to avoid a category that
+  already has competitors. Confusing those two is the mistake that selected the 2026-10-01 recon's
+  topics by how empty the shelf was.
 - **Do not propose anything already killed with a recorded reason.** The binding list is
   `docs/research/2026-09-24-market-decision.md` §3 plus the dead zones in `docs/niche-selection.md`.
   Re-proposing a killed idea is not a fresh idea.
@@ -47,15 +165,58 @@ the first real slot shipped with none of it. They are now enforced:
   validated plan, so the archetype is decided before the first line of UI exists.
 - The contract is in `docs/slot-economics.md`.
 
-An archetype needs its capability enabled on the slot. A purchase-led or subscription slot without
-the `billing` capability enabled, or an ads-led slot without `ads`, is a plan that cannot be honoured
-by the build, and the gate reports it as such. Do not write a monetization plan the shipped app
-cannot implement — that gap is exactly what happened last time.
+An archetype needs its capability enabled on the slot. A purchase-led slot without the `billing`
+capability enabled, or an ads-led slot without `ads`, is a plan that cannot be honoured by the
+build, and the gate reports it as such. Do not write a monetization plan the shipped app cannot
+implement — that gap is exactly what happened last time.
 
 **A paid app with nothing to sell is not monetized.** Setting a price in Play Console is a weak
 lever with no discovery; `docs/monetization-strategy.md` §4 records it as effectively dead outside
 ad-hostile audiences. If the plan's honest answer to "what does the user buy?" is "nothing, they just
 pay up front", say so out loud and justify it against that.
+
+# There is no house monetization, and subscriptions are banned
+
+Two owner instructions, recorded 2026-10-01, that the factory had been getting wrong.
+
+**No archetype is a default.** *Our goal is simply to earn. Whether it is ads, a one-time purchase or
+a repeat purchase is another question — that depends on the app, the audience and the product.* All
+four archetypes in `scripts/lib/slot-economics.mjs` — `purchase_led_single_unlock`,
+`purchase_led_repeat_sales`, `ads_led_utility`, `purchase_only_no_ads` — are first-class options, and
+the choice is a conclusion about this app and this audience, never a starting point.
+
+Why it has to be said out loud: **every example this repository contained taught one answer.** All six
+plans under `docs/ideation/plans/`, all four recipes of `docs/ideation/2026-09-26-five-recipes.md`, the
+single worked example beside the archetype table, the reference slot, and both proposals of the
+2026-10-01 recon were `purchase_led_single_unlock`. That was not a measurement; it was an inheritance.
+`docs/monetization-strategy.md` stated "purchase-led is the starting hypothesis", and a hypothesis
+stated as a starting point *is* a default — so the doctrine produced the monoculture it warned against.
+Ads are not a consolation prize for "we could not design a purchase": an ads-led utility is a finished
+product shape, and §2's arithmetic decides whether it reaches the target.
+
+- **A proposal must show the alternatives it rejected, in revenue terms.** "Subscription is out of
+  scope; repeat sales rejected because the user's records are static and there is nothing to re-sell;
+  the single unlock is the only shape that fits" is a derivation. "We chose the unlock" is not. This
+  is a judgement the owner makes at checkpoint 1, not a machine-checked field — `docs/slot-economics.md`
+  says so plainly rather than letting the absence of a check look like the absence of the rule.
+- **Two slots sharing a monetization model without a stated reason is a smell**, exactly as two slots
+  sharing a palette would be. The mix is expected to differ from slot to slot.
+- **The four are not the whole space.** If recon finds a mechanism that is neither a purchase nor ads,
+  it comes back as a proposal carrying its arithmetic and its capability pairing, and `ARCHETYPES` and
+  the contract are extended together — not bent into the nearest existing row.
+
+**Subscriptions are banned.** *We drop subscriptions immediately — that is the one thing we will not
+do, there are too many nuances. So a subscription is forbidden. Everything else is fine.* Recurring
+revenue means the entitlement has to be re-established continuously: server-side validation plus a
+renewal, refund, cancellation, grace-period and failed-payment lifecycle on a schedule the client does
+not control. That is a server project with a billing backend, and this factory builds slots.
+
+The ban is **machine-enforced, not prose**: `subscription` was removed from `ARCHETYPES`, so any plan
+naming it fails `parseEconomics`, `requiredCapabilitiesFor` and `check-economics.mjs`, with no
+exemption path. `docs/monetization-strategy.md` §3.3 keeps the three conditions that used to make a
+subscription "correct" as the record of why the position moved from *deferred* to *out of scope* —
+they are not a gate that can be satisfied. The `billing` capability stays available for one-time and
+consumable purchases.
 
 # Budget: about one hour, not eight
 
@@ -89,3 +250,17 @@ An idea is proposed, not started. A proposal lives in `docs/ideation/` and must 
 the job, the paying user, what is bought, the price, the demand evidence with its strength, the build
 estimate, and the kill criteria — in a form the owner can accept or reject without reading code. Only
 after the owner picks it does `new-slot.mjs` run. See `docs/ideation/README.md`.
+
+Three things are load-bearing in that document, because the owner's decision rests on them and not on
+the prose around them:
+
+- **The wedge, in one sentence** — what a user gets from this slot that they do not get from the apps
+  already on that shelf. It must be a difference in **functionality or content**, not in naming or
+  colour (`docs/monetization-strategy.md` §1.2). If it cannot be written, the idea is not ready —
+  and this is the *only* distinctness test; a populated shelf is not a defect.
+- **The revenue arithmetic, with the division shown** — price, deductions, net per sale, and the sales
+  per month needed to clear the target. This is what the owner is being asked to approve.
+- **The incumbents, as evidence rather than as a warning list.** Say who earns there and how
+  (installs, price, ads, IAP): that is the demand reading, and a strong one is a point in the
+  proposal's favour.
+

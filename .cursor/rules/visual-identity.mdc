@@ -49,10 +49,21 @@ A slot is not styled until all of these are true.
   its mark alone because seven labelled pills cannot fit once the longest locale's words are in
   them. Any layout whose style depends on English string lengths (a fixed-width pill, a tab row of
   labels, a one-line headline) is a defect that only appears after localisation.
-- **The icon is drawn, not borrowed.** It is generated from `studio.json`'s `mark`, it reads at
-  48dp, it survives the adaptive-icon masks (72dp circle, squircle, 66dp safe zone), and it carries
-  no baked-in rounded mask or shadow — Play rejects those, and `visual-qa.py`'s `icon` section
-  measures them.
+- **The mark is drawn, not borrowed.** The launcher icon, the adaptive-icon foreground, the
+  monochrome/themed layer and any in-app brand mark are generated from `studio.json`'s `mark`, read
+  at 48dp, survive the adaptive-icon masks (72dp circle, squircle, 66dp safe zone), and carry no
+  baked-in rounded mask or shadow — Play rejects those, and `visual-qa.py`'s `icon` section measures
+  them. A stock library glyph is never the mark: this half of the rule is unchanged.
+- **UI iconography is a library's, not a hand's.** Every general-purpose glyph — a back arrow, a
+  plus, a bin, a settings gear, an empty-state symbol — comes from **one** licence-cleared
+  professional set, vendored into the slot with its licence text and a per-icon provenance record
+  (`docs/icon-provenance.md`), tinted from the theme and carrying no colour of its own. Hand-drawing
+  these as Compose `Canvas` or path primitives is the defect, not the virtue: a set drawn by one
+  agent from primitives is not competing with a set drawn by a professional team, and the owner's
+  instruction, recorded 2026-10-02, is that the factory go online and take a ready-made,
+  well-chosen set instead. A glyph whose meaning the app itself defines (a domain noun the set
+  cannot honestly express) stays slot-owned and is drawn in the library's stroke weight and grid; a
+  library icon is never bent to mean something it does not.
 
 ## What is banned
 
@@ -60,7 +71,16 @@ A slot is not styled until all of these are true.
   `TopAppBar` plus a stock `TabRow` plus the default `Button` and `OutlinedTextField`, arranged in
   `Card`s on the default background. That is the "just tabs and buttons and numbers" app.
 - Shipping the first palette you thought of, or the same palette in two slots.
-- Emoji, clipart, or a stock icon as the app's mark or as UI iconography.
+- Emoji, clipart, or a stock icon as the app's **mark**. The launcher icon, the adaptive-icon
+  foreground, the monochrome/themed layer and any in-app brand mark stay slot-owned and are derived
+  from `store/studio.json`'s `mark`. This is a licence term as well as a design one: the Remix Icon
+  License v1.0 §3.3 forbids using its icons "as a brand mark, app icon, or identity symbol where the
+  Icon itself represents the brand", and a catalogue whose apps share one stock mark is exactly the
+  near-duplicate evidence Play's Repetitive Content policy acts on.
+- **Hand-drawing general-purpose UI iconography** — a back arrow, a plus, a delete bin, a settings
+  gear — as Compose `Canvas` or path primitives. That is the half the 2026-10-02 instruction
+  reverses: these glyphs come from the licence-cleared set of `docs/icon-provenance.md`, not from a
+  file of hand-rolled vectors.
 - A styled store pack over an unstyled app. The style must be in the build the user installs, and
   `media-capture.mjs` photographs real screens with asserted readings — a mocked-up pretty frame
   around a plain screen is a false claim, not a marketing choice.
@@ -87,6 +107,16 @@ reusing a slot's identity. Derive a new one per slot from that slot's own subjec
 - `node scripts/media-capture.mjs --slot <slug>` is what makes the claim true: it replays the
   journey against the signed release build and refuses a frame that does not show the readings its
   shot declares.
+- The **mark** half is measured today: `python scripts/check-adaptive-icon.py` and
+  `scripts/core/icon.mjs` read the shipped vector and fail on ink outside the 66dp safe zone or
+  beyond the circle keyline.
+- The **UI-iconography** half — the licence allowlist, the provenance record, the theme tint and the
+  one-family rule — has **no sensor yet**. `docs/icon-provenance.md` specifies the record and the
+  allowlist, and nothing reads it. Naming a check that does not exist would be the exact failure
+  this repository keeps re-learning, so it is stated plainly instead: until a program reads
+  `apps/<slot>/icons/provenance.json`, this half is a builder's obligation read back from the diff,
+  and neither `verify.mjs` nor `visual-qa.py` will catch a hand-drawn glyph or a licence that is not
+  on the allowlist.
 
 None of these can say the app is beautiful. They can say the app's declared identity is the one in
 the build, the one in the pack, and the one in the pixels — and they can say two slots do not have

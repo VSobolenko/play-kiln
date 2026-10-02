@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Настоящий русский перевод, написанный вместе с деревом значений по умолчанию, а не приделанный
+    задним числом. У каждого переводимого ключа res/values/strings.xml есть строка здесь, и порядок
+    позиционных аргументов совпадает с английским: `localeProblems()`
+    (scripts/core/policy.mjs) падает на пропущенном или перенумерованном `%1$s`.
+
+    `about_privacy_url` здесь нет намеренно: это translatable="false", то есть адрес политики,
+    а не текст, и значения по умолчанию — единственный источник правды для него.
+-->
+<resources>
+    <string name="app_name" translatable="true">Lawn Round Log</string>
+
+    <!-- Общие действия. -->
+    <string name="action_add_customer" translatable="true">Добавить клиента</string>
+    <string name="action_edit" translatable="true">Изменить</string>
+    <string name="action_delete" translatable="true">Удалить</string>
+    <string name="action_cancel" translatable="true">Отмена</string>
+    <string name="action_save" translatable="true">Сохранить</string>
+    <string name="action_confirm" translatable="true">Подтвердить</string>
+    <string name="action_back" translatable="true">Назад</string>
+    <string name="action_dismiss" translatable="true">Закрыть</string>
+    <string name="action_open" translatable="true">Открыть %1$s</string>
+    <string name="action_edit_entry" translatable="true">Изменить запись для %1$s</string>
+    <string name="action_delete_entry" translatable="true">Удалить запись для %1$s</string>
+
+    <!-- Статус визита. Его читает и общая метка статуса, и список дня. -->
+    <string name="visit_mowed" translatable="true">Скошено</string>
+    <string name="visit_skipped" translatable="true">Пропущено</string>
+    <string name="visit_rained_off" translatable="true">Из-за дождя</string>
+
+    <!-- Маршрут: упорядоченный список работы, которым управляет сам оператор. -->
+    <string name="round_title" translatable="true">Маршрут</string>
+    <string name="round_day_label" translatable="true">Маршрут на %1$s</string>
+    <string name="round_total_owed" translatable="true">Всего должны</string>
+    <string name="round_customers_label" translatable="true">Клиенты</string>
+    <string name="round_tab_today" translatable="true">На сегодня</string>
+    <string name="round_tab_all" translatable="true">Весь маршрут</string>
+    <string name="round_empty_title" translatable="true">Клиентов пока нет</string>
+    <string name="round_empty_body" translatable="true">Добавьте людей в маршрут — приложение сохранит их порядок, визиты и то, что они ещё должны.</string>
+    <string name="round_detail_placeholder" translatable="true">Выберите клиента, чтобы открыть запись здесь.</string>
+    <string name="round_move_up" translatable="true">Поднять %1$s выше</string>
+    <string name="round_move_down" translatable="true">Опустить %1$s ниже</string>
+    <string name="round_mark_mowed" translatable="true">Отметить %1$s как скошено</string>
+    <string name="round_mark_skipped" translatable="true">Отметить %1$s как пропущено</string>
+    <string name="round_mark_rained_off" translatable="true">Отметить %1$s как из-за дождя</string>
+    <string name="round_rate_line" translatable="true">Ставка за визит %1$s</string>
+    <string name="round_push_day" translatable="true">Сдвинуть маршрут на один день</string>
+    <string name="round_push_confirm_body" translatable="true">Каждый клиент, ещё назначенный на сегодня, будет отмечен как из-за дождя и сдвинется ровно на один день. Используйте это, когда погода забрала утро.</string>
+
+    <!-- Карточка клиента. -->
+    <string name="customer_new_title" translatable="true">Новый клиент</string>
+    <string name="customer_details_title" translatable="true">Данные</string>
+    <string name="customer_name" translatable="true">Имя</string>
+    <string name="customer_name_required" translatable="true">Введите имя перед сохранением.</string>
+    <string name="customer_address" translatable="true">Адрес</string>
+    <string name="customer_phone" translatable="true">Телефон</string>
+    <string name="customer_notes" translatable="true">Заметки</string>
+    <string name="customer_rate" translatable="true">Ставка за визит</string>
+    <string name="customer_rate_hint" translatable="true">По ней заранее подставляется сумма для этого клиента.</string>
+    <string name="customer_rate_invalid" translatable="true">Введите сумму, например 40</string>
+    <string name="customer_balance" translatable="true">Баланс</string>
+
+    <!-- Платежи. -->
+    <string name="payment_section_title" translatable="true">Платежи</string>
+    <string name="payment_amount" translatable="true">Полученная сумма</string>
+    <string name="payment_add" translatable="true">Записать платёж</string>
+    <string name="payment_remove" translatable="true">Удалить этот платёж</string>
+    <string name="payment_none" translatable="true">Платежей пока нет.</string>
+
+    <!-- История и экспорт в CSV. -->
+    <string name="history_title" translatable="true">История</string>
+    <string name="history_count" translatable="true">Записей: %1$d</string>
+    <string name="history_empty" translatable="true">Пока ничего не записано</string>
+    <string name="history_empty_body" translatable="true">Визиты и платежи появятся здесь сразу после того, как вы запишете их в маршруте.</string>
+    <string name="history_filter_all" translatable="true">Все</string>
+    <string name="history_filter_visits" translatable="true">Визиты</string>
+    <string name="history_filter_payments" translatable="true">Платежи</string>
+    <string name="history_visit_amount" translatable="true">%1$s к оплате</string>
+    <string name="history_unknown_customer" translatable="true">Клиент удалён</string>
+    <string name="history_edit_title" translatable="true">Исправить запись</string>
+    <string name="history_edit_subtitle" translatable="true">%1$s, %2$s</string>
+    <string name="history_edit_status" translatable="true">Результат</string>
+    <string name="history_delete_entry_body" translatable="true">Удалить запись для %1$s за %2$s?</string>
+    <string name="export_csv" translatable="true">Экспорт в CSV</string>
+    <string name="export_done" translatable="true">Экспортировано строк: %1$d</string>
+    <string name="export_failed" translatable="true">Не удалось записать файл.</string>
+
+    <!-- Единственная покупка. Одна цена, без пробного срока и без подписки. -->
+    <string name="unlock_title" translatable="true">Открыть всю запись</string>
+    <string name="unlock_body" translatable="true">В бесплатной версии — до %1$d клиентов. Покупка сохраняет всех клиентов, всю историю и экспорт в CSV.</string>
+    <string name="unlock_bullet_customers" translatable="true">Столько клиентов, сколько нужно</string>
+    <string name="unlock_bullet_history" translatable="true">Вся история визитов с возможностью правки</string>
+    <string name="unlock_bullet_export" translatable="true">Экспорт в CSV через системный выбор файла</string>
+    <string name="unlock_price_label" translatable="true">Один платёж</string>
+    <string name="unlock_price" translatable="true">$9.99</string>
+    <string name="unlock_price_note" translatable="true">Один платёж. Ни подписки, ни продления.</string>
+    <string name="unlock_action" translatable="true">Разблокировать</string>
+    <string name="unlock_restore" translatable="true">Восстановить покупку</string>
+    <string name="unlock_unlocked" translatable="true">Открыто</string>
+    <string name="unlock_owned_body" translatable="true">Спасибо. Все клиенты, все визиты и экспорт теперь ваши.</string>
+    <string name="unlock_busy" translatable="true">Открываем Google Play…</string>
+    <string name="unlock_failed" translatable="true">Покупка не завершилась. Попробуйте снова или восстановите прежнюю покупку.</string>
+    <string name="unlock_unavailable" translatable="true">Google Play сейчас недоступен на этом устройстве.</string>
+    <string name="free_tier_limit_message" translatable="true">В бесплатной версии — %1$d клиентов. Разблокируйте один раз, чтобы добавить сколько угодно; этот клиент сохранён.</string>
+
+    <!-- Настройки. Каждая настройка здесь меняет то, что приложение действительно читает. -->
+    <string name="settings_title" translatable="true">Настройки</string>
+    <string name="settings_appearance_header" translatable="true">Оформление</string>
+    <string name="settings_appearance" translatable="true">Оформление</string>
+    <string name="settings_appearance_system" translatable="true">Как в системе</string>
+    <string name="settings_appearance_light" translatable="true">Светлое</string>
+    <string name="settings_appearance_dark" translatable="true">Тёмное</string>
+    <string name="settings_appearance_note" translatable="true">У приложения своя светлая и тёмная палитры; здесь выбирается, какая из них используется.</string>
+    <string name="settings_language_header" translatable="true">Язык</string>
+    <string name="settings_language" translatable="true">Язык приложения</string>
+    <string name="settings_language_summary" translatable="true">Выберите язык этого приложения.</string>
+    <string name="settings_language_summary_legacy" translatable="true">Измените язык в настройках Android для этого приложения.</string>
+    <string name="settings_behaviour_header" translatable="true">Поведение</string>
+    <string name="settings_currency" translatable="true">Символ валюты</string>
+    <string name="settings_currency_summary" translatable="true">Показывается перед каждой суммой.</string>
+    <string name="settings_currency_error" translatable="true">Используйте от одного до трёх символов.</string>
+    <string name="settings_default_amount" translatable="true">Сумма визита по умолчанию</string>
+    <string name="settings_default_amount_summary" translatable="true">По ней задаётся ставка для нового клиента.</string>
+    <string name="settings_amount_error" translatable="true">Введите число, например 40</string>
+    <string name="settings_confirm_delete" translatable="true">Спрашивать перед удалением</string>
+    <string name="settings_confirm_delete_summary" translatable="true">Спрашивать перед удалением клиента, визита или платежа.</string>
+    <string name="settings_haptics" translatable="true">Отклик вибрацией</string>
+    <string name="settings_haptics_summary" translatable="true">Вибрировать, когда визит записан.</string>
+
+    <!-- Подтверждение перед необратимым действием. -->
+    <string name="delete_confirm_title" translatable="true">Удалить это?</string>
+    <string name="delete_confirm_body" translatable="true">%1$s, а также все его визиты и платежи будут удалены.</string>
+
+    <!-- О приложении и вторая половина политики конфиденциальности, которую требует Play. -->
+    <string name="about_title" translatable="true">О приложении</string>
+    <string name="about_body" translatable="true">%1$s хранит ваш маршрут на этом устройстве. Ни аккаунта, ни синхронизации, ни сети в ежедневной работе: маршрут, его визиты и балансы открываются в режиме полёта.</string>
+    <string name="about_privacy_policy" translatable="true">Политика конфиденциальности</string>
+    <string name="about_contact" translatable="true">Поддержка: v.sobolenko.vs@gmail.com</string>
+    <string name="about_version" translatable="true">Версия %1$s</string>
+</resources>

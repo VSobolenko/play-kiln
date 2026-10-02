@@ -191,8 +191,8 @@ def stroke(role: str, points: Sequence[tuple[float, float]], weight: str) -> dic
 # --------------------------------------------------------------------------------------
 # The marks
 #
-# Both marks are built on a keyline and on the declared stroke scale, and both are centrally
-# symmetric so their arithmetic centre is their optical centre.
+# Every mark is built on a keyline and on the declared stroke scale, and every mark below is
+# centrally symmetric, so its arithmetic centre is its optical centre.
 #
 # `pipe` - a pipe cross-section measured across its bore: an annulus (the pipe wall) on the circle
 # keyline with a dimension line spanning the inner diameter and a tick at each end, the tick
@@ -203,6 +203,12 @@ def stroke(role: str, points: Sequence[tuple[float, float]], weight: str) -> dic
 # punched through it, and an amber check in the page's own content area. The page is the
 # silhouette; the spine and the check are interior detail and are therefore derived from the page
 # rectangle rather than from the canvas, so a page that moves takes its detail with it.
+#
+# `mark-stripes` - the mown-stripe fan: four bold strokes converging toward a vanishing point above
+# them, the pattern a mower leaves on a lawn. It is the one mark here whose silhouette is neither a
+# disc nor a page, so it declares the circle keyline it is *measured against* rather than a keyline
+# it is inscribed in: its outermost ink reaches 91% of that bound (beside `pipe`'s 100% and
+# `mark-book`'s 96%) and every reach gate reads the same bound.
 # --------------------------------------------------------------------------------------
 
 # pipe
@@ -259,11 +265,40 @@ BOOK: tuple[dict, ...] = (
     stroke("amber", [_book_point(x, y) for x, y in _CHECK_FRACTIONS], "bold"),
 )
 
+# mark-stripes
+# Four strokes at the one declared bold weight, each a straight two-point line from topY to bottomY
+# with round caps, and each stripe's top point nearer the vertical axis than its bottom point so the
+# four converge upward toward a vanishing point. The two outer stripes are `paper` and the two inner
+# ones `amber`, which is the mown-stripe pattern: one chalk pass beside one cut accent.
+#
+# The fan does not sit on a keyline the way `pipe` sits on the circle or `mark-book` on the portrait
+# rectangle - its silhouette is a trapezoid, and there is no keyline for one. It is therefore placed
+# to the geometry the slot declared and bounded by the *reach* gate: the outermost ink lands at
+# 0.2616 of the canvas, 91% of the circle keyline (beside `pipe`'s 100% and `mark-book`'s 96%), and
+# the top/bottom pairs mirror about x = 0.5, which puts the silhouette's centre exactly on the
+# optical anchor with no nudge.
+_STRIPES_TOP_Y = 0.350
+_STRIPES_BOTTOM_Y = 0.650
+# (topX, bottomX, role): the two chalk outer stripes outside the two cut-accent inner ones.
+_STRIPES_AXES: tuple[tuple[float, float, str], ...] = (
+    (0.385, 0.315, "paper"),
+    (0.462, 0.438, "amber"),
+    (0.538, 0.562, "amber"),
+    (0.615, 0.685, "paper"),
+)
+
+STRIPES: tuple[dict, ...] = tuple(
+    stroke(role, ((top_x, _STRIPES_TOP_Y), (bottom_x, _STRIPES_BOTTOM_Y)), "bold")
+    for top_x, bottom_x, role in _STRIPES_AXES
+)
+
 MARK_REGISTRY: dict[str, dict] = {
     "pipe": {"primitives": PIPE, "keyline": "circle",
              "note": "a pipe cross-section measured across its bore"},
     "mark-book": {"primitives": BOOK, "keyline": "portrait",
                   "note": "a bound, marked page with three binding rings and an amber check"},
+    "mark-stripes": {"primitives": STRIPES, "keyline": "circle",
+                     "note": "four mown stripes converging toward a vanishing point above them"},
 }
 DEFAULT_MARK = "pipe"
 

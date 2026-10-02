@@ -11,6 +11,7 @@ documentation for an existing app. A file here is a proposal, and the owner is t
 | `<date>-<topic>.md` | A human-readable proposal set: what was measured, one or more recipes in full, a comparison, a recommendation, and the refusals. |
 | `plans/<slug>.economics.json` | One gate-ready economics plan per recipe, in the exact schema of `docs/slot-economics.md`. |
 | `plans/<slug>.differentiators.json` | One gate-ready promise contract per recipe, in the exact schema of `docs/slot-differentiators.md`: the measured reasons this app can win, each weighted `core` or `supporting`. |
+| `plans/<slug>.naming.json` | One gate-ready naming contract per recipe, in the exact schema of `docs/app-naming.md`: the scored candidates the name was chosen from, the chosen name, and the alternatives that were rejected with their reasons. |
 
 ## The rule: a proposal must pass the economics gate before a slot exists
 
@@ -31,7 +32,7 @@ So the order is fixed and is not negotiable:
 3. **The owner picks one.** Only the owner chooses; the factory does not start an idea on its own.
 4. **Scaffold.** Run the `new-slot.mjs` command the proposal records. It writes the validated plan
    verbatim to the slot root as `economics.json`, and the slot's `capabilities.json` must enable
-   what the archetype needs (`billing` for the purchase-led and subscription archetypes, `ads` for
+   what the archetype needs (`billing` for the `purchase_led_*` archetypes, `ads` for
    `ads_led_utility`). It also writes `differentiators.json` from the promise contract, with every
    promise `deferred` — see the next section.
 5. **Promote the evidence.** The gate's `evidenceRef` pattern accepts only
@@ -65,7 +66,27 @@ called done with the easy ten of twenty delivered and the rest quietly abandoned
 
 > The five recipes recorded in `2026-09-26-five-recipes.md` and the proposals beside them predate
 > this contract: each records only `--economics`, so `new-slot.mjs` will refuse them. Before any of
-> them is scaffolded, its promise contract has to be written from the recon already in the proposal.
+> them is scaffolded, its promise contract and its naming contract have to be written from the recon
+> already in the proposal.
+
+## The rule: a proposal must also name the app
+
+The name is the third recorded decision, beside the price and the reasons. It is derived from a
+scored field of candidates rather than invented as the thought before the first line of code, because
+a title that is the bare category noun spends Play's strongest ranking field on the head term the
+incumbent already owns and gives a user nothing to prefer. `docs/app-naming.md` is the contract and
+`plans/<slug>.naming.json` is the artifact.
+
+```bash
+node scripts/check-naming.mjs --naming docs/ideation/plans/<slug>.naming.json --validate-only
+```
+
+This prints `SKIP` for the pack cross-check, because a proposal has no slot and no `store/listing.json`
+yet; the schema checks are not skipped, and `--validate-only` skips only the evidence file resolving on
+disk. A `BLOCKED` verdict means the name is not proposable: the contract must carry at least five
+scored candidates spanning at least three archetypes, the chosen candidate at 70/100 or better, at
+least one rejected alternative with the reason it lost, and a title inside Play's 30-character cap in
+every declared locale.
 
 ## What a proposal must contain
 
@@ -74,10 +95,13 @@ An idea reaches the owner as a proposal, never as a started slot
 
 - Category and job, stated as one sentence.
 - The paying user, what exactly is bought, the price, and the moment of payment.
-- The archetype, and the capability it needs.
+- The archetype, the capability it needs, and **which archetypes were considered and rejected, with the revenue reason for each**. No archetype is the factory's default, all four are first-class, and `subscription` is banned outright — see `.cursor/rules/ideation-gate.mdc` § "There is no house monetization, and subscriptions are banned".
 - The reasons the app can win, as a promise contract: each one a sentence, with its recon evidence
   and strength label, and its weight (`core` or `supporting`). At least three promises, at least two
   of them `core`.
+- The name, derived rather than invented: the candidates that were scored, the archetypes they span,
+  and the alternatives that were rejected with the reason each lost — so the owner sees the field the
+  name was chosen from, not only the name.
 - Demand evidence with each claim labelled MEASURED, ON RECORD, INFERRED or UNVERIFIED, and the
   hand-classified job share alongside any relevance-guard verdict — a guard verdict alone is not
   evidence, because the guard is blind to homonym collisions.

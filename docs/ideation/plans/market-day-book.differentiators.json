@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "slot": "market-day-book",
+  "reconRef": "docs/ideation/2026-10-01-small-business-takings.md#6-recipe--market-day-book-market-day-book--recommended",
+  "claims": [
+    {
+      "id": "takings-and-stock-are-one-entry",
+      "weight": "core",
+      "promise": "Recording a sale takes what left the stall off the count at the trader's own purchase cost, so the day's figures and the stock count are never typed twice and never disagree, and the trader can see what a day actually left them from their own prices rather than a second sheet.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-small-business-takings.md#41-the-decisive-complaint--the-app-that-already-serves-both-halves",
+        "finding": "A paying user of com.shrey_businessx.android, 4.0 stars over 100K+ installs, wrote \"my only issue is, it doesn't have a space to actually input restock quantities with cost pri[ce]\", classified missing-feature; the app already sells sales profit plus inventory and declares advertising plus in-app purchases."
+      },
+      "status": "deferred",
+      "deferredReason": "No model or screen exists yet: the entry that decrements a stock line at a stored cost price, and the fixture that proves a sale and a stock movement cannot disagree, are the first things to build."
+    },
+    {
+      "id": "supplier-balance-stays-editable",
+      "weight": "core",
+      "promise": "What is owed to each wholesaler is carried from the same entries and can be corrected in place, so a wrong vendor balance never becomes permanent and the trader can always see what was bought, what was paid and what is still owed.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-small-business-takings.md#42-the-rest-of-the-corpus",
+        "finding": "A critical review of com.srgroup.purchasesalesbook, 3.9 stars over 249 reviews at 10K+ installs, reads \"1. Can't edit errors in Vendor Balance. 2. Can't edit errors in Total balance. 3. There's no clarity of Debt Purchase and Payments made for Vendors.\", classified missing-feature."
+      },
+      "status": "deferred",
+      "deferredReason": "The supplier ledger is designed in the proposal and not written; the promise resolves when an edit to a past payment corrects the balance and a fixture proves an uncorrectable state is impossible."
+    },
+    {
+      "id": "no-account-and-it-does-not-lose-the-day",
+      "weight": "core",
+      "promise": "The book opens and records with no account and no network, the record stays on the phone, and the trader owns it as an exported CSV and PDF file, so no sync failure and no service shutdown can cost a market day.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-small-business-takings.md#42-the-rest-of-the-corpus",
+        "finding": "A paying user of com.shrey_businessx.android wrote \"My data doesn't sync across my devices even after paying for premium\", and a review of gn.cashbook, 3.9 stars over 500K+ installs, reads \"I lost my 4 days back up automatically Even I already backed it up daily\", classified data-loss."
+      },
+      "status": "deferred",
+      "deferredReason": "No local store, no export and no offline test exist yet; the promise resolves when the app records with the radio off and a fixture fails if any record path needs a network or an account."
+    },
+    {
+      "id": "bought-once-ads-go",
+      "weight": "supporting",
+      "promise": "One purchase removes the advertising for good, on the day sheet, the stock list and the supplier ledger, with no subscription, no trial and no further upsell, so paying actually changes what the trader sees.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-small-business-takings.md#41-the-decisive-complaint--the-app-that-already-serves-both-halves",
+        "finding": "The same paying user of com.shrey_businessx.android wrote \"Why do I still get ads...even after paying for premium\", classified ads and paywall; a review of com.foodmonk.rekordapp, 4.1 stars over 1M+ installs, reads \"after one month they will ask for payment to see or open your file. This is cheating with the customers.\""
+      },
+      "status": "deferred",
+      "deferredReason": "The ads and billing capabilities are not wired and the unlock sheet does not exist; the promise resolves when a fixture proves no ad request is issued once the entitlement is held."
+    },
+    {
+      "id": "one-day-sheet-per-market",
+      "weight": "supporting",
+      "promise": "Each market day is one sheet the trader closes in one screen: float in, takings by payment kind, the pitch fee, the stock that left, and the difference between what was counted and what was recorded, so a cash-up is a glance rather than a hunt through a ledger.",
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/ideation/2026-10-01-small-business-takings.md#34-craft-fair-sales-tracker-food-truck-sales-log-farmers-market-sales-log",
+        "finding": "The measured shelf names the day as the unit of work in com.passiveapp.sunmi_receipt (Stall POS Checkout), com.kutirsoft.dailysalesrecord (Daily Sales Record) and com.ackbiz.daily_book (Daily Book), while no incumbent's day sheet was opened or read, so this promise is a design inference from titles and not an observation."
+      },
+      "status": "deferred",
+      "deferredReason": "The day sheet does not exist; the promise resolves when one screen renders a closed day with float, takings, pitch fee and the counted-against-recorded difference, and a capture or fixture shows it."
+    }
+  ]
+}

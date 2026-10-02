@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "slot": "coin-collection-catalogue",
+  "reconRef": "docs/ideation/2026-10-01-coin-catalogue-and-pilot-logbook.md#5-recipe-1--coin-collection-catalogue-coin-collection-catalogue--recommended",
+  "claims": [
+    {
+      "id": "find-and-edit-a-coin",
+      "weight": "core",
+      "promise": "A collector can find one coin by year and denomination in seconds, correct a wrong field in place, and remove a coin he sold or gave away in a single tap, so the catalogue follows the collection instead of drifting behind it.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-coin-catalogue-and-pilot-logbook.md#52-what-the-incumbents-users-say--measured",
+        "finding": "On com.miccron.coinoscope, 3.7 stars over 1M+ installs, a 1-star review of 18 sampled reads \"Super hard to use. You can't search for a specific dated coin. To edit out a pic from my collection (if i sell or gift one) has proven elusive\"."
+      },
+      "status": "deferred",
+      "deferredReason": "No UI exists yet: search, in-place editing and deletion over the coin record are the first screens to build and the first fixture set to write."
+    },
+    {
+      "id": "owned-file-no-account",
+      "weight": "core",
+      "promise": "The catalogue is a file the collector owns: it needs no account, no subscription and no network, and it moves in and out as CSV, so the record survives losing the phone and never depends on a service staying alive.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-coin-catalogue-and-pilot-logbook.md#52-what-the-incumbents-users-say--measured",
+        "finding": "4 of the 13 critical reviews read in the coin pocket are classified paywall, 31 percent of that critical set, and all three largest coin apps measured declare in-app purchases while the 500K+ catalogue leader declares none."
+      },
+      "status": "deferred",
+      "deferredReason": "The CSV round-trip and the local-store-without-network guarantee are unbuilt; the promise is resolved only when both have tests that fail against a network or account dependency."
+    },
+    {
+      "id": "collector-fields-not-a-scanner",
+      "weight": "core",
+      "promise": "The app records what a collector actually records, country, denomination, year, mint mark, grade, what was paid, what it is valued at and where it is stored, instead of being a photo identifier that cannot be corrected or trusted.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-coin-catalogue-and-pilot-logbook.md#51-the-hand-classification-which-the-guard-cannot-do",
+        "finding": "About 15 of 30 visible results on the coin collection shelf are photo identifiers with in-app purchases, while about 12 of 30 are catalogues, and the 50K+ identifier com.colnect.identify.coin sits at 2.6 stars with an entry complaint quoted in the proposal."
+      },
+      "status": "deferred",
+      "deferredReason": "The record schema is defined in the proposal but not in code; it is resolved when the editor covers the full field set and a fixture proves every field round-trips through CSV."
+    },
+    {
+      "id": "bought-once-no-ads",
+      "weight": "supporting",
+      "promise": "It is bought once and never advertises: there is no subscription, no trial, no upsell after the unlock and no advertising identifier collected.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-coin-catalogue-and-pilot-logbook.md#52-what-the-incumbents-users-say--measured",
+        "finding": "2 of the 13 critical reviews in the pocket are classified ads, and the installed catalogue leader com.spencerpages declares neither advertising nor in-app purchases."
+      },
+      "status": "deferred",
+      "deferredReason": "The billing capability and the single unlock sheet are not built; the ads half is resolved by shipping with no advertising dependency at all."
+    },
+    {
+      "id": "photo-picker-no-permission",
+      "weight": "supporting",
+      "promise": "Coin photos come from the system photo picker, so the app requests no camera and no storage permission and its install prompt asks for nothing.",
+      "evidence": {
+        "strength": "ON RECORD",
+        "source": "docs/ideation/2026-10-01-coin-catalogue-and-pilot-logbook.md#54-the-reason-list-the-promise-contract",
+        "finding": "The Play compliance floor in AGENTS.md states the Photo Picker is preferred and that permissions must be minimized; no permission is declared in this recipe's plan."
+      },
+      "status": "deferred",
+      "deferredReason": "The photo picker is not wired up and the manifest has not been authored, so the zero-permission claim cannot yet be checked against a built APK."
+    },
+    {
+      "id": "several-collections-own-totals",
+      "weight": "supporting",
+      "promise": "Several collections can be kept side by side, each with its own count and total, so a bullion stack and a graded set are never averaged into one meaningless number.",
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/ideation/2026-10-01-coin-catalogue-and-pilot-logbook.md#51-the-hand-classification-which-the-guard-cannot-do",
+        "finding": "The measured shelf splits between bullion and graded collecting, and the catalogue apps in it expose a single undifferentiated list rather than per-collection totals."
+      },
+      "status": "deferred",
+      "deferredReason": "The collection model is a design decision recorded in the proposal, not code; it is resolved when per-collection totals render and a fixture proves two collections do not share a total."
+    }
+  ]
+}

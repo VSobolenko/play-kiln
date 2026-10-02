@@ -1,0 +1,158 @@
+---
+description: A physical phone over adb is the test target and never an emulator, so every behaviour claim is a run on the artifact the owner is handed
+alwaysApply: true
+---
+
+# The test runs on the phone, not in an emulator
+
+The factory hands the owner a **finished product**, so testing is not a stage that can be outsourced to
+the reviewer. The agent that built the app runs it. The owner's instruction, recorded 2026-10-01:
+
+> "Есть такой очень важный пункт, как тестирование, потому что агент должен сам себя полностью всё
+> протестировать, так как он уже отдаёт полностью готовленный нам продукт. Суть в том, что он должен
+> тестировать не на эмуляторе, потому что эмулятор нагружает систему, становится всё медленно и всё
+> плохо. Я подключаю почти всегда через АДБ полностью доступный телефон для всего управления Samsung
+> Galaxy A16. Приоритет отдавать ему, пускай всё тестирует на нём. Там и тапы, и свачи, и всё, короче,
+> и качать можно, и устанавливать можно. Поэтому это полностью телефон для тестирования, может
+> спокойно им управлять."
+
+In one sentence: **the attached Samsung Galaxy A16 over adb is the test target, it is fully ours to
+drive, and an emulator is not used** — because a running AVD loads the machine, and a slow machine
+slows every later slot in the same day. The emulator is not a cheaper device; it is a tax on the whole
+factory.
+
+## The measured starting position
+
+- `scripts/media-capture.mjs` already speaks to a device rather than to a machine: it finds `adb` on
+  `PATH` or under `$ANDROID_HOME/platform-tools` (`findAdb()`), lists devices with `adb devices`,
+  addresses the chosen one as `adb -s <serial> …`, installs the release APK
+  (`adb install -r app/build/outputs/apk/release/app-release.apk` is the remedy its own error prints),
+  launches with `monkey -p <applicationId> -c android.intent.category.LAUNCHER 1`, reads the screen with
+  `exec-out uiautomator dump /dev/tty` and `dumpsys package`, drives `shell input tap` / `input text` /
+  `input keyevent`, and photographs with `exec-out screencap -p` as **bytes**.
+- That is the whole controllable surface this rule relies on. Nothing here is invented: every action
+  the rule asks for is a subcommand the factory already runs, or a `DroidAgentKit` tool already
+  configured for this project in `.cursor/mcp.json`.
+- Two pieces of existing text still point at an emulator, and this rule supersedes both: the hint
+  `emulatorHint()` prints when no device is attached, and `.cursor/commands/ui-verify.md`'s table,
+  which still lists "Android emulator + adb + screenshot — Preferred for Compose UI". Correcting them
+  is the follow-up; reading them is not permission.
+
+## Rules
+
+- **The test target is a device in `device` state on `adb devices`, and with more than one attached
+  every command is addressed by `-s <serial>`.** A serial that shows `offline` is not a target — the
+  device-capture readiness probe measured exactly that state and refused it. `DroidAgentKit`'s
+  `android_devices_list` is the same reading through the MCP server.
+- **The phone is what the app is run on; an emulator is not a substitute.** No AVD is started to
+  make a rule green. If the phone is not attached, the run is `UNVERIFIED` (below) and never a pass
+  bought with an emulator.
+- **The device is fully controllable and the test is expected to use it.** Install
+  (`android_app_install`, or `adb install -r <apk>`), launch (`android_app_launch`), tap and swipe
+  (`shell input tap` / `input swipe`, or `android_ui_find` for the point), type (`shell input text`),
+  go back (`shell input keyevent 4`), photograph (`android_screen_snapshot` /
+  `exec-out screencap -p`), read the hierarchy (`android_accessibility_snapshot` /
+  `exec-out uiautomator dump`), read the log (`android_logcat_capture`), triage a crash
+  (`android_crash_triage`). "I could not reach that screen" is a claim about the app or about the run,
+  not a limit of the phone.
+- **A tap coordinate is read, not guessed.** `android_ui_find` returns the tap point for a text,
+  content description or resource id and reports ambiguous matches as candidates instead of picking
+  one. Hand-eyeballing a pixel offset from a screenshot is how a journey silently exercises the wrong
+  control and still produces six green-looking captures.
+- **The artifact under test is the artifact the owner is handed.** In development that is the debug
+  APK built from the revision under review; in release it is the signed artifact, and
+  `media-capture.mjs` already refuses to publish anything until the **installed** `base.apk` is
+  byte-identical to the recorded one — measured 2026-09-25, a stale install
+  (`installed sha256=075224ba…` against the rebuilt `f8706756…`) was refused with exit 2 and no
+  publication. A screen photographed on an older install is evidence about a different app, and it
+  must not be reported as evidence about this one.
+- **Reading the source is not a test.** A behaviour claim needs a run that observed it: the app
+  launched, the screen reached, the string rendered, the value stored, the crash absent. A code path
+  that looks correct and was never executed is `UNVERIFIED` — the same standard
+  `.cursor/rules/verification-discipline.mdc` holds every other claim to, applied to the app itself.
+- **No device attached means `UNVERIFIED`, and it is reported as such.** Not `PASS`, not "works as
+  far as we can tell", and above all not an emulator started quietly to turn the row green. Say which
+  serial was missing, say what remains unrun, and hand the owner the list — an honest gap is a
+  question he can answer in one sentence.
+- **Gradle stays one process per slot, so device runs serialize with builds.** The app must be built
+  before it can be installed: one Gradle invocation produces the APK
+  (`.cursor/rules/build-speed.mdc`), and the device run happens after it, in the same slot, alone.
+  A device being attached does not license a second concurrent build, and a build started while a run
+  is installing the previous APK corrupts the state the run is reading.
+- **The phone is shared with the owner, and the run is a guest on it.** A test may install its own
+  package, launch it, clear **its own** applicationId's data (`shell pm clear <applicationId>` is the
+  permitted shape — it is the app under test), and change a per-app setting
+  (`shell cmd locale set-app-locales <applicationId> --locales <locale>`). It may not factory-reset
+  the device, may not `pm uninstall` a package it did not install, may not clear another app's data,
+  and may not leave a device-wide setting changed: an IME the run disabled is re-enabled, a locale a
+  run set is restored. The owner's phone is where his own work lives.
+- **Every captured file goes under `.kiln/scratch/`, never the system temp directory.** Screenshots,
+  `uiautomator` dumps and logcat captures are written through `scripts/lib/scratch.mjs`
+  (`SCRATCH_DIR`, `scratchDirFor('device-<slot>')`) — not `%TEMP%`/`%TMP%`, not `$TMPDIR`, not
+  anywhere else outside the repository. `.cursor/rules/workspace-hygiene.mdc` governs this and the
+  reason is the owner's machine: a factory that fills the system temp directory has spent something
+  that was not its to spend, and a PNG among the files makes that mess unreadable rather than small.
+- **A capture is bytes, and on Windows it is never piped as text.** `adb exec-out screencap -p`
+  through a text pipeline mangles CR/LF and yields a file that is not a PNG — the device-capture
+  readiness probe recorded the trap, and `media-capture.mjs` passes `{ binary: true }` for exactly
+  this reason.
+
+## What is banned
+
+- Starting an AVD to satisfy a test row, and any report that says "tested on the emulator" as though
+  the target were a choice.
+- A `PASS` for app behaviour whose only evidence is the source file, the diff, or the compile.
+- A silent substitution of one artifact for another: a journey replayed against a previous install,
+  a debug APK offered as the release evidence, a screenshot from an older run.
+- Reporting a UI journey as verified while the taps were hand-guessed from coordinates nobody read
+  from the hierarchy.
+- Making a second Gradle invocation concurrent with an install or a run in the same slot.
+- Wiping, resetting or uninstalling anything on the owner's phone that the factory did not put there,
+  and leaving a device-wide setting changed behind a run.
+- Writing a screenshot, a UI dump or a log to the system temp directory because it was the convenient
+  path.
+- Turning "no device is attached" into a pass by any route, including narrowing the claim until the
+  run becomes unnecessary.
+
+## How it is verified
+
+This rule is enforced by **the run and its record** — and, since 2026-10-02, by a sensor that reads
+that record rather than by prose alone. `slot.device` in `scripts/core/device.mjs` requires
+`apps/<slot>/device-verification.json` to name the serial, the timestamp, the artifact path and its
+sha256, and at least three observations of what was tapped and what appeared; when the built
+`app/build/outputs/apk/debug/app-debug.apk` exists it **recomputes that hash and fails on a
+disagreement**, which is `scripts/lib/apk-provenance.mjs`'s rule applied at the point it was missing.
+A slot carrying no record is `UNVERIFIED`, never a pass.
+
+What the sensor cannot do, stated rather than implied: it proves that **a record exists and agrees
+with the artifact**. It cannot prove the run happened, that the taps were real, or that an
+observation describes what was on the screen — a fabricated record passes it. So the record is still
+the evidence a later reader contradicts, and this is what a handoff must carry:
+
+```text
+adb devices -l                              # the attached serial, in `device` state
+<DroidAgentKit android_devices_list>        # the same reading through the MCP server
+<DroidAgentKit android_app_install / android_app_launch>
+<DroidAgentKit android_ui_find>             # the tap point, read from the hierarchy
+<DroidAgentKit android_screen_snapshot>     # what was on the screen
+<DroidAgentKit android_logcat_capture / android_crash_triage>
+<DroidAgentKit android_test_run>            # an allowlisted test task, with its JUnit XML parsed
+node scripts/media-capture.mjs --slot <slug>  # phase 2: refuses a stale install, five-link chain
+node scripts/verify.mjs --slot <slug> --build # the slot's source checks + assembleDebug
+```
+
+- The record names the **serial**, the artifact and its hash, the revision, and what was observed on
+  screen — the observation that would have made the claim negative is stated before the run, as
+  `harness/roles/verifier.md` requires of every verdict. A "tested, works" with no serial and no
+  artifact is prose.
+- `media-capture.mjs` is the one place where this rule has teeth in code, and only in phase 2: its
+  provenance chain walks HEAD → `dist/release-manifest.json` → the recorded sha256 → the APK on disk →
+  the installed `base.apk`, and a missing or mismatched link is fatal
+  (`.cursor/rules/release-gate.mdc`; `scripts/lib/apk-provenance.mjs` carries the offline suite).
+- Phase 1 has no such script. Its device evidence is the run the builder performed on the debug APK
+  from the revision being handed over, and it belongs in the handoff beside the build that produced
+  it — the same revision the owner installs at checkpoint 1.5, so a claim about the app and the APK he
+  is holding are the same sentence.
+- A device that is **not** attached produces the `UNVERIFIED` row, printed where the test would have
+  been, with the reason. That row is the check: a rule that reports a gap is worth more than a rule
+  that reports a pass nobody ran.

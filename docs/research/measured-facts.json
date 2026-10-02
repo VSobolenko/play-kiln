@@ -303,5 +303,85 @@
       "probe": null
     },
     "gap": "partial only: the JDK 17 floor is `MIN_MAJOR_SUPPORTED` in `scripts/lib/java.mjs` (asserted by `scripts/selftest.mjs`), and `scripts/kiln-status.mjs` probes the Gradle wrapper 9.7.1, compileSdk 37, targetSdk 36 and Build Tools 36.0.0 - but the AGP 9.4.1, Kotlin/Compose Compiler 2.3.21 and Compose BOM 2026.09.00 pins are asserted by no program."
+  },
+  {
+    "id": "android-edge-to-edge-mandatory-from-target-35",
+    "claim": "Edge-to-edge is enforced for every app that targets API 35 or higher, and the opt-out (`R.attr#windowOptOutEdgeToEdgeEnforcement`) is deprecated and disabled at target 36, so an app that draws under the system bars cannot turn it off and must apply the insets itself.",
+    "source": "https://developer.android.com/about/versions/15/behavior-changes-15 (section `Edge-to-edge enforcement`: \"Apps are edge-to-edge by default on devices running Android 15 if the app is targeting Android 15 (API level 35)\") and https://developer.android.com/about/versions/16/behavior-changes-16 (section `Edge to edge opt-out going away`), both quoted with the compatibility change ID 309578419 in `docs/research/2026-10-02-android-window-insets.md` §1; enforced by the `uiux.insets` sensor in `scripts/core/uiux.mjs`",
+    "sourceKind": "vendor-docs",
+    "verifiedAt": "2026-10-02",
+    "verifiedBy": "vendor-page",
+    "expiresAfterDays": 365,
+    "whereUsed": [
+      "docs/research/2026-10-02-android-window-insets.md",
+      "docs/ui-ux-standards.md",
+      "scripts/core/uiux.mjs",
+      ".cursor/rules/ui-ux-baseline.mdc"
+    ],
+    "enforcedBy": "uiux.insets"
+  },
+  {
+    "id": "android-safedrawing-contains-cutout-and-ime",
+    "claim": "`safeDrawing` is the union of `systemBars`, `ime` and `displayCutout`, so it is the smallest inset set that covers the status bar, the keyboard and a landscape camera cutout, while `systemBars` carries neither the IME nor the cutout and `statusBarsPadding()` alone carries neither either.",
+    "source": "The AOSP union definitions in `compose/foundation/foundation-layout/.../WindowInsets.android.kt` (`safeDrawing = systemBars ∪ ime ∪ displayCutout`) and the Material 3 internal `systemBarsForVisualComponents = systemBars ∪ displayCutout` in `SystemBarsDefaultInsets.android.kt`, both fetched and quoted in `docs/research/2026-10-02-android-window-insets.md` §2; enforced by the `uiux.insets` sensor in `scripts/core/uiux.mjs`, which reads the cutout-aware token set, the status-bars-only note and the IME predicate",
+    "sourceKind": "vendor-docs",
+    "verifiedAt": "2026-10-02",
+    "verifiedBy": "vendor-page",
+    "expiresAfterDays": 365,
+    "whereUsed": [
+      "docs/research/2026-10-02-android-window-insets.md",
+      "docs/ui-ux-standards.md",
+      "scripts/core/uiux.mjs",
+      ".cursor/rules/ui-ux-baseline.mdc"
+    ],
+    "enforcedBy": "uiux.insets"
+  },
+  {
+    "id": "android-scaffold-does-not-apply-its-insets",
+    "claim": "A Material 3 `Scaffold` does not apply its `contentWindowInsets` to the content — it hands them to the content lambda as `PaddingValues` — and its default set carries the display cutout but not the IME, so a lambda that drops its padding is as exposed as no Scaffold at all.",
+    "source": "The Material 3 `Scaffold` reference (\"Scaffold does not apply the insets to content; this responsibility is yours\") and the AOSP `systemBarsForVisualComponents` default, both quoted in `docs/research/2026-10-02-android-window-insets.md` §4; enforced by the `uiux.insets` sensor in `scripts/core/uiux.mjs`, whose `Scaffold` predicate reads the content lambda's first binding and fails when it is unused",
+    "sourceKind": "vendor-docs",
+    "verifiedAt": "2026-10-02",
+    "verifiedBy": "vendor-page",
+    "expiresAfterDays": 365,
+    "whereUsed": [
+      "docs/research/2026-10-02-android-window-insets.md",
+      "docs/ui-ux-standards.md",
+      "scripts/core/uiux.mjs",
+      ".cursor/rules/ui-ux-baseline.mdc"
+    ],
+    "enforcedBy": "uiux.insets"
+  },
+  {
+    "id": "android-predictive-back-is-one-manifest-declaration",
+    "claim": "Predictive back is opted into by a single declaration — `android:enableOnBackInvokedCallback` on `<application>` or `<activity>` — and without it the system animation has nothing to preview, so back is an instant swap on a current device.",
+    "source": "https://developer.android.com/guide/navigation/custom-back/predictive-back-gesture, recorded with its DETECTABLE verdict in `docs/research/2026-10-02-modern-android-platform-surface.md` (ranked gate candidate 1, which also states that whether the root wrongly intercepts is not statically decidable); enforced by the `uiux.platform` sensor in `scripts/core/uiux.mjs`",
+    "sourceKind": "vendor-docs",
+    "verifiedAt": "2026-10-02",
+    "verifiedBy": "vendor-page",
+    "expiresAfterDays": 365,
+    "whereUsed": [
+      "docs/research/2026-10-02-modern-android-platform-surface.md",
+      "docs/ui-ux-standards.md",
+      "scripts/core/uiux.mjs",
+      ".cursor/rules/ui-ux-baseline.mdc"
+    ],
+    "enforcedBy": "uiux.platform"
+  },
+  {
+    "id": "android-material3-expressive-is-alpha-only-at-the-pin",
+    "claim": "The pinned Compose BOM 2026.09.00 maps to stable `material3` 1.4.0, while every Material 3 Expressive component and the `MotionScheme` physics live on the `1.5.0-alpha*` track behind `@ExperimentalMaterial3ExpressiveApi`, so an Expressive dependency is an alpha adoption that breaks the pin.",
+    "source": "https://developer.android.com/jetpack/androidx/releases/compose-material3 and https://developer.android.com/develop/ui/compose/bom/bom-mapping, measured for `docs/research/2026-10-02-modern-android-platform-surface.md` §6, which reaches the `1.5.0-alpha*` track and states that presence of the alpha artifact is DETECTABLE while its taste is not; the factory's own BOM pin is `scaffold/android-compose/gradle/libs.versions.toml`; enforced by the `uiux.platform` sensor in `scripts/core/uiux.mjs`",
+    "sourceKind": "vendor-docs",
+    "verifiedAt": "2026-10-02",
+    "verifiedBy": "vendor-page",
+    "expiresAfterDays": 180,
+    "whereUsed": [
+      "docs/research/2026-10-02-modern-android-platform-surface.md",
+      "docs/ui-ux-standards.md",
+      "scripts/core/uiux.mjs",
+      "AGENTS.md"
+    ],
+    "enforcedBy": "uiux.platform"
   }
 ]

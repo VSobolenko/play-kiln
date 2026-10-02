@@ -10,6 +10,14 @@
       {
         "command": "node .cursor/hooks/secret-guard.cjs",
         "matcher": "^(Write|StrReplace|EditNotebook)$"
+      },
+      {
+        "command": "node .cursor/hooks/parallel-guard.cjs"
+      }
+    ],
+    "subagentStart": [
+      {
+        "command": "node .cursor/hooks/parallel-guard.cjs"
       }
     ],
     "beforeShellExecution": [

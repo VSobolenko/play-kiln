@@ -41,8 +41,16 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 # measurements that decide whether the rendered mark is a designed mark live beside it. Both are
 # imported rather than restated: a second copy of the keyline is a second thing to drift.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lib import colours  # noqa: E402  the one colour-maths implementation, shared with visual-qa
 from lib import icon_design  # noqa: E402
 from lib import icon_qa  # noqa: E402
+
+# The colour maths was a byte-for-byte copy in this module until 2026-10-02; `scripts/lib/colours.py`
+# now owns `hex_of`/`parse_hex` and this module imports them ("one source of truth, imported - never
+# restated", `.cursor/rules/verification-discipline.mdc`). The name stays a module-level *alias*
+# because `scripts/test-icon-design.py` reads `studio.hex_of` directly: the name survives, the second
+# implementation does not.
+hex_of = colours.hex_of
 
 # --------------------------------------------------------------------------------------
 # Design tokens
@@ -65,6 +73,11 @@ MUTED = (170, 188, 210)
 BEZEL = (13, 18, 27)
 BEZEL_RIM = (126, 148, 176)
 
+# The reference slot's own artwork, kept as the historic fallback only. `apply_palette` overwrites
+# the module globals above with the slot being rendered, so these constants are never *the* palette
+# of a pack; they are what `resolve_palette` reaches for when a slot omits a role, which is a
+# different app's colours. That fallback is now reported, and on a slot the baseline gates refused
+# (`.cursor/rules/visual-identity.mdc`: two slots never share a palette).
 PALETTE_DEFAULTS = {
     "ink": INK, "ink_soft": INK_SOFT, "ink_lift": INK_LIFT,
     "amber": AMBER, "amber_deep": AMBER_DEEP, "amber_pale": AMBER_PALE,
@@ -72,16 +85,114 @@ PALETTE_DEFAULTS = {
     "bezel": BEZEL, "bezel_rim": BEZEL_RIM,
 }
 
+# `FACTORY_BASELINE` is parsed from its one definition rather than copied: a second literal date
+# here would be the "one source of truth, never restated" defect, and the two could drift apart.
+_FACTORY_BASELINE_RE = re.compile(r"FACTORY_BASELINE\s*=\s*'(\d{4}-\d{2}-\d{2})'")
 
-def resolve_palette(values: dict | None) -> dict[str, tuple[int, int, int]]:
-    """Resolve studio palette roles, retaining the historic palette for omitted roles."""
+
+def factory_baseline() -> str:
+    """The date a factory baseline starts gating newly created slots, from `core/baseline.mjs`."""
+    path = Path(__file__).resolve().parent / "core" / "baseline.mjs"
+    match = _FACTORY_BASELINE_RE.search(path.read_text(encoding="utf-8"))
+    if match is None:
+        raise SystemExit(f"BLOCKED: cannot read FACTORY_BASELINE from {path}")
+    return match.group(1)
+
+
+def _registry_entry(slot: Path) -> dict | None:
+    """The registry row for a slot, matched by `dir` exactly as `core/baseline.mjs` matches it."""
+    root = Path(__file__).resolve().parent.parent
+    try:
+        relative = slot.resolve().relative_to(root).as_posix()
+    except ValueError:
+        return None
+    registry = root / "registry" / "apps.json"
+    if not registry.is_file():
+        return None
+    apps = json.loads(registry.read_text(encoding="utf-8")).get("apps")
+    if not isinstance(apps, list):
+        return None
+    return next((app for app in apps if app.get("dir") == relative), None)
+
+
+def palette_baseline_applies(slot: Path | None) -> tuple[bool, str]:
+    """Whether the palette-completeness baseline gates this slot, and the reason either way.
+
+    This mirrors `scripts/core/baseline.mjs` rather than inventing a second date rule: a proof slot
+    (no `economics.json`), a killed slot and a slot created before `FACTORY_BASELINE` are exempt and
+    carry the finding as a note; a slot born into the baseline is gated.
+    """
+    if slot is None:
+        return False, "the caller did not name the slot"
+    if not (slot / "economics.json").is_file():
+        return False, "not a product slot: it declares no economics.json, so it is a pipeline proof"
+    entry = _registry_entry(slot)
+    if entry is not None and entry.get("status") == "killed":
+        return False, "the slot is killed; its evidence is archived rather than gated"
+    created_at = entry.get("createdAt") if isinstance(entry, dict) else None
+    created_at = created_at[:10] if isinstance(created_at, str) else None
+    if not created_at:
+        return True, ""
+    baseline = factory_baseline()
+    if created_at < baseline:
+        return False, f"created {created_at}, before the {baseline} baseline"
+    return True, ""
+
+
+def resolve_palette(
+    values: dict | None,
+    slot: Path | None = None,
+    *,
+    applies: bool | None = None,
+) -> dict[str, tuple[int, int, int]]:
+    """Resolve a slot's declared palette, refusing a silent inheritance on a gated slot.
+
+    `PALETTE_DEFAULTS` are the reference slot's artwork, not a neutral fallback, so a slot that
+    omits a role is otherwise painted in a different app's colours with nothing to say so - the
+    shared-identity failure `.cursor/rules/visual-identity.mdc` forbids. A slot the baseline gates
+    is refused; a slot that predates the rule keeps the defaults but is told, in the output, which
+    roles it inherited and from where. `slot` supplies the identity the applicability rule reads;
+    `applies` supplies an already-evaluated answer when the caller has one.
+    """
+    declared = values or {}
+    inherited = [role for role in PALETTE_DEFAULTS if role not in declared]
+    if inherited:
+        if applies is None:
+            applies, reason = palette_baseline_applies(slot)
+        else:
+            reason = "applicability supplied by the caller"
+        if applies and slot is not None:
+            raise SystemExit(
+                "BLOCKED: "
+                + slot.as_posix()
+                + " declares no palette value for role(s) "
+                + ", ".join(inherited)
+                + " in store/studio.json, and it is a slot the "
+                + factory_baseline()
+                + " baseline gates. Every palette role must be declared, or the omitted role is "
+                "silently painted with the historic reference palette in scripts/store-studio.py "
+                "- another app's colours, which .cursor/rules/visual-identity.mdc forbids."
+            )
+        print(
+            "NOTE studio - "
+            + (f"{slot.as_posix()}: " if slot is not None else "")
+            + "palette role(s) "
+            + ", ".join(inherited)
+            + " are inherited from the historic reference palette in scripts/store-studio.py "
+            "(the reference slot's own artwork colours)"
+            + (f"; {reason}" if reason else "")
+            + ". Declare them in store/studio.json so the pack is painted in this slot's colours."
+        )
     resolved = dict(PALETTE_DEFAULTS)
-    for role, value in (values or {}).items():
+    for role, value in declared.items():
         if role not in resolved:
             continue
-        if not isinstance(value, str) or not re.fullmatch(r"#[0-9A-Fa-f]{6}", value):
-            raise SystemExit(f"BLOCKED: palette role '{role}' must be a #RRGGBB colour, got {value!r}")
-        resolved[role] = tuple(int(value[index:index + 2], 16) for index in (1, 3, 5))
+        try:
+            resolved[role] = colours.parse_hex(value)
+        except ValueError:
+            raise SystemExit(
+                f"BLOCKED: palette role '{role}' must be a #RRGGBB colour, got {value!r}"
+            ) from None
     return resolved
 
 
@@ -293,10 +404,12 @@ def wrap(draw: ImageDraw.ImageDraw, text: str, face: ImageFont.ImageFont, width:
 # --------------------------------------------------------------------------------------
 # The mark
 #
-# Two marks are registered: `pipe` is a section through a bore with a dimension line across it,
-# and `mark-book` is a bound, marked page. Both are built on the shared keyline system from a small
-# set of primitives, and both are rendered twice from that one description - as pixels for the
+# Three marks are registered: `pipe` is a section through a bore with a dimension line across it,
+# `mark-book` is a bound, marked page, and `mark-stripes` is the mown-stripe fan (four strokes
+# converging toward a vanishing point). All three are built on the shared keyline system from a
+# small set of primitives, and each is rendered twice from that one description - as pixels for the
 # listing icon and as Android path data for the launcher - so the two cannot drift apart.
+# The registry is the single source of truth for this list; nothing else enumerates the marks.
 # --------------------------------------------------------------------------------------
 
 
@@ -666,8 +779,8 @@ def write_vectors(res: Path, colors: dict[str, str]) -> list[Path]:
     return written
 
 
-def hex_of(color: tuple[int, int, int]) -> str:
-    return "#{:02X}{:02X}{:02X}".format(*color)
+# `hex_of` is imported from `scripts/lib/colours.py` at the top of this module; there is no local
+# definition, so the colour maths has one implementation (see the import alias above).
 
 
 # --------------------------------------------------------------------------------------
@@ -751,8 +864,46 @@ def default_studio(listing: dict) -> dict:
     }
 
 
+def _release_approval_problem(slot: Path) -> str | None:
+    """The reason identity rendering must wait, imported from ``render.py`` rather than restated.
+
+    Rendering the mark, the feature graphic and the screenshot sets is release work: the assets are
+    the app's public claim about itself, and the owner approves the app before they are produced.
+    This module also rewrites the app's own launcher vectors, so it is not merely store output.
+
+    The decision lives in ``scripts/lib/release-approval.mjs``, which ``render.py`` already wraps in
+    ``release_approval_block``. The wrapper is imported rather than re-implemented because a second
+    copy of the rule is a second answer to one question. ``render.py`` loads this file by path, so the
+    lookup reuses an already-loaded copy instead of re-executing its loader — the same reason and the
+    same shape as ``_load_pack_model`` above, which exists for exactly this hazard.
+    """
+    path = (Path(__file__).resolve().parent / "store" / "render.py").resolve()
+    for module in list(sys.modules.values()):
+        module_file = getattr(module, "__file__", None)
+        if module_file and Path(module_file).resolve() == path:
+            return module.release_approval_block(slot)
+    spec = importlib.util.spec_from_file_location("store_render", path)
+    if spec is None or spec.loader is None:
+        raise SystemExit(f"BLOCKED: cannot load {path} to check the release approval")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["store_render"] = module
+    try:
+        spec.loader.exec_module(module)
+    except Exception:
+        sys.modules.pop("store_render", None)
+        raise
+    return module.release_approval_block(slot)
+
+
 def render_slot(slot: Path, *, preview_circle: bool = False, identity_only: bool = False) -> None:
     global CURRENT_MARK
+    # Before anything is read or written. Invoked directly this command used to have no gate at all,
+    # which made `release-gate.mdc`'s own claim — that release work cannot be reached by calling a
+    # helper instead of the documented entry point — untrue for the one script that composes the
+    # entire store identity and rewrites the launcher vectors.
+    problem = _release_approval_problem(slot)
+    if problem is not None:
+        raise SystemExit(f"BLOCKED: {problem}")
     store = slot / "store"
     listing = json.loads((store / "listing.json").read_text(encoding="utf-8"))
     studio_path = store / "studio.json"
@@ -766,7 +917,7 @@ def render_slot(slot: Path, *, preview_circle: bool = False, identity_only: bool
         )
     studio = default_studio(listing)
     studio.update(json.loads(studio_path.read_text(encoding="utf-8")))
-    palette = resolve_palette(studio.get("palette"))
+    palette = resolve_palette(studio.get("palette"), slot)
     apply_palette(palette)
     CURRENT_MARK = resolve_mark(studio)
 

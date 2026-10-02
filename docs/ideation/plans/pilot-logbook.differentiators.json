@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "slot": "pilot-logbook",
+  "reconRef": "docs/ideation/2026-10-01-coin-catalogue-and-pilot-logbook.md#6-recipe-2--pilot-logbook-pilot-logbook",
+  "claims": [
+    {
+      "id": "no-entry-is-lost",
+      "weight": "core",
+      "promise": "A flight entry is written to the device as it is typed, survives a crash or an app that is closed mid-entry, and is never silently unsaved, so a logbook that a licence depends on cannot lose a flight.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-coin-catalogue-and-pilot-logbook.md#62-what-the-incumbents-users-say--measured",
+        "finding": "Safelog, 3.0 stars over 10K+ installs, draws a 1-star review reading \"it constantly crashes, 100% of the time while I'm in the middle of entering my flight times\", and crash is 4 of the 10 critical reviews read on this shelf."
+      },
+      "status": "deferred",
+      "deferredReason": "Persistence on every edit and the crash-recovery path are unbuilt; the promise is resolved only when a test fails against a batch-write-on-exit implementation."
+    },
+    {
+      "id": "pilot-owns-the-file",
+      "weight": "core",
+      "promise": "The logbook is the pilot's own file: no account, no mandatory cloud sync that can drop entries, and a backup that restores exactly what was written.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-coin-catalogue-and-pilot-logbook.md#62-what-the-incumbents-users-say--measured",
+        "finding": "Garmin Pilot, 2.8 stars over 500K+ installs, draws a 2-star review reading \"Doesn't save anything anymore. I've used this app on Android for the past year as a student pilot\", and data-loss appears in 3 of the 10 critical reviews read."
+      },
+      "status": "deferred",
+      "deferredReason": "Local storage and the restore path do not exist yet; the promise is resolved when a backup taken from one install restores into a clean one in a test."
+    },
+    {
+      "id": "licence-complete-columns",
+      "weight": "core",
+      "promise": "Every column and running total a licence needs is editable and correct, and a summary prints for an examiner or an insurer, so the logbook is evidence rather than a personal notebook.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-coin-catalogue-and-pilot-logbook.md#62-what-the-incumbents-users-say--measured",
+        "finding": "missing-feature is 3 of the 10 critical reviews read (30 percent) and confusing-ui 2 of 10, while 26 of 30 visible titles on the pilot logbook query do this job and 7 of the 15 rated ones sit below 4.2 stars."
+      },
+      "status": "deferred",
+      "deferredReason": "The column set and the totals rule are unbuilt; the promise is resolved when a fixture asserts each total against a hand-computed reference logbook."
+    },
+    {
+      "id": "bought-once-no-subscription",
+      "weight": "supporting",
+      "promise": "It is bought once with no subscription and no advertising, so a pilot who flies twice a month is not paying a monthly fee to keep his own record readable.",
+      "evidence": {
+        "strength": "ON RECORD",
+        "source": "docs/ideation/2026-10-01-coin-catalogue-and-pilot-logbook.md#64-the-reason-list",
+        "finding": "docs/monetization-strategy.md section 3.1 records the single unlock as the archetype for this class of local tool, and every top app measured on the shelf is free with in-app purchases rather than a one-time price."
+      },
+      "status": "deferred",
+      "deferredReason": "Billing is not wired up and the unlock sheet does not exist; it is resolved when the purchase is the only paywall in the shipped app."
+    },
+    {
+      "id": "works-without-signal",
+      "weight": "supporting",
+      "promise": "The logbook works with no signal, in a cockpit or on a ramp, because nothing in the entry path waits on a network call.",
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/ideation/2026-10-01-coin-catalogue-and-pilot-logbook.md#62-what-the-incumbents-users-say--measured",
+        "finding": "The weakest measured apps on this shelf are the ones that route the record through a sync, and the plan enables no network capability and no server."
+      },
+      "status": "deferred",
+      "deferredReason": "The offline guarantee is unbuilt; it is resolved when a test proves the entry path makes no network call."
+    }
+  ]
+}

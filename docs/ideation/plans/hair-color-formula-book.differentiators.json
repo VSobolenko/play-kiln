@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "slot": "hair-color-formula-book",
+  "reconRef": "docs/ideation/2026-10-01-accountable-service-records.md#3-recipe-1--a-colourists-own-formula-book",
+  "claims": [
+    {
+      "id": "reproduces-last-formula",
+      "weight": "core",
+      "promise": "A returning client's previous formula is on screen before the colourist mixes - shades, developer ratio, processing time and the result noted - so the colour is reproduced instead of re-guessed.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-accountable-service-records.md#3-recipe-1--a-colourists-own-formula-book",
+        "finding": "The 4.4-star, 194-review, 50K-plus-install Redken Style Station returned 3 critical reviews in the 2026-10-01 scan-complaints run, one of them a content regression: 'I used to love the old app. There used to be an inspiration lookbook where you could access formulas and an education section.'"
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet; the promise is carried by the client record screen and its formula history view."
+    },
+    {
+      "id": "any-brand-any-ratio",
+      "weight": "core",
+      "promise": "The book stores any manufacturer's shade line plus the exact developer ratio, so a colourist who works across brands is not limited to one catalogue.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-01-accountable-service-records.md#3-recipe-1--a-colourists-own-formula-book",
+        "finding": "The 2026-10-01 enrichment recorded Redken Style Station, the job's reference app, as published by L'Oreal with ads=false and iap=false at a free price, while the only independent rival, Charm: Save Formulas and Clients, carries 10K-plus installs and 40 reviews with iap=true."
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet; the promise is carried by the brand and shade data model, which must not be a single manufacturer's catalogue."
+    },
+    {
+      "id": "no-account-no-network",
+      "weight": "supporting",
+      "promise": "Every stored formula opens with no account, no sign-in and no network, so the book works in a basement salon with no signal.",
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/ideation/2026-10-01-accountable-service-records.md#1-method-and-the-control-that-says-the-sensor-has-not-drifted",
+        "finding": "In the 2026-10-01 recon a forced account or login was a classified complaint on 3 of the 6 shelves screened, including POOl360 at 2.3 stars and 10K-plus installs: 'I have to log in multiple times each time i use it, doesn't save my info when i do.' The inference from those shelves to colourists is ours, not a colourist's words."
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet; the promise is carried by the absence of any auth path and by the local database."
+    },
+    {
+      "id": "client-colour-card",
+      "weight": "supporting",
+      "promise": "The colourist can hand the client a card of the formula used, so the record survives the appointment and the next visit does not depend on the client remembering.",
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/ideation/2026-10-01-accountable-service-records.md#3-recipe-1--a-colourists-own-formula-book",
+        "finding": "No incumbent read in this recon offers a client-facing formula export: the reference app is a brand swatch and virtual try-on tool and the independent rival is a formula and client store, so the client-facing card is a gap observed in the shelf rather than a quote from a review."
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet; the promise is carried by the export path and the client card layout."
+    }
+  ]
+}

@@ -136,22 +136,123 @@ least 48 dp. An `Icon`/`Image` passes a label or an explicit `null`; a clickable
 
 ## 6. Edge-to-edge and the IME
 
-**Rule `uiux.insets`.** `enableEdgeToEdge()` in the activity — mandatory once the app targets
-`targetSdk 35`, and this factory targets `36` — plus, whenever the slot shows a text field,
-`android:windowSoftInputMode="adjustResize"` in the manifest **and** an IME inset read
-(`imePadding()`, `fitInside(WindowInsetsRulers.Ime…)`, or a `WindowInsets.ime` reference).
+**Rule `uiux.insets`.** The owner's second live report was a screen that drew *"under the notification
+panel, under the camera, and under the bottom buttons"* — written, he said, *"as if for old phones."*
+On a current phone that is not a style complaint; it is the platform's own behaviour, and it is
+measurable in source.
 
-The IME is the inset that catches people out: it is not a system bar, `Scaffold`'s own
-`contentWindowInsets` does not carry it, and the platform only resizes the window for it when the
-activity says `adjustResize`. A slot that declares neither can leave the field the user is typing into
-underneath the keyboard.
+### The platform requirement
 
-- Compose window insets — `WindowInsets.ime`, and *"On Android 15 (API level 35) and higher, your app
-  draws underneath the system bars and display cutouts once your app targets SDK 35"*:
-  <https://developer.android.com/develop/ui/compose/system/insets>
+Edge-to-edge is **enforced**, not chosen: from `targetSdk 35` the window spans the whole display and
+the app draws behind the system bars — *"Apps are edge-to-edge by default on devices running Android
+15 if the app is targeting Android 15 (API level 35)"*, and *"This is a breaking change that might
+negatively impact your app's UI."* The opt-out (`R.attr#windowOptOutEdgeToEdgeEnforcement`) is
+deprecated and **disabled** at `targetSdk 36`, and this factory targets `36`, so there is nothing left
+to switch off. The sensor accepts either form of the opt-in —
+`enableEdgeToEdge()` or `WindowCompat.setDecorFitsSystemWindows(window, false)` — and fails on the
+absence of both.
+
+<https://developer.android.com/about/versions/15/behavior-changes-15> ·
+<https://developer.android.com/about/versions/16/behavior-changes-16>
+
+### What subsumes what
+
+`displayCutout` is a **distinct** inset type. It is not in `systemBars`, and it is not in
+`statusBars`. `safeDrawing` is the union that contains all three of the ones that matter:
+
+```text
+safeDrawing = systemBars ∪ ime ∪ displayCutout
+systemBarsForVisualComponents = systemBars ∪ displayCutout   (what M3's bars use by default)
+```
+
+In portrait a top cutout usually sits inside the status bar, so a screen padded with
+`statusBarsPadding()` *looks* correct. Rotate to landscape and the cutout moves to a vertical edge,
+where `systemBars` contributes nothing on that side — the first character of a title, or a toolbar
+icon, can end up behind the camera. That is the "text crawls onto the camera" report, and the sensor
+names it: a screen that uses only `statusBars`/`systemBars`/`navigationBars` with nothing
+cutout-aware anywhere is **reported as a note inside a PASS**, because the collision is real but
+device- and orientation-dependent, and a hard failure there would fire on correct code.
+
+<https://developer.android.com/develop/ui/compose/system/cutouts> ·
+<https://developer.android.com/develop/ui/compose/system/insets> ·
+<https://developer.android.com/develop/ui/compose/system/setup-e2e>
+
+### `Scaffold` hands you the insets; it does not apply them
+
+This is the mechanism behind the owner's top and bottom symptoms, and it is measured, not inferred:
+*"By default, `Scaffold` provides insets as parameter `PaddingValues` for you to consume and use.
+`Scaffold` does not apply the insets to content; this responsibility is yours."* So a `Scaffold` whose
+content lambda drops its `innerPadding` is byte-for-byte as exposed as no `Scaffold` at all — the
+first line under the notification panel and the last row under the gesture bar. The sensor reads the
+lambda's first binding (named, destructured, or Kotlin's implicit `it`) and **fails** when the body
+never uses it. A `Scaffold` is a fix only when its padding is consumed.
+
+The same reference measures the other half: passing `WindowInsets(0, 0, 0, 0)` is the documented way
+to disable a component's own handling, and an M3 bar's default is the set that unions the cutout in —
+so a bar that zeroes its `windowInsets` gives up protection it had for free, and that is a failure
+rather than a note. Zeroing an *inner* `Scaffold`'s `contentWindowInsets` is deliberately **not**
+flagged: doing that is the documented shape when a host Scaffold already applied the insets.
+
+<https://developer.android.com/develop/ui/compose/system/material-insets> ·
+<https://developer.android.com/develop/ui/compose/system/insets-ui>
+
+### The IME is a fourth, separate mechanism
+
+The keyboard is not a system bar, `Scaffold`'s default `contentWindowInsets` does not carry it, and
+the platform only resizes the window for it when the activity declares
+`android:windowSoftInputMode="adjustResize"` — *"This setting allows your app to receive IME
+insets"*. So whenever a slot shows a text field the sensor requires that declaration **and** an IME
+inset read: `imePadding()`, `fitInside(…)`, a `WindowInsets` safe set, or a `ModalBottomSheet` that
+carries it by default. The official edge-to-edge skill prefers
+`Modifier.fitInside(WindowInsetsRulers.Ime.current)` over `imePadding()` *"because it reduces jank
+and extra padding caused by forgetting to consume insets upstream"*, and the sensor accepts both.
+
+<https://developer.android.com/develop/ui/compose/system/setup-e2e> ·
+<https://developer.android.com/develop/ui/compose/system/evaluate-rulers>
+
+### What the sensor cannot say
+
+It names the **cause** of a collision, never the collision. Whether a `Text` actually reaches the
+camera depends on the device, the orientation, the content and the font scale. The manual half is
+named in `docs/research/2026-10-02-android-window-insets.md` §6 — turn on **Simulate a display with a
+cutout**, rotate to landscape, and repeat in both **Gesture** and **3-button** navigation.
+
 - Vendored, in this repository: `.agents/skills/android-official/system-edge-to-edge/SKILL.md`.
 
-## 7. The factory's own half
+## 7. The modern Android platform surface
+
+**Rule `uiux.platform`.** The owner's third sentence was about the app looking like *"just ordinary
+buttons and ordinary texts"*, so this rule reads the surfaces a current Android app can stand on. It
+holds two failures and a list of notes, and the split is the point: a **presence-only** measurement is
+a note, because the token satisfies the check while the quality is a judgement.
+
+**The two failures.**
+
+- **Predictive back is unopted.** `android:enableOnBackInvokedCallback="true"` on `<application>` or
+  `<activity>` is a one-line, universal declaration, and without it the system animation has nothing
+  to preview. What the sensor does *not* also require is that the root does not intercept back —
+  that half is not statically decidable.
+  <https://developer.android.com/guide/navigation/custom-back/predictive-back-gesture>
+- **A Material 3 Expressive artifact on the alpha track.** The pinned Compose BOM `2026.09.00` maps to
+  stable `material3 1.4.0`; every Expressive component and the `MotionScheme` physics live on
+  `1.5.0-alpha*` behind `@ExperimentalMaterial3ExpressiveApi`. Requiring them would break the pin, so
+  they are **forbidden rather than required** — measured per `…platform-surface.md` §6.
+  <https://developer.android.com/jetpack/androidx/releases/compose-material3>
+
+**The notes.** Each of these is worth doing and is reported in the PASS detail with the reason it
+cannot be a gate, because every one of them is conditional on the slot's own job:
+
+| Surface | Why it is a note |
+|---|---|
+| Splash screen (`core-splashscreen`, `installSplashScreen()`) | `<https://developer.android.com/develop/ui/views/launch/splash-screen>` — a perceived start-up improvement, and continuity needs a device and a stopwatch. |
+| Share / text-processing target (`ACTION_SEND`, `ACTION_PROCESS_TEXT`) | Only meaningful when the slot produces something another app can consume. |
+| Photo Picker (`PickVisualMedia`) | `<https://developer.android.com/training/data-storage/shared/photopicker>` — the recommended path when a slot reads media, and a slot that never does needs neither the picker nor the `READ_MEDIA_*` permission. |
+| Haptics (`LocalHapticFeedback`) | `<https://developer.android.com/reference/kotlin/androidx/compose/ui/hapticfeedback/HapticFeedback>` — presence is a token while the semantic `HapticFeedbackType` is the actual point. |
+| `animateItem` / shared elements | `<https://developer.android.com/develop/ui/compose/animation/shared-elements>` — load-bearing on a list whose order changes, decorative on a static one. |
+| `SelectionContainer` | It helps only where the app's output is text a user would want to copy. |
+| Autofill `contentType` | `<https://developer.android.com/develop/ui/compose/text/autofill>` — it applies only where the slot collects identity fields, and the wrong hint is worse than none. |
+
+## 8. The factory's own half
 
 **Rules `uiux.scaffold` and `uiux.rule`.** `scaffold/android-compose/` is the template every new slot
 is copied from, so a finding there is the count of slots that would be born with the defect — it is
@@ -178,12 +279,16 @@ to guess:
 | `widthIn` / `heightIn` | `heightIn(min = 48.dp)` is the correct touch-target idiom, and firing on it would punish the fix for `uiux.a11y`. |
 | Whether the palette, hierarchy and depth are good | That is `DESIGN.md`, `.cursor/rules/visual-identity.mdc`, `scripts/visual-qa.py` and the owner's judgement. |
 | Whether the app is usable at a 200 % font scale | Only a render can say. The sensor removes the *structural* causes; it cannot certify the result. |
+| A landscape camera collision | Real but device- and orientation-dependent: the sensor reports a screen that is not cutout-aware as a **note inside a PASS**, never a failure. |
+| A consumed `innerPadding` used for the wrong thing | The sensor proves the padding is read, not that it is applied where it matters. |
+| A splash screen, a share target, a picker, a haptic | Presence is measurable; whether the slot's own job benefits is a judgement, so each is a note in the detail. |
+| Whether an Expressive dependency is *wanted* | The sensor only fails the **alpha** track, which the pinned BOM does not carry. A stable future BOM is a toolchain decision. |
 
 ## How it is verified
 
 ```bash
 node scripts/verify.mjs                        # `uiux.project` runs in the `invariants` group
-node scripts/verify.mjs --slot <slug>          # the six `uiux.*` slot checks, in the `ui` group
+node scripts/verify.mjs --slot <slug>          # the seven `uiux.*` slot checks, in the `ui` group
 python scripts/visual-qa.py --slot <slug>      # the pixel half: palette, contrast, icon masks
 ```
 

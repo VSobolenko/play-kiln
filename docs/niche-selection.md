@@ -42,7 +42,7 @@ visible result set read directly. Query, then what the incumbents look like:
 | `visual schedule autism` | ~35 | **No institutional incumbent.** Ratings exist but many are poor: 2.0★, 2.5★, 2.9★, 3.4★, 3.7★, 3.8★, 3.9★; best is 4.8★; one paid app at $4.99 | **Candidate, with a monetization constraint** |
 | `habit tracker` | ~28 | Top 20 nearly all 4.3–4.9★, from Google, TickTick, Leap Fitness, HabitRPG | Fortress |
 | `shift work calendar` | ~30 | Top 14 almost all **4.6–5.0★** from dedicated indie shops; only outliers at 3.7★ and 2.8★ | Fortress |
-| `fasting tracker` | ~19 | Mostly 4.4–4.9★; weak outliers at 2.7★, 3.7★, 3.8★; incumbents are subscription-funded | Fortress, needs subscriptions |
+| `fasting tracker` | ~19 | Mostly 4.4–4.9★; weak outliers at 2.7★, 3.7★, 3.8★; incumbents are subscription-funded | **Fortress** — enter through the weak outliers or not at all. The subscription funding is a market fact, not the reason to skip |
 | `first aid guide` | ~27 | American Red Cross 4.8★, IFRC 4.4★, UN 4.5★, National Safety Council 4.3★ | Fortress (institutions) |
 | `bjj training log` | ~29 | **About two thirds of top results show no rating at all** (pando, RollJournal, My Jiu-Jitsu, BJJ College, Strap, Fluyd, BetterBJJ, Roll IQ, …) | **Dead zone** |
 
@@ -70,8 +70,13 @@ Is demand proven?      Do incumbents carry substantial review counts?
 
 Two secondary filters:
 
-- **Monetization fit** — if the category is subscription-driven and we have deferred subscriptions,
-  skip it for now. This is why `fasting tracker` is out despite being a real market.
+- **Monetization fit** — the category's revenue shape has to be one the factory can actually ship.
+  Subscriptions are banned outright (`.cursor/rules/ideation-gate.mdc` § "There is no house
+  monetization"), so a category whose money is *only* recurring — where a user cannot be served by a
+  one-off purchase or by ads — is out until a one-off shape is found. Note this is a narrower test
+  than "subscription-driven": a category with subscriptions **and** one-off or ad-supported
+  competitors is reachable through that shape, and a shelf being subscription-funded is not by itself
+  a reason to skip it.
 - **Buildability** — the slot must be reachable by a Kotlin/Compose template with no backend.
 
 ## 3. The screening procedure
@@ -115,7 +120,26 @@ The fortresses and the openings separate along one line that is not obvious:
   incumbents are amateurs with poor ratings despite proven demand.
 
 **Heuristic: look for a job where the person doing the work would never build the app.** That is
-where proven demand and weak supply coexist, which is the only combination worth a slot.
+where proven demand and weak supply coexist, so it is where a *pocket* tends to be found.
+
+> **Corrected 2026-10-01 — this is a supply signal, not an entry requirement.** The owner rejected a
+> recon that had selected its audiences by how well they satisfied the sentence, and named the
+> failure: *the goal is to earn. If an app, by our calculations, will earn, we build it. We look at
+> absolutely everything; there are no frames.* Two things were wrong, and both are now written into
+> `.cursor/rules/ideation-gate.mdc` § "The objective is revenue, not novelty":
+>
+> - **Reading it as a requirement excludes the strongest target shape** — a popular category with a
+>   weak mid-tier, which is exactly where demand is proven and a wedge is winnable. An occupied shelf
+>   is evidence of demand, not a reason to refuse.
+> - **Applying it to a hobby rather than to work.** The sentence is about *a person doing a job*. A
+>   hobby is not a job: hobbyists build apps for their own hobby, so a hobby shelf can be both crowded
+>   and cheap. The two proposals of the 2026-10-01 recon were selected this way — coin collecting is a
+>   hobby, and pilot logbooks are built by pilots and by flight-school software vendors, which is the
+>   opposite of the phenomenon this sentence describes.
+>
+> The sentence still earns its place as a *hypothesis about supply*: where practitioners are not
+> software people, incumbents tend to be amateur and beatable. It tells you where to look. It does not
+> decide what is worth building — the revenue arithmetic does.
 
 ### Candidate A — specialised calculation tools for a trade or profession
 

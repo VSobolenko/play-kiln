@@ -44,22 +44,39 @@ words; the plan's approval SHALL NOT be inferred from any agent's confidence.
 ### Requirement: The plan SHALL declare an archetype from the fixed spectrum
 
 `archetype` SHALL be one of `purchase_led_single_unlock`, `purchase_led_repeat_sales`,
-`ads_led_utility`, `purchase_only_no_ads`, or `subscription`, matching the archetype table
-in `docs/monetization-strategy.md` §3.6. A free-form string SHALL be rejected, because an
+`ads_led_utility`, or `purchase_only_no_ads`, matching the archetype table in
+`docs/monetization-strategy.md` §3.6. A free-form string SHALL be rejected, because an
 archetype that cannot be classified cannot be checked against the capabilities that
 implement it.
 
+No member of that spectrum SHALL be treated as a default, and a plan SHALL NOT be accepted
+on the strength of having named an archetype: the proposal SHALL state the archetypes it
+considered and the revenue reason each was rejected. This is a judgement at the owner's
+checkpoint rather than a validated field; `docs/slot-economics.md` records why.
+
+`subscription` SHALL be rejected. The owner banned recurring billing on 2026-10-01 because
+re-establishing entitlement continuously requires server-side validation plus a renewal,
+refund, cancellation and grace-period lifecycle, which makes the slot a server project. The
+ban is enforced by `subscription` being absent from `ARCHETYPES`, and SHALL NOT be
+overridable by any exemption file.
+
 #### Scenario: Unknown archetype
 
-- **WHEN** the plan's `archetype` is not one of the five values
+- **WHEN** the plan's `archetype` is not one of the four accepted values
 - **THEN** validation fails and names the accepted values
+
+#### Scenario: The banned subscription archetype
+
+- **WHEN** the plan's `archetype` is `subscription`
+- **THEN** `parseEconomics` fails naming the accepted values, `requiredCapabilitiesFor`
+  throws, and `scripts/check-economics.mjs` exits non-zero, with no exemption path
 
 ### Requirement: A plan SHALL name a revenue mechanism the slot can actually implement
 
 Validation SHALL pair the archetype with the enabled capabilities declared in the slot's
-`capabilities.json`: purchase-led and subscription archetypes require `billing`,
-`ads_led_utility` requires `ads`, and `purchase_only_no_ads` requires neither because the
-price is set in Play Console.
+`capabilities.json`: the `purchase_led_*` archetypes require `billing`, `ads_led_utility`
+requires `ads`, and `purchase_only_no_ads` requires neither because the price is set in Play
+Console.
 
 #### Scenario: Purchase-led plan on a slot with no billing
 

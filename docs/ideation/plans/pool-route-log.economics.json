@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A pool service technician, or the owner of a small route of properties, who is the person on the pool deck with a phone in one wet hand.",
+  "paidUnit": "One non-consumable unlock of the route log: unlimited properties, the complete per-property service history and the printable per-visit service record.",
+  "priceUsd": 14.99,
+  "momentOfPayment": "After the technician has set up their second property and taps to add a third, or taps Share on a finished service record; one property is free and fully functional.",
+  "distinctnessSentence": "A pool route record that keeps each property's test readings, the treatment actually applied and the running history on the technician's phone, and hands the homeowner a service record at the end of the stop, with no account and no web view.",
+  "evidenceRef": "docs/ideation/2026-10-01-accountable-service-records.md#4-recipe-2--a-pool-route-service-record",
+  "day1RevenuePath": "A technician finds it searching for a pool service log, sets up a second property free, taps to add a third, and buys the 14.99 dollar unlock through Play Billing.",
+  "killCriteria": {
+    "windowDays": 60,
+    "minInstalls": 1200,
+    "minRevenueUsd": 120
+  },
+  "assumptionsUnverified": [
+    "That a solo pool technician pays once for a record app instead of staying inside the monthly route software the business already buys; the buyer's alternative is a subscription and this recipe is deliberately the opposite shape, which is an argument and not a measurement.",
+    "That the professional sub-job is large enough to carry the slot at all, since its only two rated incumbents carry 45 and 23 reviews while the shelf's 50K+ installs belong to homeowner apps for a different job.",
+    "That one-time in-app-purchase conversion lands in the 1 to 3 percent band used in the arithmetic; that band comes from docs/monetization-strategy.md section 4, which labels it UNVERIFIED.",
+    "That published pool chemistry ranges can be cited and checked to the same standard the factory applies to code tables; the treatment guidance is safety-adjacent and no source has been selected or verified yet.",
+    "That unit system and locale are a usable wedge, since a metric-only and Italian-only incumbent rated 3.4 stars at 50K+ installs is the evidence for it and shipping both costs build time."
+  ]
+}

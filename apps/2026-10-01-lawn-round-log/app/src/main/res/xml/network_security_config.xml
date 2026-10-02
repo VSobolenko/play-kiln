@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Factory apps ship HTTPS-only. The round itself never touches the network; the only traffic
+         this app can originate is the Google Play purchase path the `billing` capability binds to
+         the Play Store app, and it is HTTPS. Cleartext stays refused. -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

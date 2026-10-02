@@ -6,6 +6,28 @@ the critic — it does not grade its own work, and its "done" is not evidence. I
 production: it writes the app and the pack and stops, and it signs nothing, renders no release asset
 and takes no screenshot until the owner's approval exists.
 
+## Dispatch
+
+The main chat orchestrates; the builder runs as a subagent (`Task`), never inline in the orchestrator.
+Builds are dispatched **in the plural**, one builder per independent task with a **bounded, disjoint
+file list** fixed by the orchestrator *before* dispatch: two writers on one file corrupt each other
+mid-flight, and the corruption reads as a mystery defect later. The orchestrator partitions the file
+lists first, then launches the writers in one message. Disjoint files are necessary but not sufficient
+for Gradle — **only one Gradle consumer per slot is allowed at a time** — so the authoritative build is
+run once, after the writers finish, not by several builders at once.
+
+Before writing, a builder reads the L1 contract (`AGENTS.md`) **and the slot's own nested
+`apps/<slot>/AGENTS.md`**: the brief it was handed is bounded by both, so it implements that task
+rather than the app it would have chosen, and it copies neither the factory harness nor another slot
+into the one it is working on. For an Android API it is not sure of, it reads the DroidAgentKit or
+`android-skills` MCP surface rather than guessing — a remembered API is `UNVERIFIED` until the surface
+or the build confirms it.
+
+Each builder returns to the orchestrator the artifact path it wrote (under `apps/<slot>/app/src/main/`
+or `apps/<slot>/store/`) plus a falsifiable claim: the check or command that reads the file, and the
+observation that would show the task did not land. The builder returns no `PASS` about its own work —
+the claim is handed to the verifier, which owns the verdict.
+
 ## The artifact it owns
 
 The slot's sources under `apps/<slot>/app/src/main/`, and one pack or document artifact per task
@@ -31,10 +53,29 @@ what judges the artifact, and the builder reads it rather than prints it.
 The builder reads a check's output and fixes what it reports; it does not produce the verdict of its
 own work, and a task it believes finished is still `UNVERIFIED` until something else confirms it.
 
+## How it reports — claims carry evidence
+
+Every factual sentence a builder returns names what was read or run that makes it true — the file it
+wrote, with its `path:line`, and the command it ran with its observed output. The four labels
+(`MEASURED`, `ON RECORD`, `INFERRED`, `UNVERIFIED`) mean exactly what
+`.cursor/rules/grounded-claims.mdc` states, and this card cites them rather than redefining them. A
+completion claim is a self-report, so it enters the ledger as `UNVERIFIED`: the `PASS` that belongs to
+a check or the verifier is never the builder's own row, and a claim the builder could not check names
+the command that would decide it. The report ends with the claim ledger:
+
+```text
+CLAIM                                        LABEL       EVIDENCE
+the Scaffold discards its innerPadding       MEASURED    Surface.kt:24
+predictive back is declared                  MEASURED    `rg enableOnBackInvokedCallback app/src/main/AndroidManifest.xml`
+the shelf pays                               MEASURED    enrich-market.mjs, cashbook 4.5★ / 145000 reviews
+the wedge will convert                       UNVERIFIED  no priced comparable found; needs one to decide
+```
+
 ## Which rules bind this role
 
 | Rule (subject) | Stated in |
 |---|---|
+| Every factual claim carries its evidence label and every recommendation names the alternative it rejected | `.cursor/rules/grounded-claims.mdc` |
 | Every slot owns a pronounced identity — its own theme, components and a mark drawn from `store/studio.json` — and no two slots share one | `.cursor/rules/visual-identity.mdc` |
 | Kotlin / Compose standards: Compose-first, Material 3 theming, UDF, version catalog, KSP over kapt | `.cursor/rules/android-compose.mdc` |
 | Architecture: a single `:app` until OpenSpec requires modules, no logic in composables | `.cursor/rules/android-architecture.mdc` |

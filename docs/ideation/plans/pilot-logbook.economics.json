@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A private or student pilot on Android who is required to keep a logbook and currently types it into a free app that has crashed mid-entry or quietly stopped saving.",
+  "paidUnit": "One permanent unlock of the full logbook: unlimited flights, every column and running total and the printable summary an examiner or insurer asks for, exported to CSV, with no account and no cloud sync.",
+  "priceUsd": 9.99,
+  "momentOfPayment": "After the pilot has logged his first ten flights for free, at the moment he needs the totals summary, the eleventh flight or the CSV export, behind one clearly priced unlock sheet.",
+  "distinctnessSentence": "An entry is written to the device as it is typed and survives a crash or a closed app, the logbook is the pilot's own file with no account and no sync that can drop entries, and a licence summary prints from it, which the measured incumbents fail at.",
+  "evidenceRef": "docs/ideation/2026-10-01-coin-catalogue-and-pilot-logbook.md#6-recipe-2--pilot-logbook-pilot-logbook",
+  "day1RevenuePath": "The slot is listed against the pilot logbook query, where 26 of 30 visible titles do the job and half the weakest of them are logging crashes and lost entries, the pilot installs it after losing an entry elsewhere, and the first unlock arrives through the billing capability the plan requires.",
+  "killCriteria": {
+    "windowDays": 60,
+    "minInstalls": 250,
+    "minRevenueUsd": 60
+  },
+  "assumptionsUnverified": [
+    "Install-to-purchase conversion is assumed at 2 percent of installs; no slot in this repository has ever measured a conversion rate, so every revenue figure derived from it is an assumption.",
+    "Four free logbooks already hold the shelf between 4.6 and 4.8 stars, so it is assumed that a paid app can still sell against free competition on reliability rather than on price.",
+    "The licence column set and the totals rule are assumed to be buildable from public sources without an aviation-domain consultant, and a wrong total in a licence record is a correctness defect rather than a cosmetic one.",
+    "Google Play's 15 percent service fee, a 2 percent refund allowance and a 2 percent currency-conversion allowance are plan assumptions in docs/monetization-strategy.md section 2.2, not measurements of this developer account.",
+    "Search visibility is unknown: the pilot logbook query returns thirty cards and the top four apps are all free and all rated above 4.5, so ranking is an assumption rather than a plan."
+  ]
+}

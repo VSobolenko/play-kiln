@@ -259,4 +259,4 @@ listing.privacyPolicyUrl = url
 writeFileSync(listingPath, `${JSON.stringify(listing, null, 2)}\n`)
 console.log(`PASS        verified reachable (HTTP ${status}, ${body.length} bytes)`)
 console.log(`\nprivacy policy URL: ${url}`)
-console.log(`recorded in store/listing.json (store/ is outside the release-approval digest, so this does not void the approval)`)
+console.log('recorded in store/listing.json — the listing is part of the approved pack, so any recorded release approval is now void: re-record it with scripts/approve-release.mjs before releasing')

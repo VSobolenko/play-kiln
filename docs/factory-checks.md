@@ -56,7 +56,7 @@ group and print `file:line` findings.
 
 | Module | Check ids | What it decides |
 |---|---|---|
-| `scripts/core/uiux.mjs` | `uiux.navigation`, `uiux.adaptive`, `uiux.text-layout`, `uiux.motion`, `uiux.a11y`, `uiux.insets`, `uiux.scaffold`, `uiux.rule`, `uiux.fixtures` | Navigation 3 hosts its own back stack; a multi-destination slot reads the window size class; text can wrap and grow; screens animate; every interactive element has a name and a 48 dp target; the keyboard is placed; and the scaffold carries all of it before any slot does |
+| `scripts/core/uiux.mjs` | `uiux.navigation`, `uiux.adaptive`, `uiux.text-layout`, `uiux.motion`, `uiux.a11y`, `uiux.insets`, `uiux.platform`, `uiux.scaffold`, `uiux.rule`, `uiux.fixtures` | Navigation 3 hosts its own back stack; a multi-destination slot reads the window size class; text can wrap and grow; screens animate; every interactive element has a name and a 48 dp target; the keyboard is placed; content is not drawn under the status bar, the camera cutout or the gesture bar; and the app behaves like a modern Android app — predictive back opted in, no alpha Material 3 Expressive artifact on a pinned BOM; and the scaffold carries all of it before any slot does |
 | `scripts/core/settings.mjs` | `settings.surface`, `settings.reachable`, `settings.language`, `settings.theme`, `settings.behaviour`, `settings.strings`, `settings.persistence`, `settings.documented` | a settings surface exists, is reachable from the app, and every preference in it reaches the code that acts on it — a toggle that changes nothing is theatre |
 | `scripts/core/localization.mjs` | `locale.multilingual`, `locale.placeholder`, `locale.hardcoded`, `locale.pseudolocale` | a slot is born multilingual; a declared tree is a translation rather than a copy or a sentinel; no user-facing prose is compiled into Kotlin; no pseudolocale ships |
 | `scripts/core/baseline.mjs` | — (shared) | **which slots a new rule gates.** The creation date comes from `registry/apps.json` and "is this an app at all" from the presence of an `economics.json`, so the four slots that already existed carry a finding as a printed note instead of a permanent red row, while every slot created from 2026-09-30 is gated. A finding that exists and is not reported would read exactly like a finding that is not there, so the note is printed either way |
@@ -108,6 +108,96 @@ environment it was started with, so a daemon older than the rule keeps writing t
 until it is stopped (`--no-daemon` is the forbidden fix), and a process the factory did not spawn —
 a tool an agent runs by hand, a provider SDK's own cache, a browser's download directory — is outside
 any sensor in this repository.
+
+### The naming contract, added 2026-10-01
+
+The app's name is a recorded product decision now, beside the money plan and the promise list. The
+owner's correction is concrete: an agent building a utility names it after its category, and a title
+that is the bare category noun spends Play's strongest ranking field on the head term the incumbent
+already owns. `docs/app-naming.md` is the contract, `scripts/lib/slot-naming.mjs` is its parser
+(`parseNaming`, `validateNamingAgainstListing`), and `scripts/check-naming.mjs` is the gate.
+`scripts/core/naming.mjs` carries both halves of the check, so `slot.naming` runs in the `policy`
+group beside `slot.differentiators`, and `naming.fixtures` runs in `invariants` on every verify.
+
+| Command | What it decides | Observed 2026-10-01 |
+|---|---|---|
+| `node scripts/check-naming.mjs --slot <slug>` | the recorded name parses, is not a bare category noun / an empty modifier / ALL-CAPS / promotional text, fits Play's 30-character cap in every declared locale, is carried by at least 5 scored candidates spanning 3 archetypes with the chosen one at ≥ 70/100 beside a rejected alternative, and that `store/listing.json` ships the same title that was approved | `UNVERIFIED`, exit 2, on `teacher-gradebook` — it carries no `naming.json`, and `new-slot.mjs` no longer creates one without the contract |
+| `node scripts/check-naming.mjs --naming <path> [--validate-only]` | a contract that is not in a slot yet, which is how `new-slot.mjs` validates it before anything is written | `PASS` — `naming schema — title "Sunstone: Lawn Round Log", archetype carrier_job_noun, 5 candidate(s), 1 rejected` |
+| `node scripts/verify.mjs --only invariants`, row `naming.fixtures` | the sensor can still fail — 12 inline fixtures including `Calculator`, `My Calculator`, `CALCULATOR`, a 31-character title, and a pack whose title disagrees with the approved name | `PASS  naming.fixtures  12 fixtures` |
+
+### The device-run record, added 2026-10-02
+
+The owner's correction: an agent ran `/forge`, wrote some code, and stopped asking him to install and
+confirm the app, having tested nothing itself. `.cursor/rules/device-testing.mdc` already said the
+connected phone is the test target and that reading the source is not a test, but **nothing read the
+run**, and that rule said so out loud. The run is an artifact now —
+`apps/<slot>/device-verification.json`, carrying the serial, the timestamp, the artifact path and its
+sha256, and at least three observations of what was tapped and what appeared. `scripts/core/device.mjs`
+carries both halves, so `slot.device` runs in the `policy` group beside `slot.differentiators` and
+`device.fixtures` runs in `invariants` on every verify. Its honest limit: it proves a record exists and
+agrees with the artifact, not that the run happened — a fabricated record passes it, and the rule says
+so rather than implying more.
+
+| Command | What it decides | Observed 2026-10-02 |
+|---|---|---|
+| `node scripts/verify.mjs --slot <slug>`, row `slot.device` | the record names a serial, a parseable timestamp, a 64-hex artifact sha256 and at least 3 observations, and — when the debug APK is built — **recomputes the APK's hash and fails on a disagreement**, so a record about a different build fails instead of standing in for this one | `UNVERIFIED`, exit 2, on `lawn-round-log` — it carries no `device-verification.json` |
+| `node scripts/verify.mjs --only invariants`, row `device.fixtures` | the sensor can still fail — 16 inline fixtures including a stale hash against a real dummy artifact, 2 observations, a non-hex hash, a missing serial and a wrong `schemaVersion`, with "no record at all" asserted as `UNVERIFIED` rather than `FAIL` | `PASS  device.fixtures  16 fixtures` |
+
+### The iconography split and its provenance record, added 2026-10-02
+
+Two owner instructions arrived together after he installed a built app and looked at it: the icons are
+hand-drawn imitations — a modern app **downloads ready-made, professional icon sets** — and the
+palette reads as neon. The second is a separate change with its own sensor. For the first, the mark
+and the UI icons are one concern with two different answers, so the ban was split rather than
+softened: **the launcher mark and the brand mark stay slot-owned and custom**, and **UI iconography
+must come from a licence-cleared, vendored set** rather than a Canvas imitation.
+`.cursor/rules/visual-identity.mdc` carries the split, `docs/icon-provenance.md` is the machine
+contract for `apps/<slot>/icons/provenance.json`, and `scripts/core/icons.mjs` is the sensor. Seven
+legs run in the `icon` group beside the adaptive-icon check. Its `reports` list is written out
+literally rather than derived, because the fact ledger reads the registry as *text* and can only name
+an id that appears there as a literal `id:`; a load-time assertion fails if it ever drifts from the
+sensor's own `ICON_IDS`.
+
+The defect it was built from is measured, not stylistic: the live slot's three launcher vectors were
+identical in geometry to `scaffold/android-compose`'s placeholder, and none of their fill colours was
+a role of the slot's own palette — the app had no mark of its own at all.
+
+| Command | What it decides | Observed 2026-10-02 |
+|---|---|---|
+| `node scripts/verify.mjs --slot <slug>`, row `icons.mark` | the mark `store/studio.json` declares resolves in the Python-owned `MARK_REGISTRY`, so the pack cannot declare an identity the studio cannot render | `PASS` on `lawn-round-log` — `3 registered: pipe, mark-book, mark-stripes` |
+| `node scripts/verify.mjs --slot <slug>`, row `icons.launcher` | the launcher vectors are the slot's own rather than the scaffold's, judged by path geometry against `scaffold/android-compose` **and** by whether each fill colour is a role of the slot's palette | `FAIL` on `lawn-round-log` — all three vectors (`foreground`, `background`, `monochrome`) are the placeholder; **fires on none of them** on `teacher-gradebook`, whose vectors are its own |
+| `node scripts/verify.mjs --slot <slug>`, rows `icons.provenance` / `icons.licence` | `icons/provenance.json` resolves — schema, SPDX allowlist, every file present and hashing to what it claims — and each declared SPDX has committed, non-empty licence text | `UNVERIFIED`, exit 2, on every slot: none carries the record yet, which is true rather than a false alarm |
+| `node scripts/verify.mjs --slot <slug>`, rows `icons.offline` / `icons.deprecated` / `icons.tint` | no icon artifact is fetched at build or run time; no deprecated `material-icons-core`/`-extended` coordinate (the pinned Material 3 no longer carries it); UI iconography carries no literal colour, the mark excluded by design | `PASS` on `lawn-round-log` |
+| `node scripts/verify.mjs --only invariants`, row `icons.fixtures` | the sensor can still fail — 16 inline fixtures across the seven legs | `PASS  icons.fixtures  16 fixtures` |
+
+Falsifiability was observed rather than assumed. Neutering the `icons.launcher` leg so it returned no
+problems turned `icons.fixtures` `FAIL` (`the scaffold copy is a finding: expected 1, got 0`), and the
+sensor was then restored byte-identically with its sha256 compared before and after — a check that has
+never been made to fail is not yet known to be able to.
+
+Its honest limit, stated rather than implied: it cannot tell a beautiful icon set from an ugly one.
+It can say the set was licence-cleared, vendored, and tinted from the theme — the judgement of the
+mark and the palette stays with the owner at checkpoint 1.
+
+### The grounded-claims duty, added 2026-10-02
+
+The owner's report — a scout said a pocket was good, the UI/UX work said the design was good, and
+neither answered with facts — is the defect `.cursor/rules/grounded-claims.mdc` stops. The duty is
+behavioural, so the sensor can only read the **declaration**: `harness.groundedClaims` in
+`scripts/core/harness.mjs`, in the `invariants` group, checks that the rule loads (`alwaysApply: true`),
+that every role card under `harness/roles/` names it, and that every agent card under `.cursor/agents/`,
+`.codex/agents/` and `.claude/agents/` names it or delegates to a role card.
+`docs/grounded-claims.md` is the contract, and `harness.groundedClaimsFixtures` is the inline set that
+proves the sensor can fail.
+
+| Command | What it decides | Observed 2026-10-02 |
+|---|---|---|
+| `node scripts/verify.mjs`, row `harness.groundedClaims` (the `invariants` group) | the rule loads, every `harness/roles/*.md` card names it, and every agent card names it or delegates to a role card | `FAIL` in this working tree — the five role cards name the rule; the agent mirror cards (`android-debugger`, `evaluator`, `generator`, `money-owner`, `planner`, `play-auditor`) do not yet, and that pass is still in flight |
+| `node scripts/verify.mjs --only invariants`, row `harness.groundedClaimsFixtures` | the sensor can still fail — 9 inline fixtures over synthetic card sets | `PASS  harness.groundedClaimsFixtures  9 fixtures` |
+
+Its honest limit, stated rather than implied: it proves the duty is **declared**, never that a
+particular sentence is true. A fabricated claim ledger passes it, and the rule says so rather than
+implying more.
 
 ## 2. The retired gate — `scripts/verify-slot.mjs`
 

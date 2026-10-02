@@ -136,6 +136,50 @@ function describe(paths) {
   return rest > 0 ? `${named} (+${rest} more)` : named
 }
 
+/**
+ * How much tool use this session performed, and how much of it was a worker dispatch.
+ *
+ * Written by `.cursor/hooks/parallel-guard.cjs`, which sees every `preToolUse` payload. Returns
+ * `null` when the log cannot be read at all, which the caller treats as "not observable" and stays
+ * silent about — the alternative, reading a missing log as "no delegation", is exactly the
+ * unconditional-reminder defect this file's header describes.
+ *
+ * `everDispatched` is the arming condition and it is the whole reason this function is safe. It is
+ * true only when the log has **at least one** row that the guard itself marked as a dispatch. The
+ * caller will not accuse a session until it is true, and the reason is a real uncertainty rather
+ * than caution: whether Cursor's `preToolUse` fires for the `Task` tool at all was **not** confirmed
+ * when this was written — `hooks.json` is read at session start, so the entry added mid-session could
+ * not be observed firing — and a guard that fires for ordinary tools while never seeing `Task` would
+ * report every delegating session as a session that delegated nothing. Waiting for positive proof
+ * that a dispatch is visible costs nothing when the answer is "yes" (one dispatch anywhere in the
+ * log's history arms it permanently) and prevents a false accusation when the answer is "no".
+ *
+ * `tools === 0` is treated as not-observable for the same reason: a hook that did not fire and a
+ * session that called nothing look identical from here, and only one of them is about the agent.
+ */
+function countToolUse(root, since) {
+  const file = path.join(root, '.superpowers', 'parallel', 'tools.log')
+  let text
+  try {
+    text = fs.readFileSync(file, 'utf8')
+  } catch {
+    return null
+  }
+  let tools = 0
+  let dispatches = 0
+  let everDispatched = false
+  for (const row of text.split('\n')) {
+    if (!row) continue
+    const [iso, , isDispatch] = row.split('\t')
+    if (isDispatch === '1') everDispatched = true
+    const at = Date.parse(iso)
+    if (!Number.isFinite(at) || at <= since) continue
+    tools += 1
+    if (isDispatch === '1') dispatches += 1
+  }
+  return { tools, dispatches, everDispatched }
+}
+
 function main() {
   const input = readInput()
 
@@ -153,6 +197,10 @@ function main() {
   const changed = []
   for (const relative of WATCHED) collectChanges(path.join(root, relative), root, since, changed)
 
+  // Read the tool log before advancing the watermark, against the same `since`, so the count covers
+  // exactly the batch the file changes cover.
+  const activity = countToolUse(root, since)
+
   // Advance before deciding, so the same batch is announced once rather than after every turn.
   writeWatermark(root, Date.now())
 
@@ -160,12 +208,24 @@ function main() {
 
   // The sentence is assembled from this run's own observation, so it cannot claim more or less
   // than what was measured.
-  emit({
-    followup_message:
-      `PlayKiln stop gate: this session changed ${changed.length} file(s) under apps/ or harness/ — ` +
-      `${describe(changed)}. Confirm evidence (\`node scripts/verify.mjs\` and/or \`/eval\`). ` +
-      'If already reported with stdout, reply DONE.'
-  })
+  let message =
+    `PlayKiln stop gate: this session changed ${changed.length} file(s) under apps/ or harness/ — ` +
+    `${describe(changed)}. Confirm evidence (\`node scripts/verify.mjs\` and/or \`/eval\`). ` +
+    'If already reported with stdout, reply DONE.'
+
+  // Delegation, stated only when it is observable. Two conditions guard against a false accusation:
+  // the sensor must have seen at least one dispatch at some point (`everDispatched`), and it must
+  // have fired in this batch at all (`tools > 0`). Either being false means "cannot see", which is
+  // not the same fact as "did not delegate", and a session is never accused of the second on the
+  // strength of the first.
+  if (activity && activity.everDispatched && activity.tools > 0 && activity.dispatches === 0) {
+    message +=
+      ` Separately: this session made ${activity.tools} tool call(s) and dispatched 0 subagent(s).` +
+      ' `.cursor/rules/parallel-execution.mdc` puts the work in subagents and keeps this chat to' +
+      ' orchestration — say why this change was not delegated, or dispatch it.'
+  }
+
+  emit({ followup_message: message })
 }
 
 main()

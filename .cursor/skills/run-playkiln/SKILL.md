@@ -46,8 +46,9 @@ cd apps\<date>-<slug>
 .\gradlew.bat assembleDebug
 ```
 
-The debug APK is `app/build/outputs/apk/debug/app-debug.apk` — that is what the owner installs
-to review the app. Do not run `assembleRelease`/`bundleRelease` by hand during development; the
+The debug APK is `app/build/outputs/apk/debug/app-debug.apk` — that is the artifact the agent
+installs on the connected phone to test the app; the owner reviews the decision, not the build. Do
+not run `assembleRelease`/`bundleRelease` by hand during development; the
 release pipeline (`node scripts/prepare-release.mjs --slot <slug>`) owns them, runs them in one
 Gradle invocation, and records the signed artifacts plus the release manifest.
 

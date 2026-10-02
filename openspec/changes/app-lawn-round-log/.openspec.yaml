@@ -1,0 +1,6 @@
+schema: spec-driven
+created: 2026-10-01
+goal: Ship an offline lawn-round log a solo operator owns outright — an ordered round of
+  recurring customers, one-tap visit status, a per-customer owed balance and a CSV
+  export — editable without an account or a server, unlocked once instead of rented
+  monthly.

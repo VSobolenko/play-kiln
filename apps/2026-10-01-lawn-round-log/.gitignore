@@ -1,0 +1,53 @@
+# Local SDK configuration and build-system state.
+local.properties
+.gradle/
+.kotlin/
+
+# Generated build and packaged artifacts.
+build/
+**/build/
+*.apk
+*.aab
+captures/
+# dist/ holds release artifacts and must never be committed.
+dist/
+.cxx/
+
+# Signing material. keystore.properties configures the upload key; neither the
+# configuration nor any key file may ever be committed.
+*.jks
+*.keystore
+keystore.properties
+
+# The owner's release approval for this slot. Machine-local state bound to a source digest:
+# committing it would let an approval outlive the revision it approved.
+release-approval.json
+
+# Promo codes issued for this slot's promotions. A code is a free unlock of whatever the
+# slot sells, so a downloaded batch is a pile of giveaways: it belongs beside the slot on
+# one machine, never in a repository that can be cloned, forked, shared, or made public
+# later. `store/console-answers.md` carries the reviewer instruction with a placeholder
+# rather than a live code, so the committed pack has nothing to leak.
+#
+# Both names are listed because the console's own export is `promotion_codes.csv` while the
+# factory's convention for the same file is `promo-codes.csv`, and a rule that covers only
+# the second one leaves the console's real filename untracked-but-committable - which is how
+# a batch of 100 codes sat staged for a commit on 2026-09-29.
+promo-codes.csv
+promotion_codes.csv
+
+# Local environment and service credentials.
+.env
+.env.*
+!.env.example
+google-services.json
+play-service-account.json
+
+# IDE-local files.
+.idea/
+*.iml
+
+# Worker logs. `scripts/codex-run.mjs` writes a run's stdout beside its durable
+# ledger under `.kiln/`, and a run started with the slot as its working directory
+# leaves that output in the slot root instead. They are build logs, not sources.
+.kiln-*.log

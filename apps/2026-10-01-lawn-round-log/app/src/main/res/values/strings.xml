@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Every user-facing string of the slot lives here, and the matching tree lives in values-ru/.
+    Nothing in this app compiles prose into Kotlin: a literal in a `Text(...)` or in a
+    `contentDescription` is a string no translator can reach and no pseudolocale can stretch
+    (`scripts/core/localization.mjs`, `locale.hardcoded`).
+
+    `about_privacy_url` is deliberately translatable="false": a policy address is not copy, and the
+    default configuration is the only source of truth for it. A copy of it under values-ru/ would be
+    a second source for one URL, which is the drift `documents/slot-...` records.
+
+    Every `%1$s` / `%1$d` here is matched position for position in values-ru/ — a dropped or
+    renumbered argument is what `localeProblems()` (scripts/core/policy.mjs) fails the pack for.
+-->
+<resources>
+    <string name="app_name" translatable="true">Lawn Round Log</string>
+
+    <!-- Shared actions. -->
+    <string name="action_add_customer" translatable="true">Add customer</string>
+    <string name="action_edit" translatable="true">Edit</string>
+    <string name="action_delete" translatable="true">Delete</string>
+    <string name="action_cancel" translatable="true">Cancel</string>
+    <string name="action_save" translatable="true">Save</string>
+    <string name="action_confirm" translatable="true">Confirm</string>
+    <string name="action_back" translatable="true">Back</string>
+    <string name="action_dismiss" translatable="true">Dismiss</string>
+    <string name="action_open" translatable="true">Open %1$s</string>
+    <string name="action_edit_entry" translatable="true">Edit the entry for %1$s</string>
+    <string name="action_delete_entry" translatable="true">Delete the entry for %1$s</string>
+
+    <!-- Visit status. Read by the shared status pill as well as by the day list. -->
+    <string name="visit_mowed" translatable="true">Mowed</string>
+    <string name="visit_skipped" translatable="true">Skipped</string>
+    <string name="visit_rained_off" translatable="true">Rained off</string>
+
+    <!-- The round: an ordered worklist the operator controls. -->
+    <string name="round_title" translatable="true">Round</string>
+    <string name="round_day_label" translatable="true">Round for %1$s</string>
+    <string name="round_total_owed" translatable="true">Total owed</string>
+    <string name="round_customers_label" translatable="true">Customers</string>
+    <string name="round_tab_today" translatable="true">Due today</string>
+    <string name="round_tab_all" translatable="true">Whole round</string>
+    <string name="round_empty_title" translatable="true">No customers yet</string>
+    <string name="round_empty_body" translatable="true">Add the people on your round and the app keeps their order, their visits, and what they still owe.</string>
+    <string name="round_detail_placeholder" translatable="true">Choose a customer to open the record here.</string>
+    <string name="round_move_up" translatable="true">Move %1$s up</string>
+    <string name="round_move_down" translatable="true">Move %1$s down</string>
+    <string name="round_mark_mowed" translatable="true">Mark %1$s as mowed</string>
+    <string name="round_mark_skipped" translatable="true">Mark %1$s as skipped</string>
+    <string name="round_mark_rained_off" translatable="true">Mark %1$s as rained off</string>
+    <string name="round_rate_line" translatable="true">Rate per visit %1$s</string>
+    <string name="round_push_day" translatable="true">Push the round by one day</string>
+    <string name="round_push_confirm_body" translatable="true">Every customer still due today is recorded as rained off and moves forward by exactly one day. Use this when the weather takes the morning.</string>
+
+    <!-- The customer record. -->
+    <string name="customer_new_title" translatable="true">New customer</string>
+    <string name="customer_details_title" translatable="true">Details</string>
+    <string name="customer_name" translatable="true">Name</string>
+    <string name="customer_name_required" translatable="true">Enter a name before saving.</string>
+    <string name="customer_address" translatable="true">Address</string>
+    <string name="customer_phone" translatable="true">Phone</string>
+    <string name="customer_notes" translatable="true">Notes</string>
+    <string name="customer_rate" translatable="true">Rate per visit</string>
+    <string name="customer_rate_hint" translatable="true">Used to pre-fill the amount for this customer.</string>
+    <string name="customer_rate_invalid" translatable="true">Enter an amount, for example 40</string>
+    <string name="customer_balance" translatable="true">Balance</string>
+
+    <!-- Payments. -->
+    <string name="payment_section_title" translatable="true">Payments</string>
+    <string name="payment_amount" translatable="true">Amount received</string>
+    <string name="payment_add" translatable="true">Record payment</string>
+    <string name="payment_remove" translatable="true">Remove this payment</string>
+    <string name="payment_none" translatable="true">No payments recorded yet.</string>
+
+    <!-- History and the CSV export. -->
+    <string name="history_title" translatable="true">History</string>
+    <string name="history_count" translatable="true">%1$d entries</string>
+    <string name="history_empty" translatable="true">Nothing recorded yet</string>
+    <string name="history_empty_body" translatable="true">Visits and payments appear here as soon as they are recorded on the round.</string>
+    <string name="history_filter_all" translatable="true">All</string>
+    <string name="history_filter_visits" translatable="true">Visits</string>
+    <string name="history_filter_payments" translatable="true">Payments</string>
+    <string name="history_visit_amount" translatable="true">%1$s owed</string>
+    <string name="history_unknown_customer" translatable="true">Removed customer</string>
+    <string name="history_edit_title" translatable="true">Correct the entry</string>
+    <string name="history_edit_subtitle" translatable="true">%1$s, %2$s</string>
+    <string name="history_edit_status" translatable="true">Outcome</string>
+    <string name="history_delete_entry_body" translatable="true">Remove the entry for %1$s on %2$s?</string>
+    <string name="export_csv" translatable="true">Export CSV</string>
+    <string name="export_done" translatable="true">Exported %1$d rows</string>
+    <string name="export_failed" translatable="true">The file could not be written.</string>
+
+    <!-- The single unlock. One price, no trial clock, no subscription. -->
+    <string name="unlock_title" translatable="true">Unlock the full record</string>
+    <string name="unlock_body" translatable="true">The free app holds up to %1$d customers. Unlocking keeps every customer, the whole history and the CSV export.</string>
+    <string name="unlock_bullet_customers" translatable="true">As many customers as you need</string>
+    <string name="unlock_bullet_history" translatable="true">The whole visit history, editable</string>
+    <string name="unlock_bullet_export" translatable="true">CSV export through the system file picker</string>
+    <string name="unlock_price_label" translatable="true">One payment</string>
+    <string name="unlock_price" translatable="true">$9.99</string>
+    <string name="unlock_price_note" translatable="true">One payment. No subscription and no renewal.</string>
+    <string name="unlock_action" translatable="true">Unlock</string>
+    <string name="unlock_restore" translatable="true">Restore purchase</string>
+    <string name="unlock_unlocked" translatable="true">Unlocked</string>
+    <string name="unlock_owned_body" translatable="true">Thank you. Every customer, every visit and the export are yours.</string>
+    <string name="unlock_busy" translatable="true">Opening Google Play...</string>
+    <string name="unlock_failed" translatable="true">The purchase did not complete. Try again, or restore an earlier purchase.</string>
+    <string name="unlock_unavailable" translatable="true">Google Play is not available on this device right now.</string>
+    <string name="free_tier_limit_message" translatable="true">The free app holds %1$d customers. Unlock once to add as many as you like; this customer is kept.</string>
+
+    <!-- Settings. Every preference here changes something the app actually reads. -->
+    <string name="settings_title" translatable="true">Settings</string>
+    <string name="settings_appearance_header" translatable="true">Appearance</string>
+    <string name="settings_appearance" translatable="true">Appearance</string>
+    <string name="settings_appearance_system" translatable="true">Follow the system</string>
+    <string name="settings_appearance_light" translatable="true">Light</string>
+    <string name="settings_appearance_dark" translatable="true">Dark</string>
+    <string name="settings_appearance_note" translatable="true">The app carries its own light and dark palettes; this chooses which one is used.</string>
+    <string name="settings_language_header" translatable="true">Language</string>
+    <string name="settings_language" translatable="true">App language</string>
+    <string name="settings_language_summary" translatable="true">Choose the language this app uses.</string>
+    <string name="settings_language_summary_legacy" translatable="true">Change the language in the Android settings for this app.</string>
+    <string name="settings_behaviour_header" translatable="true">Behaviour</string>
+    <string name="settings_currency" translatable="true">Currency symbol</string>
+    <string name="settings_currency_summary" translatable="true">Shown in front of every amount.</string>
+    <string name="settings_currency_error" translatable="true">Use one to three characters.</string>
+    <string name="settings_default_amount" translatable="true">Default visit amount</string>
+    <string name="settings_default_amount_summary" translatable="true">Used as the rate for a new customer.</string>
+    <string name="settings_amount_error" translatable="true">Enter a number, for example 40</string>
+    <string name="settings_confirm_delete" translatable="true">Confirm before deleting</string>
+    <string name="settings_confirm_delete_summary" translatable="true">Ask before a customer, visit or payment is removed.</string>
+    <string name="settings_haptics" translatable="true">Vibration feedback</string>
+    <string name="settings_haptics_summary" translatable="true">Vibrate when a visit is recorded.</string>
+
+    <!-- Confirmation before a destructive action. -->
+    <string name="delete_confirm_title" translatable="true">Delete this?</string>
+    <string name="delete_confirm_body" translatable="true">%1$s and every visit and payment recorded for them will be removed.</string>
+
+    <!-- About, and the in-app half of the privacy policy Play requires. -->
+    <string name="about_title" translatable="true">About</string>
+    <string name="about_body" translatable="true">%1$s keeps your round on this device. No account, no sync, and no network in the daily work: the round, its visits and its balances open in airplane mode.</string>
+    <string name="about_privacy_policy" translatable="true">Privacy policy</string>
+    <string name="about_contact" translatable="true">Support: v.sobolenko.vs@gmail.com</string>
+    <string name="about_version" translatable="true">Version %1$s</string>
+    <string name="about_privacy_url" translatable="false">https://lawn-round-log.invalid/privacy</string>
+</resources>

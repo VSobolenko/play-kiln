@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <!-- API 31+ requires separate cloud-backup and device-transfer policies because users
+         can permit one restoration path without permitting the other. Keep both explicit.
+
+         Both paths carry the whole round. It is the operator's own business record - his
+         customers, his logged visits and his recorded payments - and it belongs to nobody else,
+         so a restore must not silently lose it; no part of it is excluded. The excludes name only
+         credential-shaped files this app never writes, which keeps a future secret out of a
+         backup without withholding anything the operator typed. -->
+    <cloud-backup>
+        <include domain="sharedpref" path="." />
+        <include domain="file" path="." />
+        <include domain="database" path="." />
+        <exclude domain="sharedpref" path="secrets.xml" />
+        <exclude domain="sharedpref" path="auth_tokens.xml" />
+        <exclude domain="file" path="secrets/" />
+        <exclude domain="file" path="tokens/" />
+        <exclude domain="database" path="secrets.db" />
+        <exclude domain="database" path="tokens.db" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="sharedpref" path="." />
+        <include domain="file" path="." />
+        <include domain="database" path="." />
+        <exclude domain="sharedpref" path="secrets.xml" />
+        <exclude domain="sharedpref" path="auth_tokens.xml" />
+        <exclude domain="file" path="secrets/" />
+        <exclude domain="file" path="tokens/" />
+        <exclude domain="database" path="secrets.db" />
+        <exclude domain="database" path="tokens.db" />
+    </device-transfer>
+</data-extraction-rules>

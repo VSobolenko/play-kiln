@@ -33,6 +33,15 @@ The measured starting position, re-measured in this tree:
 - Neither the slot nor the scaffold declares `android:windowSoftInputMode="adjustResize"` or applies
   the IME inset, while `ClassroomTabs.kt:445` shows a text field the keyboard can cover.
 
+Then, on 2026-10-02, he installed a built app on a current phone and reported a second class of
+defect, translated from his own words: **"text crawls onto the notification panel, text crawls onto
+the camera, and it hides under the bottom buttons"**, written "as if for old phones" — and, in the
+same breath, that the app was **"just ordinary buttons and ordinary texts"**. The first sentence is
+the edge-to-edge and window-inset defect; the second is the platform-surface defect. Both are
+measured in `docs/research/2026-10-02-android-window-insets.md` and
+`docs/research/2026-10-02-modern-android-platform-surface.md`, which this rule cites rather than
+restates.
+
 `docs/ui-ux-standards.md` is the standard, with the citations. `scripts/core/uiux.mjs` is the sensor,
 and it is the only thing that measures this rule.
 
@@ -59,19 +68,114 @@ and it is the only thing that measures this rule.
   passes a label or an explicit `null`; a clickable element carries a `Text`, a non-null
   `contentDescription` or an `onClickLabel`; nothing declares an extent below `48.dp`.
   Check id: **`uiux.a11y`**.
-- **Edge-to-edge, and the keyboard is placed.** `enableEdgeToEdge()` in the activity — mandatory at
-  `targetSdk 36` — plus, whenever the slot shows a text field, `adjustResize` in the manifest **and**
-  an IME inset (`imePadding()`, `fitInside(WindowInsetsRulers.Ime…)` or `WindowInsets.ime`). The IME
-  is not a system bar and `Scaffold`'s default insets do not carry it. Check id: **`uiux.insets`**.
-- **The scaffold carries all of the above before any slot does.** `scaffold/android-compose/` is what
-  every new slot is copied from, so a finding there is the count of slots that would be born with the
-  defect. Check id: **`uiux.scaffold`** — this check is expected to be **red** until the orchestrator
-  wires the scaffold, and it must never be weakened to make it pass.
-- **This rule and this module agree, or neither is trustworthy.** `uiux.rule` fails if
-  `.cursor/rules/ui-ux-baseline.mdc` stops naming a check id, if `docs/ui-ux-standards.md` stops
-  citing one of the sources the rules rest on, or if a vendored skill a citation points at is
-  deleted. A rule text that has drifted from its sensor is a rule nobody follows.
-  Check id: **`uiux.rule`**.
+
+### Edge-to-edge and insets: the window edge is the design, the chrome is the collision
+
+At `targetSdk 36` edge-to-edge is not a style choice. The window draws behind the status bar, the
+navigation bar and the display cutout, Android 16 removes the opt-out entirely, and the platform's
+own change list disables the top and bottom offsets so content draws behind the bars "unless insets
+are applied" (**MEASURED**, `docs/research/2026-10-02-android-window-insets.md` §1). So a screenshot
+taken at `y = 0` proves nothing: **content reaching the window edge is the designed behaviour.** The
+defect is one thing only — text and controls drawn *under* the system chrome, which is exactly what
+the owner described. The fix is never to retreat from the edge; it is to consume the right insets.
+
+**The subsumption that makes the naive fix wrong.** The types are not interchangeable, and the unions
+are MEASURED from the AOSP source (`…insets.md` §2):
+
+```text
+safeDrawing  = systemBars ∪ ime ∪ displayCutout
+safeGestures = tappableElement ∪ mandatorySystemGestures ∪ systemGestures ∪ waterfall
+safeContent  = safeDrawing ∪ safeGestures
+```
+
+`systemBars` — and therefore `statusBarsPadding()` and `systemBarsPadding()` — contains **neither the
+display cutout nor the IME**. A top punch-hole is usually inside the status bar in portrait, so
+`statusBarsPadding()` *looks* correct; rotate to landscape and the cutout is on a vertical edge where
+`statusBars` contributes nothing, and the first glyph or toolbar icon sits behind the camera
+(**MEASURED**, same doc — that is the owner's camera defect). `safeDrawing` is the union; reach for it.
+
+**A `Scaffold` is not an inset fix by itself.** `ScaffoldDefaults.contentWindowInsets` is
+`systemBars ∪ displayCutout`, so it does cover a landscape cutout — but it carries **no IME** — and a
+`Scaffold` does not apply its insets to the content slot at all: it hands the content lambda
+`PaddingValues` and states that applying them "is your responsibility" (**MEASURED**, `…insets.md`
+§4). A `Scaffold` whose `innerPadding` is dropped or never referenced is byte-for-byte as exposed as
+no `Scaffold` at all.
+
+**The bottom edge, specifically.** The bottom offset is disabled for both navigation modes, so
+anything anchored to the bottom — a FAB, a save button, the last row of a scrollable — lands under the
+gesture pill or the 3-button bar unless the inset is applied. A `LazyColumn` with
+`Modifier.fillMaxSize()` and no `contentPadding` can scroll its last item to the very bottom, where it
+exists but cannot be tapped. The inset belongs **in the scrollable's own `contentPadding`**, not as
+`Modifier.padding()` on a parent, so the list may scroll behind the bar and still stop above it
+(**MEASURED**, `…insets.md` §5(c)).
+
+**The sane default, in one line.** A screen root outside a `Scaffold` gets
+`Modifier.safeDrawingPadding()` (`safeContentPadding()` where system gestures also clash) — the sane
+default precisely because it unions the bars, the cutout and the keyboard. Where a `Scaffold` is used,
+the content lambda consumes its `innerPadding` (`Modifier.padding(inner).consumeWindowInsets(inner)`),
+and a scrollable receives it as `contentPadding` so the last item is reachable. A component's own
+inset handling is strengthened, never switched off: `contentWindowInsets = WindowInsets(0, 0, 0, 0)`
+on a bar or a `Scaffold` re-introduces the very collisions it was handling.
+
+- **The opt-in, and the keyboard.** Edge-to-edge is opted in explicitly with
+  `enableEdgeToEdge()` in the activity, or `WindowCompat.setDecorFitsSystemWindows(window, false)` —
+  mandatory at `targetSdk 36`. Whenever the slot shows a text field, the manifest carries
+  `android:windowSoftInputMode="adjustResize"` **and** the screen applies an IME inset
+  (`imePadding()`, `fitInside(WindowInsetsRulers.Ime…)` or `WindowInsets.ime`); the IME is its own
+  inset and `Scaffold`'s default does not carry it. The same check fails a screen that pins chrome
+  below a weighted list — a `Surface`/`Column` (or a composable that roots at one) following a
+  `weight(…)`/scroll child in a window-filling `Column` — without `navigationBarsPadding()`,
+  `windowInsetsPadding(…)`, `safeDrawing`, `WindowInsetsSides.Bottom`, `systemBars` or
+  `contentWindowInsets`, because that bar renders under the three-button navigation bar. Check id:
+  **`uiux.insets`**.
+
+## The modern platform, and what reaches for it
+
+A correct app that never touches the platform is still "ordinary buttons and ordinary text". This
+section is the factory's expectation of the platform surface. Its sensor half is **`uiux.platform`**,
+which fails on the two things that are decidable from source alone and **reports the rest as notes**,
+because presence is checkable and the *right* use is not.
+
+**Opted in, and checked.** Predictive back is opted in with
+`android:enableOnBackInvokedCallback="true"` on `<application>` — one manifest attribute, and its
+absence is invisible until a device is used, so `uiux.platform` fails when it is missing. It is also
+the platform feature the app's own host must already support: Navigation 3's host-owned back stack is
+what the gesture has to preview, which is why `uiux.navigation` and `uiux.motion` are its
+precondition. Intercepting back at the root activity disables the back-to-home animation app-wide
+(**MEASURED**, `docs/research/2026-10-02-modern-android-platform-surface.md` §2) — so back handling
+belongs with the host's back stack, never in `MainActivity`.
+
+**The pinned toolchain is a boundary, not a preference.** Material 3 Expressive and the physics
+`MotionScheme` live in `material3 1.5.0-alpha*`; this factory's pinned BOM (`2026.09.00`) ships stable
+`material3 1.4.0` and contains neither (**MEASURED**, `…platform-surface.md` §6). Reaching for the
+alpha artifact breaks the pinned toolchain every slot shares, so `uiux.platform` **fails** on a build
+file that declares an M3 Expressive / `MotionScheme` alpha artifact the pin does not carry. The motion
+an app needs is already on the pin: `uiux.motion` lists the animators, `Modifier.animateItem` and the
+shared-element APIs.
+
+**Encouraged where the job gives a reason — reported, never gated.** An app is not defective for
+lacking one of these, but an app whose job plainly implies one should have it, and `uiux.platform`
+reports each as a note rather than a row that turns red:
+
+- the Splash Screen API (`core-splashscreen`, `installSplashScreen()`, a `Theme.SplashScreen` parent)
+  — a cold start that looks like the app rather than a white flash;
+- share out (`ACTION_SEND`) where the app produces something shareable, and a text-processing target
+  (`ACTION_PROCESS_TEXT`) where its job is to transform selected text;
+- the Photo Picker (`ActivityResultContracts.PickVisualMedia`) instead of broad media permissions —
+  the path Play's own policy prefers (**MEASURED**, `…platform-surface.md` §5);
+- haptics (`LocalHapticFeedback`) where a state change has no other confirmation; the semantic type
+  is the point and a scanner cannot judge it;
+- `Modifier.animateItem` on a list whose order can change, and shared-element transitions where a
+  list thumbnail becomes a detail hero;
+- `SelectionContainer` where the app's output is text worth copying;
+- autofill `Modifier.contentType(...)` on the app's identity fields.
+
+The adaptive vocabulary `uiux.adaptive` measures today is a floor, not a ceiling. Where a slot's job
+implies a list and a detail, reach for `ListDetailPaneScaffold` / `currentWindowAdaptiveInfoV2` /
+`NavigationSuiteType`; for a foldable, `collectFoldingFeaturesAsState` / `FoldingFeature` — the
+research names each as missing from the current set (**ON RECORD**, `…platform-surface.md` §3). None
+of this licenses decoration: motion, haptic moments and widget glanceability must stay out of the
+gate, because a source scan cannot tell a meaningful transition from a decorative one.
 
 ## What is banned
 
@@ -84,13 +188,23 @@ and it is the only thing that measures this rule.
 - A hard cut between screens where a transition belongs.
 - An icon-only control with no accessible name, and a declared touch target below 48 dp.
 - A text field the keyboard can cover, and an app that does not go edge-to-edge at `targetSdk 36`.
+- `statusBarsPadding()` or `systemBarsPadding()` as the screen's **sole** inset handling — the
+  landscape-cutout collision the owner photographed.
+- A `Scaffold` whose `innerPadding` is dropped or never referenced, which is as exposed as no
+  `Scaffold`.
+- `contentWindowInsets = WindowInsets(0, 0, 0, 0)` (or the same on a bar's `windowInsets`), switching
+  off the handling a component already had.
+- A full-bleed scrollable whose last row sits under the gesture pill or the 3-button bar because the
+  inset was put on a parent `Modifier.padding()` instead of the list's `contentPadding`.
+- A manifest that leaves predictive back unopted (`android:enableOnBackInvokedCallback` absent).
+- A declared M3 Expressive / `MotionScheme` **alpha** artifact at a pin that does not carry it.
 - Weakening `uiux.scaffold` to make a wiring task look finished. The scaffold is the point.
 
 ## How it is verified
 
 ```bash
-node scripts/verify.mjs                       # runs `uiux.project` in the `invariants` group
-node scripts/verify.mjs --slot <slug>         # runs the six `uiux.*` slot checks, in the `ui` group
+node scripts/verify.mjs                       # runs `uiux.scaffold` and `uiux.rule` in the `invariants` group
+node scripts/verify.mjs --slot <slug>         # runs the seven `uiux.*` slot checks, in the `ui` group
 node --input-type=module -e "import('./scripts/core/uiux.mjs').then(m=>console.log(m.uiuxFindings('apps/<slot>')))"
 node --input-type=module -e "import('./scripts/core/uiux.mjs').then(m=>console.log(m.textLayoutFindings('apps/<slot>')))
 ```
@@ -99,6 +213,9 @@ node --input-type=module -e "import('./scripts/core/uiux.mjs').then(m=>console.l
   It runs no build and spawns no process.
 - Findings are `file:line` strings, so a fix is a diff and not a reading. `uiuxFindings()` is the
   whole set; `textLayoutFindings()` is the wrapping/typography subset the owner's review was about.
+  `uiux.insets` names a missing opt-in, an unused `innerPadding`, a zeroed bar inset or a
+  `statusBars`-only screen; `uiux.platform` names a missing predictive-back opt-in and an alpha
+  Expressive dependency, and **reports** the product-conditional surfaces as notes.
 - Applicability is derived by `scripts/core/baseline.mjs`, not restated here: a slot created before
   `2026-09-30` (the four that already exist), a pipeline proof with no `economics.json`, and a killed
   slot carry the finding as a **note** inside a PASS; a slot created from today is gated. A finding
@@ -131,3 +248,11 @@ A static scan that guesses produces false positives, and a noisy gate is read pa
   wrapping — a box that cannot grow, a clamp that cannot indicate truncation. `docs/ui-ux-standards.md`
   says this in the same words, and the manual half (a `@PreviewFontScales` render, a real device at a
   200 % font scale) stays with the builder and the owner.
+- **The scan names the cause of a collision; it cannot see the collision.** `uiux.insets` can point at
+  the line that dropped an `innerPadding` or used `statusBarsPadding()` alone, but whether a `Text`
+  actually sits under the camera or the notification panel is a runtime fact — inset values depend on
+  the device, the orientation and the content. Only a run on the attached phone shows it, which is why
+  `.cursor/rules/device-testing.mdc` and the `device-verification.json` record it requires are part of
+  this rule rather than beside it: a green `uiux.insets` row means the cause is absent, never that the
+  pixels are right. The manual half is named in `…insets.md` §6 — turn on **Simulate a display with a
+  cutout**, **rotate to landscape**, and repeat in both **Gesture** and **3-button** navigation.

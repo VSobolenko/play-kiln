@@ -53,11 +53,20 @@ from scipy import ndimage
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT / "scripts") not in sys.path:
     sys.path.insert(0, str(ROOT / "scripts"))
+from lib import colours  # noqa: E402  the one colour-maths implementation, shared with icon_qa
 from lib import icon_design as design  # noqa: E402  the keyline grid, the stroke scale, the marks
 from lib import icon_qa  # noqa: E402  the icon measurements this report publishes
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lib.scratch import SCRATCH_DIR
-LUMA = np.array([0.2126, 0.7152, 0.0722])
+
+# The names this module has always exported are kept as aliases of the shared primitives, so there
+# is one implementation while every existing call site keeps reading the name it already used.
+LUMA = colours.LUMA
+luminance = colours.relative_luminance
+srgb_to_linear = colours.srgb_to_linear
+contrast_ratio = colours.contrast_ratio
+hex_of = colours.hex_of
+parse_hex = colours.parse_hex
 
 
 # ----------------------------------------------------------------------------- helpers
@@ -72,28 +81,8 @@ def load_module(name: str, path: Path):
     return module
 
 
-def luminance(array: np.ndarray) -> np.ndarray:
-    return array[..., :3].astype(np.float64) @ LUMA
-
-
-def srgb_to_linear(channel) -> np.ndarray:
-    value = np.asarray(channel, dtype=np.float64) / 255.0
-    return np.where(value <= 0.04045, value / 12.92, ((value + 0.055) / 1.055) ** 2.4)
-
-
-def contrast_ratio(rgb_a, rgb_b) -> float:
-    la = float(srgb_to_linear(np.asarray(rgb_a, dtype=np.float64)) @ LUMA)
-    lb = float(srgb_to_linear(np.asarray(rgb_b, dtype=np.float64)) @ LUMA)
-    hi, lo = max(la, lb), min(la, lb)
-    return (hi + 0.05) / (lo + 0.05)
-
-
 def sha256(path: Path) -> str:
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
-
-
-def hex_of(rgb) -> str:
-    return "#%02X%02X%02X" % tuple(int(round(float(v))) for v in rgb[:3])
 
 
 def rounded_mask(size, radius: int) -> np.ndarray:
@@ -1113,38 +1102,48 @@ def section_contrast(kit, studio, slot: Path, out: dict) -> dict:
                 row["sections"][name] = measurement
         rows.append(row)
 
-    # icon mark against the field it is drawn on
+    # Icon mark against the field it is drawn on. The parts are the palette roles the slot's *own*
+    # declared mark draws with, read from the mark registry through `icon_qa.role_masks` - not the
+    # row bands and colour predicates of the first slot's artwork (`caliper_*` belongs to
+    # `pipe-sizing`). Those constants selected arbitrary pixels in every other slot's icon and the
+    # report still printed a confident PASS about them, which is the defect this replaces.
+    mark_name = spec.get("mark") or design.DEFAULT_MARK
+    icon_palette = studio.resolve_palette(spec.get("palette"))
     with Image.open(store / "assets" / "icon-512.png") as image:
-        icon = np.asarray(image.convert("RGB"), dtype=np.float32)
-        icon_alpha = np.asarray(image.convert("RGBA"))[..., 3]
-    luma_icon = luminance(icon)
-    mark = luma_icon > 215
-    amber_mark = (icon[..., 0] > 190) & (icon[..., 1] > 110) & (icon[..., 1] < 215) & (icon[..., 2] < 130)
+        icon_rgba = np.asarray(image.convert("RGBA"), dtype=np.uint8)
+    icon = icon_rgba[..., :3].astype(np.float64)
+    icon_alpha = icon_rgba[..., 3]
     icon_size = icon.shape[0]
-    row_index = np.arange(icon_size)[:, None]
+    mark = icon_qa.mark_mask(icon_rgba, None, icon_palette, mark_name)
     contrasts = []
-    parts = (("caliper_paper_line", mark & (row_index > 240) & (row_index < 272)),
-             ("caliper_paper_top_tick", mark & (row_index < 230)),
-             ("ring_amber_upper", amber_mark & (row_index < 200)),
-             ("ring_amber_lower", amber_mark & (row_index > 320)))
-    for part, sel in parts:
+
+    def part_contrast(part: str, sel: np.ndarray, source: str) -> None:
+        """One region's mean ink against the field in the same rows, as the report always did."""
         if not sel.any():
-            continue
+            return
         fg = icon[sel].mean(axis=0)
         rows_with_sel = np.flatnonzero(sel.any(axis=1))
         row_band = np.zeros((icon_size, 1), dtype=bool)
         row_band[rows_with_sel, 0] = True
-        field = np.broadcast_to(row_band, mark.shape) & ~mark & ~amber_mark
+        field = np.broadcast_to(row_band, mark.shape) & ~mark
         if not field.any():
-            continue
+            return
         bg = icon[field].mean(axis=0)
-        contrasts.append({"part": part, "fg_rgb": [round(float(v), 1) for v in fg],
+        contrasts.append({"part": part, "source": source,
+                          "fg_rgb": [round(float(v), 1) for v in fg],
                           "bg_rgb": [round(float(v), 1) for v in bg],
                           "fg_hex": hex_of(fg), "bg_hex": hex_of(bg),
                           "contrast": round(contrast_ratio(fg, bg), 2),
                           "passes_3_to_1_nontext": contrast_ratio(fg, bg) >= 3.0,
                           "passes_4_5_to_1": contrast_ratio(fg, bg) >= 4.5,
                           "fg_pixels": int(sel.sum()), "field_pixels": int(field.sum())})
+
+    # The overall reading is generic and stays: the whole mark's ink against the whole field.
+    if mark.any() and (~mark).any():
+        part_contrast("mark_vs_field", mark, f"declared mark {mark_name!r}")
+    # The per-part reading is the mark's own declared roles, so it can only describe this slot.
+    for role, sel in icon_qa.role_masks(icon_rgba, icon_palette, mark_name, mark).items():
+        part_contrast(f"role:{role}", sel, f"declared mark {mark_name!r}")
     headline_rows = [r for r in rows if r.get("headline")]
     body_rows = [r for r in rows if r.get("body")]
     out["contrast"] = {
@@ -1159,6 +1158,9 @@ def section_contrast(kit, studio, slot: Path, out: dict) -> dict:
                                "mark_px": int(mark.sum()),
                                "frac_of_icon": round(float(mark.mean()), 4)} if mark.any() else None,
         "icon_mark_contrasts": contrasts,
+        "icon_mark_contrasts_source": (
+            f"regions derived from this slot's declared mark {mark_name!r} through the palette roles "
+            "its primitives draw with, never from another slot's pixel constants"),
     }
     return out["contrast"]
 
@@ -1320,9 +1322,10 @@ def section_palette(kit, studio, slot: Path, out: dict) -> dict:
     declared = {}
     for key in ("brandColor", "accentColor"):
         value = graphics.get(key, "")
-        if not re.fullmatch(r"#[0-9A-Fa-f]{6}", value):
+        try:
+            rgb = list(parse_hex(value))
+        except ValueError:
             continue
-        rgb = [int(value[i:i + 2], 16) for i in (1, 3, 5)]
         declared[key] = {"hex": value, "rgb": rgb, "nearest_kotlin": nearest(rgb, kotlin),
                          "exact_kotlin_match": any(v["rgb"] == rgb for v in kotlin.values())}
     studio_vs_kotlin = {name: {"studio_hex": hex_of(token), "rgb": list(token),

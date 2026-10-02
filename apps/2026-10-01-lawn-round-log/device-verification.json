@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "serial": "R58MB3SGZVL",
+  "testedAt": "2026-10-02T01:02:06+03:00",
+  "apkSha256": "909644ea65a53fb8250cf01ef768b4b9596b0ff3ed30ecd412400fab0c9ed229",
+  "artifact": "app/build/outputs/apk/debug/app-debug.apk",
+  "observations": [
+    "Installed the debug APK with `adb -s R58MB3SGZVL install -r` and confirmed the artifact under test is the one built: the installed /data/app/~~r7zn5WSpjDuyRwXrnNB0GQ==/com.gexetr.lawnroundlog.debug-geOAv-7hJnsMa8FZV9NpoQ==/base.apk hashes on-device (sha256sum) to 909644ea65a53fb8250cf01ef768b4b9596b0ff3ed30ecd412400fab0c9ed229, byte-identical to app/build/outputs/apk/debug/app-debug.apk.",
+    "Launched com.gexetr.lawnroundlog.debug; the Round screen rendered the ordered worklist and the hero total, and the action bar's six controls all reported bounds ending at y<=2110 while the system navigation bar begins at y=2196. Before this revision the four secondary controls (History, Unlock the full record, Settings, About) were laid out under the navigation bar and appeared zero-sized in the UI hierarchy.",
+    "Tapped 'Mark Ivan Petrov as mowed' at (162,1161) — the point read from the UI hierarchy, not guessed — and the customer row then rendered the word 'Mowed' as a status pill at [807,1135][954,1188], so one-tap visit marking works and the outcome is stated in words as well as colour.",
+    "Tapped Settings at (781,2090); the settings surface opened and its lowest control, the 'Confirm before deleting' toggle, reported bounds ending at y=2110, which is above the navigation bar and therefore reachable and tappable.",
+    "Tapped Unlock the full record at (458,2090); the paywall rendered and its lowest control, 'Restore purchase', reported bounds ending at y=1664, so the last action on the slot's revenue surface is reachable rather than hidden behind the system bar.",
+    "Tapped About at (964,2078) and the About screen opened with 'Version 0.1.0-debug' reporting bounds ending at y=1248; pressed back and tapped History at (143,2090), and the visit history list rendered with 'Mowed' as its lowest entry."
+  ]
+}

@@ -46,6 +46,18 @@
       "publishedNote": "The owner reported the app approved and live on Google Play in session, and that he installed it himself from the store page. This is the date the fact was recorded, not a console-verified approval date; nobody read Play Console's own date.",
       "createdAt": "2026-09-26T13:42:41.139Z",
       "updatedAt": "2026-09-30T00:00:00.000Z"
+    },
+    {
+      "id": "lawn-round-log",
+      "dir": "apps/2026-10-01-lawn-round-log",
+      "name": "Lawn Round Log",
+      "applicationId": "com.gexetr.lawnroundlog",
+      "idea": "An offline lawn round log a solo mower owns outright: ordered customers, one-tap visits, owed balances and CSV export, unlocked once.",
+      "archetype": "purchase_led_single_unlock",
+      "promises": 5,
+      "status": "scaffolded",
+      "createdAt": "2026-10-01T18:24:47.021Z",
+      "updatedAt": "2026-10-01T18:24:47.021Z"
     }
   ]
 }

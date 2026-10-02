@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Legacy fullBackupContent equivalent for API 30 and lower. Keep its data scope in
+         sync with both sections of data_extraction_rules.xml.
+
+         The stored round is the operator's own business record: his customers, the visits he
+         logged and the payments he took. Backing it up is the correct behaviour, because a lost
+         phone must not silently lose a season of his record, so every domain the record can live
+         in is included in full. The excludes below name only files this app never writes; they are
+         a defensive filter so that a future credential stored under one of those names is not
+         copied off the device. Nothing the operator typed is excluded. -->
+    <include domain="sharedpref" path="." />
+    <include domain="file" path="." />
+    <include domain="database" path="." />
+    <exclude domain="sharedpref" path="secrets.xml" />
+    <exclude domain="sharedpref" path="auth_tokens.xml" />
+    <exclude domain="file" path="secrets/" />
+    <exclude domain="file" path="tokens/" />
+    <exclude domain="database" path="secrets.db" />
+    <exclude domain="database" path="tokens.db" />
+</full-backup-content>

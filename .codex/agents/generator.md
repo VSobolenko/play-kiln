@@ -14,6 +14,6 @@ own.
 Adapter settings, and nothing more:
 
 - The role is the *builder*; the rules that govern a dispatched worker are tabulated under
-  *Which rules bind this role* in `harness/roles/verifier.md`.
+  *Which rules bind this role* in `harness/roles/builder.md`.
 - The build route, the pinned JDK and the phase-1/phase-2 boundary are enforced by the scripts
   `AGENTS.md` names, not by this card.

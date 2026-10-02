@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "archetype": "ads_led_utility",
+  "payingUser": "A one-person trading business, a market-stall holder, a craft-fair seller or a pop-up-shop keeper, who sells in person on market days and keeps the day's money and stock record on the phone in their pocket.",
+  "paidUnit": "One permanent unlock of the whole book: unlimited market days, unlimited stock lines and suppliers, the supplier ledger, and period export as CSV and PDF, with the advertising switched off for good.",
+  "priceUsd": 4.99,
+  "momentOfPayment": "After the trader has closed a couple of market days for free, at the moment the book fills and they want another market day, a supplier balance or an export, behind one clearly priced unlock sheet that is also the ad-free purchase.",
+  "distinctnessSentence": "The day's takings and the stock that left the stall are one entry, so the trader never types the day's sales twice, the supplier balance is carried from the same entries and stays editable, the book needs no account and no network, and buying it once removes the advertising for good, which the measured incumbents do not offer together.",
+  "evidenceRef": "docs/ideation/2026-10-01-small-business-takings.md#64-the-revenue-arithmetic-with-the-division-shown",
+  "day1RevenuePath": "The slot is listed on Play against the daily takings and small-shop sales-record queries where the free leaders declare advertising plus in-app purchases, the first market traders install it and close a few market days for free, the free day limit stops them, and the first unlock payment arrives through the billing capability this plan requires.",
+  "killCriteria": {
+    "windowDays": 60,
+    "minInstalls": 2000,
+    "minRevenueUsd": 150
+  },
+  "assumptionsUnverified": [
+    "Install volume for a niche market-trader app is unverified: the category leader holds 10 million plus installs, but nothing measured here says a trader-specific book reaches the 12,300 installs a month the plan needs at a 2 percent conversion rate.",
+    "Install-to-purchase conversion is assumed at 2 percent of installs, with the 1 to 3 percent band taken from docs/monetization-strategy.md section 4 where it is itself labelled unverified; no slot in this repository has ever measured a real conversion rate.",
+    "Daily-active-users per install is assumed at 15 percent for a work-day tool, and it is the single assumption the whole advertising stream rests on; no slot has measured retention, daily-active users or session frequency.",
+    "Whether the audience tolerates advertising at all is judged from the shelf's shape, where 5 of 10 measured incumbents declare advertising, and not from any review classified as ad-hostility, of which there were none in the corpus.",
+    "Google Play's 15 percent service fee, a 2 percent refund allowance and a 2 percent currency allowance are plan assumptions in docs/monetization-strategy.md section 2.2, not measurements of this developer account; at a 30 percent fee the net per unlock falls to about 3.31 dollars and the required sales rise from 246 to 302.",
+    "The market-stall sub-query is a graveyard of unrated micro-apps whose cause is unmeasured: it may mean nobody wants a stall-specific record, or that nobody has built one well, and both readings are consistent with the cards observed."
+  ]
+}
