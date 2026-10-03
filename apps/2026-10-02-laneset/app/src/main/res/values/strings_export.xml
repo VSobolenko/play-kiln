@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The two data doors: the set list leaving the phone, and a coach's workout coming in.
+
+    Every key here also exists in res/values-ru/strings_export.xml, with the same format arguments.
+    A key in one tree only is a failure reported in both directions.
+-->
+<resources>
+
+    <!-- Export sheet -->
+    <string name="export_sheet_title">Hand off this set</string>
+    <string name="export_sheet_supporting">Take it to the pool with you.</string>
+    <string name="export_close">Close</string>
+    <string name="export_share_action">Share as text</string>
+    <string name="export_share_supporting">Send the whole set list to a messaging app.</string>
+    <string name="export_print_action">Save a printable card</string>
+    <string name="export_print_supporting">Write a one-page PDF wherever you choose.</string>
+    <string name="export_share_chooser_title">Share the set list</string>
+    <string name="export_pdf_file_name">laneset-set-list.pdf</string>
+    <string name="export_share_failed">No app on this phone can take the set list. Try the printable card instead.</string>
+    <string name="export_print_saved">Card saved.</string>
+    <string name="export_print_failed">The card could not be written there. Try another location.</string>
+
+    <!-- Coach-workout import -->
+    <string name="import_title">Import a coach\'s workout</string>
+    <string name="import_back">Back</string>
+    <string name="import_intro">Already have a set from your coach? Paste it here and Laneset reads it into the same paced session it builds for you: every interval gets a target time from your own pace and the pool you swim in.</string>
+    <string name="import_example_header">How a set is written</string>
+    <string name="import_example_body">A section word such as Warm up, Main set or Cool down starts a group, then one line per set. Laneset reads a repetitions-and-distance pair like 8 x 100 free on 1:45, a single distance like 300, a stroke word such as free, back, breast, fly or IM, a send-off such as on 1:45 or @1:10, and an explicit rest like rest 20. The section words and the stroke words are the ones a pool writes in English; everything else is a number.</string>
+    <string name="import_field_label">Coach\'s workout</string>
+    <string name="import_field_placeholder">Warm up 300 free</string>
+    <string name="import_read_action">Read the workout</string>
+    <string name="import_clear_field">Clear the field</string>
+    <string name="import_clipboard_action">Paste from clipboard</string>
+    <string name="import_empty_hint">The set you paste appears here, interval by interval, before anything is saved.</string>
+    <string name="import_status_empty">Paste a workout first — the field is empty.</string>
+    <string name="import_status_clipboard_empty">The clipboard holds no text to paste. Copy the set first, or type it in.</string>
+    <string name="import_status_nothing">No set was recognised. Each line needs a repetitions-and-distance pair such as 8 x 100, or a single distance such as 300.</string>
+    <string name="import_status_needs_pace">Swim the two pace trials first. Without your threshold pace there is no target time to put on an interval.</string>
+    <string name="import_unreadable_header">These lines could not be read:</string>
+    <string name="import_unreadable_line">Line %1$d</string>
+    <string name="import_review_header">What Laneset read</string>
+    <string name="import_review_supporting">This is the set list as it will be shared or printed.</string>
+    <string name="import_stat_distance">Distance</string>
+    <string name="import_stat_time">Total time</string>
+    <string name="import_stat_pace">Threshold pace</string>
+    <string name="import_stat_intervals">Intervals</string>
+    <string name="import_meters_value">%1$d m</string>
+    <string name="import_pace_value">%1$s /100 m</string>
+    <string name="import_accept_action">Save this session</string>
+    <string name="import_saved">Saved. It is waiting for you on Home.</string>
+
+</resources>

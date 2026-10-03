@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.gexetr.lawnroundlog.ui.AppearanceMode
 import java.io.IOException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -42,6 +43,10 @@ private val Context.roundLogSettingsDataStore by preferencesDataStore(name = "ro
  */
 class SettingsStore(private val context: Context) {
 
+    /** The palette choice the theme host restores after the process returns. */
+    val appearance: Flow<AppearanceMode> = preference(APPEARANCE, AppearanceMode.FOLLOW_SYSTEM.name)
+        .map { stored -> AppearanceMode.entries.firstOrNull { it.name == stored } ?: AppearanceMode.FOLLOW_SYSTEM }
+
     /** The symbol prefixed to every amount the operator sees. Stored as text, never as a number. */
     val currencySymbol: Flow<String> = preference(CURRENCY_SYMBOL, DEFAULT_CURRENCY_SYMBOL)
 
@@ -55,6 +60,10 @@ class SettingsStore(private val context: Context) {
 
     /** Whether recording a visit gives haptic feedback, which matters outdoors in gloves. */
     val hapticsEnabled: Flow<Boolean> = preference(HAPTICS_ENABLED, DEFAULT_HAPTICS_ENABLED)
+
+    suspend fun setAppearance(value: AppearanceMode) {
+        context.roundLogSettingsDataStore.edit { preferences -> preferences[APPEARANCE] = value.name }
+    }
 
     suspend fun setCurrencySymbol(value: String) {
         context.roundLogSettingsDataStore.edit { preferences -> preferences[CURRENCY_SYMBOL] = value }
@@ -104,6 +113,7 @@ class SettingsStore(private val context: Context) {
         private val DEFAULT_VISIT_AMOUNT_USD = doublePreferencesKey("default_visit_amount_usd")
         private val CONFIRM_BEFORE_DELETE = booleanPreferencesKey("confirm_before_delete")
         private val HAPTICS_ENABLED = booleanPreferencesKey("haptics_enabled")
+        private val APPEARANCE = stringPreferencesKey("appearance")
 
         /** The symbol a round shows when the operator has never chosen one. */
         const val DEFAULT_CURRENCY_SYMBOL: String = "$"

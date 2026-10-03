@@ -1,295 +1,164 @@
 package com.gexetr.lawnroundlog.ui.components
 
-import androidx.compose.foundation.Canvas
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.gexetr.lawnroundlog.R
 
 /**
- * The round log's own glyph set.
+ * The round log's UI iconography.
  *
- * Why these are drawn rather than imported: `.cursor/rules/visual-identity.mdc` bans *"a stock icon
- * as the app's mark or as UI iconography"*, and lists *"a glyph set used as iconography"* as part of
- * what a slot owns. A `material-icons-*` dependency would make the app legible as every other
- * Compose app, which is the failure the rule names — a correct app that looks like an unstyled
- * Material demo is a failed recipe even when every gate is green.
+ * These glyphs are **not drawn here**. They are the Tabler Icons set, vendored into
+ * `app/src/main/res/drawable/` with its licence text and a per-icon provenance record, exactly as
+ * `.cursor/rules/visual-identity.mdc` requires: general-purpose UI iconography — a back arrow, a
+ * plus, a bin, a lock — comes from one licence-cleared professional set, because a set drawn by hand
+ * from path primitives is not competing with a set drawn by a professional team. The owner's
+ * instruction, recorded 2026-10-02, is that the factory takes a ready-made, well-chosen set.
  *
- * The whole family shares one stroke weight and one cap style, derived from [GlyphStrokeRatio], so
- * the set reads as one hand rather than fifteen separate drawings. That single constant is
- * deliberate: a glyph set whose weight drifts per glyph is the most visible way an iconography
- * stops looking drawn and starts looking assembled.
+ * A file in this module that hand-rolls a general-purpose glyph with `Canvas`/`drawLine` is the
+ * defect that rule names, not the virtue. What stays slot-owned is the **mark** — the launcher icon,
+ * the adaptive-icon layers and the in-app brand glyph in `Brand.kt` — which rule 13 keeps out of the
+ * library, and which is derived from `store/studio.json`.
  *
- * Colour never lives here. Every glyph takes [tint], defaulting to `LocalContentColor.current`, so
- * the set inherits the slot's own theme and cannot drift from the palette in `ui/theme/Color.kt`.
+ * The one judgement each name records is whether the library expresses the app's own noun honestly.
+ * `GlyphRain` is the set's own `cloud-rain` because a rained-off visit *is* weather; `GlyphLock` is
+ * the set's lock because the paywall's shape is not the app's invention. A glyph whose meaning the
+ * app defined and the set could not express would stay slot-owned here, drawn in this set's stroke
+ * weight — none of the seventeen currently needs that.
+ *
+ * Colour never lives in the icon. Every glyph takes [tint], defaulting to `LocalContentColor.current`,
+ * so the set inherits the slot's own theme and cannot drift from the palette in `ui/theme/Color.kt`;
+ * the vendored `VectorDrawable`s carry a stroke colour only because a vector path must name one to
+ * render at all, and Compose's `Icon` tint replaces it at every call site.
  *
  * Accessibility is the call site's decision, not the glyph's: a glyph that is the only content of a
  * control needs an accessible name, and one that merely repeats an adjacent label should stay
  * decorative. So none of these carry a `contentDescription`; the noun is supplied where the noun is
- * known.
+ * known, in the enclosing control's own semantics.
+ *
+ * Provenance: `apps/2026-10-01-lawn-round-log/icons/provenance.json`, licence text in
+ * `apps/2026-10-01-lawn-round-log/icons/LICENSES/MIT.txt`.
  */
 
 /** The box every glyph draws inside. 24 dp is the icon convention the rest of the UI is laid out to. */
 private val GlyphSize = 24.dp
 
 /**
- * Stroke weight as a fraction of the box, so a glyph is resolution- and size-independent: the same
- * definition renders correctly at 24 dp in a list row and scaled up in the mark.
- */
-private const val GlyphStrokeRatio = 0.105f
-
-/**
  * The one drawing surface every glyph is composed on.
  *
- * Keeping the `Canvas`, the size and the stroke derivation in one place is what makes the family
- * consistent by construction rather than by discipline: a glyph cannot pick its own weight or its
- * own box, because it is handed neither.
+ * Keeping the size and the tint derivation in one place is what makes the family consistent by
+ * construction rather than by discipline: a glyph cannot pick its own size or its own colour,
+ * because it is handed neither.
  */
 @Composable
-private fun GlyphBox(
+private fun Glyph(
+    @DrawableRes art: Int,
     modifier: Modifier = Modifier,
     tint: Color = LocalContentColor.current,
-    onDraw: DrawScope.(stroke: Float, colour: Color) -> Unit,
-) {
-    Canvas(modifier = modifier.size(GlyphSize)) {
-        onDraw(size.minDimension * GlyphStrokeRatio, tint)
-    }
-}
+) = Icon(
+    painter = painterResource(art),
+    contentDescription = null,
+    modifier = modifier.size(GlyphSize),
+    tint = tint,
+)
 
-/**
- * One straight stroke, with every coordinate expressed as a fraction of the box.
- *
- * Fractions rather than pixels for the same reason the weight is a ratio: the glyph is defined once
- * and stays correct at any rendered size.
- */
-private fun DrawScope.seg(
-    colour: Color,
-    x1: Float,
-    y1: Float,
-    x2: Float,
-    y2: Float,
-    stroke: Float,
-) {
-    drawLine(
-        color = colour,
-        start = Offset(size.width * x1, size.height * y1),
-        end = Offset(size.width * x2, size.height * y2),
-        strokeWidth = stroke,
-        cap = StrokeCap.Round,
-    )
-}
-
-/** A filled dot. */
-private fun DrawScope.dot(colour: Color, cx: Float, cy: Float, radius: Float) {
-    drawCircle(
-        color = colour,
-        radius = radius * size.minDimension,
-        center = Offset(size.width * cx, size.height * cy),
-    )
-}
-
-/** An outlined circle. */
-private fun DrawScope.ring(colour: Color, cx: Float, cy: Float, radius: Float, stroke: Float) {
-    drawCircle(
-        color = colour,
-        radius = radius * size.minDimension,
-        center = Offset(size.width * cx, size.height * cy),
-        style = Stroke(width = stroke),
-    )
-}
-
-/** Back. An arrow rather than a bare chevron: it is a direction, not a collapse. */
+/** Back. */
 @Composable
 fun GlyphBack(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
-    GlyphBox(modifier, tint) { stroke, colour ->
-        seg(colour, 0.82f, 0.50f, 0.20f, 0.50f, stroke)
-        seg(colour, 0.44f, 0.26f, 0.20f, 0.50f, stroke)
-        seg(colour, 0.20f, 0.50f, 0.44f, 0.74f, stroke)
-    }
+    Glyph(R.drawable.ic_arrow_left, modifier, tint)
 
 /** Add. */
 @Composable
 fun GlyphAdd(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
-    GlyphBox(modifier, tint) { stroke, colour ->
-        seg(colour, 0.50f, 0.20f, 0.50f, 0.80f, stroke)
-        seg(colour, 0.20f, 0.50f, 0.80f, 0.50f, stroke)
-    }
+    Glyph(R.drawable.ic_plus, modifier, tint)
 
-/** Delete. A bin with a lid and a handle, so it is a bin and not a waste-paper square. */
+/** Delete. */
 @Composable
 fun GlyphDelete(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
-    GlyphBox(modifier, tint) { stroke, colour ->
-        seg(colour, 0.20f, 0.30f, 0.80f, 0.30f, stroke)
-        seg(colour, 0.40f, 0.30f, 0.40f, 0.18f, stroke)
-        seg(colour, 0.40f, 0.18f, 0.60f, 0.18f, stroke)
-        seg(colour, 0.60f, 0.18f, 0.60f, 0.30f, stroke)
-        seg(colour, 0.30f, 0.30f, 0.35f, 0.82f, stroke)
-        seg(colour, 0.35f, 0.82f, 0.65f, 0.82f, stroke)
-        seg(colour, 0.65f, 0.82f, 0.70f, 0.30f, stroke)
-    }
+    Glyph(R.drawable.ic_trash, modifier, tint)
 
-/** Edit. A pencil with a visible nib, drawn at an angle so it does not read as a slash. */
+/** Edit. */
 @Composable
 fun GlyphEdit(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
-    GlyphBox(modifier, tint) { stroke, colour ->
-        seg(colour, 0.30f, 0.70f, 0.68f, 0.32f, stroke)
-        seg(colour, 0.60f, 0.24f, 0.76f, 0.40f, stroke)
-        seg(colour, 0.20f, 0.80f, 0.30f, 0.70f, stroke)
-        seg(colour, 0.20f, 0.80f, 0.36f, 0.76f, stroke)
-    }
+    Glyph(R.drawable.ic_pencil, modifier, tint)
 
-/** Lock. A squared shackle, deliberately not the rounded library shape. */
+/** Lock. The paywall's shape. */
 @Composable
 fun GlyphLock(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
-    GlyphBox(modifier, tint) { stroke, colour ->
-        seg(colour, 0.26f, 0.46f, 0.26f, 0.82f, stroke)
-        seg(colour, 0.26f, 0.82f, 0.74f, 0.82f, stroke)
-        seg(colour, 0.74f, 0.82f, 0.74f, 0.46f, stroke)
-        seg(colour, 0.74f, 0.46f, 0.26f, 0.46f, stroke)
-        seg(colour, 0.38f, 0.46f, 0.38f, 0.32f, stroke)
-        seg(colour, 0.38f, 0.32f, 0.62f, 0.32f, stroke)
-        seg(colour, 0.62f, 0.32f, 0.62f, 0.46f, stroke)
-    }
+    Glyph(R.drawable.ic_lock, modifier, tint)
 
-/** Export. An arrow leaving a tray — the action, not the destination app it happens to open. */
+/** Export. A file leaving the app, which is the action rather than the destination it opens. */
 @Composable
 fun GlyphExport(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
-    GlyphBox(modifier, tint) { stroke, colour ->
-        seg(colour, 0.50f, 0.70f, 0.50f, 0.20f, stroke)
-        seg(colour, 0.36f, 0.34f, 0.50f, 0.20f, stroke)
-        seg(colour, 0.50f, 0.20f, 0.64f, 0.34f, stroke)
-        seg(colour, 0.22f, 0.60f, 0.22f, 0.82f, stroke)
-        seg(colour, 0.22f, 0.82f, 0.78f, 0.82f, stroke)
-        seg(colour, 0.78f, 0.82f, 0.78f, 0.60f, stroke)
-    }
+    Glyph(R.drawable.ic_file_export, modifier, tint)
 
-/** A customer. Head and shoulders, which is what the operator is looking for in a row. */
+/** Share. The same document handed to any app that accepts one. */
+@Composable
+fun GlyphShare(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
+    Glyph(R.drawable.ic_share, modifier, tint)
+
+/** A customer. */
 @Composable
 fun GlyphCustomer(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
-    GlyphBox(modifier, tint) { stroke, colour ->
-        ring(colour, 0.50f, 0.32f, 0.15f, stroke)
-        seg(colour, 0.24f, 0.82f, 0.32f, 0.62f, stroke)
-        seg(colour, 0.32f, 0.62f, 0.68f, 0.62f, stroke)
-        seg(colour, 0.68f, 0.62f, 0.76f, 0.82f, stroke)
-    }
+    Glyph(R.drawable.ic_user, modifier, tint)
 
 /** Move up the round. */
 @Composable
 fun GlyphMoveUp(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
-    GlyphBox(modifier, tint) { stroke, colour ->
-        seg(colour, 0.26f, 0.60f, 0.50f, 0.36f, stroke)
-        seg(colour, 0.50f, 0.36f, 0.74f, 0.60f, stroke)
-        seg(colour, 0.50f, 0.36f, 0.50f, 0.80f, stroke)
-    }
+    Glyph(R.drawable.ic_arrow_up, modifier, tint)
 
 /** Move down the round. */
 @Composable
 fun GlyphMoveDown(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
-    GlyphBox(modifier, tint) { stroke, colour ->
-        seg(colour, 0.26f, 0.40f, 0.50f, 0.64f, stroke)
-        seg(colour, 0.50f, 0.64f, 0.74f, 0.40f, stroke)
-        seg(colour, 0.50f, 0.20f, 0.50f, 0.64f, stroke)
-    }
+    Glyph(R.drawable.ic_arrow_down, modifier, tint)
 
 /** Mowed. */
 @Composable
 fun GlyphMowed(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
-    GlyphBox(modifier, tint) { stroke, colour ->
-        seg(colour, 0.22f, 0.54f, 0.42f, 0.74f, stroke)
-        seg(colour, 0.42f, 0.74f, 0.80f, 0.28f, stroke)
-    }
+    Glyph(R.drawable.ic_check, modifier, tint)
 
 /** Skipped. */
 @Composable
 fun GlyphSkipped(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
-    GlyphBox(modifier, tint) { stroke, colour ->
-        seg(colour, 0.26f, 0.26f, 0.74f, 0.74f, stroke)
-        seg(colour, 0.74f, 0.26f, 0.26f, 0.74f, stroke)
-    }
+    Glyph(R.drawable.ic_x, modifier, tint)
 
-/**
- * Rained off. A cloud dome with rain under it, which is the weather rather than a generic warning —
- * the operator reads the reason, not an alarm.
- */
+/** Rained off. The weather, which is the reason, rather than a generic warning. */
 @Composable
 fun GlyphRain(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
-    GlyphBox(modifier, tint) { stroke, colour ->
-        drawArc(
-            color = colour,
-            startAngle = 180f,
-            sweepAngle = 180f,
-            useCenter = false,
-            topLeft = Offset(size.width * 0.22f, size.height * 0.18f),
-            size = Size(size.width * 0.56f, size.height * 0.40f),
-            style = Stroke(width = stroke, cap = StrokeCap.Round),
-        )
-        seg(colour, 0.34f, 0.52f, 0.28f, 0.74f, stroke)
-        seg(colour, 0.52f, 0.52f, 0.46f, 0.74f, stroke)
-        seg(colour, 0.70f, 0.52f, 0.64f, 0.74f, stroke)
-    }
+    Glyph(R.drawable.ic_cloud_rain, modifier, tint)
 
 /** A warning, for the cases that are neither weather nor a plain skip. */
 @Composable
 fun GlyphWarning(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
-    GlyphBox(modifier, tint) { stroke, colour ->
-        seg(colour, 0.50f, 0.16f, 0.86f, 0.80f, stroke)
-        seg(colour, 0.86f, 0.80f, 0.14f, 0.80f, stroke)
-        seg(colour, 0.14f, 0.80f, 0.50f, 0.16f, stroke)
-        seg(colour, 0.50f, 0.40f, 0.50f, 0.58f, stroke)
-        dot(colour, 0.50f, 0.69f, 0.045f)
-    }
+    Glyph(R.drawable.ic_alert_triangle, modifier, tint)
 
 /** A date, for the round's own day. */
 @Composable
 fun GlyphDate(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
-    GlyphBox(modifier, tint) { stroke, colour ->
-        seg(colour, 0.20f, 0.28f, 0.80f, 0.28f, stroke)
-        seg(colour, 0.80f, 0.28f, 0.80f, 0.82f, stroke)
-        seg(colour, 0.80f, 0.82f, 0.20f, 0.82f, stroke)
-        seg(colour, 0.20f, 0.82f, 0.20f, 0.28f, stroke)
-        seg(colour, 0.20f, 0.44f, 0.80f, 0.44f, stroke)
-        seg(colour, 0.36f, 0.16f, 0.36f, 0.32f, stroke)
-        seg(colour, 0.64f, 0.16f, 0.64f, 0.32f, stroke)
-        dot(colour, 0.36f, 0.62f, 0.055f)
-    }
+    Glyph(R.drawable.ic_calendar, modifier, tint)
 
-/**
- * Settings. Sliders rather than a gear: the gear is the shape every app in the store already has,
- * and this screen's job is to change a handful of real values, which is what a slider says.
- */
+/** Settings. Sliders, which is what this screen's job is. */
 @Composable
 fun GlyphSettings(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
-    GlyphBox(modifier, tint) { stroke, colour ->
-        seg(colour, 0.18f, 0.30f, 0.82f, 0.30f, stroke)
-        seg(colour, 0.18f, 0.50f, 0.82f, 0.50f, stroke)
-        seg(colour, 0.18f, 0.70f, 0.82f, 0.70f, stroke)
-        dot(colour, 0.40f, 0.30f, 0.085f)
-        dot(colour, 0.62f, 0.50f, 0.085f)
-        dot(colour, 0.30f, 0.70f, 0.085f)
-    }
+    Glyph(R.drawable.ic_adjustments_horizontal, modifier, tint)
 
 /** Information. */
 @Composable
 fun GlyphInfo(modifier: Modifier = Modifier, tint: Color = LocalContentColor.current) =
-    GlyphBox(modifier, tint) { stroke, colour ->
-        ring(colour, 0.50f, 0.50f, 0.33f, stroke)
-        dot(colour, 0.50f, 0.33f, 0.050f)
-        seg(colour, 0.50f, 0.45f, 0.50f, 0.68f, stroke)
-    }
+    Glyph(R.drawable.ic_info_circle, modifier, tint)
 
 /**
  * The whole set on one surface.
@@ -315,6 +184,7 @@ private fun GlyphSetPreview() {
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     GlyphExport()
+                    GlyphShare()
                     GlyphCustomer()
                     GlyphMoveUp()
                     GlyphMoveDown()

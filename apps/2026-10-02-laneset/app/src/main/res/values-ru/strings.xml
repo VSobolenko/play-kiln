@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Laneset's Russian words, key for key with values/strings.xml.
+
+  Android merges every file in values/ into one resource table, and scripts/core/policy.mjs compares
+  the two trees in both directions: a key here with no default, a default with no key here, or a
+  format argument in a different position is a failure rather than a silent fallback to English. The
+  file therefore mirrors the English tree exactly — the same preserved keys, the same home keys, the
+  same placeholders in the same order — and only the sentences differ.
+
+  The Russian is written rather than machine-translated, and the words are the ones a Russian pool
+  uses: вольный стиль, брасс, лопатки, колобашка, заминка. A stroke or a piece of gear stays lower
+  case because it is read mid-sentence in a set line, exactly as in the English tree.
+-->
+<resources>
+
+    <!-- The app's identity. The carrier is a brand and stays Latin; the idea line is the app's
+         own sentence and this screen does not rewrite it. -->
+    <string name="app_name" translatable="true">Laneset: Swim Set Builder</string>
+    <string name="app_idea" translatable="true">A swim set builder that computes each session from the swimmer\'s own constraints (minutes, pool length, focus, strokes to avoid, gear on deck) against authored programming rules, walks them through the two pace trials that put a target time on every interval, and prints or shares the set list; one-time unlock, offline, no account.</string>
+
+    <!-- Read by ui/PlayKilnApp.kt for the empty detail pane beside Home. -->
+    <string name="home_pick_section" translatable="true">Выберите раздел, чтобы открыть его здесь.</string>
+
+    <!-- Home's top bar and identity header. -->
+    <string name="home_title" translatable="true">Laneset</string>
+    <string name="home_tagline" translatable="true">Тренировка собирается по вашим условиям.</string>
+    <string name="home_about_action" translatable="true">О приложении</string>
+
+    <!-- Before anything is built. -->
+    <string name="home_empty_title" translatable="true">Пока ни одной тренировки</string>
+    <string name="home_empty_body" translatable="true">Выберите бассейн, время и направление, а затем соберите тренировку. У каждого отрезка будет целевое время.</string>
+
+    <!-- The generated session: the hero, the totals, the runner and the list. -->
+    <string name="home_session_header" translatable="true">Ваша тренировка</string>
+    <string name="home_block_headline" translatable="true">%1$d × %2$d м</string>
+    <string name="home_pace_value_default" translatable="true">Целевые времена рассчитаны по стандартному темпу приложения — %1$s /100 м. Два теста заменят его вашим.</string>
+    <string name="home_pace_value_yours" translatable="true">Целевые времена рассчитаны по вашему измеренному темпу.</string>
+    <string name="home_trials_action" translatable="true">Проплыть тесты 400 м и 200 м</string>
+    <string name="home_trials_locked_action" translatable="true">Открыть тест темпа</string>
+    <string name="home_stat_distance" translatable="true">Дистанция</string>
+    <string name="home_stat_time" translatable="true">Время</string>
+    <string name="home_stat_intervals" translatable="true">Отрезки</string>
+    <string name="home_stat_pace" translatable="true">Темп /100 м</string>
+    <!-- The unit formatters, in the same argument order as the English tree. -->
+    <string name="home_meters_value" translatable="true">%1$d м</string>
+    <string name="home_minutes_value" translatable="true">%1$d мин</string>
+    <string name="home_setlist_header" translatable="true">Вся тренировка</string>
+    <string name="home_setlist_supporting" translatable="true">У каждого отрезка есть целевое время — его видно по часам.</string>
+    <string name="home_discard_action" translatable="true">Удалить тренировку</string>
+
+    <!-- The runner. -->
+    <string name="home_runner_rep" translatable="true">Повтор %1$d из %2$d</string>
+    <string name="home_runner_progress" translatable="true">Блок %1$d из %2$d · повторов осталось: %3$d</string>
+    <string name="home_runner_back" translatable="true">Назад</string>
+    <string name="home_runner_next" translatable="true">Далее</string>
+    <string name="home_runner_complete" translatable="true">Это был последний повтор. Тренировка проплыта.</string>
+
+    <!-- One line of the set list. -->
+    <string name="home_block_line" translatable="true">%1$d × %2$d м %3$s</string>
+    <string name="home_block_target_rest" translatable="true">Цель %1$s · отдых %2$s</string>
+    <string name="home_block_gear" translatable="true">Инвентарь: %1$s</string>
+    <string name="home_section_totals" translatable="true">%1$d м · %2$s</string>
+
+    <!-- The constraints form. -->
+    <string name="home_constraints_header" translatable="true">Собрать тренировку</string>
+    <string name="home_pool_label" translatable="true">Длина бассейна</string>
+    <string name="home_minutes_label" translatable="true">Сколько минут</string>
+    <string name="home_focus_locked_note" translatable="true">Выносливость доступна бесплатно. Остальные направления входят в разовую покупку: их целевые времена считаются по темпу, который измеряют ваши два теста.</string>
+    <string name="home_stroke_avoid_label" translatable="true">Какие способы убрать</string>
+    <string name="home_strokes_supporting" translatable="true">Уберите то, что сегодня не идёт. Хотя бы один способ останется.</string>
+    <string name="home_gear_label" translatable="true">Инвентарь на бортике</string>
+    <string name="home_gear_supporting" translatable="true">Тренировка использует только то, что вы взяли.</string>
+    <string name="home_constraints_stale" translatable="true">Условия изменились. Соберите тренировку заново.</string>
+    <string name="home_build_action" translatable="true">Собрать тренировку</string>
+    <string name="home_rebuild_action" translatable="true">Собрать заново</string>
+
+    <!-- The handoff, and the one purchase. -->
+    <string name="home_handoff_header" translatable="true">Забрать в бассейн</string>
+    <string name="home_handoff_supporting" translatable="true">Отправьте список текстом или сохраните карточку для печати.</string>
+    <string name="home_handoff_locked" translatable="true">Отправка и печать готовой тренировки входят в разовую покупку.</string>
+    <string name="home_handoff_action" translatable="true">Отправить или напечатать</string>
+    <string name="home_import_action" translatable="true">Открыть тренировку тренера</string>
+    <string name="home_import_locked" translatable="true">Чтение тренировки, написанной тренером, входит в разовую покупку.</string>
+    <string name="home_unlock_action" translatable="true">Что даёт покупка</string>
+
+    <!-- A refused action, said in the page. -->
+    <string name="home_notice_keep_one_stroke" translatable="true">Нужен хотя бы один способ плавания. Верните один.</string>
+    <string name="home_notice_generation_failed" translatable="true">Из этих условий тренировка не собирается. Измените одно и соберите снова.</string>
+    <string name="home_notice_dismiss" translatable="true">Понятно</string>
+
+    <!-- The vocabulary the domain's enums are mapped onto. One key per constant. -->
+    <string name="home_section_warm_up" translatable="true">Разминка</string>
+    <string name="home_section_main_set" translatable="true">Основная часть</string>
+    <string name="home_section_cool_down" translatable="true">Заминка</string>
+    <string name="home_stroke_freestyle" translatable="true">вольный стиль</string>
+    <string name="home_stroke_backstroke" translatable="true">на спине</string>
+    <string name="home_stroke_breaststroke" translatable="true">брасс</string>
+    <string name="home_stroke_butterfly" translatable="true">баттерфляй</string>
+    <string name="home_stroke_medley" translatable="true">комплекс</string>
+    <string name="home_gear_kickboard" translatable="true">доска</string>
+    <string name="home_gear_pull_buoy" translatable="true">колобашка</string>
+    <string name="home_gear_fins" translatable="true">ласты</string>
+    <string name="home_gear_paddles" translatable="true">лопатки</string>
+    <string name="home_gear_snorkel" translatable="true">трубка</string>
+    <string name="home_focus_speed" translatable="true">Спринт</string>
+    <string name="home_focus_threshold" translatable="true">Порог</string>
+    <string name="home_focus_endurance" translatable="true">Выносливость</string>
+    <string name="home_focus_technique" translatable="true">Техника</string>
+    <string name="home_focus_recovery" translatable="true">Восстановление</string>
+
+    <!-- The focus chips carry the boundary inside the control. -->
+    <string name="home_focus_chip_free" translatable="true">%1$s · бесплатно</string>
+    <string name="home_focus_chip_locked" translatable="true">%1$s · по покупке</string>
+
+    <!-- The joiner between two pieces of gear, quoted so the space after the comma is preserved. -->
+    <string name="home_list_separator" translatable="true">", "</string>
+
+    <!-- The About surface. Not this screen's copy: Home only opens it. -->
+    <string name="about_title" translatable="true">Об этом приложении</string>
+    <string name="about_back" translatable="true">Назад</string>
+    <string name="about_body" translatable="true">%1$s собирает тренировку по вашим условиям — сколько у вас минут, длина бассейна, направление, способы плавания, которые нужно убрать, и инвентарь на бортике — и ставит целевое время на каждый отрезок. Два теста темпа, 400 м и 200 м, задают целевые времена по вашему темпу, а готовую тренировку можно отправить текстом или распечатать. Всё остальное открывается одной разовой покупкой: без подписки, без аккаунта и без интернета.</string>
+    <string name="about_privacy_note" translatable="true">Одна покупка — и всё, что вы сохраняете: тренировки, темп и настройки, — остаётся в памяти приложения на вашем устройстве. Сеть используется только для оплаты через Google Play, которая проводит разовую покупку; тренировка полностью собирается и без сигнала.</string>
+    <string name="about_privacy_policy_action" translatable="true">Открыть политику конфиденциальности</string>
+
+    <!-- Settings. Every preference here is read by code outside the settings screen. -->
+    <string name="settings_title" translatable="true">Настройки</string>
+    <string name="settings_back" translatable="true">Назад</string>
+    <string name="settings_appearance_header" translatable="true">Внешний вид</string>
+    <string name="settings_theme_supporting" translatable="true">Выберите, как выглядит приложение.</string>
+    <string name="settings_theme_system" translatable="true">Как в системе</string>
+    <string name="settings_theme_light" translatable="true">Светлая</string>
+    <string name="settings_theme_dark" translatable="true">Тёмная</string>
+    <string name="settings_dynamic_color_title" translatable="true">Цвета обоев</string>
+    <string name="settings_dynamic_color_supported" translatable="true">Построить палитру по обоям устройства.</string>
+    <string name="settings_dynamic_color_unsupported" translatable="true">Недоступно в этой версии Android.</string>
+    <string name="settings_language_header" translatable="true">Язык</string>
+    <string name="settings_language_title" translatable="true">Язык приложения</string>
+    <string name="settings_language_summary" translatable="true">Выберите язык, который использует приложение.</string>
+    <string name="settings_language_summary_legacy" translatable="true">Измените язык в настройках Android.</string>
+    <string name="settings_language_unavailable" translatable="true">На этом устройстве нет настроек языка для приложений.</string>
+    <string name="settings_behaviour_header" translatable="true">Поведение</string>
+    <string name="settings_haptics_title" translatable="true">Виброотклик</string>
+    <string name="settings_haptics_summary" translatable="true">Вибрировать при выполнении основного действия.</string>
+</resources>

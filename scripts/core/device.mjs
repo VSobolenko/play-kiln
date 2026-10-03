@@ -21,12 +21,19 @@
 // teach the operator to read past the row — the failure mode `harness/lessons.md` and
 // `docs/reviews/2026-09-29-factory-review-decisions.md` D6 both record.
 //
-// The important half is the cross-check. When the slot's debug APK exists, its sha256 is computed
-// and compared to the record's `apkSha256`; a disagreement means the record describes a *different*
-// build, which is the false pass `scripts/lib/apk-provenance.mjs` was written for: a stale install
-// reported as evidence about the current app. The artifact absent is not a defect — a slot in
-// development may record a run on a build that has since been cleaned — so that case PASSes with the
-// cross-check named as not run, rather than failing a stage the slot has not reached.
+// The important half decides whether the app under review is still the app that was tested. The unit
+// for that is the revision, not the artifact's bytes: a debug APK is not byte-reproducible across
+// builds, so comparing hashes alone reported an identical-source rebuild as a stale install and forced
+// a truthful record to be hand-edited after every rebuild. A record may therefore carry `buildDigest`
+// — the digest `scripts/lib/release-approval.mjs` computes over the slot's build inputs, **imported
+// here rather than re-implemented**, so a revision has one definition — and when it equals the current
+// digest the revision is unchanged and the record PASSes, whatever the artifact's bytes hash to. When
+// the digest differs, the app changed since the run and the record FAILs, naming the remedy. When the
+// record carries no `buildDigest` the artifact cross-check is still made, and a disagreement remains
+// the false pass `scripts/lib/apk-provenance.mjs` was written for: a stale install reported as
+// evidence about the current app. The artifact absent is not a defect — a slot in development may
+// record a run on a build that has since been cleaned — so that case PASSes with the cross-check named
+// as not run, rather than failing a stage the slot has not reached.
 //
 // What this cannot claim, stated rather than implied: it reads JSON and one APK. It can say a run
 // was recorded against a serial, that the record is well-formed, and that it names the build now on
@@ -37,6 +44,7 @@
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { sha256 } from '../lib/play-assets.mjs'
+import { releaseSourceDigest } from '../lib/release-approval.mjs'
 import { scratchDirFor } from '../lib/scratch.mjs'
 import { expectEqual, expectTrue, fail, guard, pass, ROOT, runFixtures, unverified, VERDICT } from './lib.mjs'
 
@@ -68,6 +76,24 @@ function describeValue(value) {
   if (typeof value === 'number' || typeof value === 'boolean') return `the ${typeof value} ${String(value)}`
   if (Array.isArray(value)) return `an array of ${value.length}`
   return `a ${typeof value}`
+}
+
+/**
+ * The 64-lowercase-hex rule for a digest-shaped field, shared by `apkSha256` and `buildDigest` so the
+ * two cannot drift apart. `noun` names what the digest is over, and every message is built from the
+ * offending value, matching the other fields' failures rather than restating the rule in prose.
+ */
+function hexDigestProblem(field, value, noun) {
+  if (typeof value !== 'string') {
+    return `${field} must be the 64-character lowercase hex sha256 of ${noun}; found ${describeValue(value)}`
+  }
+  if (value.length !== 64) {
+    return `${field} must be 64 lowercase hex characters; "${truncate(value)}" is ${value.length} character(s)`
+  }
+  if (!/^[0-9a-f]{64}$/.test(value)) {
+    return `${field} "${truncate(value)}" is 64 characters but is not lowercase hex; a sha256 uses only 0-9 and a-f, in lowercase`
+  }
+  return undefined
 }
 
 /**
@@ -111,21 +137,20 @@ function deviceRecordProblems(value) {
     )
   }
 
-  if (typeof value.apkSha256 !== 'string') {
-    problems.push(
-      'apkSha256 must be the 64-character lowercase hex sha256 of the installed artifact; found ' +
-        describeValue(value.apkSha256)
+  const apkSha256Problem = hexDigestProblem('apkSha256', value.apkSha256, 'the installed artifact')
+  if (apkSha256Problem) problems.push(apkSha256Problem)
+
+  // `buildDigest` is optional: a record written before this field existed, or one whose run predates a
+  // source change, may honestly carry none, and the artifact cross-check below still applies. When it
+  // is present it must be a sha256 exactly as `apkSha256` must, so a malformed digest is reported as
+  // the schema defect it is rather than being compared and read as a stale revision.
+  if (value.buildDigest !== undefined) {
+    const buildDigestProblem = hexDigestProblem(
+      'buildDigest',
+      value.buildDigest,
+      "the slot's build inputs"
     )
-  } else if (value.apkSha256.length !== 64) {
-    problems.push(
-      `apkSha256 must be 64 lowercase hex characters; "${truncate(value.apkSha256)}" is ` +
-        `${value.apkSha256.length} character(s)`
-    )
-  } else if (!/^[0-9a-f]{64}$/.test(value.apkSha256)) {
-    problems.push(
-      `apkSha256 "${truncate(value.apkSha256)}" is 64 characters but is not lowercase hex; a ` +
-        'sha256 uses only 0-9 and a-f, in lowercase'
-    )
+    if (buildDigestProblem) problems.push(buildDigestProblem)
   }
 
   if (typeof value.artifact !== 'string' || value.artifact.trim() === '') {
@@ -170,9 +195,12 @@ function deviceRecordProblems(value) {
  *     must not switch the check off.
  *   * **A record that does not satisfy its own schema is a defect, in full.** Every problem is
  *     reported, and each message is built from the offending value and the rule.
- *   * **A record about a different build is a defect.** When the slot's debug APK exists its sha256
- *     is computed and compared; a disagreement is the stale-install false pass
- *     `scripts/lib/apk-provenance.mjs` exists to prevent.
+ *   * **A record about a different revision is a defect, and a rebuild of the same revision is not.**
+ *     When the record carries a `buildDigest` it is compared to the slot's current build-input digest:
+ *     a difference is a `FAIL` naming the changed app, and an equality is a `PASS` whose verdict the
+ *     revision carries — even when the artifact's bytes differ, because a debug build is not
+ *     byte-reproducible. With no `buildDigest`, the artifact sha256 cross-check stands, and a
+ *     disagreement is the stale-install false pass `scripts/lib/apk-provenance.mjs` exists to prevent.
  */
 export function deviceChecks(slotDir) {
   return [
@@ -205,11 +233,60 @@ export function deviceChecks(slotDir) {
         `${value.observations.length} observation(s)`
 
       const apk = path.join(slotDir, ...DEBUG_APK_PARTS)
-      if (!existsSync(apk)) {
+      const artifactBuilt = existsSync(apk)
+
+      // The revision the record names, when it named one. This is deliberately not the artifact's
+      // bytes: an identical-source rebuild produces a different debug APK, so the hash alone reported
+      // a truthful record as a stale install. `releaseSourceDigest` is the same digest the release
+      // approval is bound to, imported rather than copied, so the two cannot disagree about what a
+      // revision is.
+      if (value.buildDigest !== undefined) {
+        const current = releaseSourceDigest(slotDir)
+        if (current.digest !== value.buildDigest) {
+          return fail(
+            'slot.device',
+            `${rel(file)} records buildDigest ${value.buildDigest.slice(0, 12)}… but the slot's ` +
+              `build inputs now digest to ${current.digest.slice(0, 12)}…. The app changed since ` +
+              'the run, so the record describes a revision that no longer exists. Drive the journey ' +
+              'again on the attached phone against the current revision and record a new run ' +
+              'against it.'
+          )
+        }
+        const revisionFact =
+          `buildDigest ${value.buildDigest.slice(0, 12)}… matches the slot's current build inputs, ` +
+          'so the revision is the one that was tested'
+        if (!artifactBuilt) {
+          return pass(
+            'slot.device',
+            `${summary}; ${revisionFact}; no ${rel(apk)} is built, so the artifact's bytes were not ` +
+              'cross-checked'
+          )
+        }
+        const actual = sha256(apk)
+        if (actual === value.apkSha256) {
+          return pass(
+            'slot.device',
+            `${summary}; ${revisionFact}; apkSha256 also matches ${rel(apk)} as built`
+          )
+        }
+        return pass(
+          'slot.device',
+          `${summary}; ${revisionFact}. This verdict is carried by the revision digest, not by the ` +
+            `artifact-hash cross-check: the recorded apkSha256 ${value.apkSha256.slice(0, 12)}… ` +
+            `differs from ${rel(apk)}, which hashes to ${actual.slice(0, 12)}…, because a debug ` +
+            'build is not byte-reproducible. The bytes differ while the build inputs do not, so this ' +
+            'is a rebuild of the revision that was tested rather than a stale install.'
+        )
+      }
+
+      if (!artifactBuilt) {
         return pass(
           'slot.device',
           `${summary}; no ${rel(apk)} is built, so the recorded apkSha256 was not cross-checked ` +
-            'against a build on disk — the check makes that comparison once the artifact exists'
+            'against a build on disk — the check makes that comparison once the artifact exists. ' +
+            "This record names no buildDigest, so an identical-source rebuild will still be read as " +
+            "a stale install: record the revision's buildDigest to make a rebuild of the same " +
+            'revision stop invalidating the record.'
         )
       }
 
@@ -218,10 +295,11 @@ export function deviceChecks(slotDir) {
         return fail(
           'slot.device',
           `${rel(file)} records apkSha256 ${value.apkSha256.slice(0, 12)}… but ${rel(apk)} hashes ` +
-            `to ${actual.slice(0, 12)}…. A record about a different build is a stale install ` +
-            'reported as evidence about the current app, which is the defect ' +
-            'scripts/lib/apk-provenance.mjs exists to prevent. Reinstall the current debug APK ' +
-            'and record the run against it.'
+            `to ${actual.slice(0, 12)}…. Drive the journey again on the attached phone and record a ` +
+            "new run against this build, or record the revision's buildDigest so a rebuild of " +
+            'identical source stops invalidating the record. A record about a different build is a ' +
+            'stale install reported as evidence about the current app, which is the defect ' +
+            'scripts/lib/apk-provenance.mjs exists to prevent.'
         )
       }
 
@@ -342,6 +420,75 @@ export function deviceFixtures() {
     ])
 
     cases.push([
+      'RULE buildDigest names the tested revision — a rebuild that changed the APK bytes but not the build inputs PASSes, and the byte difference is reported',
+      () => {
+        const dir = freshDir('digest-match-apk-diff')
+        const apk = writeArtifact(dir, Buffer.from('kiln fixture artifact bytes, rebuilt from the same source\n'))
+        // The digest is the shared function's own reading of this fixture tree, taken with the
+        // artifact in place and the record absent (the record is excluded from the digest, so it does
+        // not matter) — so a PASS proves the comparison is a comparison rather than a constant.
+        const buildDigest = releaseSourceDigest(dir).digest
+        const actual = sha256(apk)
+        expectTrue(actual !== 'e'.repeat(64), 'the fixture artifact already hashes to the recorded value')
+        writeRecord(dir, validRecord({ apkSha256: 'e'.repeat(64), buildDigest }))
+        const verdict = verdictOf(dir)
+        expectEqual(verdict.verdict, VERDICT.PASS, `verdict (${verdict.detail})`)
+        expectTrue(
+          verdict.detail.includes(buildDigest.slice(0, 12)),
+          `the revision digest was not named: ${verdict.detail}`
+        )
+        expectTrue(
+          verdict.detail.includes('carried by the revision digest'),
+          `the verdict was not attributed to the revision: ${verdict.detail}`
+        )
+        expectTrue(
+          verdict.detail.includes(actual.slice(0, 12)),
+          `the differing artifact hash was not reported: ${verdict.detail}`
+        )
+      }
+    ])
+
+    cases.push([
+      "RULE buildDigest names the tested revision — a digest that no longer matches the slot's build inputs FAILs, naming the changed app",
+      () => {
+        const dir = freshDir('digest-different')
+        writeArtifact(dir, Buffer.from('kiln fixture artifact bytes\n'))
+        writeRecord(dir, validRecord({ buildDigest: 'c'.repeat(64) }))
+        const verdict = verdictOf(dir)
+        expectEqual(verdict.verdict, VERDICT.FAIL, `verdict (${verdict.detail})`)
+        expectTrue(
+          verdict.detail.includes('The app changed since the run'),
+          `the changed build inputs were not named: ${verdict.detail}`
+        )
+        expectTrue(
+          verdict.detail.includes('Drive the journey again'),
+          `the re-run remedy was not named: ${verdict.detail}`
+        )
+      }
+    ])
+
+    cases.push([
+      'RULE no buildDigest leaves the artifact cross-check in force — a hash that disagrees names BOTH remedies, not one',
+      () => {
+        const dir = freshDir('no-digest-hash-mismatch')
+        const apk = writeArtifact(dir, Buffer.from('kiln fixture artifact bytes, no digest recorded\n'))
+        const actual = sha256(apk)
+        expectTrue(actual !== 'd'.repeat(64), 'the fixture artifact already hashes to the recorded value')
+        writeRecord(dir, validRecord({ apkSha256: 'd'.repeat(64) }))
+        const verdict = verdictOf(dir)
+        expectEqual(verdict.verdict, VERDICT.FAIL, `verdict (${verdict.detail})`)
+        expectTrue(
+          verdict.detail.includes('Drive the journey again on the attached phone'),
+          `the on-device re-run remedy was not named: ${verdict.detail}`
+        )
+        expectTrue(
+          verdict.detail.includes("record the revision's buildDigest"),
+          `the buildDigest remedy was not named: ${verdict.detail}`
+        )
+      }
+    ])
+
+    cases.push([
       'RULE observations is an array of at least 3 non-empty strings — an empty array FAILs',
       () => {
         const dir = freshDir('observations-empty')
@@ -409,6 +556,26 @@ export function deviceFixtures() {
         expectTrue(
           verdict.detail.includes('is 6 character(s)'),
           `the length found was not shown: ${verdict.detail}`
+        )
+      }
+    ])
+
+    cases.push([
+      'RULE buildDigest, when present, is 64 lowercase hex characters like apkSha256 — a non-hex value FAILs, showing what was found',
+      () => {
+        const dir = freshDir('build-digest-not-hex')
+        const found = 'z'.repeat(64)
+        writeRecord(dir, validRecord({ buildDigest: found }))
+        const verdict = verdictOf(dir)
+        expectEqual(verdict.verdict, VERDICT.FAIL, `verdict (${verdict.detail})`)
+        expectTrue(verdict.detail.includes('buildDigest'), `the field was not named: ${verdict.detail}`)
+        expectTrue(
+          verdict.detail.includes('not lowercase hex'),
+          `the hex rule was not stated: ${verdict.detail}`
+        )
+        expectTrue(
+          verdict.detail.includes(found),
+          `the value found was not shown: ${verdict.detail}`
         )
       }
     ])

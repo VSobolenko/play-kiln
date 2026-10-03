@@ -1,0 +1,80 @@
+---
+description: Every application is authored inside an OpenSpec change, and the scaffold refuses to create a slot without one; harness configuration is the only work outside a spec
+globs: apps/**,openspec/**
+alwaysApply: true
+---
+
+# A slot is born inside a specification
+
+The owner's rule: **every application is written inside a specification — an OpenSpec change — and
+any change without one is forbidden, except harness work.** The rule is the boundary on what a slot
+*is*, so it is stated once here and cited everywhere else rather than restated.
+
+It was violated on 2026-10-02: `apps/2026-10-02-laneset/` existed **with code** while
+`openspec/changes/` held no change for it. The mechanism was mechanical, not deliberate. The three
+recorded contracts a slot already needed — `economics.json`, `differentiators.json` and `naming.json`
+— were each required by `scripts/new-slot.mjs`, validated before any file was written, and refused by
+name when missing. **Nothing asked for a specification**, so a slot was born outside the spec the
+owner required and every gate still returned `PASS`, because every gate read the contracts it had been
+built from and none read the one that was absent.
+
+## The rule
+
+- **Every slot is created and built inside an OpenSpec change, authored by the planner before any app
+  code exists.** The change lives at `openspec/changes/<change-name>/` and the slot's own change is
+  `app-<slug>`. It carries a `proposal.md`, a `tasks.md` and at least one delta spec
+  (`specs/<capability>/spec.md`); the shape is the existing `openspec/changes/app-lawn-round-log/`.
+  The change is authored with the **`openspec-propose`** skill and is checked with
+  `openspec validate <change-name>`; a change that does not validate is not a specification.
+- **The scaffold refuses without it.** `scripts/new-slot.mjs` takes `--spec <change-name>`
+  (defaulting to `app-<slug>`) and **refuses before it writes anything** when
+  `openspec/changes/<spec>/` is missing, or lacks `proposal.md`, `tasks.md` or a `specs/**/spec.md`.
+  The refusal fires before `mkdirSync`, because a slot directory that exists at all is half of the
+  defect the rule prevents — the point is not to detect the violation afterwards but to make the
+  ungoverned slot impossible to create. The refusal names the exact path it expected and the exact
+  remedy.
+- **The change stays live from scaffold to archive.** It is not a proposal written and forgotten: it
+  is the specification the slot is built against, and it is the artifact a later reader checks the
+  app against.
+- **A killed or abandoned change is archived without merging its delta spec.** The rule and its
+  instance list are stated in `AGENTS.md` ("A change whose capability was killed is archived without
+  merging its delta spec") — that half is cited here, not restated, because the CLI only performs the
+  merge and the distinction between a completed and a killed change is where the corruption lives.
+- **Harness configuration is the one exception, and it is narrow.** Work on the factory itself —
+  `scripts/**`, `.cursor/**`, `harness/**`, `docs/**`, `scaffold/**`, the registry — is outside the
+  rule, because the factory is not one of its own slots and a change for every harness edit would
+  make the harness unmaintainable. Nothing else is exempt: not "a small app", not "a prototype", not
+  "the change would take as long as the code". A slot that is worth building is worth specifying.
+
+## What is banned
+
+- Creating a slot before its change exists, in any order — including scaffolding first and "writing
+  the spec afterwards", because a specification written after the app only describes what was built.
+- Adding application code to a slot whose change is absent, archived, or has never validated.
+- Treating the change as optional paperwork, or importing the rule's *shape* (a proposal file) while
+  leaving `tasks.md` or the delta spec out.
+- Invoking the harness exception for anything under `apps/**`. The exception is for the factory, and
+  `apps/**` is what the factory makes.
+
+## How it is verified
+
+- **`slot.spec`** is the enforcement: the check reads a slot for its originating change — the slot's
+  declaration and the change under `openspec/changes/` — and fails when it is absent or malformed. It
+  joins `scripts/new-slot.mjs`'s refusal, which is the *pre-creation* half: the scaffold cannot write
+  a slot without a change, and the check reports one that got in some other way.
+- **The scaffold refusal is the load-bearing half**, and it is stronger than any check that reads an
+  existing slot, because it fires before the directory exists.
+- Evidence and claims discipline are `.cursor/rules/verification-discipline.mdc` (a check that cannot
+  fail is not a check) and `.cursor/rules/grounded-claims.mdc` (no claim without a source), cited
+  rather than restated: this rule adds a boundary, not a second copy of how a boundary is proved.
+
+### The honest limit
+
+`slot.spec` proves a specification **exists and is well-formed**. It cannot prove the app matches it —
+that the `tasks.md` were done, that the delta spec describes the shipped behaviour, or that the code
+was written against the change rather than the change written around the code. A slot can hold a
+valid, empty specification and pass. The judgement that the app is the app the specification
+describes stays with the **owner at checkpoint 1**, alongside the money, naming and promise
+decisions, exactly as the other contracts' honest limits state. What the gate removes is the
+*unnoticed* ungoverned slot — the one that never had a specification at all, and was therefore never
+asked what it was for.

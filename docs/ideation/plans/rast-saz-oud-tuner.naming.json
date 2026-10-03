@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "title": "Rast: Saz & Oud Tuner",
+  "slug": "rast-saz-oud-tuner",
+  "applicationId": "com.gexetr.rastsazoudtuner",
+  "archetype": "carrier_job_noun",
+  "candidates": [
+    {
+      "name": "Rast: Saz & Oud Tuner",
+      "archetype": "carrier_job_noun",
+      "score": 84,
+      "why": "An ownable carrier (Rast, the foundational makam) plus the real job noun users type; at 21 characters it fits every declared locale and the name states the two instruments the app serves."
+    },
+    {
+      "name": "Perde: Makam Tuner",
+      "archetype": "borrowed_foreign_word",
+      "score": 74,
+      "why": "Perde is the Turkish makam fret and interval, exact to the job and meaningless to a generic tuner, but it transliterates into an unfortunate stem in Russian and so loses the localisation dimension."
+    },
+    {
+      "name": "Quartertone",
+      "archetype": "coined",
+      "score": 63,
+      "why": "A single compact word that names the microtonal job and is easy to type, but it says nothing about saz or oud and a lone English word is a weaker carrier outside one locale."
+    },
+    {
+      "name": "Fine Tuner",
+      "archetype": "descriptive",
+      "score": 49,
+      "why": "It describes accuracy honestly, but tuner is the overcrowded head term owned by a 50M-install leader and the plain phrase collides with the whole fortress."
+    },
+    {
+      "name": "Tuner",
+      "archetype": "descriptive",
+      "score": 9,
+      "why": "The negative control: a bare category noun that spends Play's strongest ranking field on the exact term the category leader already owns and gives a user nothing to prefer."
+    },
+    {
+      "name": "Cherry Tuner",
+      "archetype": "eponymous",
+      "score": 24,
+      "why": "It borrows the flavour of CherrySoft, which already ships the 1M+ baglama and 500K+ oud tuners, so a near-name invites confusion and a trust and policy risk."
+    }
+  ],
+  "rejected": [
+    {
+      "name": "Tuner",
+      "reason": "A bare category noun and the gate's negative control: it competes for the head term a 50M+ install leader already owns and tells a player nothing about saz, oud or the makam."
+    },
+    {
+      "name": "Makam Tuner",
+      "reason": "The measured query maqam tuner is a fortress polluted by Quran-recitation homonyms, so the word buys the wrong audience for a microtonal instrument tuner."
+    },
+    {
+      "name": "Tembra",
+      "reason": "It near-collides with Temba, Tembera and Teambra on the visible shelf, so a name heard once cannot be typed reliably and fails the radio test."
+    }
+  ],
+  "searchPhrases": [
+    "saz tuner",
+    "baglama tuner",
+    "oud tuner",
+    "quarter tone tuner",
+    "maqam tuner"
+  ],
+  "audience": "Saz and baglama players and oud players across Turkey, the Balkans, the Caucasus and the Middle East and their diaspora, plus students of makam music who need the microtonal intervals rather than equal temperament.",
+  "rationale": "The pocket's two 1M+ incumbents sit at only 4.2 and 4.4 stars and the 500K+ oud tuner at 4.1, so a name that claims the microtonal, ad-free, one-price job can be preferred without fighting the generic tuner fortress for its head term. Rast is the foundational makam, so the carrier is specific to this music and ownable, while the trailing job noun carries the exact query terms saz and oud.",
+  "collisionCheck": "node scripts/scan-market.mjs --query 'rast tuner' returned mixed with guard partial and no app titled Rast on the visible page; the alternatives were screened too: perde tuner was rejected for its Russian transliteration, koma tuner because Koma reads as coma in Russian, and tembra for the near-collisions Temba, Tembera and Teambra. UNVERIFIED: a class 9 trademark screen of Rast was not run.",
+  "localisationCheck": "en-US title is 21 characters and ru-RU is 22 characters, both inside Play's 30-character cap with at least 8 characters of slack, so the carrier plus job noun survives the longest declared locale. Neither translation is machine-generated and the carrier Rast is kept untranslated as the brand.",
+  "evidence": "docs/ideation/2026-10-02-niche-real-time-tools.md#6-name-derivation",
+  "localizedTitles": {
+    "en-US": "Rast: Saz & Oud Tuner",
+    "ru-RU": "Rast: Тюнер саза и уда"
+  }
+}

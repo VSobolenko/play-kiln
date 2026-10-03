@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Laneset adaptive icon. It is a composition of three resources, not an image:
+  `ic_launcher_background` (the pool field), `ic_launcher_foreground` (`mark-clock`) and
+  `ic_launcher_monochrome` (the same mark flattened for Android 13+ themed icons).
+
+  All three are authored here rather than rendered, and all three derive from `store/studio.json`'s
+  `mark`, so the launcher icon, the store icon and the in-app `BrandMark` are one shape. The mark's
+  outermost ink is 31.00dp from the centre - on the circle keyline, 2dp inside the 66dp safe zone -
+  so no launcher mask crops it; `python scripts/check-adaptive-icon.py` is the measurement.
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_background" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <monochrome android:drawable="@drawable/ic_launcher_monochrome" />
+</adaptive-icon>

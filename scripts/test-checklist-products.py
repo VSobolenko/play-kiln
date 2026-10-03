@@ -13,7 +13,9 @@ The legs below hold two things at once, and the second matters as much as the fi
 - **A billing slot names the real ID.** The checklist must name the exact `ProductId("...")` string
   the slot's Kotlin declares, so an ID cannot be invented at upload time. The extractor is exercised
   on a real Kotlin file, both quote styles, a de-duplicated multi-product slot, a non-literal
-  reference and a generated copy under `build/` that must NOT parse.
+  reference, the constant form (`const val ..._PRODUCT_ID = "..."`) with and without a `: String`
+  annotation, a string constant *not* named like a product id, and a generated copy under `build/`
+  that must NOT parse.
 - **A non-billing slot names nothing.** A generator that sprayed these steps at every slot would
   teach the human to skim the list, and would tell a slot about products it does not sell.
 
@@ -87,6 +89,16 @@ SOURCE_RELATIVE = Path("app/src/main/java/com/gexetr/testapp/monetization/Moneti
 def literal(product_id: str, quote: str = '"') -> str:
     """A Kotlin declaration line, as a slot would write it."""
     return f"val PRODUCT = ProductId({quote}{product_id}{quote})"
+
+
+def constant_literal(product_id: str, *, annotated: bool = True) -> str:
+    """The other shape a slot uses: the id named once as a constant a later reader can grep.
+
+    The name carries `PRODUCT_ID` on purpose - that name, not the string value, is what tells this
+    reader the constant is a product id.  `annotated` flips the optional `: String` annotation.
+    """
+    annotation = ": String " if annotated else " "
+    return f'const val GAME_PRODUCT_ID{annotation}= "{product_id}"'
 
 
 def make_slot(declarations: list[str], *, billing: bool, extra_sources: dict | None = None):
@@ -187,6 +199,39 @@ check(
     "a non-literal ProductId(...) reference is not parsed as a product ID",
 )
 
+# The other shape: the id named once as a constant. `laneset` declares its product this way, so the
+# scanner has to read it or a billing slot is reported as selling nothing. Both typed and inferred
+# declarations must be found.
+slot, store, _ = make_slot([constant_literal("laneset_unlock")], billing=True)
+found = kit.declared_product_ids(slot)
+check(
+    found == ["laneset_unlock"],
+    f"a const val PRODUCT_ID with a String annotation is read as a product ID (got {found})",
+)
+
+slot, store, _ = make_slot([constant_literal("coins_pack", annotated=False)], billing=True)
+found = kit.declared_product_ids(slot)
+check(
+    found == ["coins_pack"],
+    f"a const val PRODUCT_ID without a type annotation is read too (got {found})",
+)
+
+# ... and the name is the whole predicate, so a constant that is not named like a product id must
+# not fire - even when its value looks like one.
+slot, store, _ = make_slot(['val GREETING = "hello"'], billing=True)
+found = kit.declared_product_ids(slot)
+check(
+    found == [],
+    f"a string constant not named like a product id is not a product (got {found})",
+)
+
+slot, store, _ = make_slot(['val UNLOCK = "laneset_unlock"'], billing=True)
+found = kit.declared_product_ids(slot)
+check(
+    found == [],
+    f"a product-looking value under a non-product name is not a product (got {found})",
+)
+
 # A generated copy is not source: reading `app/build/` would let stale code add a console product.
 slot, store, _ = make_slot(
     [literal("real_unlock")],
@@ -271,6 +316,24 @@ text = checklist_text(store)
 check(
     "`alpha_pack`" in text and "`zeta_unlock`" in text,
     "a multi-product slot's checklist names every declared ID",
+)
+
+# The constant shape reaches the checklist too, and both shapes de-duplicate into one set.
+slot, store, _ = make_slot([constant_literal("laneset_unlock")], billing=True)
+text = checklist_text(store)
+check(
+    "`laneset_unlock`" in text,
+    "a constant-form product ID is named in the checklist",
+)
+
+slot, store, _ = make_slot(
+    [constant_literal("harbour_unlock"), literal("harbour_unlock")],
+    billing=True,
+)
+found = kit.declared_product_ids(slot)
+check(
+    found == ["harbour_unlock"],
+    f"a constant and a ProductId naming one id are de-duplicated (got {found})",
 )
 
 # The generator is deterministic: the same slot regenerated produces the same checklist.

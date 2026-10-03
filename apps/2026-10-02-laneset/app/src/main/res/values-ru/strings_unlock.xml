@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The single-price unlock surface, Russian.
+
+  The key set is identical to `values/strings_unlock.xml`; a key present in one tree and not the other
+  is a failure `scripts/core/policy.mjs` reports in both directions. The price note names no number for
+  the same reason the English note does not: the localized price is shown by Google Play itself.
+-->
+<resources>
+    <string name="unlock_title" translatable="true">Открыть</string>
+    <string name="unlock_back" translatable="true">Назад</string>
+
+    <string name="unlock_hero_label" translatable="true">Одна покупка, а не подписка</string>
+    <string name="unlock_lede" translatable="true">Laneset можно использовать бесплатно. Одна покупка открывает остальное, и оно остаётся вашим.</string>
+
+    <string name="unlock_includes_header" translatable="true">Покупка открывает</string>
+    <string name="unlock_benefit_focuses" translatable="true">Все остальные виды тренировок: спринт, порог, техника и восстановление</string>
+    <string name="unlock_benefit_pace_test" translatable="true">Пошаговый тест темпа на 400 и 200 метров</string>
+    <string name="unlock_benefit_import" translatable="true">Импорт тренировки тренера</string>
+    <string name="unlock_benefit_handoff" translatable="true">Отправка и печать готового комплекса</string>
+
+    <string name="unlock_purchase_label" translatable="true">Платёж</string>
+    <string name="unlock_purchase_value" translatable="true">Разовый</string>
+    <string name="unlock_subscription_label" translatable="true">Подписка</string>
+    <string name="unlock_subscription_value" translatable="true">Нет</string>
+    <string name="unlock_no_renewal" translatable="true">Без подписки, без пробного периода и без продления. Вы платите один раз и сохраняете покупку.</string>
+    <string name="unlock_price_note" translatable="true">Google Play покажет точную цену в вашей валюте на экране подтверждения перед оплатой.</string>
+
+    <string name="unlock_buy" translatable="true">Открыть всё приложение</string>
+    <string name="unlock_purchasing" translatable="true">Открываем Google Play…</string>
+    <string name="unlock_action_restore" translatable="true">Восстановить покупку</string>
+    <string name="unlock_action_retry" translatable="true">Повторить</string>
+
+    <string name="unlock_owned_title" translatable="true">Открыто</string>
+    <string name="unlock_owned_body" translatable="true">Вам доступно всё приложение: все виды тренировок, пошаговый тест темпа и импорт тренировки тренера.</string>
+
+    <string name="unlock_connecting" translatable="true">Подключение к Google Play…</string>
+    <string name="unlock_unavailable_title" translatable="true">Google Play недоступен</string>
+    <string name="unlock_unavailable_body" translatable="true">Не удалось связаться с магазином, поэтому покупку сейчас нельзя оформить. Бесплатная тренировка на выносливость по-прежнему работает.</string>
+
+    <string name="unlock_notice_cancelled" translatable="true">Оплата не прошла — вы закрыли экран Google Play.</string>
+    <string name="unlock_notice_failed" translatable="true">Покупка не завершилась. Можно попробовать снова.</string>
+    <string name="unlock_notice_unavailable" translatable="true">Не удалось начать покупку. Повторите через минуту.</string>
+    <string name="unlock_notice_not_restored" translatable="true">Google Play не нашёл покупку для этой учётной записи.</string>
+
+    <string name="unlock_account_note" translatable="true">Покупка привязана к учётной записи Google на этом устройстве. После переустановки войдите в ту же учётную запись и нажмите «Восстановить покупку».</string>
+</resources>

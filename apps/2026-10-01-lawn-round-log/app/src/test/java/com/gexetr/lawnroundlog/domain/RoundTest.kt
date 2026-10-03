@@ -178,6 +178,22 @@ class RoundTest {
     }
 
     @Test
+    fun correctingAPastPaymentKeepsItsDateAndChangesTheBalanceByTheDifference() {
+        val state = RoundState(
+            customers = listOf(customer("ada")),
+            visits = listOf(Visit(Round.visitId("ada", "2026-10-05"), "ada", "2026-10-05", VisitStatus.MOWED, 100.0)),
+        )
+        val paid = Round.setPayment(state, "ada", "2026-10-06", 40.0)
+
+        val corrected = Round.setPayment(paid, "ada", "2026-10-06", 25.0)
+
+        assertEquals(1, corrected.payments.size)
+        assertEquals("2026-10-06", corrected.payments.single().dateIso)
+        assertEquals(25.0, corrected.payments.single().amountUsd, 0.0001)
+        assertEquals(75.0, Balance.balanceFor(corrected, "ada"), 0.0001)
+    }
+
+    @Test
     fun owedByCustomerListsOnlyUnsettledCustomersInRoundOrder() {
         val state = RoundState(
             customers = listOf(customer("b", position = 1), customer("a", position = 0)),

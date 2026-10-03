@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_repeat_sales",
+  "payingUser": "A tabletop game master who already pays for DM tooling: 8 of 8 enriched worldbuilding incumbents declare in-app purchases, the 500K+ category leader runs ads plus IAP, and the adjacent name generator earns 4.8 stars over 7,300 reviews.",
+  "paidUnit": "A permanent themed content pack that adds an authored library of scene parts in one genre; the base app already ships a complete core library, so a pack buys more worlds rather than access to the feature.",
+  "priceUsd": 2.99,
+  "momentOfPayment": "After the first generated scene, when the user presses Keep to pin that scene to the session board; generation is never interrupted, and the pack is what is sold.",
+  "distinctnessSentence": "One press returns a whole runnable scene instead of a single table result, every part names its source table and re-rolls in place, the scene stays on the device so nothing is uploaded or server-deleted, no advertisement covers a roll, and the library is bought as permanent packs rather than rented.",
+  "evidenceRef": "docs/research/2026-10-02-generator-and-creative-evidence.md#4-the-pocket-enriched-by-hand-demand-is-proven-the-generator-tier-is-weak",
+  "day1RevenuePath": "A game master generates a scene in the first session, presses Keep, and buys the 2.99 USD base unlock at that moment; a second themed pack follows when the campaign moves to another genre.",
+  "killCriteria": {
+    "windowDays": 90,
+    "minInstalls": 6150,
+    "minRevenueUsd": 900
+  },
+  "assumptionsUnverified": [
+    "No conversion reading exists: the arithmetic is a threshold, not a forecast, and only a dated Play Console reading through check-outcomes.mjs can decide it.",
+    "The shelf monetizes by in-app purchase, but nothing measured shows any incumbent selling genre packs; the repeat unit is this plan's own design and is untested.",
+    "The 5-6 agent hour estimate assumes the authored library stays in scope; a larger library than planned is the main schedule risk and the core promise is there to catch it.",
+    "The name passed a Play search only; no trademark register was screened, so no legal clearance exists."
+  ]
+}

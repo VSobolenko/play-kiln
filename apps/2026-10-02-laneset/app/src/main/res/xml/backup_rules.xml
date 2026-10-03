@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Legacy fullBackupContent equivalent for API 30 and lower (this slot's minSdk is 26). Keep
+         its data scope in sync with both sections of data_extraction_rules.xml. -->
+    <include domain="sharedpref" path="." />
+    <include domain="file" path="." />
+    <include domain="database" path="." />
+    <!-- Everything the app persists through DataStore lives under files/datastore/. The settings
+         are device-local, and the one-time unlock is re-established with Play on a fresh install
+         rather than migrated, so nothing there belongs in a backup or a restore. -->
+    <exclude domain="file" path="datastore/" />
+    <exclude domain="sharedpref" path="secrets.xml" />
+    <exclude domain="sharedpref" path="auth_tokens.xml" />
+    <exclude domain="file" path="secrets/" />
+    <exclude domain="file" path="tokens/" />
+    <exclude domain="database" path="secrets.db" />
+    <exclude domain="database" path="tokens.db" />
+</full-backup-content>

@@ -136,7 +136,7 @@ export const EXCLUSION_REASONS = {
   'not-read-by-the-build':
     'no task of the build opens it, so it cannot change the compiled bytes or what signs them; the factory scripts that do read it decide a plan or render a document, and those run outside Gradle',
   'the-record-itself':
-    'it is the approval record being checked, and hashing it would make writing a record change the digest that record states'
+    'it is a record that is written and then checked — `release-approval.json` for the approval, `device-verification.json` for the on-device run — and hashing it would make writing the record change the digest that record states'
 }
 
 export const EXCLUSION_CRITERION =
@@ -147,6 +147,11 @@ export const EXCLUSION_CRITERION =
 /** Which reason each excluded name is excluded for: the list, keyed by name. */
 export const EXCLUDED_FILE_REASONS = new Map([
   [APPROVAL_FILENAME, 'the-record-itself'],
+  // The on-device run record is excluded for the same reason as the approval: `slot.device` checks it,
+  // and a record that stores the revision's `buildDigest` must not be part of the digest it stores.
+  // It is named `RECORD_NAME` in `scripts/core/device.mjs`; there is no cycle to import it from here,
+  // because `device.mjs` imports this module for `releaseSourceDigest`.
+  ['device-verification.json', 'the-record-itself'],
   ['.kiln-state.json', 'machine-local'],
   // The SDK root and the upload key's path and password: this machine's, not the app's.
   ['local.properties', 'machine-local'],

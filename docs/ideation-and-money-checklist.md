@@ -71,11 +71,20 @@ of the plan is `node scripts/check-economics.mjs --slot <slug>`.
       is recorded in `apps/<slot>/capabilities.json` before the idea is approved. Rules:
       `.cursor/rules/ideation-gate.mdc`, `.cursor/rules/client-secrets.mdc`.
 
-### Q10. Is buildability scored, not discovered?
+### Q10. Is buildability scored, not discovered — and are the device capabilities declared?
 
-- [ ] The proposal gives a build estimate in agent hours and names the shape it chose on purpose: no
-      server, no account, no dangerous permission, no camera, no ML, offline by construction. Rule:
-      `.cursor/rules/ideation-gate.mdc`.
+- [ ] The proposal gives a build estimate in agent hours and names the shape it chose on purpose.
+- [ ] The proposal declares, one line per capability in a `## Device capabilities` section, which of
+      the twelve device capabilities the job uses and which it does not — so a job that needs nothing
+      from the phone says so on purpose rather than by silence, and a job that needs the camera, the
+      microphone, the sensors, location or a widget is a stated choice rather than an omission.
+- [ ] Every `used` capability names the API the slot would call, what the job loses without it, and
+      the permission it needs. The Android Photo Picker (`ActivityResultContracts.PickVisualMedia`)
+      needs no runtime permission, so using it costs nothing against permission minimisation while a
+      capability that does need a permission must say so. Rules: `docs/ideation/README.md`;
+      `.cursor/rules/ideation-gate.mdc` § "Budget: about one hour, not eight" — where a local and
+      free capability is not a cost and the things to avoid are a server, an account, a paid API, ML
+      that needs a server, and a runtime permission that buys nothing.
 
 ### Q11. Is the wall-clock number an estimate, or a target presented as a result?
 

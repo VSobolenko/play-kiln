@@ -101,6 +101,10 @@ fun CustomerRoute(
     }
 
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
+    // The payment waiting on the same confirmation the setting promises. Held as the payment id, not
+    // the object, so the state survives a configuration change; the amount is looked up when the
+    // dialog is built.
+    var confirmRemovePaymentId by rememberSaveable { mutableStateOf<String?>(null) }
     var paymentText by rememberSaveable { mutableStateOf("") }
 
     val balance = existing?.let { state.balances[it.id] } ?: 0.0
@@ -120,7 +124,7 @@ fun CustomerRoute(
         modifier = Modifier
             .fillMaxSize()
             .windowInsetsPadding(
-                WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+                WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal),
             )
             .imePadding(),
     ) {
@@ -243,8 +247,16 @@ fun CustomerRoute(
                         paymentText = ""
                     },
                     onRemove = { payment ->
-                        buzz()
-                        round.removePayment(payment)
+                        // "Ask before a customer, visit or payment is removed" is a preference the
+                        // History screen honours and this screen honoured for the customer only.
+                        // Leaving the payment path unconditional made one setting true on one screen
+                        // and false on another, which is the defect the preference exists to prevent.
+                        if (settings.confirmBeforeDelete) {
+                            confirmRemovePaymentId = payment.id
+                        } else {
+                            buzz()
+                            round.removePayment(payment)
+                        }
                     },
                     currencySymbol = settings.currencySymbol,
                 )
@@ -288,6 +300,41 @@ fun CustomerRoute(
             },
             dismissButton = {
                 TextButton(onClick = { confirmDelete = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+        )
+    }
+
+    val removingPayment = confirmRemovePaymentId?.let { id ->
+        state.record.payments.firstOrNull { it.id == id }
+    }
+    if (removingPayment != null) {
+        // Same shape as the customer dialog: the amount and the date are in the sentence, because a
+        // bare "Delete this?" under a thumb that has scrolled names nothing the user can check.
+        AlertDialog(
+            onDismissRequest = { confirmRemovePaymentId = null },
+            title = { Text(stringResource(R.string.delete_confirm_title)) },
+            text = {
+                Text(
+                    stringResource(
+                        R.string.payment_remove_confirm_body,
+                        formatAmount(settings.currencySymbol, removingPayment.amountUsd),
+                        removingPayment.dateIso,
+                    ),
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        confirmRemovePaymentId = null
+                        buzz()
+                        round.removePayment(removingPayment)
+                    },
+                ) { Text(stringResource(R.string.action_delete)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmRemovePaymentId = null }) {
                     Text(stringResource(R.string.action_cancel))
                 }
             },

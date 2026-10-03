@@ -8,8 +8,8 @@ can be checked against it. Nothing here is a substitute for the owner's approval
 is a program: the console ladder is a recorded runbook, not code.
 
 **Markers.** `[human]` — an action only the owner may take. `[console]` — a console action a person
-or an agent performs. `[verify]` — a read-only check. Exactly two steps are `[human]`; they are
-listed again in §10.
+or an agent performs. `[verify]` — a read-only check. Exactly one step is `[human]` — the
+store-graphics upload; it is listed again in §10.
 
 **Sources.** `docs/play-publishing-playbook.md` §5.1 (the live walk), the archived console model
 `docs/play-console-observations.json` — the frozen body of the deleted `scripts/lib/console-form.json`,
@@ -23,14 +23,23 @@ marked *an archived reading; no program reads this file* —
 While any dashboard task is open, nothing in the submission flow is reachable and the submit button
 stays disabled. Clearing these three is what enables it.
 
-### A. The two first-publication declarations `[human]`
+### A. The two first-publication declarations `[console]`
+
+The agent ticks these two **only when the slot carries a recorded release approval**. The approval is
+the human checkpoint — the owner reviews the plan and the policies before the initial publication and
+says so in his own words — and the clicks are not themselves the checkpoint. The owner's decision,
+recorded 2026-10-03: «В нашем заводе есть правило, что перед публикацией необходимо одобрение
+владельца. Собственно говоря, в то время и я проверяю проверку всех вот этих политик, и только после
+моего одобрения я говорю разрешить публикацию. Поэтому, если я разрешил публикацию, значит эти
+галочки можно уже автоматически нажимать. Потому что все проверки необходимые для публикации
+проводятся до начальной публикации всего приложения.»
 
 - [ ] `Панель управления` (`.../app-dashboard`) → dialog `Заявки`: tick
       `Подтвердить, что приложение соответствует Правилам программы для разработчиков`.
 - [ ] Tick `Принять экспортное законодательство США`.
-- [ ] These are the owner's own legal attestations, accepted **once per app** rather than per
-      release. No field of the store pack carries them; do not infer them from a slot's
-      capabilities or its pack.
+- [ ] These are accepted **once per app** rather than per release, and the agent performs them only
+      under the recorded approval above. No field of the store pack carries them; do not infer them
+      from a slot's capabilities or its pack.
 - [ ] In the observed run both were already ticked and the dialog's primary button was disabled —
       that disabled button is the evidence that nothing remained to save there.
 
@@ -61,9 +70,11 @@ stays disabled. Clearing these three is what enables it.
 
 - [ ] `Контент приложения → Политика конфиденциальности` (`.../app-content/privacy-policy`), field
       `URL политики конфиденциальности`, carries the slot's `listing.privacyPolicyUrl`.
-- [ ] The URL must be a **hosted HTTPS URL the owner controls**; `privacyPolicyUrl` has no default.
-      Which hosts count as unfinished placeholders is stated once in
-      `.cursor/rules/project-conventions.mdc`.
+- [ ] The URL is **published by the factory, not obtained from the owner**:
+      `node scripts/publish-privacy.mjs --slot <slug>` renders `store/privacy.md` to a real public
+      HTTPS page during development and records it — `docs/privacy-policy-hosting.md`,
+      `.cursor/rules/privacy-policy.mdc`. Which hosts count as unfinished placeholders is stated once
+      in `.cursor/rules/project-conventions.mdc`.
 - [ ] The same policy must be reachable **from inside the app**. The console's own prose on that
       page reads: `Следует разместить ссылку на политику конфиденциальности на странице
       приложения в Google Play и в самом приложении, даже если оно не предназначено для детей и не
@@ -385,7 +396,7 @@ it blocks nothing.
 
 ---
 
-## 10. What stays human — exactly two steps
+## 10. What stays human — one step, and the declarations the agent now performs
 
 Every other step of this ladder is console-mandatory and unattended: an agent may walk it when the
 owner has directed it and is observing. What an agent may do on its own initiative — and what it may
@@ -397,10 +408,12 @@ never do without an instruction — is stated once in `.cursor/rules/authorizati
    limitation and not as a policy.** A human — or a driver that owns the file chooser — performs this
    step and nothing else.
 2. **The two first-publication declarations (§1.A)** — `Правила программы для разработчиков` and
-   `Экспортное законодательство США`. These are the owner's own attestations, accepted **once per
-   app** rather than per release. The export declaration is a certification about encryption the app
-   uses: every slot uses encryption whether or not it imports crypto code, and the **annual BIS
-   self-classification question is an open obligation**, not settled law.
+   `Экспортное законодательство США` — are performed by the **agent**, not the owner, once the slot
+   carries a recorded release approval: the approval is the human checkpoint, and the click is not.
+   They are accepted **once per app** rather than per release. The export declaration is a
+   certification about encryption the app uses: every slot uses encryption whether or not it imports
+   crypto code, and the **annual BIS self-classification question is an open obligation**, not
+   settled law.
 
 The release approval itself (checkpoint 2) precedes this ladder: the agent has already installed the
 debug APK on the connected phone and exercised the app itself, the handoff carries its observed

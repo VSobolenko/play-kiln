@@ -180,8 +180,12 @@ hours**. So the target and the practice are about fivefold apart, and that gap i
   the captures synthetic
   in `store/review-notes.md`.
 - Run staging gates with `--skip-build` and do the single authoritative `--build` at the end.
-- Cut scope, not verification: fewer screens and a narrower job decided **before** the build, never a
-  skipped gate at the end.
+- Cut scope, not verification: fewer screens and a **smaller surface** decided **before** the build,
+  never a skipped gate at the end — and never a narrower **job**. This line used to read "a narrower
+  job", and the owner's measured outcome was raw apps: a gradebook that only adds and deletes a
+  student, a calculator that only calculates. The surface narrows; the job does not. The handoffs
+  (`.cursor/rules/app-depth.mdc`) are what make a job finishable, and cutting them is how a slot
+  becomes a demo.
 
 What that means for how you spend the time:
 

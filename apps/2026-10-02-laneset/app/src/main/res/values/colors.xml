@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      The pre-Compose window background.
+
+      It is one value with one job: the colour the window is painted the instant the activity is
+      created, before Compose has drawn a frame. It is the light scheme's own `background` role —
+      `Color.kt`'s `DeckPaper` — so the window never flashes a colour the theme does not paint, which
+      is what makes the first frame invisible rather than a flicker.
+
+      There is deliberately no seed colour here. A "seed" is a value a Material colour algorithm is
+      fed, and this slot derives its palette by hand from its own subject rather than from a seed, so
+      a `playkiln_seed` in this file would be a name that lies about where the colours come from.
+      The identity itself lives in `store/studio.json` and in `ui/theme/Color.kt`, which is the one
+      source of truth `scripts/core/palette.mjs` compares the pack against.
+    -->
+    <color name="playkiln_window_background">#F4FBFD</color>
+</resources>

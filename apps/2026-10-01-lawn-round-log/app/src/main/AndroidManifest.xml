@@ -5,10 +5,29 @@
          without a reason, and never enable cleartext traffic.
 
          This slot declares no uses-permission element of its own. The round, its visit history
-         and its balances are local files, and the only thing that ever needs the network is the
-         Google Play purchase, which the `billing` capability binds to the Play Store app and which
-         contributes no permission of its own. Whether the merged manifest of the built artifact
-         stays permission-free is measured from that artifact, not asserted here. -->
+         and its balances are local files, and nothing the operator types is ever uploaded.
+
+         The MERGED manifest of the built artifact is NOT permission-free, and this is the measured
+         reading rather than a guess. `aapt2 dump permissions` on the signed release APK prints
+         com.android.vending.BILLING, the AndroidX-generated
+         DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION, android.permission.ACCESS_NETWORK_STATE and
+         android.permission.INTERNET. The two network permissions are contributed by
+         com.google.android.datatransport, a transitive dependency of Play Billing (billing-ktx
+         9.1.0), which uploads the purchase event through the Play Store. They are declared by the
+         library, not chosen here, and no runtime permission is ever requested of the operator.
+         store/data-safety.md carries the same four-permission reading.
+
+         The app does NOT declare android:localeConfig, and this is deliberate. The owner pressed the
+         settings row expecting a screen inside the app where he picks the language, and the platform
+         route cannot give him one on this device: below Android 13 there is no per-app language
+         picker at all, so the honest system route degrades to the app-info page. The app therefore
+         owns the language itself through the AndroidX backport (AppCompat, hosted in an
+         AppCompatActivity, autoStoreLocales), which on Android 13+ writes the same framework store
+         the system would. `.cursor/rules/app-settings.mdc` accepts an in-app picker on exactly one
+         condition — that no android:localeConfig is declared — because a second, system-side control
+         for one value is how an app ends up in a language nobody chose. `res/xml/locales_config.xml`
+         is kept, but only as the app's own list of the languages it ships: it is the picker's data,
+         not a promise to the system. -->
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -16,7 +35,6 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:localeConfig="@xml/locales_config"
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -31,6 +49,40 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- The Share half of the CSV export: a content Uri for one file the app has just written
+             to its own cache. Exported=false because nothing outside the app may query it and
+             grantUriPermissions=true because the receiving app is handed a read grant for the one
+             document the operator chose to send. The authority is the slot's own applicationId,
+             so two slots can never collide on it, and it requires no permission of any kind. -->
+        <!-- The authority is built from the applicationId the build installed, not written out, so
+             the release package and the `.debug` variant each register their own provider. A literal
+             authority would make the debug package claim the release package's provider and the
+             installer would refuse it (INSTALL_FAILED_CONFLICTING_PROVIDER), which is exactly what
+             happened when this slot's debug build was first installed beside its release build.
+             `fileProviderAuthority()` in ui/history/HistoryViewModel.kt spells the same expression. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <!-- The AndroidX per-app language backport. On API 26-32 AppCompat stores the languages the
+             user chose and re-applies them before the first composition, so a restart opens in the
+             chosen language instead of flashing the system default first. disabled because the
+             service is a metadata holder the library reads, never a component that runs. -->
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
     </application>
 
 </manifest>

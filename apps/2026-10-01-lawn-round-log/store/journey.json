@@ -1,0 +1,215 @@
+{
+  "schemaVersion": 1,
+  "locale": "en-US",
+  "_comment": "Six-shot journey for the Lawn Round Log store screenshots, replayed by scripts/media-capture.mjs and framed by scripts/store/render.py. Every coordinate was measured from the live view hierarchy (`adb -s R58MB3SGZVL exec-out uiautomator dump /dev/tty`) of the signed release build (com.gexetr.lawnroundlog, versionName 0.1.0, versionCode 1, dist/lawn-round-log-0.1.0-1-release.apk) installed on a physical Samsung Galaxy A40 (SM-A405FM), 1080x2340 / 480dpi, Android 11, device language en-US. No coordinate below was estimated from a screenshot, and none was carried over from another slot.",
+  "_why_locale_is_declared": "Every expectation below is the literal text of a node, and Android resolves those strings against the *device's* language rather than the listing's. media-capture compares this value against `am get-config` before it takes the capture lock, so a phone in another language is refused in seconds instead of failing every reading in every shot. The device reported `en-rUS` when this journey was authored.",
+  "_why_the_setup_lives_in_shot_01": "media-capture runs `pm clear` before the first shot, so a capture cannot inherit a scene: the round the screenshots show has to be built by the run itself. The scene is three customers with their addresses, entered through the app's own New-customer screen; shot-01 is taken once the app is back on the day list. Shots 02-06 are navigation and one mark, not setup.",
+  "_why_the_setup_adds_three_and_not_one": "The round's own card is about 470 px tall inside a list viewport of about 785 px, so exactly one card is fully in frame with the hero and the strip above it. Three customers are what makes the *order* claim visible: the second card's name is in frame behind the first card's move-up and move-down buttons, and the hero's customer count reads the round rather than a single stop.",
+  "_why_the_addresses_are_typed_and_the_rates_are_not": "The address is a second `text` step per customer because the card draws it under the name and a round of three blank rows photographs as a form rather than as a round. The rate field is deliberately left at the app's own pre-filled 40.00 in all three: a `clear` step is one adb invocation per key press, and editing a pre-filled amount is the one place where a partially-deleted default would silently corrupt a reading instead of failing it. Every amount this journey asserts (40.00 owed, and the hero's 40.00) is therefore the app's own arithmetic over the rate it pre-fills, which is why the money reading is 40.00 and not a value typed anywhere.",
+  "_why_the_marked_customer_moves_out_of_the_default_tab": "The day list opens on its 'Due today' tab, and 'Due today' is `Round.dueOn`: every active customer with no visit recorded for the day. Marking a visit therefore removes that customer from the default tab, which is the app working rather than a journey bug — so shot-02 taps the strip's second item, 'Whole round' (`Round.ordered`), where the marked card stays visible with its status pill. Both items' clickable bounds were read from the hierarchy rather than from their labels: 'Due today' is [48,623][411,767] and 'Whole round' is [435,623][852,767] at 1080x2340.",
+  "_why_the_push_dialog_is_shot_03_and_confirmed_in_shot_04": "The action the pack's third caption names is one dialog deep, and the dialog is the only screen that states what the action does — 'Every customer still due today is recorded as rained off and moves forward by exactly one day.' So shot-03 photographs the dialog itself, and shot-04's first step confirms it, which is what puts the two 'Rained off' rows and the '3 entries' count in shot-05's ledger. The confirm coordinate is the dialog's own Confirm button, read from the dialog's dump.",
+  "_why_no_shot_scrolls_to_an_offset": "The list is scrolled to an *extreme* rather than to a mid-position wherever a frame needs the top card: a swipe that starts at the top is a no-op, so the offset is a property of the content rather than of a fling's velocity, and the frame is reproducible. The swipes below travel downward (finger from y=950 to y=1450), which returns the list toward its first card.",
+  "_why_every_reading_is_self_identifying": "Every expectation names a field, and for a reading that the app itself computes — 'Total owed', '$40.00', '3 entries', 'Mowed' — the field is the node's own text, anchored with ^...$. That is the strongest form available for a computed result or a list row: a plain string is accepted only inside an editable input, so a bare 'Total owed' with no field could never match a label anyway. Regex metacharacters in the values are escaped (the currency sign and the periods), because an unescaped '.' in a label pattern matches any character and would let a near-miss node satisfy the reading. A plain 'Total owed' expectation is deliberately absent: the app is compared by a regex, and a value that appears in two places (the hero's tile and a customer screen's own section heading) is a weaker claim than one that appears once.",
+  "_why_the_export_shot_shows_a_lock": "MEASURED FINDING, recorded here so the pack does not have to be read alongside a chat report. The release build is the real free-tier build: the History screen's header draws its single action from `if (unlocked) { GlyphExport; GlyphShare } else { GlyphLock }` (ui/history/HistoryScreen.kt), and on the installed artifact that action is one clickable 144x144 px `android.view.View` at [912,110][1056,254] (48 dp, centre 984,182) whose child node carries content-desc 'Unlock the app' at [948,146][1020,218]. Tapping it was observed to open the Unlock screen, not to write or send a file. The CSV export — Save through `ActivityResultContracts.CreateDocument(\"text/csv\")` and Share through `ACTION_SEND` — is therefore unreachable without making the one-time purchase, and shot-05 photographs the ledger and the locked door as the shipped build genuinely shows them rather than a screen a free user cannot reach. The pack's fifth caption ('Every visit on the record: the ledger is free, the CSV export unlocks once') and the fifth studio headline ('Every visit, on the record') were written for this frame: they describe the ledger the free build shows and name the export as the thing the unlock adds, so neither promises an action this screenshot cannot show. This journey does not, and must not, install the debug build, stub a purchase or photograph an unlocked state to satisfy them. shot-06 is the other half of the same fact: it is the screen that lock opens.",
+  "_why_the_unlock_price_is_readable_without_a_purchase": "The unlock screen was opened on the installed release build without any purchase being made, and it renders its own three bullets, the price label and the price ('$9.99') from the app's resources and the locally configured product. No purchase, restore, or Play Billing dialog is triggered by this journey: shot-06 stops at the screen that offers the purchase and never taps 'Unlock'. Leaving the billing flow untouched is also what keeps the device's Play account out of the capture.",
+  "_why_the_waits_are_what_they_are": "The runner waits one second after launching the app and then executes steps back to back. Compose needs longer than that to draw the day list on a cold start, so shot-01 opens with a 9000 ms wait; every screen change in this journey is followed by 1.4-1.8 s, which is the observed draw time for the day list, the customer record and the ledger on this device. The waits are load-bearing, not padding.",
+  "_why_there_are_no_clear_steps": "A `clear` step is one adb invocation per key press. Every field this journey types into arrives empty — the New-customer screen's Name and Address are blank on a first run, and media-capture's `pm clear` is what guarantees it — so there is no pre-filled value to delete and no clear step in the file.",
+  "_preconditions": [
+    "Target the release build. The debug variant carries a .debug applicationId suffix and would photograph a package that never ships, and media-capture refuses a DEBUGGABLE install itself: node scripts/prepare-release.mjs --slot lawn-round-log is already staged as dist/lawn-round-log-0.1.0-1-release.apk, then adb install -r dist/lawn-round-log-0.1.0-1-release.apk",
+    "A physical device at 1080x2340 / 480dpi with the app's language set to English (en-US), because every reading below is English copy. The device must not be asleep: a locked screen swallows the taps and the first shot then fails with an empty hierarchy.",
+    "The app must be a first run. media-capture enforces this itself with `pm clear`, so the empty round the setup builds on cannot be inherited from an earlier run, and it retries 'ime disable' until the enabled list is empty because a live keyboard autocorrects typed values and rescrolls the form.",
+    "No purchase is made by this journey and none is needed for five of the six frames. The free tier holds up to eight customers, so the three the setup adds are inside it.",
+    "The one frame the free tier cannot show is the export: shot-05 photographs the History ledger with the header's lock, which is the export's own door on this build. See _why_the_export_shot_shows_a_lock above.",
+    "The tablet assets are composed from these same phone captures rather than captured on a tablet device, because no tablet device is attached; Play treats large-screen assets as a claim about the large-screen experience, so this phone-framed status is disclosed in store/review-notes.md instead of being passed off as a tablet capture."
+  ],
+  "supportedStepTypes": {
+    "tap": { "x": 540, "y": 1200 },
+    "swipe": { "x1": 540, "y1": 950, "x2": 540, "y2": 1450, "durationMs": 400 },
+    "wait": { "ms": 750 },
+    "text": { "value": "example text" },
+    "clear": { "count": 4 },
+    "back": {}
+  },
+  "shots": [
+    {
+      "name": "shot-01",
+      "title": "The round in your order",
+      "body": "Build the round, then the day list: three customers in the order the operator drives them, each with a position chip, a move-up and move-down control, and the three outcomes one tap away.",
+      "expect": [
+        { "value": "Total owed", "field": { "label": "^Total owed$" } },
+        { "value": "$0.00", "field": { "label": "^\\$0\\.00$" } },
+        { "value": "Customers", "field": { "label": "^Customers$" } },
+        { "value": "Due today", "field": { "label": "^Due today$" } },
+        { "value": "Whole round", "field": { "label": "^Whole round$" } },
+        { "value": "The Baileys", "field": { "label": "^The Baileys$" } },
+        { "value": "12 Elm Road", "field": { "label": "^12 Elm Road$" } },
+        { "value": "Rate per visit $40.00", "field": { "label": "^Rate per visit \\$40\\.00$" } },
+        { "value": "M. Turner", "field": { "label": "^M\\. Turner$" } }
+      ],
+      "steps": [
+        { "type": "wait", "ms": 9000 },
+
+        { "type": "tap", "x": 588, "y": 1708 },
+        { "type": "wait", "ms": 1400 },
+        { "type": "tap", "x": 540, "y": 558 },
+        { "type": "wait", "ms": 700 },
+        { "type": "text", "value": "The Baileys" },
+        { "type": "wait", "ms": 500 },
+        { "type": "tap", "x": 540, "y": 797 },
+        { "type": "wait", "ms": 700 },
+        { "type": "text", "value": "12 Elm Road" },
+        { "type": "wait", "ms": 500 },
+        { "type": "tap", "x": 969, "y": 182 },
+        { "type": "wait", "ms": 1800 },
+
+        { "type": "tap", "x": 588, "y": 1708 },
+        { "type": "wait", "ms": 1400 },
+        { "type": "tap", "x": 540, "y": 558 },
+        { "type": "wait", "ms": 700 },
+        { "type": "text", "value": "M. Turner" },
+        { "type": "wait", "ms": 500 },
+        { "type": "tap", "x": 540, "y": 797 },
+        { "type": "wait", "ms": 700 },
+        { "type": "text", "value": "4 Mill Lane" },
+        { "type": "wait", "ms": 500 },
+        { "type": "tap", "x": 969, "y": 182 },
+        { "type": "wait", "ms": 1800 },
+
+        { "type": "tap", "x": 588, "y": 1708 },
+        { "type": "wait", "ms": 1400 },
+        { "type": "tap", "x": 540, "y": 558 },
+        { "type": "wait", "ms": 700 },
+        { "type": "text", "value": "K. Nowak" },
+        { "type": "wait", "ms": 500 },
+        { "type": "tap", "x": 540, "y": 797 },
+        { "type": "wait", "ms": 700 },
+        { "type": "text", "value": "9 Chapel Street" },
+        { "type": "wait", "ms": 500 },
+        { "type": "tap", "x": 969, "y": 182 },
+        { "type": "wait", "ms": 1800 },
+
+        { "type": "swipe", "x1": 540, "y1": 950, "x2": 540, "y2": 1450, "durationMs": 400 },
+        { "type": "wait", "ms": 500 },
+        { "type": "swipe", "x1": 540, "y1": 950, "x2": 540, "y2": 1450, "durationMs": 400 },
+        { "type": "wait", "ms": 800 }
+      ]
+    },
+    {
+      "name": "shot-02",
+      "title": "One tap at the kerb",
+      "body": "Mark the visit mowed with the card's first control, then look at the whole round: the card keeps a Mowed pill and the hero's total rises by the customer's rate.",
+      "expect": [
+        { "value": "The Baileys", "field": { "label": "^The Baileys$" } },
+        { "value": "Mowed", "field": { "label": "^Mowed$" } },
+        { "value": "Total owed", "field": { "label": "^Total owed$" } },
+        { "value": "$40.00", "field": { "label": "^\\$40\\.00$" } },
+        { "value": "12 Elm Road", "field": { "label": "^12 Elm Road$" } },
+        { "value": "Rate per visit $40.00", "field": { "label": "^Rate per visit \\$40\\.00$" } },
+        { "value": "M. Turner", "field": { "label": "^M\\. Turner$" } },
+        { "value": "Whole round", "field": { "label": "^Whole round$" } }
+      ],
+      "steps": [
+        { "type": "tap", "x": 162, "y": 1247 },
+        { "type": "wait", "ms": 1600 },
+
+        { "type": "tap", "x": 643, "y": 695 },
+        { "type": "wait", "ms": 1500 },
+
+        { "type": "swipe", "x1": 540, "y1": 950, "x2": 540, "y2": 1450, "durationMs": 400 },
+        { "type": "wait", "ms": 500 },
+        { "type": "swipe", "x1": 540, "y1": 950, "x2": 540, "y2": 1450, "durationMs": 400 },
+        { "type": "wait", "ms": 800 }
+      ]
+    },
+    {
+      "name": "shot-03",
+      "title": "Rained off? Push the whole round one day",
+      "body": "The one bulk action on the round, and the dialog that explains it before it moves anything: every customer still due today is recorded as rained off and moves forward exactly one day.",
+      "expect": [
+        { "value": "Push the round by one day", "field": { "label": "^Push the round by one day$" } },
+        { "value": "Every customer still due today is recorded as rained off and moves forward by exactly one day. Use this when the weather takes the morning.", "field": { "label": "^Every customer still due today is recorded as rained off and moves forward by exactly one day\\. Use this when the weather takes the morning\\.$" } },
+        { "value": "Cancel", "field": { "label": "^Cancel$" } },
+        { "value": "Confirm", "field": { "label": "^Confirm$" } }
+      ],
+      "steps": [
+        { "type": "tap", "x": 540, "y": 1882 },
+        { "type": "wait", "ms": 1500 }
+      ]
+    },
+    {
+      "name": "shot-04",
+      "title": "See who still owes you, customer by customer",
+      "body": "Confirm the rain push, then open the first customer: the record carries the running balance the mowed visits built, beside the address and the rate the amount came from.",
+      "expect": [
+        { "value": "The Baileys", "field": { "label": "^The Baileys$" } },
+        { "value": "Balance", "field": { "label": "^Balance$" } },
+        { "value": "$ 40.00", "field": { "label": "^\\$ 40\\.00$" } },
+        { "value": "Details", "field": { "label": "^Details$" } },
+        { "value": "12 Elm Road", "field": { "label": "^12 Elm Road$" } },
+        { "value": "Rate per visit", "field": { "label": "^Rate per visit$" } },
+        { "value": "Used to pre-fill the amount for this customer.", "field": { "label": "^Used to pre-fill the amount for this customer\\.$" } }
+      ],
+      "steps": [
+        { "type": "tap", "x": 831, "y": 1379 },
+        { "type": "wait", "ms": 1800 },
+
+        { "type": "swipe", "x1": 540, "y1": 950, "x2": 540, "y2": 1450, "durationMs": 400 },
+        { "type": "wait", "ms": 500 },
+        { "type": "swipe", "x1": 540, "y1": 950, "x2": 540, "y2": 1450, "durationMs": 400 },
+        { "type": "wait", "ms": 700 },
+
+        { "type": "tap", "x": 774, "y": 1001 },
+        { "type": "wait", "ms": 1800 }
+      ]
+    },
+    {
+      "name": "shot-05",
+      "title": "Keep your own copy: the whole record, exportable",
+      "body": "The ledger the round writes, newest first: every visit with its outcome and the amount it left owed, correctable in place. The header's single action is the lock, because export and share are what the one-time unlock buys.",
+      "expect": [
+        { "value": "History", "field": { "label": "^History$" } },
+        { "value": "3 entries", "field": { "label": "^3 entries$" } },
+        { "value": "All", "field": { "label": "^All$" } },
+        { "value": "Visits", "field": { "label": "^Visits$" } },
+        { "value": "Payments", "field": { "label": "^Payments$" } },
+        { "value": "The Baileys", "field": { "label": "^The Baileys$" } },
+        { "value": "Mowed", "field": { "label": "^Mowed$" } },
+        { "value": "$40.00 owed", "field": { "label": "^\\$40\\.00 owed$" } },
+        { "value": "K. Nowak", "field": { "label": "^K\\. Nowak$" } },
+        { "value": "Rained off", "field": { "label": "^Rained off$" } },
+        { "value": "$0.00 owed", "field": { "label": "^\\$0\\.00 owed$" } },
+        { "value": "M. Turner", "field": { "label": "^M\\. Turner$" } }
+      ],
+      "steps": [
+        { "type": "back" },
+        { "type": "wait", "ms": 1500 },
+
+        { "type": "tap", "x": 169, "y": 2096 },
+        { "type": "wait", "ms": 1800 }
+      ]
+    },
+    {
+      "name": "shot-06",
+      "title": "Free for eight customers, unlocked once",
+      "body": "The round's own unlock door: one payment of $9.99 for unlimited customers and the CSV export, with no subscription and no renewal. The visit history and the per-customer balances are free at every tier and are deliberately not part of the purchase.",
+      "expect": [
+        { "value": "Unlock the app", "field": { "label": "^Unlock the app$" } },
+        { "value": "The free app holds up to 8 customers, and keeps every visit and every balance you record. Unlocking lifts that limit and adds the CSV export.", "field": { "label": "^The free app holds up to 8 customers, and keeps every visit and every balance you record\\. Unlocking lifts that limit and adds the CSV export\\.$" } },
+        { "value": "As many customers as you need", "field": { "label": "^As many customers as you need$" } },
+        { "value": "CSV export through the system file picker", "field": { "label": "^CSV export through the system file picker$" } },
+        { "value": "One payment", "field": { "label": "^One payment$" } },
+        { "value": "$9.99", "field": { "label": "^\\$9\\.99$" } },
+        { "value": "One payment. No subscription and no renewal.", "field": { "label": "^One payment\\. No subscription and no renewal\\.$" } },
+        { "value": "Unlock", "field": { "label": "^Unlock$" } },
+        { "value": "Restore purchase", "field": { "label": "^Restore purchase$" } }
+      ],
+      "steps": [
+        { "type": "back" },
+        { "type": "wait", "ms": 1500 },
+
+        { "type": "tap", "x": 415, "y": 2086 },
+        { "type": "wait", "ms": 2500 }
+      ]
+    }
+  ]
+}

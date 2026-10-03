@@ -1,0 +1,208 @@
+---
+description: The depth contract — a slot carries the user's whole job (before, during, after), not only the record-keeping middle, and at least one shipped claim is a handoff
+alwaysApply: true
+---
+
+# A job is finished, not started
+
+The owner's report, recorded 2026-10-02, after nearly two slots: **"we get a raw app that can do only
+one thing."** His examples are exact. A teacher's gradebook creates, edits and deletes students and
+nothing else. A calculator calculates and nothing else. **"Where is the saving, where is the search,
+where are the engineering functions?"** He is not asking for more features for their own sake: he is
+saying that every app the factory has handed him is technically functional and *still not something a
+professional would keep*. His words: *"I want quality apps, and quality matters to me more than the
+feature count."*
+
+This is a defect with a name and measured evidence, in `docs/research/2026-10-02-app-depth-anatomy.md`
+and `docs/research/2026-10-02-user-review-depth-signals.md`:
+
+- **The name is partial flow.** The middle of the user's job is implemented; the handoffs are not. The
+  app is usable and cannot be *finished* with.
+- **Measured**: **15.13 %** of low-star reviews are *missing feature* (Khalid 2014), and roughly
+  **17–23 %** of all reviews in the mined corpora are feature requests. Users are not complaining that
+  the core act is wrong; they are complaining that the job stops.
+- **The ranked extras** users name, in evidence order: **export / backup / data portability** — the
+  only one that is *itself a paid product* in four commercial apps and a named upgrade reason in a
+  paying app's 5★ reviews — then sync, search/filter, reminders, widgets, competitor import, bulk
+  operations, statistics, templates.
+- **Counter-evidence is real and this rule obeys it**: a shipped extra can destroy an app (a cloud-sync
+  race wiped saves and dropped a top-3 game to #13), and an unused feature charges maintenance rent.
+  The decision rule the evidence gives is *"what does this replace for users who never asked?"* and
+  *"under ~5 % engagement for a month is a removal candidate"* — so depth means the handoffs the job
+  actually has, never a settings screen full of switches.
+
+## Why the factory ships partial flow — the mechanism, measured
+
+The scope of a slot **is its promise list**. `differentiators.json` is what the builder is obliged to
+deliver, and every promise must reach `shipped` with a proof. A contract that names only the middle of
+the job therefore produces exactly an app that does only the middle, and it does so *while every gate
+reports PASS*.
+
+Two measured instances, in this repository:
+
+- `apps/2026-09-26-teacher-gradebook` carries a **`core` promise `edit-every-record`** whose proof is
+  `deleteAssignment`. A `core` promise was spent on the record-keeping middle, so the middle is what
+  was built.
+- `apps/2026-10-01-lawn-round-log` builds `domain/Csv.kt` — and there is **no `ACTION_SEND`, no
+  `ACTION_CREATE_DOCUMENT` and no `FileProvider` anywhere in its `app/src/main`**. The CSV is
+  constructed and the user has no way to get the file off the phone. The slot's own idea text promised
+  "CSV export"; no promise carries it, so no proof was required to exist.
+
+That is the whole defect. It is not that the builder was lazy — it is that **nothing asked for the
+handoff**, and the budget rule (`ideation-gate.mdc`: *prefer the cheapest shape*, *cut scope*) then
+removed any reason to volunteer one.
+
+## The rule
+
+Every slot decomposes the user's job into **before**, **during** and **after** the core act, and the
+contract must cover all three. The job is not the act; the job is everything the act sits inside.
+
+| Stage | What it is | For the gradebook, for the calculator |
+|---|---|---|
+| **before** | what the user brings or prepares — last term's data, a list they already have, a template, defaults | import a class list; remember the last expression type |
+| **during** | the central act the app is named for | record a grade; evaluate an expression |
+| **after** | what the user does with the result — keeps it, sends it, files it, is reminded of it, reviews it | export the term a parent can read; save/share the result |
+
+**At least one `shipped` claim must be a handoff** — a claim whose `depthFamily` is a *connective*
+family and whose proof artifact actually contains that family's API. A contract of three core acts and
+no connective is the defect this rule exists to stop.
+
+### The depth families
+
+Each claim declares its `depthFamily` from this closed set. The **connective** ones are the handoffs;
+they are the ones that make a job finishable, and they are the ones a proof can be checked against.
+
+| `depthFamily` | What it is | Proof token the artifact must contain | Counts toward the handoff floor? |
+|---|---|---|---|
+| `core_operation` | the app's central act | — | **never** — this is the middle, not a differentiator |
+| `data_in` | bring the user's own data, media or an incumbent's export in | `ACTION_OPEN_DOCUMENT`, `ACTION_GET_CONTENT`, `GetContent`, `OpenDocument`, `PickVisualMedia`, `ACTION_IMAGE_CAPTURE`, `TakePicture`, `ImageCapture`, `ClipData`, `ClipboardManager` | yes |
+| `data_out` | get the result off the device usable | `ACTION_SEND`, `ACTION_CREATE_DOCUMENT`, `FileProvider`, `PdfDocument`, `share` | yes |
+| `durability` | the user cannot lose the work | `dataExtractionRules`, `fullBackupContent`, `UndoState`, `undo`, `rememberSaveable`, `SavedStateHandle` | yes |
+| `reminder` | the app reaches the user | `NotificationChannel`, `WorkManager`, `NotificationManagerCompat` | yes |
+| `widget` | capture without opening the app | `GlanceAppWidget`, `AppWidgetProvider` | yes |
+| `find` | find it again later | `SearchBar`, `Fts4`, `Fts5`, `MATCH`, `searchQuery` | yes |
+| `bulk` | act on many at once | `selectAll`, `toggleSelection`, `multiSelect`, `selection` | yes |
+| `insight` | see the whole picture | `Canvas`, `Vico`, `chart`, `statistics`, `aggregate` | **no** — the research rates this presence-only |
+| `speed`, `fit`, `access`, `collaboration`, `trust` | templates, personalisation, accessibility, sharing, no lock-in | — | **no** — reportable, never floored |
+
+**A camera capture is `data_in`; a playback is not.** The owner's decision, recorded 2026-10-02, made
+the phone's **free, local** capabilities legitimate — the photo picker, the gallery, the user's own
+media, the motion sensors and the camera, with no server and no paid API. The picker
+(`PickVisualMedia`) was already a token; the camera was not, which left the gate unable to count the
+handoff a camera-shaped job actually is. The camera brings the user's own content *into* the app exactly
+as the picker does — only the door differs — so it joins `data_in` with its own tokens:
+`ACTION_IMAGE_CAPTURE` (the system camera intent), `TakePicture` (the
+`ActivityResultContracts.TakePicture` route) and `ImageCapture` (the CameraX use case). Three boundaries
+are stated rather than implied, so nothing is forced into a family it does not fit. **Playing the user's
+own media is not a `data_in` handoff**: nothing crosses the app's boundary, so it is either the act the
+app is named for (`core_operation`, never floored) or an on-device rendering, and neither finishes the
+job. **Recording the user's own media is likewise the act itself**; the recording becomes a handoff only
+when the result leaves the device, which is `data_out`. **Motion sensors are in the same position as
+playback** — they feed the act rather than cross the app's boundary — so they take no family of their
+own. The media picker needs no new token: `PickVisualMedia` already carries it.
+
+### The schema, added to `differentiators.json`
+
+```jsonc
+{
+  "claims": [
+    {
+      "id": "term-export",
+      "weight": "core",
+      "jobStage": "after",            // before | during | after
+      "depthFamily": "data_out",      // from the closed set above
+      "promise": "...",
+      "evidence": { /* unchanged */ },
+      "status": "shipped",
+      "proof": { /* unchanged; its artifact must contain the family's token */ },
+      "comparison": { "incumbent": "<package or title>", "limitation": "<what it does not do>", "source": "<path or URL>" }
+    }
+  ],
+  "jobCoverage": {
+    "before": { "claimId": "…" },      // or a scout refusal, below
+    "during": { "claimId": "…" },      // never a refusal
+    "after":  { "claimId": "…" }        // or the owner's refusal, below
+  }
+}
+```
+
+`before` and `after` may carry a refusal **instead of** a claim. `before` is the scout's call, with a
+reason: what the user brings or prepares is a fact about the job the scout measured, and its own words
+are enough.
+
+```jsonc
+"before": { "refusal": { "reason": "…", "decidedBy": "scout", "recordedAt": "2026-10-02" } }
+```
+
+**`during` is never refusable.** It is the act the app is named for; refusing it means there is no app.
+
+**`after` is the stage this rule exists for, and refusing it is the owner's decision.** The handoff is
+the single most valuable capability this contract promises — it is what makes the job finishable, and the
+research in this rule's own opening ranks export / backup / data portability first — so refusing `after`
+is not a scheduling note a scout writes; it is a decision to ship without the handoff. It therefore needs
+**the owner's own words**, exactly as weakening a `core` promise does: `decidedBy` must be `"owner"`, and
+the refusal carries the same `ownerDecision { words, recordedAt }` a narrowed or dropped `core` promise
+carries, validated by the **same helper** so the two paths cannot drift apart. A refusal recorded by the
+scout, or a missing or empty owner record, is a `FAIL` naming what is missing — *"I did not think of it"*
+was never a reason, and it is not the scout's reason to give.
+
+```jsonc
+"after": {
+  "refusal": {
+    "reason": "…",
+    "decidedBy": "owner",
+    "recordedAt": "2026-10-02",
+    "ownerDecision": { "words": "<the owner's own words>", "recordedAt": "2026-10-02" }
+  }
+}
+```
+
+## What is banned
+
+- A job contract with **no connective claim** — three ways to edit a record and no way to get it out.
+- A `core` promise whose content is a basic record operation. `edit-every-record` is not a reason to
+  install; it is the middle of the job wearing a promise's clothes.
+- A **proof that does not contain the family's token**. A `data_out` claim proved by a class that
+  builds a CSV string and an app with no share intent is the `lawn-round-log` defect: the artifact
+  exists, the handoff does not.
+- Declaring `insight` (`chart`/`statistics`) to satisfy the floor. The research rates it presence-only.
+- A refusal written to make a gate green. A `before` refusal is the scout's words for why the job has no
+  such stage; an `after` refusal is the **owner's** words for giving up the handoff, and a scout's refusal
+  there is refused by the gate. Neither is a formality.
+- Padding the list with features the job does not have. The counter-evidence is in this rule's own
+  opening: an unused feature costs more than it earns.
+
+## What it can prove, and what it cannot
+
+**Machine-checked:** the schema; that every stage resolves to a claim that exists; that `during` is
+never a refusal; that a `before` refusal carries a reason, a decider and a date while an `after` refusal
+is the owner's, in his own words; that at least one `shipped` connective claim exists; and that its proof
+artifact contains the named token for its family. A refusal's `reason` is free text under the same
+"not a placeholder" rule as every other field, which rejects a token but cannot read sincerity — that
+limit is why a human audits every refusal.
+Check ids: **`slot.differentiators`** and the fixture suite in `scripts/core/policy.mjs`.
+
+**Human-audited, reported and never auto-passed:** the CRUD report — claims whose text reads as a bare
+record operation — every refusal, and every `comparison`. The CRUD predicate is a **report, not a
+gate**: `docs/research/2026-10-02-depth-encoding-and-detectability.md` measured that the repo's own
+worst case (`edit-every-record`) escapes a lexical predicate because it carries a contrast clause, so a
+fail here would be a false positive on correct prose. It prints, and the owner reads it at checkpoint 1.
+
+**This cannot prove the app is good, wanted or worth paying for** — and it is gameable: three invented
+claims plus one `ACTION_SEND` satisfies it. What it removes is the *unnoticed* partial flow: the slot
+whose contract never mentioned the handoff, so nobody ever asked whether the job could be finished.
+
+**The honest limit**, in this factory's own terms: a rule that only a document asserts is a rule nobody
+follows. The normative text is here; the enforcement is `slot.differentiators` under
+`scripts/core/policy.mjs`; and applicability is **derived, not hand-listed**
+(`scripts/core/baseline.mjs`), so the slots that predate this rule carry their findings as a printed
+note while every slot from today is gated. The judgement that separates a rich app from a padded one
+stays with the owner, at checkpoint 1.
+
+## Sources
+
+`docs/research/2026-10-02-app-depth-anatomy.md`,
+`docs/research/2026-10-02-user-review-depth-signals.md`,
+`docs/research/2026-10-02-depth-encoding-and-detectability.md`, `docs/app-depth.md`,
+`docs/slot-differentiators.md`, `.cursor/rules/differentiator-contract.mdc`,
+`.cursor/rules/ideation-gate.mdc`.

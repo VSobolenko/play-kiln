@@ -56,6 +56,24 @@ summary, a list of candidates, or a plan for a proposal has not done its job —
 leaves nothing on disk, which is indistinguishable from no work at all. The proposal is committed
 beside its plans, because a document that lives only in a transcript cannot be resumed from.
 
+The proposal also carries the **device-capability declaration** `docs/ideation/README.md` defines: a
+`## Device capabilities` section answering `used` or `not used` for each of twelve capabilities —
+camera, photo picker / gallery, media playback or capture, microphone, location, motion sensors,
+contacts / calendar, notifications / reminder, home-screen widget, share / export, Bluetooth / USB,
+files / SAF. **Leaving the section out is not an option, and a proposal that uses no capability must
+say so explicitly**, twelve times rather than by omission, because "none" as a finding the owner can
+read is the whole point. The omission it replaces was structural rather than a scout's preference: no
+recon contract had a field for a device capability, so a scout had nowhere to write "this job needs
+the camera" even if it wanted to. When a capability is `used`, the line names the API the slot would
+call and what the job loses without it, and a capability that needs a runtime permission names that
+permission. The platform fact that makes this a **declaration** problem rather than a cost problem:
+the Android Photo Picker (`ActivityResultContracts.PickVisualMedia`) needs **no runtime permission at
+all**, so "uses the photo picker" costs nothing against the permission-minimisation bar — a scout
+that silently avoided it was not making a permission decision — while a capability that does need a
+permission must name it. `node scripts/verify.mjs` reads the section (`ideas.capabilities`) and
+reports a proposal with none, a capability left unanswered, or a declaration that contradicts the
+document's own permissions prose.
+
 ## Its verdict vocabulary
 
 The factory's check vocabulary is `PASS`, `FAIL`, `SKIP`, `UNVERIFIED` (`scripts/core/lib.mjs`). The
@@ -90,6 +108,17 @@ the shelf pays                               MEASURED    enrich-market.mjs, cash
 the wedge will convert                       UNVERIFIED  no priced comparable found; needs one to decide
 ```
 
+The claims a scout authors also carry the **job's shape**, because the promise list is what the builder
+is obliged to deliver. Every claim declares its `jobStage` (`before`, `during`, `after`) and its
+`depthFamily`, and the plan's `jobCoverage` binds each of the three stages to a claim — or, only where
+the job genuinely lacks that stage, to a written refusal: in the scout's own words on `before`, and in
+the **owner's** own words on `after`, which needs the owner's `ownerDecision` exactly as weakening a
+`core` promise does. `during` is never refusable, and at least one claim is a handoff. A list of record
+operations is the raw app the owner rejected, and it is the scout's list before it is the builder's. The
+stages, the family set and the connective floor are `.cursor/rules/app-depth.mdc`; the fields are
+`docs/slot-differentiators.md`, not
+restated here.
+
 ## Which rules bind this role
 
 | Rule (subject) | Stated in |
@@ -99,8 +128,10 @@ the wedge will convert                       UNVERIFIED  no priced comparable fo
 | Budget: about one hour of agent time per slot, reported as elapsed rather than as a met target | `.cursor/rules/ideation-gate.mdc` |
 | A server is a cost to state before the idea is approved, not a detail to discover after | `.cursor/rules/ideation-gate.mdc` |
 | The reason list is authored at recon, before the UI, and becomes the promise contract | `.cursor/rules/differentiator-contract.mdc` |
+| The job's three stages are authored at recon, one claim each, with a refusal only where the job lacks a stage — `before` the scout's, `after` the owner's, `during` never refusable | `.cursor/rules/app-depth.mdc` |
 | Slot layout, the `com.gexetr.<slug>` namespace, and no factory config copied into a slot | `.cursor/rules/project-conventions.mdc` |
 | The proposal shape, and the plans that make it gate-ready | `docs/ideation/README.md` |
+| A proposal declares the device capabilities its job uses — one `used`/`not used` line for each of twelve, with the API, the loss and the permission for every `used` one; a job that uses none says so explicitly | `docs/ideation/README.md` § "which device capabilities the job uses" |
 | The economics contract: archetype vocabulary, capability pairing, kill-criteria shape | `docs/slot-economics.md` |
 | No archetype is the default and a subscription is banned outright; the proposal states the alternatives it rejected | `.cursor/rules/ideation-gate.mdc` § "There is no house monetization" |
 | The promise contract: weights, evidence labels, deferred-to-delivered resolution | `docs/slot-differentiators.md` |

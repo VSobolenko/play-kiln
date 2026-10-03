@@ -466,7 +466,9 @@ def main(argv: list[str] | None = None) -> int:
         review.write_text(
             f"# Reviewer notes — {listing['appName']}\n\n"
             "- TODO-HUMAN: Review listing.json claims against the finished app.\n"
-            "- TODO-HUMAN: Replace the support email and privacy-policy URL before upload.\n"
+            f"- TODO-HUMAN: Run `node scripts/publish-privacy.mjs --slot {listing['slug']}` to publish "
+            "`store/privacy.md` and record its public HTTPS URL in listing.json.\n"
+            "- TODO-HUMAN: Confirm the support email in listing.json is a monitored address.\n"
             "- TODO-HUMAN: Run the store renderer after review.\n",
             encoding="utf-8",
         )

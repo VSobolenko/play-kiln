@@ -17,10 +17,12 @@
  *     false claim and Play review or a buyer will find it. That is a failure.
  *   - **optional** orphans are reported as notes, because the author may know a reason.
  *
- * Why the list is written out here rather than derived from the listing text: deriving it would mean
- * matching prose to identifiers, and a heuristic that guesses wrong either misses a dropped control or
- * fails on a legitimate rename. An explicit list with the claim it enforces beside it is reviewable,
- * and a reviewer adding a feature is the person who should add its line.
+ * Why the two tables are written out rather than derived from the listing text: deriving them would
+ * mean matching prose to identifiers, and a heuristic that guesses wrong either misses a dropped
+ * control or fails on a legitimate rename. An explicit list with the claim it enforces beside it is
+ * reviewable, and a reviewer adding a feature is the person who should add its line. The tables live
+ * in `scripts/core/policy.mjs`, the single home for them, and are imported here so this CLI and the
+ * core's `slot.uiCoverage` check cannot drift apart.
  *
  * **The defect this table then caused, recorded 2026-09-29.** Because the table is written for the one
  * slot it was authored against, it reported a *pass* for every other slot while checking nothing: a
@@ -39,61 +41,9 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { NOT_A_CONTROL, REQUIRED } from './core/policy.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-
-/**
- * Operations the store listing promises, with the promise each one keeps.
- *
- * The `claim` text is a quotation or a close paraphrase of `store/listing.json`'s `fullDescription`,
- * so this table can be checked against the listing it guards rather than trusted.
- */
-const REQUIRED = {
-  addClass: 'the listing sells "create, rename, edit and delete them" for classes',
-  renameClass: 'the listing sells "create, rename, edit and delete them" for classes',
-  updateClassDetails: 'the listing sells "edit" for classes (subject, period, term)',
-  deleteClass: 'the listing sells deleting a class, with its roster and marks',
-  addStudent: 'the listing sells "add a roster by hand"',
-  updateStudent: 'the listing sells "edit anyone, mark someone inactive when they leave"',
-  deleteStudent: 'the listing sells "or delete them"',
-  importRoster: 'the listing sells "or import a CSV ... never adds the same student twice"',
-  addCategory: 'the listing sells "weigh coursework, exams and homework however your department does"',
-  updateCategory: 'the listing sells changing a category weight',
-  deleteCategory: 'a category that can be added and weighed must be removable',
-  moveCategory: 'the listing sells "reorder them"',
-  addAssignment: 'the listing sells recording a score per assignment',
-  updateAssignment: 'the listing sells weighted categories, which requires editing an assignment',
-  deleteAssignment: 'an assignment that can be added must be removable',
-  setGrade: 'the listing sells "record a score, mark work missing, or exempt a student"',
-  clearGrade: 'the listing sells that "an empty cell is never written as a zero"',
-  setAttendance: 'the listing sells "mark a register per day"',
-  clearAttendance: 'a register that can be marked must be correctable',
-  markAllPresent: 'the listing sells "with one tap for everyone present"',
-  addNote: 'the listing sells "participation notes"',
-  updateNote: 'the listing sells notes with a kind and a date',
-  deleteNote: 'a note that can be recorded must be removable',
-  addContact: 'the listing sells "a log of who you contacted, when, and what about"',
-  updateContact: 'the listing sells "follow-up dates that come back to you"',
-  deleteContact: 'a contact that can be logged must be removable',
-  resizeSeating: 'the listing sells "set a grid of desks"',
-  setSeat: 'the listing sells "and put students in them"',
-  moveToNextFreeDesk: 'the listing sells seating plans a teacher does not redraw',
-  requestExport: 'the listing sells CSV and PDF export',
-  requestBackup: 'the listing sells writing "your whole record to one file you keep"',
-  restoreBackup: 'the listing sells restoring that file later',
-}
-
-/** Operations that are deliberately not called from a screen, with the reason they are not. */
-const NOT_A_CONTROL = {
-  load: 'called by the shell on entry, not by a button',
-  announce: 'how a screen posts a message; called from other ViewModel code',
-  next: 'the id generator, used by the ViewModel itself',
-  isUnlocked: 'the entitlement question, asked by the ViewModel and by tests',
-  classroom: 'a state accessor a screen reads through `state`, not an action',
-  averageOf: 'a read, reached through the average surface or the shell',
-  csvFor: 'produces the export payload; `requestExport` is the control',
-  backupDocument: 'produces the backup payload; `requestBackup` is the control',
-}
 
 function findSlot(slug) {
   const apps = path.join(root, 'apps')

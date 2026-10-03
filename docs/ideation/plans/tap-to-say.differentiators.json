@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "slot": "tap-to-say",
+  "reconRef": "docs/ideation/2026-10-02-assistive-and-communication.md#7-the-promise-contract",
+  "claims": [
+    {
+      "id": "adult-needs-board",
+      "weight": "core",
+      "promise": "Every tile on the board is an adult need or a ward need, phrased the way an adult says it, so a stroke survivor is never handed a picture book of a child's wants and the nurse beside the bed never has to translate it first.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-assistive-and-communication-evidence.md#31-the-adult-vs-child-framing-reading",
+        "finding": "The three highest-install cards on the communication board query are framed for children in their own titles: com.shmoontz.commboards.lite reads CommBoards AAC Autism Speech at 4.0 stars over 769 exact reviews and 50K-plus installs, com.missingstep.aactalk.autism reads AAC Talk Autism Communication at 3.9 stars over 42 reviews and 5K-plus installs, and com.aac.autism.cards reads AAC Autism Communication Cards at 1K-plus installs; the sensor also reported that the word adult appears in no title on that query, while the cards that do serve adults narrow to a clinical subtype such as Language Therapy: Aphasia or Apraxia Therapy: Aphasia."
+      },
+      "status": "deferred",
+      "deferredReason": "The board does not exist yet. The promise is resolved when the authored tile set is written and a test asserts that every shipped tile belongs to the adult and ward need set, with no child-directed symbol or wording present in either locale."
+    },
+    {
+      "id": "voice-never-paywalled",
+      "weight": "core",
+      "promise": "The device's own text-to-speech speaks a tile out loud before any purchase and after it, so being heard is never what the unlock buys; the one-time unlock buys breadth of vocabulary, not the voice.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-assistive-and-communication-evidence.md#62-verbatim-critical-reviews-quoted-as-printed",
+        "finding": "com.avazapp.international.lite, Avaz AAC at 3.3 stars over 100K-plus installs, draws the 1 star review reading that it is insane how the one thing most needed, the voice feature, is a paid feature; that app is 1 of the 6 weakest rated incumbents the aphasia pocket selected, and paywall is 7 of the 9 critical reviews read across it at 78 percent."
+      },
+      "status": "deferred",
+      "deferredReason": "No board or speech path exists yet. The promise is resolved when a test drives the starter board with no entitlement and asserts that a tap renders the tile and emits its spoken string through the text-to-speech engine, and that the unlock gate is not on that path."
+    },
+    {
+      "id": "one-price-no-renewal",
+      "weight": "core",
+      "promise": "One purchase ends the transaction: after the unlock a carer never meets a renewal, an expiry, a trial clock or a second sheet, because the app has no subscription, no account and no server that could expire an entitlement.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-assistive-and-communication-evidence.md#61-pocket-profile",
+        "finding": "Paywall and price anger is 7 of the 9 critical reviews read in the aphasia communication app pocket at 78 percent and 4 of the 5 read in the communication board adults pocket at 80 percent, and the same class is 5 of the 5 critical reviews read on the four named packages at 100 percent, including com.spoken.app at 3.8 stars over 100K-plus installs writing about those subscription plans and com.tactustherapy.conversationtherapy.lite at 3.5 stars over 10K-plus installs writing that the trial is too short to decide and 24.99 dollars for the full version is a bit much."
+      },
+      "status": "deferred",
+      "deferredReason": "No billing surface exists yet. The promise is resolved when the shipped app declares the billing capability with a single non-consumable product, has no renewal or expiry code path, and a test asserts that the unlocked board renders identically on a second cold start with no purchase re-check."
+    },
+    {
+      "id": "offline-no-account",
+      "weight": "supporting",
+      "promise": "The board opens and speaks with the phone in airplane mode, with no account, no email and no sign-in step, so a carer can hand the phone to a patient in a ward with no usable wifi and nothing has to be approved first.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-assistive-and-communication-evidence.md#62-verbatim-critical-reviews-quoted-as-printed",
+        "finding": "A forced account or login is 1 of the 9 critical reviews in the aphasia pocket and 2 of the 5 in the board pocket, reading on com.speakeasy.community at 3.6 stars over 100K-plus installs that a free trial must be signed up for or the app cannot be used, and on com.otsimo.aac at 2.8 stars over 10K-plus installs that setup freezes until a subscription is paid while the buyer states they did want the service and wanted to pay."
+      },
+      "status": "deferred",
+      "deferredReason": "Nothing is built. The promise is resolved when a test exercises the board, the speech path and the unlock flow with no network available and no account created, and asserts the only declared network dependency in the merged manifest is the billing flow."
+    },
+    {
+      "id": "born-bilingual-board",
+      "weight": "supporting",
+      "promise": "The board ships authored tiles in English and Russian rather than an English board with machine output bolted on, so a patient whose first language is not the ward's language is understood in their own words instead of in someone else's.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-assistive-and-communication-evidence.md#62-verbatim-critical-reviews-quoted-as-printed",
+        "finding": "The lowest rated card in the primary pocket, org.pictalk.www.twa at 2.4 stars over 50K-plus installs, draws both of its read critical reviews on language, writing that the app is only good for English speakers and that some words are randomly in French, while the primary pocket's enrichment shows 3 of its 8 top cards carrying no rating at all, including the Russian-named com.afasia.digo, so the bilingual half of the shelf is measurably thinner than its English half."
+      },
+      "status": "deferred",
+      "deferredReason": "The second locale is unwritten. The promise is resolved when every tile key resolves in both declared locales with a non-empty authored string, a test fails on any untranslated key, and the pseudolocale layout test passes with the longer strings in place."
+    },
+    {
+      "id": "type-to-say-escape-hatch",
+      "weight": "supporting",
+      "promise": "A typed board sits one tap from the tile board, so a need the authored tiles do not cover is still speakable and the person is never trapped inside a vocabulary somebody else chose for them.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-assistive-and-communication-evidence.md#62-verbatim-critical-reviews-quoted-as-printed",
+        "finding": "Missing feature is 1 of the 9 critical reviews in the aphasia pocket and 2 of the 5 in the board pocket, and com.shmoontz.commboards.lite at 4.0 stars over 769 exact reviews and 50K-plus installs draws it from a buyer who states they purchased the full version to add pictures, remove items and rearrange it, and who separately writes that the food choices are poor and that nothing can be added or changed, so the board's own content is what its paying users say is too thin."
+      },
+      "status": "deferred",
+      "deferredReason": "No typed board exists yet. The promise is resolved when a test asserts the tile board and the typed board are reachable from each other in one action, and that a typed phrase reaches the same spoken-string path a tile uses."
+    }
+  ]
+}

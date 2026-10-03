@@ -241,24 +241,48 @@ def generator_localized_copy(
 
 
 
+def authored_reason(prior: Any, generated: str) -> str:
+    """The reason to keep: a hand-written value, or the generator sentence when there is none.
+
+    ``store/listing.json`` is an authored pack input the owner's release approval is bound to
+    (``scripts/lib/pack-approval.mjs``), so a render must never replace a reason a human wrote --
+    doing so both destroys the text and, because the file is digest-covered, voids the approval
+    itself.  A reason is generated only when the existing value is absent, not a string, or blank;
+    this is the same restraint ``merge_missing_locales`` and ``write_preserving`` apply to the
+    documents.  The generated sentence is passed in so each call site keeps its own wording and no
+    rule is restated here.
+    """
+    if isinstance(prior, str) and prior.strip():
+        return prior
+    return generated
+
+
 def apply_capability_compliance(listing: dict[str, Any], compliance: dict[str, Any]) -> None:
     data_types = compliance.get("dataCollected", [])
     sdks = compliance.get("sdkDependencies", [])
+    # Read the reasons before either dict is replaced: the assignment below rebuilds `ads` and
+    # `dataSafety` wholesale, so a prior value reaches this function only through these two reads.
+    prior_ads = listing.get("ads") if isinstance(listing.get("ads"), dict) else {}
+    prior_data_safety = (
+        listing.get("dataSafety") if isinstance(listing.get("dataSafety"), dict) else {}
+    )
     listing["permissions"] = compliance.get("permissions", [])
     listing["ads"] = {
         "containsAds": bool(compliance.get("adsPresent")),
-        "reason": (
+        "reason": authored_reason(
+            prior_ads.get("reason"),
             "Enabled capabilities include advertising SDKs."
             if compliance.get("adsPresent")
-            else "Enabled capabilities declare no advertising SDKs."
+            else "Enabled capabilities declare no advertising SDKs.",
         ),
     }
     listing["dataSafety"] = {
         "collectsData": bool(data_types),
-        "reason": (
+        "reason": authored_reason(
+            prior_data_safety.get("reason"),
             "Derived from the enabled capabilities and their bundled SDK declarations."
             if data_types
-            else "Enabled capabilities declare no collected data."
+            else "Enabled capabilities declare no collected data.",
         ),
         "dataTypes": data_types,
         "thirdPartySdks": sdks,
@@ -309,20 +333,31 @@ def default_listing(
         "category": "PRODUCTIVITY",
         "tags": ["offline", "focus", "productivity"],
         "contactEmail": DEFAULT_CONTACT_EMAIL,
-        # No default privacy URL exists: the policy has to be hosted somewhere the owner controls,
-        # so this stays a reserved-host placeholder and the generated human-checks list says so.
+        # A draft seed, and deliberately a reserved-host placeholder: a policy URL cannot be invented
+        # and the preflight below requires the field to be a string. It is no longer a question put
+        # to the owner, because the factory hosts the policy itself -- `node scripts/publish-privacy.mjs
+        # --slot <slug>` publishes `store/privacy.md` to a public HTTPS URL (Telegraph; no account, no
+        # domain, no deployment) and writes the real value here, updating the same URL on every later
+        # edit. A pack that still carries this seed cannot ship: the Node `pack.placeholders` check
+        # (`scripts/core/assets.mjs`) and this store's own read path (`scripts/store/validate.py`)
+        # both FAIL a `privacyPolicyUrl` on a reserved host, so the seed is visibly unfinished rather
+        # than silently accepted.
         "privacyPolicyUrl": "https://example.com/privacy",
         "locales": locale_data,
+        # The two `reason`s are deliberately absent from these seeds: `apply_capability_compliance`
+        # rebuilds both dicts below, and now that it preserves an authored value a seeded sentence
+        # would be kept as though a human had written it.  A fresh draft has no author, so the
+        # generator sentence is the only value it may carry.  The remaining keys are placeholders
+        # the same call replaces.
         "dataSafety": {
             "collectsData": False,
-            "reason": "Fully offline. No accounts, no analytics, no ads.",
             "dataTypes": [],
             "thirdPartySdks": [],
             "encryptedInTransit": False,
             "hasAccountDeletion": False,
         },
         "permissions": [],
-        "ads": {"containsAds": False, "reason": "The app contains no advertising SDKs."},
+        "ads": {"containsAds": False},
         # The audience is left empty on purpose, and this is the one seeded field that is deliberately
         # not a value: the factory can know the field's shape at init time, not the app's audience, so
         # the checklist prints `TODO-HUMAN` naming the field until the slot's own `listing.json`

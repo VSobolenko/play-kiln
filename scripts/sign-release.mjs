@@ -11,12 +11,26 @@ import {
   statSync,
   writeFileSync
 } from 'node:fs'
-import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { candidateJavaHomes, resolveJavaHome } from './lib/java.mjs'
 import { checkReleaseApproval } from './lib/release-approval.mjs'
+// The keystore's location, its alias, its key parameters, the X.500 name and the example-file text
+// are the signing contract; this module reads them instead of restating them, so the generator and
+// the template every slot inherits cannot disagree (see the module header for the defect that paid
+// for this).
+import {
+  KEY_ALIAS,
+  KEY_ALGORITHM,
+  KEY_SIZE,
+  KEY_VALIDITY,
+  PASSWORD_ENVIRONMENT_NAME,
+  applicationIdFromSlot,
+  keytoolDname,
+  keystorePathFor,
+  printableKeytoolCommand
+} from './lib/signing.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -79,12 +93,17 @@ export function ensureSigning(slotDir, { generate = false, log = defaultLog } = 
     return { alias, applicationId, fingerprint, keystorePath: storeFile, propertiesFile }
   }
 
-  const keystorePath = path.join(os.homedir(), '.playkiln', 'keystores', `${applicationId}.jks`)
-  const command = printableKeytoolCommand(keytool || 'keytool', keystorePath, applicationId)
+  const keystorePath = keystorePathFor(applicationId)
+  const command = printableKeytoolCommand(keytool || 'keytool', applicationId)
 
   if (!generate) {
-    log('BLOCKED', 'keystore.properties is missing; generate the upload key explicitly or run:')
-    log('BLOCKED', command)
+    // The message names the runbook and the authorization rule rather than handing the operator a
+    // command to run as though it were routine: `harness/lessons.md` records that a previous version
+    // told the operator to generate a key, and a signing key is the app's permanent identity, so it
+    // is created only with the owner's explicit instruction (`.cursor/rules/authorization.mdc`).
+    log('BLOCKED', 'keystore.properties is missing; the factory creates the upload key, it is not hand-written')
+    log('BLOCKED', 'procedure: docs/signing.md; generating a key needs the owner\'s explicit authorization (.cursor/rules/authorization.mdc)')
+    log('BLOCKED', `only after that authorization: ${command}`)
     throw new SigningError('Signing configuration is missing')
   }
   if (!keytool) {
@@ -104,8 +123,8 @@ export function ensureSigning(slotDir, { generate = false, log = defaultLog } = 
   }
 
   const password = randomBytes(24).toString('base64url').slice(0, 32)
-  const alias = 'upload'
-  const passwordEnvironmentName = 'PLAYKILN_KEYTOOL_PASSWORD'
+  const alias = KEY_ALIAS
+  const passwordEnvironmentName = PASSWORD_ENVIRONMENT_NAME
   ensureGitIgnored(resolvedSlot, 'keystore.properties')
   const result = spawnSync(
     keytool,
@@ -121,13 +140,13 @@ export function ensureSigning(slotDir, { generate = false, log = defaultLog } = 
       '-alias',
       alias,
       '-keyalg',
-      'RSA',
+      KEY_ALGORITHM,
       '-keysize',
-      '4096',
+      String(KEY_SIZE),
       '-validity',
-      '10000',
+      String(KEY_VALIDITY),
       '-dname',
-      `CN=${applicationId}, OU=Upload, O=PlayKiln, C=US`,
+      keytoolDname(applicationId),
       '-J-Duser.language=en',
       '-J-Duser.country=US'
     ],
@@ -163,10 +182,9 @@ export function ensureSigning(slotDir, { generate = false, log = defaultLog } = 
 function readApplicationId(slotDir) {
   const gradleFile = path.join(slotDir, 'app', 'build.gradle.kts')
   if (!existsSync(gradleFile)) throw new SigningError(`Missing ${gradleFile}`, 1)
-  const text = readFileSync(gradleFile, 'utf8')
-  const match = text.match(/\bapplicationId\s*=\s*["']([^"']+)["']/)
-  if (!match) throw new SigningError('applicationId not found in app/build.gradle.kts', 1)
-  return match[1]
+  const applicationId = applicationIdFromSlot(slotDir)
+  if (!applicationId) throw new SigningError('applicationId not found in app/build.gradle.kts', 1)
+  return applicationId
 }
 
 function readProperties(file) {
@@ -189,7 +207,7 @@ function resolveStoreFile(slotDir, configuredPath) {
 }
 
 function readFingerprint(keytool, keystoreFile, alias, password) {
-  const passwordEnvironmentName = 'PLAYKILN_KEYTOOL_PASSWORD'
+  const passwordEnvironmentName = PASSWORD_ENVIRONMENT_NAME
   const result = spawnSync(
     keytool,
     [
@@ -302,12 +320,6 @@ function ensureGitIgnored(slotDir, entry) {
   if (ignored) return
   const prefix = existing.length > 0 && !existing.endsWith('\n') ? '\n' : ''
   appendFileSync(ignoreFile, `${prefix}${entry}\n`, 'utf8')
-}
-
-function printableKeytoolCommand(keytool, keystorePath, applicationId) {
-  const quotedTool = `"${keytool}"`
-  const quotedStore = `"${keystorePath}"`
-  return `${quotedTool} -genkeypair -v -keystore ${quotedStore} -alias upload -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=${applicationId}, OU=Upload, O=PlayKiln, C=US"`
 }
 
 function listAppDirs() {

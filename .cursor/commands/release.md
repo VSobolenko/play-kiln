@@ -50,11 +50,19 @@ One Gradle invocation produces the debug APK, the release APK and the AAB
 `dist/release-manifest.json` records the artifacts, the signing fingerprint and the git
 commit. Report the printed build time.
 
-**Signing keys are the owner's decision.** First check whether a keystore already exists
-(`node scripts/sign-release.mjs --slot <slug>` reports it). If none exists, **stop and ask**
-before generating anything: `--generate` and `keytool -genkeypair` create the app's permanent
-identity and need an explicit instruction in the current conversation
-(`.cursor/rules/authorization.mdc`). Never print key material or `keystore.properties`.
+**Signing keys are the owner's decision — read `docs/signing.md` before touching one.** First
+inspect what exists:
+
+```bash
+node scripts/sign-release.mjs --slot <slug>   # alias + upload-certificate SHA-256, or BLOCKED
+```
+
+If a key and its `keystore.properties` already exist, there is nothing to create. If none exists,
+**stop and ask** before generating anything: `--generate` and `keytool -genkeypair` create the app's
+permanent identity and need an explicit instruction in the current conversation, and `--generate`
+itself refuses without the owner's recorded release approval (`.cursor/rules/authorization.mdc`,
+`.cursor/rules/release-gate.mdc`, `.cursor/rules/signing-keys.mdc`). Never print key material or
+`keystore.properties`; the key's backup is `docs/signing.md` § "The backup".
 
 ## 2. Store pack
 
@@ -65,6 +73,18 @@ python scripts/store/render.py --slot <slug>
 Writes listing copy, privacy, data-safety, review notes, icon, feature graphic and both
 locale screenshot sets. Review the copy against the shipped app — `play-auditor` before
 marking ready.
+
+The public privacy-policy URL was already published and recorded in phase 1 (`/ship` step 3), because
+the app's own in-app policy needs it. Verify it rather than publishing here:
+
+```bash
+node scripts/publish-privacy.mjs --slot <slug> --check   # fetches the recorded URL, publishes nothing
+```
+
+If the policy text changed after approval, re-run the publisher (it updates the same page and the same
+URL) — but that rewrites `store/listing.json`, which is in the approved pack, so the approval lapses
+and must be re-recorded on the owner's own words before continuing. Runbook:
+`docs/privacy-policy-hosting.md`.
 
 ## 3. Screenshots
 

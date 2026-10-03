@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "slot": "rast-saz-oud-tuner",
+  "reconRef": "docs/ideation/2026-10-02-niche-real-time-tools.md",
+  "claims": [
+    {
+      "id": "quarter-tone-accuracy",
+      "weight": "core",
+      "promise": "Reads the microtonal makam intervals (komma and perde offsets from equal temperament) in cents and holds a stable lock on the thick low saz and oud courses instead of reporting silence or freezing.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-niche-real-time-tools-evidence.md#4-the-complaint-corpus",
+        "finding": "com.visne.oudtuner (4.1 stars, 2,970 reviews) draws 'Accuracy is very bad. Only 2 available tunings for free', and com.baglamatuner (4.2 stars, 2,560 reviews, 1M+) draws 'Not detecting any sounds' and 'This app freez and dont hear my saz'."
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet; the pitch-detection path and its unit tests are written at implementation time."
+    },
+    {
+      "id": "no-ads-during-tuning",
+      "weight": "core",
+      "promise": "No advertisement can interrupt a tuning session: the app is bought once and shows no full-screen, interstitial or banner ad over the tuner, ever.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-niche-real-time-tools-evidence.md#4-the-complaint-corpus",
+        "finding": "7 of 13 critical reviews on the baglama tuner shelf were ad complaints (54%), and com.visne.oudtuner is hit 'with full screen ads every 30 seconds that are not only annoying, but also cau[sing]'."
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet; the paid archetype and the absence of the ads capability are implemented at scaffold time."
+    },
+    {
+      "id": "all-tunings-one-unlock",
+      "weight": "core",
+      "promise": "Every traditional tuning ships inside the one unlock — Kara Duzen, Baglama Duzeni, Misket, and the oud and makam sets — with nothing held behind a second paywall or a weekly charge.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-niche-real-time-tools-evidence.md#4-the-complaint-corpus",
+        "finding": "com.visne.oudtuner's own review text says 'Only 2 available tunings for free, the rest is paid', and Perfect Tuner (4.1 stars, 87,501 reviews) 'ambushes you with a $15 a week subscription every time you try to use it'."
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet; the tuning catalogue and the single billing product are authored at implementation time."
+    },
+    {
+      "id": "offline-no-account",
+      "weight": "supporting",
+      "promise": "The tuner works fully offline and never asks for an account or a sign-in, so it reads pitch in a lesson room, a rehearsal cellar or a village wedding where there is no signal.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-niche-real-time-tools-evidence.md#4-the-complaint-corpus",
+        "finding": "com.golfbpm.golfbpmapp (3.5 stars, 34 reviews) is criticised because it 'Makes you create an account and doesn't even offer a free version', and an offline complaint appears on Pro Guitar Tuner (143,610 reviews)."
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet; the offline-by-construction design and the absence of any network permission are enforced at implementation time."
+    },
+    {
+      "id": "drone-and-perde-guide",
+      "weight": "supporting",
+      "promise": "Plays a sustained reference drone on any course and shows where the microtonal perde frets of each makam sit, which no enriched incumbent on the shelf offers.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-niche-real-time-tools-evidence.md#3-the-pocket-measured",
+        "finding": "0 of the 8 enriched saz/oud apps offer a microtonal fret map or a drone, and tr.com.alyaka.alper.professionaloud (2.9 stars, 456 reviews, 100K+) is asked to 'let sound has frequencies, not just solid tone'."
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet; the tone generator and the perde reference are built after the detector is proven."
+    },
+    {
+      "id": "reads-low-courses",
+      "weight": "supporting",
+      "promise": "A low-course detection mode with a wider analysis window locks the thick baglama and oud strings that the incumbents' tuners silently miss.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-niche-real-time-tools-evidence.md#4-the-complaint-corpus",
+        "finding": "com.baglamatuner (4.2 stars, 2,560 reviews, 1M+ installs) carries the critical reviews 'Not detecting any sounds' and 'This app freez and dont hear my saz'."
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet; the low-frequency detection mode is a tunable parameter of the detector built at implementation time."
+    }
+  ]
+}

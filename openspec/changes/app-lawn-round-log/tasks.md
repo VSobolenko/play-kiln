@@ -14,7 +14,10 @@
   component; the merged manifest is **measured from the built artifact** and this claim is corrected
   if it disagrees.
 - [x] The commercial surface is **one** non-consumable Play Billing unlock at **$9.99**, offered at
-  the ninth customer or the first use of history/export. No ads, no subscription, no second paywall.
+  the ninth customer or the first CSV export. No ads, no subscription, no second paywall. The visit
+  history and the owed balances are **never** withheld — the free tier keeps the whole record and the
+  unlock only lifts the customer ceiling and adds the export, and the listing copy, the string
+  resources and this contract were corrected to say exactly that on 2026-10-02.
 - [x] **`pool-route-log` is deliberately left unbuilt.** **Reason:** it and this slot are one sentence
   — "a solo trade's round on the phone" — and two of our own slots that one sentence describes is the
   internal near-duplicate Play's Spam policy reaches, up to account termination.
@@ -93,8 +96,15 @@ Base package `com.gexetr.lawnroundlog`.
   `featurePill`. Written **before** the UI is styled.
 - [ ] **[Build]** `store/listing.json`, `store/listing.md`, `store/privacy.md`,
   `store/data-safety.md`, `store/review-notes.md`, `store/release-notes.md` — drafts. Data safety
-  declares **no** collection, because nothing leaves the device and the app has no network
-  permission.
+  declares **no** collection, because the operator's record never leaves the device and the app's
+  own code neither reads nor writes the network. The claim is about **the slot's code, not the merged
+  manifest**: `billing-ktx` 9.1.0 pulls `com.google.android.datatransport` 3.1.8, which contributes
+  `android.permission.INTERNET` and `android.permission.ACCESS_NETWORK_STATE` and an internal
+  `TransportBackendDiscovery` service, and Google uses it to upload billing events — so the merged
+  release manifest declares four permissions and only the app's own manifest declares none. Both the
+  privacy policy and the data-safety sheet state this in the same words, and the merged manifest is
+  read from the built artifact rather than asserted (measured 2026-10-02 by `aapt2 dump permissions`
+  against the signed release APK).
 
 ## 5. Verification and the stop
 
@@ -103,7 +113,7 @@ Base package `com.gexetr.lawnroundlog`.
   and does not sign.
 - [ ] **[Gate]** every promise in `differentiators.json` resolved — `shipped` with a proof that
   resolves on disk, or `narrowed`/`dropped` in writing. **`verify.mjs` fails while any is
-  `deferred`**, and the five promises are the reason this slot was chosen.
+  `deferred`**, and the six promises are the reason this slot was chosen.
 - [ ] **[Human] CHECKPOINT 1.5** — the agent has installed and tested
   `app/build/outputs/apk/debug/app-debug.apk` on the connected device (serial, artifact hash and
   observed screens in the handoff); the owner approves the product, or asks for changes.

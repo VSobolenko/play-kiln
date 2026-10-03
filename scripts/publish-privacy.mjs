@@ -17,21 +17,45 @@
  * The page is generated *from* `store/privacy.md`, so the published policy and the committed file
  * cannot drift: re-running after an edit updates the same URL.
  *
+ * Publishing is an **outward act** — it writes a public page and rewrites `store/listing.json`, which
+ * is an authored pack input — so nothing here happens on a bare invocation. One slot is named with
+ * `--slot`; the fleet is named with `--all`. `--all` exists because the owner's instruction is that
+ * *every* app gets a real policy and nobody is asked again (`.cursor/rules/privacy-policy.mdc`; the
+ * gate is `pack.placeholders` in `scripts/core/assets.mjs`), and because doing that one slot at a time
+ * is how a fleet drifts. What `--all` publishes is the same question the gate answers: a slot whose
+ * recorded URL is not yet a real hosted policy. The field has no baseline — the gate FAILs it
+ * unconditionally — so the batch selects every slot carrying the defect, and `--slot <slug>` is the
+ * single-slot door. `--dry-run` reports the batch without a network call.
+ *
  * Usage:
  *   node scripts/publish-privacy.mjs --slot <slug>
  *   node scripts/publish-privacy.mjs --slot <slug> --check    # verify the recorded URL, publish nothing
+ *   node scripts/publish-privacy.mjs --all [--check] [--dry-run]
  */
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import { policyUrlProblem } from './lib/in-app-policy.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const API = 'https://api.telegra.ph'
 
-function fail(message) {
-  console.error(`BLOCKED privacy - ${message}`)
-  process.exit(2)
+/**
+ * A refusal this script must not swallow. `code` is the process exit for a single-slot run: 2 for a
+ * block (nothing was published), 1 for a check that ran and found the recorded URL is not readable. A
+ * batch run catches one per slot, so a single broken slot cannot hide the verdicts of the rest, and
+ * still exits with the worst code it saw.
+ */
+class PrivacyFailure extends Error {
+  constructor(message, code = 2) {
+    super(message)
+    this.code = code
+  }
+}
+
+function fail(message, code = 2) {
+  throw new PrivacyFailure(message, code)
 }
 
 function argument(name) {
@@ -39,11 +63,28 @@ function argument(name) {
   return index === -1 ? null : process.argv[index + 1]
 }
 
-const slug = argument('--slot')
-if (!slug) fail('usage: node scripts/publish-privacy.mjs --slot <slug> [--check]')
-const checkOnly = process.argv.includes('--check')
+const USAGE = [
+  'usage: node scripts/publish-privacy.mjs --slot <slug> [--check]',
+  '       node scripts/publish-privacy.mjs --all [--check] [--dry-run]',
+  '',
+  '  --slot <slug>  publish one slot\'s store/privacy.md and record the URL (or, with --check,',
+  '                 verify the URL already recorded, publishing nothing)',
+  '  --all          every slot whose recorded URL is not yet a real hosted policy, because',
+  '                 pack.placeholders fails the field with no baseline; --slot <slug> names one',
+  '  --check        verify recorded URLs from the outside and publish nothing',
+  '  --dry-run      with --all, print what would be published without any network call',
+  '  --help         this text',
+  '',
+  'A bare invocation publishes nothing: it prints this text and exits 2.'
+].join('\n')
 
-const slotDir = (() => {
+const checkOnly = process.argv.includes('--check')
+const dryRun = process.argv.includes('--dry-run')
+const all = process.argv.includes('--all')
+const help = process.argv.includes('--help') || process.argv.includes('-h')
+
+/** The slot directory a slug names, refusing an ambiguous match. Requires a store/listing.json. */
+function resolveSlotDir(slug) {
   const apps = path.join(ROOT, 'apps')
   const matches = readdirSync(apps).filter(
     (name) =>
@@ -52,11 +93,15 @@ const slotDir = (() => {
   )
   if (matches.length !== 1) fail(`expected one slot matching '${slug}', found ${matches.length}`)
   return path.join(apps, matches[0])
-})()
+}
 
-const listingPath = path.join(slotDir, 'store', 'listing.json')
-const privacyPath = path.join(slotDir, 'store', 'privacy.md')
-const envPath = path.join(slotDir, '.env')
+/** Every directory under apps/, in a stable order. */
+function allSlotDirs() {
+  return readdirSync(path.join(ROOT, 'apps'), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => path.join(ROOT, 'apps', entry.name))
+    .sort()
+}
 
 /** Inline markdown -> Telegraph inline nodes. */
 function inline(text) {
@@ -156,13 +201,13 @@ function blocks(markdown) {
 }
 
 /** Read the token recorded for this slot, if any. Never printed. */
-function recordedToken() {
+function recordedToken(envPath) {
   if (!existsSync(envPath)) return null
   const match = readFileSync(envPath, 'utf8').match(/^TELEGRAPH_ACCESS_TOKEN=(.+)$/m)
   return match ? match[1].trim() : null
 }
 
-function recordToken(token) {
+function recordToken(envPath, token) {
   const line = `TELEGRAPH_ACCESS_TOKEN=${token}\n`
   const existing = existsSync(envPath) ? readFileSync(envPath, 'utf8') : ''
   if (/^TELEGRAPH_ACCESS_TOKEN=/m.test(existing)) return
@@ -188,75 +233,223 @@ async function reachable(url) {
   return { status: response.status, body }
 }
 
-const listing = JSON.parse(readFileSync(listingPath, 'utf8'))
-// The listing keeps the human title in the locale block, not at the top level, so reading
-// `listing.title` silently produced a page named after the internal slot slug.
-const locale = listing.locales?.[listing.defaultLocale] || Object.values(listing.locales || {})[0] || {}
-const pageName = listing.appName || locale.title || slug
-const existing = String(listing.privacyPolicyUrl || '')
-const title = `${pageName} — privacy policy`
+/**
+ * Publish one slot's policy page and record its URL. Names the slot in every line, because a batch
+ * run's output is read as one log and an unattributed `PASS` tells the reader nothing.
+ */
+async function publishOne(slotDir) {
+  const slug = path.basename(slotDir)
+  const listingPath = path.join(slotDir, 'store', 'listing.json')
+  const privacyPath = path.join(slotDir, 'store', 'privacy.md')
+  const envPath = path.join(slotDir, '.env')
 
-if (checkOnly) {
+  if (!existsSync(privacyPath)) {
+    fail(`no store/privacy.md in ${slug}, so there is no policy to publish`)
+  }
+
+  const listing = JSON.parse(readFileSync(listingPath, 'utf8'))
+  // The listing keeps the human title in the locale block, not at the top level, so reading
+  // `listing.title` silently produced a page named after the internal slot slug.
+  const locale = listing.locales?.[listing.defaultLocale] || Object.values(listing.locales || {})[0] || {}
+  const pageName = listing.appName || locale.title || slug
+  const existing = String(listing.privacyPolicyUrl || '')
+  const title = `${pageName} — privacy policy`
+
+  const markdown = readFileSync(privacyPath, 'utf8')
+  const content = blocks(markdown)
+  if (content.length < 10) {
+    fail(`converted only ${content.length} block(s) from store/privacy.md - refusing to publish a stub`)
+  }
+
+  if (dryRun) {
+    console.log(`DRY-RUN     ${slug}: would render ${content.length} block(s) to ${API} and record the URL`)
+    return existing || '(new page)'
+  }
+
+  let token = recordedToken(envPath)
+  if (!token) {
+    const account = await call('createAccount', {
+      short_name: String(pageName).slice(0, 32),
+      author_name: String(listing.contactEmail || '')
+    })
+    token = account.access_token
+    recordToken(envPath, token)
+    console.log(`PASS        ${slug}: created a publishing account (token stored in the slot's .env, not printed)`)
+  } else {
+    console.log(`PASS        ${slug}: reusing the publishing account already recorded in the slot's .env`)
+  }
+
+  // Reuse the existing page when the recorded URL is one of ours, so an edit updates the URL a
+  // reviewer may already have seen instead of replacing it.
+  const existingPath = (existing.match(/^https:\/\/telegra\.ph\/(.+)$/) || [])[1] || null
+  let url
+  if (existingPath) {
+    const page = await call(`editPage/${existingPath}`, {
+      access_token: token,
+      title,
+      content,
+      author_name: String(listing.contactEmail || ''),
+      return_content: false
+    })
+    url = page.url
+    console.log(`PASS        ${slug}: updated the existing page`)
+  } else {
+    const page = await call('createPage', {
+      access_token: token,
+      title,
+      content,
+      author_name: String(listing.contactEmail || ''),
+      return_content: false
+    })
+    url = page.url
+    console.log(`PASS        ${slug}: created the page`)
+  }
+
+  // Verify from the outside before recording it: the API's "ok" says the write succeeded, not that a
+  // reviewer can open the page.
+  const { status, body } = await reachable(url)
+  if (status !== 200 || !body.toLowerCase().includes('privacy')) {
+    fail(`the published page for ${slug} is not readable (HTTP ${status}) - not recording it in the listing`)
+  }
+
+  listing.privacyPolicyUrl = url
+  writeFileSync(listingPath, `${JSON.stringify(listing, null, 2)}\n`)
+  console.log(`PASS        ${slug}: verified reachable (HTTP ${status}, ${body.length} bytes)`)
+  console.log(`\nprivacy policy URL: ${url}`)
+  console.log('recorded in store/listing.json — the listing is part of the approved pack, so any recorded release approval is now void: re-record it with scripts/approve-release.mjs before releasing')
+  return url
+}
+
+/**
+ * Verify one slot's recorded URL from the outside. Byte-identical output to the original
+ * single-slot `--check`, including its refusal of a non-https field: 2 blocks, 1 reports a page that
+ * is not readable, 0 passes.
+ */
+async function checkOne(slotDir) {
+  const listing = JSON.parse(readFileSync(path.join(slotDir, 'store', 'listing.json'), 'utf8'))
+  const existing = String(listing.privacyPolicyUrl || '')
   if (!/^https:\/\//.test(existing)) fail(`privacyPolicyUrl is not an https URL: ${existing}`)
   const { status, body } = await reachable(existing)
   console.log(`URL:  ${existing}\nHTTP: ${status}\nbytes: ${body.length}`)
   const marker = 'privacy'
   console.log(`mentions the policy: ${body.toLowerCase().includes(marker)}`)
-  process.exit(status === 200 && body.toLowerCase().includes(marker) ? 0 : 1)
+  return { ok: status === 200 && body.toLowerCase().includes(marker), code: status === 200 && body.toLowerCase().includes(marker) ? 0 : 1 }
 }
 
-const markdown = readFileSync(privacyPath, 'utf8')
-const content = blocks(markdown)
-if (content.length < 10) fail(`converted only ${content.length} block(s) from store/privacy.md - refusing to publish a stub`)
+/**
+ * The `--all --check` sweep: the recorded URL's shape first (so a placeholder is named rather than
+ * fetched), then reachability. Never throws for a bad URL — the caller collects the worst code.
+ */
+async function sweepOne(slotDir) {
+  const slug = path.basename(slotDir)
+  let listing
+  try {
+    listing = JSON.parse(readFileSync(path.join(slotDir, 'store', 'listing.json'), 'utf8'))
+  } catch (error) {
+    console.log(`FAIL        ${slug}: store/listing.json is not parseable: ${error.message}`)
+    return { ok: false, code: 2 }
+  }
+  const problem = policyUrlProblem(listing.privacyPolicyUrl)
+  if (problem) {
+    console.log(`FAIL        ${slug}: ${problem}`)
+    return { ok: false, code: 1 }
+  }
+  const url = String(listing.privacyPolicyUrl)
+  const { status, body } = await reachable(url)
+  const mentions = body.toLowerCase().includes('privacy')
+  const ok = status === 200 && mentions
+  console.log(`${ok ? 'PASS       ' : 'FAIL       '} ${slug}: HTTP ${status}, ${body.length} bytes, mentions the policy: ${mentions}`)
+  console.log(`            ${url}`)
+  return { ok, code: ok ? 0 : 1 }
+}
 
-let token = recordedToken()
-if (!token) {
-  const account = await call('createAccount', {
-    short_name: String(pageName).slice(0, 32),
-    author_name: String(listing.contactEmail || '')
+async function main() {
+  if (help) {
+    console.log(USAGE)
+    return 0
+  }
+  const slug = argument('--slot')
+  if (!slug && !all) {
+    console.error(USAGE)
+    console.error('refusing to run: pass --slot <slug> or --all; a bare invocation publishes nothing')
+    return 2
+  }
+  if (slug && all) {
+    console.error(USAGE)
+    console.error('refusing to run: --slot and --all are alternatives')
+    return 2
+  }
+
+  if (slug) {
+    const slotDir = resolveSlotDir(slug)
+    if (checkOnly) return (await checkOne(slotDir)).code
+    await publishOne(slotDir)
+    return 0
+  }
+
+  let worst = 0
+  let published = 0
+  let skipped = 0
+  for (const slotDir of allSlotDirs()) {
+    const name = path.basename(slotDir)
+    const listingPath = path.join(slotDir, 'store', 'listing.json')
+    const privacyPath = path.join(slotDir, 'store', 'privacy.md')
+    if (!existsSync(listingPath)) {
+      skipped += 1
+      console.log(`SKIP        ${name}: no store/listing.json`)
+      continue
+    }
+    if (!existsSync(privacyPath)) {
+      skipped += 1
+      console.log(`SKIP        ${name}: no store/privacy.md, so there is no policy to publish`)
+      continue
+    }
+    if (checkOnly) {
+      try {
+        const result = await sweepOne(slotDir)
+        worst = Math.max(worst, result.code)
+      } catch (error) {
+        console.log(`FAIL        ${name}: ${error.message}`)
+        worst = Math.max(worst, error instanceof PrivacyFailure ? error.code : 2)
+      }
+      continue
+    }
+    let listing
+    try {
+      listing = JSON.parse(readFileSync(listingPath, 'utf8'))
+    } catch (error) {
+      console.log(`FAIL        ${name}: store/listing.json is not parseable: ${error.message}`)
+      worst = Math.max(worst, 2)
+      continue
+    }
+    const problem = policyUrlProblem(listing.privacyPolicyUrl)
+    if (!problem) {
+      skipped += 1
+      console.log(`SKIP        ${name}: already a real hosted policy (${listing.privacyPolicyUrl})`)
+      continue
+    }
+    try {
+      await publishOne(slotDir)
+      published += 1
+    } catch (error) {
+      console.log(`FAIL        ${name}: ${error.message}`)
+      worst = Math.max(worst, error instanceof PrivacyFailure ? error.code : 2)
+    }
+  }
+  console.log(`\n${published} published, ${skipped} skipped, exit ${worst}`)
+  return worst
+}
+
+main()
+  .then((code) => {
+    if (code) process.exitCode = code
   })
-  token = account.access_token
-  recordToken(token)
-  console.log(`PASS        created a publishing account (token stored in the slot's .env, not printed)`)
-} else {
-  console.log(`PASS        reusing the publishing account already recorded in the slot's .env`)
-}
-
-// Reuse the existing page when the recorded URL is one of ours, so an edit updates the URL a
-// reviewer may already have seen instead of replacing it.
-const existingPath = (existing.match(/^https:\/\/telegra\.ph\/(.+)$/) || [])[1] || null
-let url
-if (existingPath) {
-  const page = await call(`editPage/${existingPath}`, {
-    access_token: token,
-    title,
-    content,
-    author_name: String(listing.contactEmail || ''),
-    return_content: false
+  .catch((error) => {
+    if (error instanceof PrivacyFailure) {
+      console.error(`BLOCKED privacy - ${error.message}`)
+      process.exitCode = error.code
+    } else {
+      console.error(`BLOCKED privacy - ${error?.stack || error}`)
+      process.exitCode = 2
+    }
   })
-  url = page.url
-  console.log(`PASS        updated the existing page`)
-} else {
-  const page = await call('createPage', {
-    access_token: token,
-    title,
-    content,
-    author_name: String(listing.contactEmail || ''),
-    return_content: false
-  })
-  url = page.url
-  console.log(`PASS        created the page`)
-}
-
-// Verify from the outside before recording it: the API's "ok" says the write succeeded, not that a
-// reviewer can open the page.
-const { status, body } = await reachable(url)
-if (status !== 200 || !body.toLowerCase().includes('privacy')) {
-  fail(`the published page is not readable (HTTP ${status}) - not recording it in the listing`)
-}
-
-listing.privacyPolicyUrl = url
-writeFileSync(listingPath, `${JSON.stringify(listing, null, 2)}\n`)
-console.log(`PASS        verified reachable (HTTP ${status}, ${body.length} bytes)`)
-console.log(`\nprivacy policy URL: ${url}`)
-console.log('recorded in store/listing.json — the listing is part of the approved pack, so any recorded release approval is now void: re-record it with scripts/approve-release.mjs before releasing')

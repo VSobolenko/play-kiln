@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Dark-mode window background; see values/colors.xml. -->
-    <color name="playkiln_window_background">#101410</color>
+    <!-- Dark-mode window background; see values/colors.xml. It is the dark scheme's own `background`
+         role, `Color.kt`'s `Neutral10`, so the window and the theme paint the same colour. -->
+    <color name="playkiln_window_background">#191C1A</color>
 </resources>

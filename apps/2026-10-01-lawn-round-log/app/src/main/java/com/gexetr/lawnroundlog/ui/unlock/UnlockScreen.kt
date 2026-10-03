@@ -165,10 +165,12 @@ fun UnlockScreen(
     }
 }
 
-/** What the unlock covers, in the order the plan sells it. One entry per sentence on the screen. */
+/** What the unlock covers, in the order the plan sells it. One entry per sentence on the screen.
+ *  It names only what the purchase buys — the customer limit and the export. The visit history and
+ *  the owed balances are free in every tier (they are what the free app is for), so a bullet for
+ *  them would sell the user what he already has. */
 private val UNLOCK_BULLETS: List<Int> = listOf(
     R.string.unlock_bullet_customers,
-    R.string.unlock_bullet_history,
     R.string.unlock_bullet_export,
 )
 

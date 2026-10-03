@@ -438,13 +438,35 @@ def pack_exists(slot_dir: Path) -> bool:
 
 
 def composes_media(slot_dir: Path) -> bool:
-    """True when the pack declares a studio identity, which makes a provenance record mandatory.
+    """True when the pack ships composed media under ``store/assets/``, which a record must attest.
 
-    ``store/studio.json`` is what says the pack composes its own media rather than shipping the
-    generic renderer's pack, so it is exactly the packs that claim captured screenshots whose
-    committed images must be bound to a recorded build.
+    Composed media is what ``scripts/store/render.py`` writes into ``store/assets/`` -- the icon,
+    the feature graphic and the screenshot sets -- so its presence on disk, not the *declaration*
+    in ``store/studio.json``, is what makes ``store/provenance.json`` required.
+
+    The two files belong to different phases of this factory.  ``store/studio.json`` is authored
+    before the UI is styled (``.cursor/rules/visual-identity.mdc``) while ``store/provenance.json``
+    is written only by ``scripts/media-capture.mjs`` in phase 2, which refuses to run without the
+    owner's recorded release approval; keying the requirement on the declaration therefore demanded
+    a phase-2 artifact of every phase-1 slot.  Keying on the media is also strictly stronger than the
+    line it replaces: composed images whose ``store/studio.json`` was deleted still require the
+    record, so removing the declaration cannot switch the check off.
+
+    An empty ``store/assets/`` directory is not composed media: no image on disk claims a build, so
+    there is nothing to attest.
+
+    This is the Python counterpart of ``hasComposedMedia`` in ``scripts/core/assets.mjs``, the one
+    other implementation of this definition; a reader compares the two there.  Unlike the limits pair
+    -- where both sides are derived from one shared declaration, ``limits.agreement`` in that file
+    holding the Node constants to ``scripts/lib/play-assets.json`` while
+    ``scripts/store/render_limits.py`` reads the same JSON for Python -- these two predicates have no
+    shared declaration, so no program compares them and this comment is the only place the two are
+    joined.
     """
-    return (store_dir(slot_dir) / STUDIO_FILENAME).is_file()
+    root = assets_dir(slot_dir)
+    if not root.is_dir():
+        return False
+    return any(entry.is_file() and not entry.is_symlink() for entry in root.rglob("*"))
 
 
 # --------------------------------------------------------------------------------------------

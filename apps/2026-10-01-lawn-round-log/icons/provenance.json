@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "sets": [
+    {
+      "library": "Tabler Icons",
+      "version": "v3.48.0",
+      "spdx": "MIT",
+      "sourceUrl": "https://github.com/tabler/tabler-icons/releases/tag/v3.48.0",
+      "licenceFile": "icons/LICENSES/MIT.txt",
+      "attribution": null,
+      "fetchedAt": "2026-10-02",
+      "fetchedBy": "agent",
+      "icons": [
+        {
+          "name": "arrow-left",
+          "file": "app/src/main/res/drawable/ic_arrow_left.xml",
+          "sha256": "5756323a546e0350ef58e73cf69e4ce52263eb0d990c5c226b08967859361212",
+          "sourcePath": "icons/outline/arrow-left.svg",
+          "attribution": null
+        },
+        {
+          "name": "plus",
+          "file": "app/src/main/res/drawable/ic_plus.xml",
+          "sha256": "51246dce3da278cc4c400fb6e53c06aa89807a3a9936673d0bf073cb5b8a3e6d",
+          "sourcePath": "icons/outline/plus.svg",
+          "attribution": null
+        },
+        {
+          "name": "trash",
+          "file": "app/src/main/res/drawable/ic_trash.xml",
+          "sha256": "4375fbb87f7e93992b68756c5e56c2569e655adf9ee089ef19420b4b03172e1c",
+          "sourcePath": "icons/outline/trash.svg",
+          "attribution": null
+        },
+        {
+          "name": "pencil",
+          "file": "app/src/main/res/drawable/ic_pencil.xml",
+          "sha256": "60e9471e19a7f4df0d254f301774e469ee920c784affa8786a8884a5966ed0dc",
+          "sourcePath": "icons/outline/pencil.svg",
+          "attribution": null
+        },
+        {
+          "name": "lock",
+          "file": "app/src/main/res/drawable/ic_lock.xml",
+          "sha256": "203292c6b8030889358ec3bf26bfce7649bcdeca37156d3388dc94e3efea30e6",
+          "sourcePath": "icons/outline/lock.svg",
+          "attribution": null
+        },
+        {
+          "name": "file-export",
+          "file": "app/src/main/res/drawable/ic_file_export.xml",
+          "sha256": "5d0b0a7ab157e99f6f1c52f3d5f325514955b97b85c2342ec13ae88c3d3b0e55",
+          "sourcePath": "icons/outline/file-export.svg",
+          "attribution": null
+        },
+        {
+          "name": "share",
+          "file": "app/src/main/res/drawable/ic_share.xml",
+          "sha256": "162db287665bb68dd6b9538d0de66d29aeab1744c28d6b0ba41dc2f3d2726778",
+          "sourcePath": "icons/outline/share.svg",
+          "attribution": null
+        },
+        {
+          "name": "arrow-up",
+          "file": "app/src/main/res/drawable/ic_arrow_up.xml",
+          "sha256": "010a080a8d8796a54582c1aa00535d4aae004c76d554e851a35dad6e5b87702c",
+          "sourcePath": "icons/outline/arrow-up.svg",
+          "attribution": null
+        },
+        {
+          "name": "arrow-down",
+          "file": "app/src/main/res/drawable/ic_arrow_down.xml",
+          "sha256": "c36db629f26b1a29d2ce9e3e78fb3b42e3dcb181c3fecacf3f6eb8eaf4e959f2",
+          "sourcePath": "icons/outline/arrow-down.svg",
+          "attribution": null
+        },
+        {
+          "name": "check",
+          "file": "app/src/main/res/drawable/ic_check.xml",
+          "sha256": "d53d10ab7524fa9d36655a9d42e462fd2cfac90246e9b16d6258c56b617af0c4",
+          "sourcePath": "icons/outline/check.svg",
+          "attribution": null
+        },
+        {
+          "name": "x",
+          "file": "app/src/main/res/drawable/ic_x.xml",
+          "sha256": "a3ec06925cce5a369e97e93b8974d7827dfa6e1659de1b92704a165e12fe36db",
+          "sourcePath": "icons/outline/x.svg",
+          "attribution": null
+        },
+        {
+          "name": "cloud-rain",
+          "file": "app/src/main/res/drawable/ic_cloud_rain.xml",
+          "sha256": "fae057c8fb0f9df890e245249b1a38af0c2100ad1efb91d0ef74786752eeea77",
+          "sourcePath": "icons/outline/cloud-rain.svg",
+          "attribution": null
+        },
+        {
+          "name": "alert-triangle",
+          "file": "app/src/main/res/drawable/ic_alert_triangle.xml",
+          "sha256": "ed8fc1f4ee8b828cc8abb8a279a17d111835f3b147479c878c3a7d2db5f85530",
+          "sourcePath": "icons/outline/alert-triangle.svg",
+          "attribution": null
+        },
+        {
+          "name": "calendar",
+          "file": "app/src/main/res/drawable/ic_calendar.xml",
+          "sha256": "c782efbb83c3a8c45ed4864ef507506f9d1b2a5792f1ae0535f279e29542a4a4",
+          "sourcePath": "icons/outline/calendar.svg",
+          "attribution": null
+        },
+        {
+          "name": "adjustments-horizontal",
+          "file": "app/src/main/res/drawable/ic_adjustments_horizontal.xml",
+          "sha256": "3f41e8113a0a53bf65d8d0800ea918dc7733bd49753667cd2f9e4d2d947518c6",
+          "sourcePath": "icons/outline/adjustments-horizontal.svg",
+          "attribution": null
+        },
+        {
+          "name": "info-circle",
+          "file": "app/src/main/res/drawable/ic_info_circle.xml",
+          "sha256": "8979ccf5f546383c42613fa07ff881874b443246bfc6f0bf77bb7b7735920d24",
+          "sourcePath": "icons/outline/info-circle.svg",
+          "attribution": null
+        },
+        {
+          "name": "user",
+          "file": "app/src/main/res/drawable/ic_user.xml",
+          "sha256": "e7123c174b9dcfed394cc1f58b8d2d910b74a792054488564acdb29519caecc2",
+          "sourcePath": "icons/outline/user.svg",
+          "attribution": null
+        }
+      ]
+    }
+  ]
+}

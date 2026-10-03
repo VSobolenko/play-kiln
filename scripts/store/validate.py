@@ -705,10 +705,73 @@ def unfinished_url_reason(value: str) -> str | None:
     return None
 
 
+def check_privacy_policy(report: Report, listing: model.Listing) -> None:
+    """The privacy-policy URL, as a FAIL rather than the generic placeholder roll-up's softer note.
+
+    This is deliberately a **FAIL**, not the ``UNFINISHED`` verdict `check_placeholder_hosts`
+    prints for an unfinished URL, and the reasoning that made ``example.com/privacy`` merely
+    unfinished has changed rather than the label merely tightened.  ``UNFINISHED`` is the pack
+    contract's word for a value the owner still has to supply; that was right while the factory had
+    no host, so the placeholder was honest pending work.  The factory now publishes the policy
+    itself -- `node scripts/publish-privacy.mjs --slot <slug>` writes `store/privacy.md` to a public
+    HTTPS URL and records it here -- so a reserved-host or absent `privacyPolicyUrl` is no longer a
+    task waiting on a person.  It is a pack the pipeline did not finish, Play refuses to publish
+    without a URL anyone can open, and the strongest blocking label is the truthful one.
+
+    Two verdicts about one field must not disagree: the Node core's ``pack.placeholders`` check
+    (`checkPlaceholderHosts` in `scripts/core/assets.mjs`) already FAILs both an empty and a
+    reserved-host `privacyPolicyUrl`, so a read path that called the same pack merely unfinished
+    would be the drift `.cursor/rules/verification-discipline.mdc` forbids.  What this measures is
+    the **value** -- a real host passes even if no command was ever typed, and a reserved host fails
+    even if one was -- never whether the publisher ran.
+    """
+    value = listing.raw.get("privacyPolicyUrl")
+    slug = listing.raw.get("slug")
+    remedy = (
+        f"node scripts/publish-privacy.mjs --slot {slug}"
+        if isinstance(slug, str) and slug.strip()
+        else "node scripts/publish-privacy.mjs --slot <slug>"
+    )
+    if not isinstance(value, str) or not value.strip():
+        report.add(
+            "privacy-policy",
+            "privacyPolicyUrl",
+            FAIL,
+            "the listing declares no privacy policy URL, and Play requires a public HTTPS one; "
+            f"run `{remedy}` to publish store/privacy.md and record it",
+        )
+        return
+    reason = unfinished_url_reason(value)
+    if reason is None:
+        report.add(
+            "privacy-policy",
+            "privacyPolicyUrl",
+            PASS,
+            f"{value} is a real host, not a reserved documentation host",
+        )
+        return
+    report.add(
+        "privacy-policy",
+        "privacyPolicyUrl",
+        FAIL,
+        f"{reason} ({value}); run `{remedy}` to publish store/privacy.md and record the real URL",
+    )
+
+
 def check_placeholder_hosts(report: Report, listing: model.Listing) -> None:
+    """Every other declared URL, and the contact email, against the reserved documentation hosts.
+
+    `privacyPolicyUrl` is deliberately measured by `check_privacy_policy` instead of here: it is a
+    Play-required field and is reported as a `FAIL`, while these rows keep the softer `UNFINISHED`
+    verdict because another URL field may be optional or still being filled in.  The roll-up below
+    therefore counts only the fields this function measured, and says so.
+    """
     problems = 0
     hosts = ", ".join(model.PLACEHOLDER_HOSTS)
-    for field, value in listing.url_fields():
+    other_fields = [
+        (field, value) for field, value in listing.url_fields() if field != "privacyPolicyUrl"
+    ]
+    for field, value in other_fields:
         reason = unfinished_url_reason(value)
         if reason is None:
             continue
@@ -737,7 +800,7 @@ def check_placeholder_hosts(report: Report, listing: model.Listing) -> None:
         "placeholder-host",
         "declared URLs",
         PASS if problems == 0 else UNFINISHED,
-        f"{len(listing.url_fields())} URL field(s) checked against {hosts}",
+        f"{len(other_fields)} URL field(s) besides privacyPolicyUrl checked against {hosts}",
     )
 
 
@@ -751,6 +814,10 @@ def sha256_of(path: Path) -> str:
 
 def check_provenance(report: Report, slot: Path, locales: Sequence[str]) -> None:
     record = model.load_provenance(slot)
+    # The trigger is composed media on disk (``model.composes_media``), never the
+    # ``store/studio.json`` declaration: the declaration is phase 1 and the record is phase 2, so
+    # keying on it demanded a phase-2 artifact of every slot in development.  The Node counterpart
+    # is ``hasComposedMedia`` in ``scripts/core/assets.mjs``.
     required = model.composes_media(slot)
     if record is None:
         if required:
@@ -758,15 +825,15 @@ def check_provenance(report: Report, slot: Path, locales: Sequence[str]) -> None
                 "provenance",
                 "store/provenance.json",
                 FAIL,
-                "the pack composes its own media (store/studio.json) but ships no record binding "
-                "its committed assets to a build; run node scripts/media-capture.mjs --slot <slug>",
+                "the pack ships composed media under store/assets/ but ships no record binding its "
+                "committed assets to a build; run node scripts/media-capture.mjs --slot <slug>",
             )
         else:
             report.add(
                 "provenance",
                 "store/provenance.json",
                 SKIP,
-                "absent, and this pack makes no capture-attestation claim",
+                "absent, and no composed media under store/assets to attest",
             )
         return
 
@@ -910,9 +977,11 @@ def run(args: argparse.Namespace) -> int:
     if listing is not None:
         check_listing_text(report, listing)
         check_placeholder_hosts(report, listing)
+        check_privacy_policy(report, listing)
     else:
         report.add("listing:text", "pack", UNVERIFIED, listing_error)
         report.add("placeholder-host", "pack", UNVERIFIED, listing_error)
+        report.add("privacy-policy", "pack", UNVERIFIED, listing_error)
 
     check_release_notes(report, slot)
 

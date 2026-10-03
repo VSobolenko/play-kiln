@@ -47,7 +47,11 @@
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { SCRATCH_DIR } from '../lib/scratch.mjs'
 import path from 'node:path'
-import { baselineVerdict } from './baseline.mjs'
+import { CONTENT_COLOUR_BASELINE, FACTORY_BASELINE, baselineVerdict } from './baseline.mjs'
+// The one WCAG implementation in the core, imported rather than re-derived: the palette sensor gates
+// every `on-X`/`X` pair with the same function, and a content colour is exactly an
+// `on-background`/`background` pair. `contrastRatio` takes `#RRGGBB` and returns the WCAG 2.x ratio.
+import { contrastRatio } from '../lib/hct.mjs'
 // Imported, never re-implemented: `decodeSource` is the one place that decides a file is binary
 // (`bytes.includes(0)`), which every text sweep in the core obeys.
 import { decodeSource } from './build.mjs'
@@ -64,7 +68,8 @@ export const UIUX_IDS = Object.freeze([
   'uiux.motion',
   'uiux.a11y',
   'uiux.insets',
-  'uiux.platform'
+  'uiux.platform',
+  'uiux.content-colour'
 ])
 
 /** The factory-scoped checks. `uiux.scaffold` is expected red until the scaffold carries the baseline. */
@@ -166,6 +171,58 @@ export const CLICKABLE_HOSTS = Object.freeze([
 
 /** Material 3's floor, and the one number in this module that is not derived: it is the published rule. */
 export const MIN_TOUCH_TARGET_DP = 48
+
+/**
+ * The calls that hand their content a colour, which is what `uiux.content-colour` looks for.
+ *
+ * Every one of these resolves `contentColor` from its container — `Surface` via
+ * `contentColorFor(containerColor)`, the Material 3 containers from their own role — so a
+ * default-coloured `Text`/`Icon` inside it stops being `Color.Black`. `Scaffold`, `Card` and the
+ * sheet families are included because they root a screen the same way; the reference fix uses
+ * `Surface` around `NavDisplay`, and the rule accepts any of them at the root.
+ */
+export const CONTENT_COLOUR_HOSTS = Object.freeze([
+  'Surface', 'Scaffold', 'Card', 'ElevatedCard', 'OutlinedCard',
+  'BottomSheet', 'ModalBottomSheet', 'BottomSheetScaffold'
+])
+
+/** The other accepted provision: a composition local set explicitly rather than through a container. */
+const CONTENT_COLOUR_PROVIDES = /LocalContentColor\s+provides\b/
+
+/**
+ * A host that opts out of providing a colour.
+ *
+ * `Color.Unspecified` is the one value that *does not* provide one — `Surface` passes it straight
+ * through to the existing `LocalContentColor` when its container colour is not recognised — so a
+ * `Surface(color = …, contentColor = Color.Unspecified)` must not read as rooted. This is the whole
+ * reason the rule reads a host's own arguments rather than only its name.
+ */
+const CONTENT_COLOUR_UNSPECIFIED = /\bcontentColor\s*=\s*Color\.Unspecified\b/
+
+/**
+ * An explicit `contentColor = …` assignment, which is the third shape that provides a colour.
+ *
+ * A container the rule does not know by name can root a screen the same way `Surface` does, so the
+ * root body is read for this argument directly rather than only for the known call names. Read at the
+ * app root only: a `contentColor` deep inside one screen is the partial fix this rule exists to catch,
+ * and accepting it module-wide would miss the defect in every app that colours a chip.
+ */
+const CONTENT_COLOUR_ARGUMENT = /\bcontentColor\s*=\s*(?!Color\.Unspecified\b)\S/
+
+/**
+ * The app's content hosts: what Navigation calls to render a destination.
+ *
+ * A host with no enclosing colour is the defect, so these are the call sites the finding names.
+ */
+const NAV_HOSTS = Object.freeze(['NavDisplay', 'NavHost'])
+
+/**
+ * WCAG 2.2 SC 1.4.3 AA's 4.5:1 text floor — the published rule, not a derived number, which is why
+ * it is named here the way `MIN_TOUCH_TARGET_DP` names Material 3's. `scripts/core/palette.mjs`
+ * encodes the same floor for every `on-X`/`X` pair; the two are the same published constant and
+ * neither is the other's source, so a shared module would be a third file for one number.
+ */
+const MIN_TEXT_CONTRAST = 4.5
 
 /**
  * A fixed extent declared on a modifier chain.
@@ -858,12 +915,33 @@ export function a11yFindings(sources) {
 const NAVIGATION_BAR_INSET = /\bnavigationBarsPadding\s*\(|\bwindowInsetsPadding\s*\(|\bsafeDrawing\b|WindowInsetsSides\s*\.\s*Bottom|\bsystemBars\b|\bcontentWindowInsets\b/
 
 /**
- * The calls that make a child flexible along the axis its parent fills.
+ * The marks of a child that is flexible *along its parent `Column`'s axis*: a `weight` on the child
+ * itself, a scroll modifier on the child itself, or a greedy lazy list as the child's own head.
  *
- * A weighted child or a scrolling container is what pushes a *following* sibling to the parent's
- * bottom edge, which is what makes that sibling a pinned bar rather than another row in the flow.
+ * Only the child's **own** head is read, because that is the only thing that pushes a *following*
+ * sibling to the parent's bottom edge and so makes it a pinned bar instead of another row in the
+ * flow. The scope is the whole point, and it was paid for: the previous version tested the child's
+ * whole subtree, so a `weight` written inside a **nested** `Row` — where it divides that `Row`'s width
+ * and leaves the outer child rigid — was read as the `Column`'s flexibility. That produced two false
+ * positives on `apps/2026-10-02-laneset`: `ui/importer/CoachImportScreen.kt` and
+ * `ui/unlock/UnlockScreen.kt` both hand the `Scaffold`'s `innerPadding` to a `fillMaxSize()` `Column`,
+ * and a trailing `Surface` / `UnlockAction` after a `Row` holding
+ * `StatTile(modifier = Modifier.weight(1f))` was reported as a bar rendering under the navigation bar
+ * it had already been inset from.
+ *
+ * A scroll modifier on the child **itself** is kept, because a scrolling child of a size-filling
+ * `Column` can be given the remaining height and leave a following sibling none.
+ *
+ * What is deliberately **not** credited here is a `Scaffold`'s own work: `bottomChromeFindings`
+ * reads "no navigation-bar inset is named anywhere" as the third condition, and a screen that hands
+ * `innerPadding` to its content — which *is* the navigation-bar inset, per this module's own cited
+ * source in `UIUX_STANDARD_SOURCES` (`material-insets`: a `Scaffold` "reports them as
+ * `innerPadding`") — names none of the tokens that condition looks for. That is a second
+ * false-positive class in the same predicate, recorded rather than fixed here: it needs a fixture of
+ * its own, and no slot in the tree exercises it today.
  */
-const FLEXIBLE_CHILD = /\bLazyColumn\s*\(|\bLazyRow\s*\(|\.weight\s*\(|\bverticalScroll\s*\(|\bhorizontalScroll\s*\(/
+const OWN_FLEXIBLE = /\.weight\s*\(|\.verticalScroll\s*\(|\.horizontalScroll\s*\(/
+const GREEDY_LIST = /^\s*(?:LazyColumn|LazyRow)\s*\(/
 
 /** A child that draws bottom chrome: a `Surface`/`Column` call, or a composable that roots at one. */
 const LITERAL_BAR = /^\s*(Surface|Column)\s*\(/
@@ -922,6 +1000,27 @@ function barChild(masked, text) {
   return declaredBarRoot(masked, call[1])
 }
 
+/** The argument list of a child's own top-level call, blanked string/comment spans included. */
+function headArgs(masked, start) {
+  const open = masked.indexOf('(', start)
+  if (open === -1) return ''
+  const close = matchParen(masked, open)
+  return close === -1 ? '' : masked.slice(open + 1, close)
+}
+
+/**
+ * Whether one child is flexible along its parent `Column`'s axis — see `OWN_FLEXIBLE`.
+ *
+ * The test reads the child's **own** head only: its own argument list for a `weight` or a scroll
+ * modifier, and its own call name for a greedy lazy list. A nested `Row`'s `weight` and a nested
+ * `Surface`'s content live in the child's *body* and are invisible here, which is exactly the
+ * narrowing the false positive required.
+ */
+function selfFlexible(masked, child) {
+  if (OWN_FLEXIBLE.test(headArgs(masked, child.start))) return true
+  return GREEDY_LIST.test(masked.slice(child.start, Math.min(child.end, child.start + 40)))
+}
+
 /**
  * The bottom bar one source pins with no navigation-bar inset, or null.
  *
@@ -941,7 +1040,7 @@ function pinnedBottomBar(source) {
     const close = column.index + column.span.length - 1
     if (close <= open) continue
     const children = topLevelChildren(masked, open + 1, close)
-    const weighted = children.some((child) => FLEXIBLE_CHILD.test(masked.slice(child.start, child.end)))
+    const weighted = children.some((child) => selfFlexible(masked, child))
     if (!/fillMaxSize/.test(column.argsSpan) && !weighted) continue
     let flexible = false
     for (const child of children) {
@@ -951,7 +1050,7 @@ function pinnedBottomBar(source) {
         if (flexible) return { line: lineOf(masked, child.start), name: bar }
         continue
       }
-      if (FLEXIBLE_CHILD.test(text)) flexible = true
+      if (selfFlexible(masked, child)) flexible = true
     }
   }
   return null
@@ -1659,6 +1758,188 @@ export function platformSummary(slotDir, sources) {
 }
 
 // ---------------------------------------------------------------------------------------------
+// uiux.content-colour: the root that gives default-coloured text something to be visible against
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * Whether the module ships a dark theme at all, which is the precondition for the defect.
+ *
+ * Two markers, because a slot may declare its darkness in either place: a `values-night` resource
+ * tree
+ * (the pre-Compose window background, and the one `values-night/colors.xml` carries) or a
+ * `darkColorScheme(` in Kotlin. Either is enough to say the dark scheme exists. A module with
+ * neither is deliberately not judged — see `contentColourFindings`.
+ */
+export function shipsDarkTheme(slotDir, sources) {
+  const resDir = path.join(slotDir, 'app', 'src', 'main', 'res')
+  const night = walkSlotFiles(resDir).find(
+    (file) => file.endsWith('.xml') && /[\\/]values-night[^\\/]*[\\/]/.test(file)
+  )
+  if (night) return true
+  return sources.some((source) => /darkColorScheme\s*\(/.test(source.masked))
+}
+
+/**
+ * Whether anything in the module gives its content a colour, at the app root or around a host.
+ *
+ * Three accepted shapes, in the order they are cheapest to read. A provider is accepted only when it
+ * is *at the root* — inside `setContent { … }`, which is the app's own root, or wrapping a content
+ * host — because a `Surface` deep inside one screen is exactly the partial fix that leaves every
+ * other destination invisible. An explicit `contentColor = …` inside the app root counts too, which
+ * is how a wrapper the rule does not know by name still provides a colour. `LocalContentColor
+ * provides …` is accepted anywhere, because a composition local set explicitly is a provision by
+ * construction and refusing it would be a false positive on correct code.
+ *
+ * The honest limit: this reads one file at a time, so it cannot follow `PlayKilnTheme(...)` into
+ * `Theme.kt` to prove a colour is or is not set there. A provision made through an intermediate
+ * composable that wraps the host and is neither a known container nor a root `contentColor` is
+ * invisible to it too. Both directions are deliberate: the predicates above are what a static scan
+ * can defend, and the paragraph in `.cursor/rules/ui-ux-baseline.mdc` says so rather than implying the
+ * scan sees pixels.
+ */
+export function providesContentColour(sources) {
+  for (const source of sources) {
+    if (CONTENT_COLOUR_PROVIDES.test(source.masked)) return true
+    const roots = callSites(source.masked, 'setContent', { allowBareLambda: true }).map((site) => [
+      site.index,
+      site.index + site.span.length
+    ])
+    // An explicit `contentColor = …` anywhere inside the app root's own body, which is how a wrapper
+    // the rule does not know by name still counts as providing a colour.
+    if (roots.some(([from, to]) => CONTENT_COLOUR_ARGUMENT.test(source.masked.slice(from, to)))) return true
+    const hosts = NAV_HOSTS.flatMap((name) => callSites(source.masked, name).map((site) => site.index))
+    for (const name of CONTENT_COLOUR_HOSTS) {
+      for (const site of callSites(source.masked, name)) {
+        // A host that explicitly passes `contentColor = Color.Unspecified` provides nothing, so it is
+        // skipped rather than counted — otherwise the one call shape that reproduces the defect would
+        // be the one shape the rule accepts.
+        if (CONTENT_COLOUR_UNSPECIFIED.test(site.args)) continue
+        const end = site.index + site.span.length
+        if (roots.some(([from, to]) => site.index >= from && end <= to)) return true
+        if (hosts.some((index) => index > site.index && index < end)) return true
+      }
+    }
+  }
+  return false
+}
+
+/**
+ * The dark scheme's declared window background, as `#RRGGBB`, or null when it cannot be resolved.
+ *
+ * This is a measurement on the finding, never the gate. The gate is `shipsDarkTheme`, because a Kotlin
+ * colour constant (`darkColorScheme(background = Color(0xFF…))`) is not something a line-oriented
+ * scan can resolve without guessing at expression structure — the same reason `palette.mjs`'s own
+ * honest limit is that it reads *declared* colours and nothing else. An XML `<color>` is resolvable,
+ * so when the module declares its dark window background there the finding prints the real WCAG
+ * contrast against `Color.Black`; when it does not, the finding still fires and simply does not quote
+ * a number it did not measure.
+ */
+export function darkWindowBackground(slotDir) {
+  const resDir = path.join(slotDir, 'app', 'src', 'main', 'res')
+  const xml = walkSlotFiles(resDir).filter((file) => file.endsWith('.xml'))
+  const read = (files) => {
+    const map = new Map()
+    for (const file of files) {
+      let text
+      try {
+        text = readFileSync(file, 'utf8')
+      } catch {
+        continue
+      }
+      for (const match of text.matchAll(/<color\s+name="([^"]+)"\s*>\s*#([0-9A-Fa-f]{6,8})\s*<\/color>/g)) {
+        map.set(match[1], normalizeHex(match[2]))
+      }
+    }
+    return map
+  }
+  const base = read(xml.filter((file) => /[\\/]values[\\/]/.test(file)))
+  const night = read(xml.filter((file) => /[\\/]values-night[^\\/]*[\\/]/.test(file)))
+  const colors = new Map([...base, ...night])
+  const themes = xml
+    .map((file) => {
+      try {
+        return readFileSync(file, 'utf8')
+      } catch {
+        return ''
+      }
+    })
+    .join('\n')
+  const referenced = /android:windowBackground\s*>\s*@color\/([A-Za-z0-9_.]+)/.exec(themes)
+  if (referenced && colors.has(referenced[1])) return colors.get(referenced[1])
+  for (const [name, value] of colors) {
+    if (/window.?background|background/i.test(name)) return value
+  }
+  return null
+}
+
+/** A `#RRGGBB` / `#AARRGGBB` colour literal as the `#RRGGBB` `contrastRatio` requires. */
+function normalizeHex(raw) {
+  const hex = raw.replace(/^#/, '')
+  if (hex.length === 8) return `#${hex.slice(2).toUpperCase()}`
+  return `#${hex.toUpperCase()}`
+}
+
+/**
+ * A module that hosts content with no content colour while shipping a dark theme.
+ *
+ * The measured defect this rule exists for: `NavDisplay` with nothing between it and the window that
+ * sets a colour, so a default-coloured `Text`/`Icon` resolves `LocalContentColor` to Compose's default
+ * `Color.Black` — invisible on the dark window background. `apps/2026-10-01-lawn-round-log` drew pure
+ * `#000000` on `#101410`, contrast 1.13:1, and in the light scheme the same code was readable, which is
+ * why every gate saw a green app. The fix is one `Surface` at the root; the rule asks for that and
+ * nothing more.
+ *
+ * Deliberately narrow, in the direction that avoids a false positive: a module with no dark theme is
+ * not judged at all, because black on a light window background is readable — an under-approximation
+ * stated here rather than left for a reader to infer. A module that provides a content colour anywhere
+ * at its root is silent. Only a module with a dark theme *and* an unrooted content host produces a
+ * finding, and the finding names the host call the way every other `uiux` finding names a `file:line`.
+ */
+export function contentColourFindings(slotDir, sources) {
+  if (!shipsDarkTheme(slotDir, sources)) return []
+  if (providesContentColour(sources)) return []
+  const background = darkWindowBackground(slotDir)
+  let measured = ''
+  if (background) {
+    try {
+      measured = `, WCAG contrast ${contrastRatio(background, '#000000').toFixed(2)}:1 against ${background}`
+    } catch {
+      measured = ''
+    }
+  }
+  const findings = []
+  for (const source of sources) {
+    for (const name of NAV_HOSTS) {
+      for (const site of callSites(source.masked, name)) {
+        findings.push(
+          `${source.rel}:${site.line}: ${name}( is the app's content host and nothing at or above it ` +
+            'provides a content colour — no Surface/Scaffold/Card wraps it and no LocalContentColor is ' +
+            'set — so a default-coloured Text/Icon falls back to Compose\'s default LocalContentColor, ' +
+            `Color.Black, which is invisible on this module's dark background${measured} (the measured ` +
+            'defect was #000000 on #101410, contrast 1.13:1; see .cursor/rules/ui-ux-baseline.mdc, ' +
+            '"uiux.content-colour")'
+        )
+      }
+    }
+  }
+  return findings
+}
+
+/** What `uiux.content-colour` measured, as one line, so a PASS row is evidence rather than an assertion. */
+export function contentColourSummary(slotDir, sources) {
+  const hosts = sources.reduce(
+    (total, source) => total + NAV_HOSTS.reduce((count, name) => count + callSites(source.masked, name).length, 0),
+    0
+  )
+  if (!shipsDarkTheme(slotDir, sources)) {
+    return `${hosts} content host(s); no dark theme declared, so Compose's default content colour cannot collide with a dark background`
+  }
+  const rooted = providesContentColour(sources)
+  const background = darkWindowBackground(slotDir)
+  return `${hosts} content host(s); a dark theme is declared; content colour ${rooted ? 'provided at the root' : 'NOT provided'}${background ? `; dark window background ${background}` : '; dark window background not resolvable from XML'}`
+}
+
+// ---------------------------------------------------------------------------------------------
 // The pure sensors, exported for measurement and for the red-before-green demonstration
 // ---------------------------------------------------------------------------------------------
 
@@ -1674,7 +1955,8 @@ export function uiuxFindings(slotDir) {
     ...insetFindings(slotDir, sources),
     ...insetNotes(sources),
     ...platformFindings(slotDir, sources),
-    ...platformNotes(slotDir, sources)
+    ...platformNotes(slotDir, sources),
+    ...contentColourFindings(slotDir, sources)
   ]
 }
 
@@ -1694,7 +1976,8 @@ const SENSORS = Object.freeze({
   'uiux.motion': (slotDir) => motionFindings(readKotlin(slotDir)),
   'uiux.a11y': (slotDir) => a11yFindings(readKotlin(slotDir)),
   'uiux.insets': (slotDir) => insetFindings(slotDir, readKotlin(slotDir)),
-  'uiux.platform': (slotDir) => platformFindings(slotDir, readKotlin(slotDir))
+  'uiux.platform': (slotDir) => platformFindings(slotDir, readKotlin(slotDir)),
+  'uiux.content-colour': (slotDir) => contentColourFindings(slotDir, readKotlin(slotDir))
 })
 
 /**
@@ -1761,7 +2044,8 @@ function summaries(slotDir, sources) {
         : `${animations} animation API site(s) across ${screens.length} screen(s)`,
     'uiux.a11y': `${icons} Icon/Image call(s) each with a contentDescription argument; ${clickables} clickable element(s) each with an accessible name and no declared extent below ${MIN_TOUCH_TARGET_DP} dp`,
     'uiux.insets': insetSummary(slotDir, sources, fields, manifest),
-    'uiux.platform': platformSummary(slotDir, sources)
+    'uiux.platform': platformSummary(slotDir, sources),
+    'uiux.content-colour': contentColourSummary(slotDir, sources)
   }
 }
 
@@ -1861,7 +2145,11 @@ function checkScaffoldBaseline() {
       // `uiux.platform` is read here too, and for the same reason: the scaffold is what every new slot
       // is copied from, so a template that never opts into predictive back would ship the omission to
       // every slot after it, with the gate reporting it one slot later instead of here.
-      ...platformFindings(scaffold, sources)
+      ...platformFindings(scaffold, sources),
+      // And `uiux.content-colour` for the strongest version of that reason: the defect was *born* in
+      // this template, so a scaffold that hosts `NavDisplay` with no enclosing content colour is the
+      // count of every slot that would inherit invisible text again.
+      ...contentColourFindings(scaffold, sources)
     ]
     if (findings.length === 0) {
       return pass('uiux.scaffold', `the scaffold carries every UI/UX rule for the ${sources.length} Kotlin file(s) it holds`)
@@ -2288,6 +2576,41 @@ export function uiuxFixtures() {
             }),
             false
           )
+          // A `weight` inside a nested Row is that Row's own horizontal division, so the following
+          // Surface is not pinned: the false positive measured on `apps/2026-10-02-laneset`, where
+          // `StatTile(modifier = Modifier.weight(1f))` inside a Row was read as the Column's
+          // flexibility. This leg fails against a whole-subtree flexible test.
+          expectSensor(
+            'uiux.insets',
+            demoFiles({
+              [`${UI_REL}/Round.kt`]: body([
+                '    Column(modifier = Modifier.fillMaxSize()) {',
+                '        Row(modifier = Modifier.fillMaxWidth()) {',
+                '            StatTile(modifier = Modifier.weight(1f))',
+                '        }',
+                '        Surface(modifier = Modifier.fillMaxWidth()) { Text(label) }',
+                '    }'
+              ])
+            }),
+            false
+          )
+          // The real slot shape — `fillMaxSize().verticalScroll(…)` on the Column itself — asserted
+          // end to end: the trailing Surface is where the content ends rather than an edge, and the
+          // `weight` belongs to the nested Row, never to a child of this Column.
+          expectSensor(
+            'uiux.insets',
+            demoFiles({
+              [`${UI_REL}/Round.kt`]: body([
+                '    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {',
+                '        Row(modifier = Modifier.fillMaxWidth()) {',
+                '            StatTile(modifier = Modifier.weight(1f))',
+                '        }',
+                '        Surface(modifier = Modifier.fillMaxWidth()) { Text(label) }',
+                '    }'
+              ])
+            }),
+            false
+          )
           // A screen that is one list with the safe-drawing inset has no bar to judge.
           expectSensor(
             'uiux.insets',
@@ -2632,6 +2955,109 @@ export function uiuxFixtures() {
           const notes = expectNote('uiux.platform', demoFiles(), true, 'splash-screen API')
           expectTrue(notes.length >= 5, `the encourage-only list produced only ${notes.length} note(s)`)
           expectSensor('uiux.platform', demoFiles(), false)
+        }
+      ],
+      // ---- uiux.content-colour ------------------------------------------------------------
+      [
+        'a dark module whose content host has no colour above it is a finding; the same module with a root Surface is not',
+        () => {
+          // The fixture's own dark window background is the `#101410` the device measured, so the
+          // finding can be asserted to quote 1.13:1 rather than merely to exist — the sensor's one
+          // measurement (the XML-resolvable contrast) is driven, not described.
+          const night = {
+            'app/src/main/res/values-night/colors.xml':
+              '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="playkiln_window_background">#101410</color>\n</resources>\n'
+          }
+          const unrooted = demoFiles(night)
+          expectSensor('uiux.content-colour', unrooted, true, 'LocalContentColor')
+          expectTrue(
+            findingsIn(unrooted, SENSORS['uiux.content-colour']).join(' ').includes('1.13:1'),
+            'the finding did not quote the measured contrast of the dark XML window background'
+          )
+          // The fix in `setContent`'s root, in another file from the host — the alternative shape the
+          // rule accepts, and the one that proves it is not merely a same-file span test.
+          const rootedAtActivity = [
+            'package com.gexetr.demo.ui',
+            'import androidx.activity.compose.setContent',
+            'import androidx.compose.foundation.layout.fillMaxSize',
+            'import androidx.compose.material3.MaterialTheme',
+            'import androidx.compose.material3.Surface',
+            'import androidx.compose.ui.Modifier',
+            '',
+            'fun MainActivity.onCreate() {',
+            '    setContent {',
+            '        MaterialTheme {',
+            '            Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {',
+            '                DemoApp()',
+            '            }',
+            '        }',
+            '    }',
+            '}',
+            ''
+          ].join('\n')
+          expectSensor(
+            'uiux.content-colour',
+            demoFiles({ ...night, [`${UI_REL}/MainActivity.kt`]: rootedAtActivity }),
+            false
+          )
+          // The third accepted shape: an explicit `contentColor = …` on a wrapper the rule does not
+          // know by name, set inside the app root.
+          const customRoot = [
+            'package com.gexetr.demo.ui',
+            'import androidx.activity.compose.setContent',
+            '',
+            'fun MainActivity.onCreate() {',
+            '    setContent {',
+            '        AppShell(contentColor = MaterialTheme.colorScheme.onBackground) {',
+            '            DemoApp()',
+            '        }',
+            '    }',
+            '}',
+            ''
+          ].join('\n')
+          expectSensor(
+            'uiux.content-colour',
+            demoFiles({ ...night, [`${UI_REL}/MainActivity.kt`]: customRoot }),
+            false
+          )
+          // And the reference shape: the Surface wraps the host in the same file.
+          const rootedAtHost = NAV3_APP.replace(
+            '    NavDisplay(\n',
+            '    Surface(color = MaterialTheme.colorScheme.background) {\n        NavDisplay(\n'
+          ).replace('\n    )\n}\n', '\n        )\n    }\n}\n')
+          expectTrue(
+            rootedAtHost !== NAV3_APP && rootedAtHost.includes('Surface(color = MaterialTheme.colorScheme.background)'),
+            'the fixture did not wrap the host in a Surface'
+          )
+          expectSensor('uiux.content-colour', demoFiles({ ...night, [`${UI_REL}/PlayKilnApp.kt`]: rootedAtHost }), false)
+        }
+      ],
+      [
+        'a light-only module is not judged, and a dark theme declared in Kotlin is',
+        () => {
+          // No dark theme at all: black on a light window background is readable, so this must be
+          // silent — the deliberate under-approximation the sensor's own comment states.
+          expectSensor('uiux.content-colour', demoFiles(), false)
+          // The other dark marker, with no `values-night` tree: `darkColorScheme(` in Kotlin is enough
+          // for the rule to apply, which is what puts a Compose-only dark theme in scope too.
+          const theme =
+            'package com.gexetr.demo.ui.theme\nimport androidx.compose.material3.darkColorScheme\nimport androidx.compose.material3.ColorScheme\nval Dark: ColorScheme = darkColorScheme()\n'
+          expectSensor('uiux.content-colour', demoFiles({ [`${UI_REL}/theme/Theme.kt`]: theme }), true, 'Color.Black')
+        }
+      ],
+      [
+        'a Surface that passes Color.Unspecified provides no colour and is still a finding',
+        () => {
+          const night = {
+            'app/src/main/res/values-night/colors.xml':
+              '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="playkiln_window_background">#101410</color>\n</resources>\n'
+          }
+          const optsOut = NAV3_APP.replace(
+            '    NavDisplay(\n',
+            '    Surface(color = MaterialTheme.colorScheme.background, contentColor = Color.Unspecified) {\n        NavDisplay(\n'
+          ).replace('\n    )\n}\n', '\n        )\n    }\n}\n')
+          expectTrue(optsOut !== NAV3_APP, 'the fixture did not wrap the host')
+          expectSensor('uiux.content-colour', demoFiles({ ...night, [`${UI_REL}/PlayKilnApp.kt`]: optsOut }), true, 'LocalContentColor')
         }
       ],
       // ---- uiux.rule ----------------------------------------------------------------------

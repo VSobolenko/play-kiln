@@ -158,8 +158,10 @@ separate decision and is recorded at checkpoint 1.5 (step D).
 ## C. Build — hand off to `/ship`, do not reinvent it
 
 On approval, follow **`.cursor/commands/ship.md` from step 1 onward**, in `New app` mode. Step 1's
-OpenSpec proposal (`app-<slug>`) is created here, because it needs the slug the owner has just
-approved; its checkpoint 1 is already satisfied by step B above, so do not ask it again. Everything
+OpenSpec change (`app-<slug>`) is authored here — `proposal.md`, `tasks.md` and a delta spec, before
+the slot exists — because it needs the slug the owner has just approved, and it is the specification
+step 2's scaffold refuses to create the slot without (`.cursor/rules/spec-first.mdc`); its checkpoint
+1 is already satisfied by step B above, so do not ask it again. Everything
 else runs unchanged — step 2's scaffold, the implementation, the tests, the verification. Do not
 restate those steps here: that file is the single source of truth for phase 1, and a copy of it would
 drift.
@@ -172,13 +174,21 @@ corrupt each other, and remember that only one Gradle consumer may hold a slot a
 
 Two things are specific to arriving through `/forge`:
 
-- **The slot inherits the recipe that was just approved.** `--slug`, `--name`, `--idea`, `--economics`
-  and `--differentiators` come from the proposal in `docs/ideation/`, and every promise in
+- **The slot inherits the recipe that was just approved.** `--slug`, `--name`, `--idea`, `--economics`,
+  `--differentiators` and `--naming` come from the proposal in `docs/ideation/`, and `--spec app-<slug>`
+  names the change authored in step 1; every promise in
   `docs/ideation/plans/<slug>.differentiators.json` still starts `deferred`. Resolve each one as the
   app is built: `shipped` with a proof that exists in the slot, or `narrowed`/`dropped` in writing —
   with the owner's own words when the promise was `core`.
 - **The recon that produced the proposal is fresher than the recipe file.** If the shelf has moved
   since it was measured, say so at checkpoint 1 rather than after the build.
+
+**The privacy policy is published in this phase, not in release.** The URL is a build input for the
+app's own in-app policy, so `/ship` step 3 carries the command (`node scripts/publish-privacy.mjs
+--slot <slug>`) and the app is built against the URL it returns; `docs/privacy-policy-hosting.md` is
+the runbook and the owner is never asked for a host (`.cursor/rules/privacy-policy.mdc`). Publishing
+rewrites `store/listing.json`, which the approval at step D binds, so it belongs before that approval
+rather than after it.
 
 ## D. CHECKPOINT 1.5 — the owner decides the product
 
@@ -221,7 +231,14 @@ After the recorded approval, follow **`.cursor/commands/release.md`**: signed AP
 pack, the captured screenshots, `verify.mjs --build`, and the `/eval` verdict. Then hand the Play
 Console ladder back to the owner's observation
 (`docs/play-publishing-playbook.md` §5.1). `/forge` ends when the slot is ready for Play — it does
-not publish, and it never performs the owner's legal declarations.
+not publish and it does not upload the store graphics; the two first-publication declarations are
+ticked by the agent during `/release`, once the recorded approval exists, because the approval is the
+human checkpoint and not the click. The owner's decision, recorded 2026-10-03: «В нашем заводе есть
+правило, что перед публикацией необходимо одобрение владельца. Собственно говоря, в то время и я
+проверяю проверку всех вот этих политик, и только после моего одобрения я говорю разрешить
+публикацию. Поэтому, если я разрешил публикацию, значит эти галочки можно уже автоматически
+нажимать. Потому что все проверки необходимые для публикации проводятся до начальной публикации
+всего приложения.»
 
 ## Guardrails
 

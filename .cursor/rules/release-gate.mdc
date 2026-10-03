@@ -73,8 +73,14 @@ Rules for the recording step:
 - **`--note` is required and must be the owner's own words.** A record with no words is a
   boolean an agent could set by itself; the note is what makes it a decision a later reader
   can audit. Never paraphrase a vague "ok" into an approval — ask what he approved.
-- Approval authorises **the release pipeline only**. Uploading, legal declarations and
-  publishing stay with the owner (`authorization.mdc`).
+- Approval authorises **the release pipeline**, and it is what lets the agent tick the two
+  first-publication legal declarations during console submission: the approval is the human
+  checkpoint, and the click is not. Uploading and publishing stay with the owner
+  (`authorization.mdc`). The owner's decision, recorded 2026-10-03: «В нашем заводе есть правило,
+  что перед публикацией необходимо одобрение владельца. Собственно говоря, в то время и я проверяю
+  проверку всех вот этих политик, и только после моего одобрения я говорю разрешить публикацию.
+  Поэтому, если я разрешил публикацию, значит эти галочки можно уже автоматически нажимать. Потому
+  что все проверки необходимые для публикации проводятся до начальной публикации всего приложения.»
 
 The record is `apps/<slot>/release-approval.json`, gitignored, and the check is one module:
 `scripts/lib/release-approval.mjs`. Six entry points call it and refuse without it:
@@ -101,7 +107,11 @@ bytes re-opens the gate, because the content is identical to what the owner revi
 from the digest: the release pipeline writes them after approval, so including them would
 make the pipeline void its own approval mid-run. `capabilities.json`, `economics.json`,
 `.kiln-state.json` and `README.md` are excluded too — they describe the slot but do not
-change the built bytes.
+change the built bytes. The two record files — `release-approval.json` and
+`device-verification.json` — are excluded for a third reason: each is written and then
+checked, and a record that stores the revision's digest must not be an input to the digest
+it stores. The list, with the reason each name is exempt for, is `EXCLUDED_FILE_REASONS` in
+`scripts/lib/release-approval.mjs`.
 
 If the digest ever disagrees with a change the owner actually wanted, the fix is to re-record
 the approval, never to weaken the check.
@@ -124,10 +134,45 @@ Report the release phase's own elapsed wall clock. The one-hour target is a dire
 release half is where the unavoidable build and capture time sits; do not present development
 time as if it covered the release.
 
+## The store graphics are the owner's upload, and the agent must ask for them
+
+One console act cannot be automated and must not be attempted: **uploading the store-graphic
+fields** — the app icon, the feature graphic and the phone / 7-inch / 10-inch screenshot sets. They
+are hidden `input[type=file]` controls that appear only after `Добавить объекты`, and the sandboxed
+browser the factory drives denies `DOM.setFileInputFiles`. That is an unsolved tooling limitation,
+recorded as a limitation and not as a policy (`docs/play-console-checklist.md` §1.B and §10); no
+route around it exists, so a session that needs these assets neither leaves the release half-done in
+silence nor invents a workaround.
+
+The owner's instruction, recorded 2026-10-03, is that at this point the agent **opens the page, gives
+the instruction, and asks — and the asking is the checkpoint**:
+
+1. **Open the page for the owner** in the browser the factory drives
+   (`…/store-listings/default/edit`), scrolled to `Значок приложения`.
+2. **Give the exact instruction**: which file goes into which field, as absolute paths — the icon
+   from `store/assets/icon-512.png`, the feature graphic from
+   `store/assets/feature-graphic-1024x500.png`, the phone set from `store/assets/<locale>/phone-*.png`
+   and the tablet sets from `store/assets/<locale>/tablet-*.png`.
+3. **Ask, and wait.** The question is a checkpoint, not a notification: the owner uploads and
+   confirms, and the agent does not proceed, does not re-save over his upload, and does not report the
+   release as finished until he answers. **While he is uploading, the agent touches the page as little
+   as possible** — it must not navigate away or reload it, because the chosen files live in the form
+   and not on the server until the step-2 save, so a reload silently discards his work and leaves the
+   agent checking an empty form it reloaded itself.
+4. **Only then continue, and check without discarding** — `Далее` → the `Отзыв` tab → save, reading
+   the validation messages the `Далее` click produces. That is what says whether the listing is
+   finally complete; a reload is not a check.
+
+The ask is mandatory because the upload is invisible to every gate: the pack validates,
+`media-capture.mjs` has already photographed the build, and the release review is the only place that
+reports the field as missing — so a session that skips the ask reports a finished release whose store
+page has no icon.
+
 ## What never changes
 
 - A green gate is not a reason to skip the owner's review. The gate decides *when* release
   work may run, not whether the app is good.
 - Never record an approval to unblock yourself. If the release scripts refuse, the answer is
   to ask the owner, not to delete or edit `release-approval.json`.
-- Never upload, never fill legal declarations, never publish (`authorization.mdc`).
+- Never upload artifacts or the store graphics, and never publish (`authorization.mdc`). The two
+  first-publication declarations are ticked by the agent only under the recorded approval above.

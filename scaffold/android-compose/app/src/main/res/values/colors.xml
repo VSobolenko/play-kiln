@@ -5,7 +5,8 @@
     <color name="playkiln_seed">#006C4C</color>
     <color name="playkiln_seed_dark">#63DBA6</color>
 
-    <!-- Window background shown for the few milliseconds before Compose draws its first frame.
-         Keeping it neutral prevents a white flash in dark mode. -->
-    <color name="playkiln_window_background">#FFFBFF</color>
+    <!-- Window background shown before Compose draws its first frame. It is the light scheme's own
+         `background` role, `Color.kt`'s `Neutral99`, so the window never flashes a colour the theme
+         does not paint. -->
+    <color name="playkiln_window_background">#FBFDF9</color>
 </resources>

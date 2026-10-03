@@ -97,6 +97,17 @@ class BillingPurchaseGate(
     private val controller: BillingController,
     private val product: ProductId = UNLOCK_PRODUCT,
     private val catalog: BillingCatalog = BillingCatalog(inAppProducts = listOf(product)),
+    /**
+     * Test-only: reports the unlock as owned without asking Play.
+     *
+     * The export handoffs sit behind this gate, and the gate is a Play purchase that cannot complete
+     * for an app that is not on Play yet — so without this a debug build could not reach the paid
+     * surface on a device, and the handoffs would ship untested. `MainActivity` passes true only when
+     * a debug build was launched with the documented extra, and a release build's `BuildConfig.DEBUG`
+     * is a compile-time false, so the branch and this parameter are folded away by R8 and the shipped
+     * gate is exactly what it was.
+     */
+    debugOwned: Boolean = false,
 ) : PurchaseGate {
 
     /**
@@ -107,9 +118,15 @@ class BillingPurchaseGate(
      */
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
-    override val owned: StateFlow<Boolean> = controller.entitlements
-        .map { entitlements -> entitlements.owns(product.key()) }
-        .stateIn(scope, SharingStarted.Eagerly, controller.entitlements.value.owns(product.key()))
+    private val debugOwnedFlow = MutableStateFlow(debugOwned)
+
+    override val owned: StateFlow<Boolean> = if (debugOwned) {
+        debugOwnedFlow.asStateFlow()
+    } else {
+        controller.entitlements
+            .map { entitlements -> entitlements.owns(product.key()) }
+            .stateIn(scope, SharingStarted.Eagerly, controller.entitlements.value.owns(product.key()))
+    }
 
     private val mutableStatus = MutableStateFlow(UnlockStatus.IDLE)
     override val status: StateFlow<UnlockStatus> = mutableStatus.asStateFlow()

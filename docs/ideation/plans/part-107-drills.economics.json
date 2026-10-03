@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A US-based aspiring commercial drone operator who must pass the FAA Part 107 aeronautical knowledge test before flying for money, and who studies on a phone in the two to six weeks before a 175 dollar appointment at a PSI testing centre.",
+  "paidUnit": "One permanent unlock of the whole app: the full ACS-mapped item set, the generated weather and airspace drill engines, and every answer's citation to the 14 CFR paragraph or the ACS knowledge code it comes from, with no advertising, no account and no renewal.",
+  "priceUsd": 9.99,
+  "momentOfPayment": "After a free set of drills per topic has shown that the app explains its answers, at the first locked topic or the first full-length mock, behind one clearly priced unlock sheet with no trial clock and no subscription prompt.",
+  "distinctnessSentence": "Where the shelf tests a learner against a fixed bank of 350 to 1,000 or more items that can be memorised and can go stale, this app generates every weather item from the METAR and TAF grammar and every airspace item from the 14 CFR Part 107 limits, validates each generated item against those rules before it is ever shown, scopes the whole bank to sUAS with no fixed-wing material, prints the paragraph or ACS code behind each answer on the answer screen itself, and does all of it in airplane mode with no ads, no subscription and no account.",
+  "evidenceRef": "docs/ideation/2026-10-02-authored-learning-and-drills.md#4-the-wedge-in-one-sentence-functionality-and-content",
+  "day1RevenuePath": "The slot is listed against the part 107 practice test query, where demand is proven by com.part107.faa.exam at 4.0 stars over 440 exact reviews and 10K or more installs and by com.edupass.part107 at 4.9 stars over 107 exact reviews, the learner installs after the free drills have proved the app explains, and the first unlock arrives through the billing capability this plan requires.",
+  "killCriteria": {
+    "windowDays": 90,
+    "minInstalls": 1850,
+    "minRevenueUsd": 900
+  },
+  "capabilities": {
+    "required": [
+      "billing"
+    ],
+    "deliberatelyNotEnabled": [
+      "ads"
+    ],
+    "note": "billing is what purchase_led_single_unlock collects through. ads is deliberately off: the measured defects this recipe answers are an ad over the quiz and a week or month subscription, so an ad-led build would reproduce them."
+  },
+  "serverRequired": false,
+  "permissions": "None beyond the billing flow's own com.android.vending.BILLING from the Play Billing library; no location, camera, storage, contacts, microphone or background work. No internet use for content, because the bank, both drill engines and every explanation ship inside the APK.",
+  "buildEstimateAgentHours": 6,
+  "archetypesRejected": [
+    {
+      "archetype": "purchase_led_repeat_sales",
+      "revenueReason": "There is no second thing to sell. The certificate is renewed on a 24 month cycle through a recurrent online course rather than a purchase, so the repeat cadence is one sale every two years, and a consumable priced below the 9.99 whole-bank unlock would cannibalise the unlock instead of adding revenue."
+    },
+    {
+      "archetype": "ads_led_utility",
+      "revenueReason": "Advertising is the measured defect this recipe answers: ads and paywall are 2 of the 6 critical reviews each on the part 107 practice test shelf, including a named review reporting constant adult ads. An ad-led build reproduces the complaint, and a new listing with no install velocity would carry that defect while earning nothing for months."
+    },
+    {
+      "archetype": "purchase_only_no_ads",
+      "revenueReason": "Every one of the eight enriched incumbents prices at zero, so the shelf's install funnel is a free download with the money collected in app and six of eight declaring an in-app purchase. A listing price trades a proven funnel for an unproven one."
+    },
+    {
+      "archetype": "subscription",
+      "revenueReason": "Banned outright by the owner on 2026-10-01 and machine enforced, since subscription is not in the ARCHETYPES list. Named here only because the 10K or more install incumbent's money is exactly a week or month subscription, which is the rent this one-price recipe replaces."
+    }
+  ],
+  "assumptionsUnverified": [
+    "Willingness to pay 9.99 dollars outright is UNVERIFIED: the only measured paying behaviour on this shelf is a week or month subscription on the 10K or more install incumbent, and the two best-rated apps are free with no in-app purchase, so no reading shows a learner buying exam prep outright.",
+    "Install-to-unlock conversion is assumed at 2 percent of installs; no slot in this repository has ever measured a conversion rate, so every revenue and installs figure derived from it is an assumption rather than a reading.",
+    "The 15 percent service fee, the 2 percent refund allowance and the 2 percent currency conversion allowance are plan assumptions carried from the monetization strategy document rather than measurements of this developer account, and the fee tier rises above the first million dollars.",
+    "The freshness argument is a hypothesis about learning and not a measured outcome: the shelf's complaints are about ads, price and accuracy rather than about memorisation, and no reading here shows that generated drills raise a learner's score.",
+    "The 2026 entrants already advertise explanations, ACS tagging, offline mode and 1,000 or more items, so this wedge rests entirely on the generated-and-validated drill engines and on the on-answer citation; whether a learner prefers that to a fixed 1,000 item bank is not measured.",
+    "Search ranking is assumed rather than planned: the shelf is led by an app with 10K or more installs and 440 exact reviews, and nothing here shows a new listing reaching 650 installs per month against it."
+  ]
+}

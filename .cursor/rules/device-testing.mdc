@@ -21,6 +21,28 @@ drive, and an emulator is not used** — because a running AVD loads the machine
 slows every later slot in the same day. The emulator is not a cheaper device; it is a tax on the whole
 factory.
 
+**The target is named by serial, because more than one phone can be attached.** On 2026-10-03 two
+devices were on `adb` at once and an agent drove the wrong one for a whole run, so the identity is
+written down here rather than left to `adb devices`:
+
+| Role | Serial | Model | Android |
+|---|---|---|---|
+| **The test target** | `R58MB3SGZVL` | `SM-A405FM` (Galaxy A40), 1080×2340 @ 480dpi | 11 |
+| **Not to be driven without the owner's word** | `RF8Y703DR2D` | `SM-A165F` (Galaxy A16), 1080×2340 @ 450dpi | 16 |
+
+The **A40 is the test phone**, and this table said the opposite until 2026-10-03: the first version of
+this rule named the A16 as the target and the A40 as forbidden, the owner corrected it — *the test
+phone is the A40* — and the correction is recorded here rather than silently swapped, because a
+record itself is evidence about the past (`slot.device` measured the slot's journey on the A40 at
+`apps/2026-10-01-lawn-round-log/device-verification.json`, which is what first exposed the
+contradiction). Every command carries `-s R58MB3SGZVL`; with two devices attached a bare `adb` fails
+outright, and a coordinate taken on one phone is meaningless on the other because they differ in
+density (450dpi against 480dpi). Open every run by confirming
+`adb -s R58MB3SGZVL shell getprop ro.product.model` reads `SM-A405FM`; if it does not, stop — the run
+is on the wrong device and every reading from it is void. The A16 is not forbidden hardware, but it is
+not this run's target either: driving it needs the owner's word in the current conversation, exactly
+as any second device does.
+
 ## The measured starting position
 
 - `scripts/media-capture.mjs` already speaks to a device rather than to a machine: it finds `adb` on
@@ -119,15 +141,26 @@ factory.
 This rule is enforced by **the run and its record** — and, since 2026-10-02, by a sensor that reads
 that record rather than by prose alone. `slot.device` in `scripts/core/device.mjs` requires
 `apps/<slot>/device-verification.json` to name the serial, the timestamp, the artifact path and its
-sha256, and at least three observations of what was tapped and what appeared; when the built
-`app/build/outputs/apk/debug/app-debug.apk` exists it **recomputes that hash and fails on a
-disagreement**, which is `scripts/lib/apk-provenance.mjs`'s rule applied at the point it was missing.
-A slot carrying no record is `UNVERIFIED`, never a pass.
+sha256, and at least three observations of what was tapped and what appeared. What decides whether the
+record still describes the app under review is the **revision**, not the artifact's bytes: a debug APK
+is not byte-reproducible across builds, so comparing hashes alone read an identical-source rebuild as a
+stale install and forced a truthful record to be hand-edited after every rebuild. A record may
+therefore carry `buildDigest` — the digest `scripts/lib/release-approval.mjs` computes over the slot's
+build inputs, **imported rather than re-implemented** — and when it equals the current digest the
+revision is unchanged and the row PASSes, whatever the artifact's bytes hash to; the detail names the
+byte difference and states that the revision, not the hash cross-check, carried the verdict. When the
+digest differs the row FAILs, naming that the app changed and requiring the journey to be driven again
+on the phone. A record with **no** `buildDigest` falls back to the artifact cross-check: when the built
+`app/build/outputs/apk/debug/app-debug.apk` exists its sha256 is recomputed, and a disagreement is a
+FAIL naming **both** remedies — drive the journey again, or record the revision's `buildDigest` so a
+rebuild of identical source stops invalidating the record — which is `scripts/lib/apk-provenance.mjs`'s
+rule applied at the point it was missing. A slot carrying no record is `UNVERIFIED`, never a pass.
 
-What the sensor cannot do, stated rather than implied: it proves that **a record exists and agrees
-with the artifact**. It cannot prove the run happened, that the taps were real, or that an
-observation describes what was on the screen — a fabricated record passes it. So the record is still
-the evidence a later reader contradicts, and this is what a handoff must carry:
+What the sensor cannot do, stated rather than implied: it proves that **a record exists and agrees with
+the artifact, or names the current revision when a `buildDigest` matches**. It cannot prove the run
+happened, that the taps were real, or that an observation describes what was on the screen — a
+fabricated record passes it. So the record is still the evidence a later reader contradicts, and this
+is what a handoff must carry:
 
 ```text
 adb devices -l                              # the attached serial, in `device` state
@@ -141,10 +174,10 @@ node scripts/media-capture.mjs --slot <slug>  # phase 2: refuses a stale install
 node scripts/verify.mjs --slot <slug> --build # the slot's source checks + assembleDebug
 ```
 
-- The record names the **serial**, the artifact and its hash, the revision, and what was observed on
-  screen — the observation that would have made the claim negative is stated before the run, as
-  `harness/roles/verifier.md` requires of every verdict. A "tested, works" with no serial and no
-  artifact is prose.
+- The record names the **serial**, the artifact and its hash, the revision (`buildDigest`, when the app
+  is rebuilt from identical source), and what was observed on screen — the observation that would have
+  made the claim negative is stated before the run, as `harness/roles/verifier.md` requires of every
+  verdict. A "tested, works" with no serial and no artifact is prose.
 - `media-capture.mjs` is the one place where this rule has teeth in code, and only in phase 2: its
   provenance chain walks HEAD → `dist/release-manifest.json` → the recorded sha256 → the APK on disk →
   the installed `base.apk`, and a missing or mismatched link is fatal

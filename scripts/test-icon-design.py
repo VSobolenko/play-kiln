@@ -105,8 +105,14 @@ def record(key: str, value) -> None:
 
 
 def new_icon(mark: str, palette: dict, canvas: int = CANVAS) -> np.ndarray:
-    """The shipped 512px icon: the declared field with the declared mark on it."""
-    field = design.icon_field(canvas, palette["ink"], palette["ink_lift"]).convert("RGBA")
+    """The shipped 512px icon: the declared field with the declared mark on it.
+
+    The palette is handed through so the field carries `icon_design.FIELD_OVERLAYS` when the slot
+    declares the waterline roles - exactly as `store-studio.render_icon` now does - rather than the
+    bare ramp. A slot without those roles (every slot but laneset) renders the same ramp as before.
+    """
+    field = design.icon_field(canvas, palette["ink"], palette["ink_lift"],
+                              palette=palette).convert("RGBA")
     field.alpha_composite(design.render_mark(canvas, mark, palette))
     return np.asarray(field, dtype=np.uint8)
 
@@ -293,8 +299,10 @@ def verify_opacity(mark: str, icon: np.ndarray, palette: dict) -> None:
           f"{mark}: the four corners are opaque, so no rounded mask is baked in",
           f"corners={corners}")
     # A masked icon keeps its corners transparent; a full-bleed one keeps the field there. Compare
-    # each corner against the field the declared ramp predicts at that pixel.
-    ramp = np.asarray(design.icon_field(CANVAS, palette["ink"], palette["ink_lift"]).convert("RGB"),
+    # each corner against the field the design declares at that pixel - the ramp plus the declared
+    # waterline, the same call `new_icon` makes.
+    ramp = np.asarray(design.icon_field(CANVAS, palette["ink"], palette["ink_lift"],
+                                        palette=palette).convert("RGB"),
                       dtype=np.int16)
     worst = int(max(abs(int(icon[y, x, channel]) - int(ramp[y, x, channel]))
                     for y, x in ((0, 0), (0, CANVAS - 1), (CANVAS - 1, 0), (CANVAS - 1, CANVAS - 1))

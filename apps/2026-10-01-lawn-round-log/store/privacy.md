@@ -25,8 +25,10 @@ in Android's settings at any time.
 
 - It creates no account and has no login.
 - It contains no analytics, no crash reporting, no advertising SDK and no tracking.
-- It requests no Android permission of its own — not the network, not location, not contacts, not
-  storage.
+- It asks you for no runtime permission: the app's own code requests none, and no permission prompt
+  ever appears. The bundled Google Play Billing library declares `INTERNET` and
+  `ACCESS_NETWORK_STATE` so that Play can complete the one-time purchase, which is the only reason the
+  app uses the network; nothing you type is uploaded.
 - It does not read your files or export anything without you choosing where it goes. The CSV export
   is written only to the location you pick in the system file picker.
 
@@ -66,10 +68,3 @@ date, and the version shown inside the app is updated with it.
 ## Contact
 
 Questions about this policy can be sent to **v.sobolenko.vs@gmail.com**.
-
----
-
-> **Publication note for the owner (not part of the policy).** This text is true of the shipped app
-> only while the app declares no `uses-permission` of its own and adds no SDK that transmits. It must be
-> hosted at an HTTPS URL the owner controls and linked from the Play listing *and* from inside the
-> app; the placeholder URL in `store/listing.json` does not satisfy either half yet.

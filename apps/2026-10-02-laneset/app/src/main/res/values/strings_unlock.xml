@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The single-price unlock surface.
+
+  Every string here is referenced by `ui/unlock/UnlockScreen.kt`. The two facts this surface exists to
+  state plainly are that the unlock is ONE payment and that there is NO subscription: the shelf's
+  leader sells the useful half as a recurring plan, so saying so is the pitch rather than a footnote.
+  No numeric price appears here on purpose — Google Play shows the localized price on its own
+  confirmation sheet, and a hard-coded currency is wrong everywhere outside the dollar zone.
+-->
+<resources>
+    <string name="unlock_title" translatable="true">Unlock</string>
+    <string name="unlock_back" translatable="true">Back</string>
+
+    <string name="unlock_hero_label" translatable="true">One payment, not a subscription</string>
+    <string name="unlock_lede" translatable="true">Laneset is free to use. One payment opens the rest of the app, and it stays yours.</string>
+
+    <string name="unlock_includes_header" translatable="true">The unlock gives you</string>
+    <string name="unlock_benefit_focuses" translatable="true">Every other focus: Sprint, Threshold, Technique and Recovery</string>
+    <string name="unlock_benefit_pace_test" translatable="true">The guided 400 m and 200 m pace test</string>
+    <string name="unlock_benefit_import" translatable="true">Coach-workout import</string>
+    <string name="unlock_benefit_handoff" translatable="true">Share and print a finished set</string>
+
+    <string name="unlock_purchase_label" translatable="true">Purchase</string>
+    <string name="unlock_purchase_value" translatable="true">One-time</string>
+    <string name="unlock_subscription_label" translatable="true">Subscription</string>
+    <string name="unlock_subscription_value" translatable="true">None</string>
+    <string name="unlock_no_renewal" translatable="true">No subscription, no trial and no renewal. You pay once and keep the unlock.</string>
+    <string name="unlock_price_note" translatable="true">Google Play shows the exact price in your currency on its confirmation sheet before you pay.</string>
+
+    <string name="unlock_buy" translatable="true">Unlock the full app</string>
+    <string name="unlock_purchasing" translatable="true">Opening Google Play…</string>
+    <string name="unlock_action_restore" translatable="true">Restore a purchase</string>
+    <string name="unlock_action_retry" translatable="true">Try again</string>
+
+    <string name="unlock_owned_title" translatable="true">Unlocked</string>
+    <string name="unlock_owned_body" translatable="true">You own the full app. Every focus, the guided pace test and the coach-workout import are available.</string>
+
+    <string name="unlock_connecting" translatable="true">Connecting to Google Play…</string>
+    <string name="unlock_unavailable_title" translatable="true">Google Play is not reachable</string>
+    <string name="unlock_unavailable_body" translatable="true">The store could not be reached, so the unlock cannot be offered right now. Your free Endurance session still works.</string>
+
+    <string name="unlock_notice_cancelled" translatable="true">No charge was made — you closed the Google Play sheet.</string>
+    <string name="unlock_notice_failed" translatable="true">The purchase did not complete. You can try again.</string>
+    <string name="unlock_notice_unavailable" translatable="true">The unlock could not be started. Try again in a moment.</string>
+    <string name="unlock_notice_not_restored" translatable="true">Google Play found no unlock on this account.</string>
+
+    <string name="unlock_account_note" translatable="true">The unlock is tied to the Google account on this device. After a reinstall, sign in with the same account and tap Restore a purchase.</string>
+</resources>

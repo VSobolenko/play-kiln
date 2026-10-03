@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "slot": "pool-diagnosis",
+  "reconRef": "docs/research/2026-10-02-advisor-and-troubleshooting-evidence.md#8-name-the-carrier-auditions-each-eliminated-by-a-measured-collision",
+  "title": "Pool Diagnosis",
+  "slug": "pool-diagnosis",
+  "applicationId": "com.gexetr.pooldiagnosis",
+  "archetype": "descriptive",
+  "candidates": [
+    {
+      "name": "Pool Diagnosis",
+      "archetype": "descriptive",
+      "score": 84,
+      "dimensions": {
+        "jobFit": 5.0,
+        "searchability": 4.5,
+        "distinctiveness": 4.0,
+        "radioTest": 5.0,
+        "uniqueness": 3.5,
+        "lengthFit": 5.0,
+        "localeSurvival": 4.0
+      },
+      "why": "It carries the token the shelf's own niche is named for (pool) and names the mechanism no incumbent's title uses (diagnosis) rather than the shared category words calculator, math and chemistry that every card on the shelf already competes for, so it is findable and distinct at once; it gives up ownability because a descriptive phrase is weakly protectable, and that trade is recorded honestly at section 8 of the evidence file."
+    },
+    {
+      "name": "Pool Sense",
+      "archetype": "compound",
+      "score": 79,
+      "dimensions": {
+        "jobFit": 4.0,
+        "searchability": 3.5,
+        "distinctiveness": 4.5,
+        "radioTest": 4.5,
+        "uniqueness": 4.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 3.5
+      },
+      "why": "Short, ownable and pronounceable, and it reads as judgement rather than arithmetic, but it names no job noun, so a user searching for what to do about high alkalinity would not find it by the words they type, and the compound is 9 characters with room to spare."
+    },
+    {
+      "name": "Bluewater: Pool Diagnosis",
+      "archetype": "carrier_job_noun",
+      "score": 77,
+      "dimensions": {
+        "jobFit": 4.5,
+        "searchability": 4.5,
+        "distinctiveness": 4.0,
+        "radioTest": 5.0,
+        "uniqueness": 2.0,
+        "lengthFit": 4.0,
+        "localeSurvival": 3.5
+      },
+      "why": "The carrier-plus-job-noun default the methodology recommends, and it fits the 30 character cap at 26 characters with 4 of slack, but Bluewater is a crowded token outside software, so the carrier gives less headroom than the descriptive phrase it replaces while adding a word the search index weights for nothing."
+    },
+    {
+      "name": "Waterwright",
+      "archetype": "coined",
+      "score": 73,
+      "dimensions": {
+        "jobFit": 3.5,
+        "searchability": 2.5,
+        "distinctiveness": 5.0,
+        "radioTest": 4.0,
+        "uniqueness": 4.5,
+        "lengthFit": 5.0,
+        "localeSurvival": 3.0
+      },
+      "why": "A coined carrier built from a real trade suffix, so it is ownable and it passes the radio test, but a listened-to carrier with no job noun behind it forces the searcher to know the name before they need the app, and its meaning is not obvious to the Russian locale at all."
+    },
+    {
+      "name": "Pool Water Advisor",
+      "archetype": "descriptive",
+      "score": 74,
+      "dimensions": {
+        "jobFit": 4.5,
+        "searchability": 4.5,
+        "distinctiveness": 2.5,
+        "radioTest": 5.0,
+        "uniqueness": 2.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 4.0
+      },
+      "why": "It is descriptive and findable, but advisor is already the word the shelf's own first card carries (PoolCoach: Chemistry Advisor) so the string offers almost no distinction from a live listing, which is the collision pressure that pushed the field toward diagnosis."
+    },
+    {
+      "name": "Alkalinity",
+      "archetype": "descriptive",
+      "score": 62,
+      "dimensions": {
+        "jobFit": 2.5,
+        "searchability": 3.5,
+        "distinctiveness": 3.5,
+        "radioTest": 4.5,
+        "uniqueness": 3.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 2.0
+      },
+      "why": "A single chemistry noun that names one parameter of the job rather than the job, so it is both too narrow and not obviously about pools, and it is the kind of one-word chemistry title that competes with reference apps rather than with the shelf it is meant to enter."
+    },
+    {
+      "name": "Pool Chemistry Calculator",
+      "archetype": "descriptive",
+      "score": 55,
+      "dimensions": {
+        "jobFit": 3.0,
+        "searchability": 5.0,
+        "distinctiveness": 1.0,
+        "radioTest": 5.0,
+        "uniqueness": 1.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 3.0
+      },
+      "why": "The shelf's shared title shape used as the first negative control: a live incumbent (com.poolchemicalcalculator.poolcalc, 50K or more installs) already ships a near-identical string, so it competes for the category phrase and tells a user nothing that would make them choose it over the app they already have, which is the one-word-swap rejection."
+    },
+    {
+      "name": "Calculator",
+      "archetype": "descriptive",
+      "score": 38,
+      "dimensions": {
+        "jobFit": 1.0,
+        "searchability": 3.0,
+        "distinctiveness": 1.0,
+        "radioTest": 5.0,
+        "uniqueness": 1.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 1.5
+      },
+      "why": "The bare category noun as the second negative control, and the owner's own example of the defect this contract exists to stop: it is a single generic word that spends Play's strongest ranking field on the head term the whole category owns, and it names neither the pool nor the judgement."
+    }
+  ],
+  "rejected": [
+    {
+      "name": "Pool Chemistry Calculator",
+      "reason": "A live incumbent already carries a near-identical string (com.poolchemicalcalculator.poolcalc, 3.6 stars over 210 reviews and 50K or more installs), and calculator names the arithmetic this recipe deliberately replaces with judgement, so it is a collision and a category word in one."
+    },
+    {
+      "name": "Calculator",
+      "reason": "It is a bare category noun, the owner's own example of the naming defect, and it names nothing a pool owner could prefer; it is kept in the field as a negative control so the chosen name has something to beat."
+    },
+    {
+      "name": "AquaCheck",
+      "reason": "Eliminated by collision before scoring: Aquachek is the HTH-compatible test-strip brand, so the token is occupied by the very product the shelf leader is sold with, which makes it a competitor's name rather than this app's."
+    },
+    {
+      "name": "Litmus",
+      "reason": "Eliminated by collision: a live Play app ships as Litmus (com.litmusmobile), so the carrier token is already in a user's search results."
+    },
+    {
+      "name": "Brine",
+      "reason": "Eliminated by collision: the token is carried by Brine Fitness, Brine Oyster House, Brineward Ferment Guide and Cap Brine, so it cannot be owned in a store search."
+    },
+    {
+      "name": "Atoll",
+      "reason": "Eliminated by collision: com.atoll.signature2 ships ATOLL Signature 2, and the query itself returned a polluted guard verdict, so the carrier is both occupied and noisy."
+    },
+    {
+      "name": "Clearwater",
+      "reason": "Eliminated by collision: Clearwater is a live app (ClearWater: Aquarium Log) and a large municipal-brand token, so it is occupied inside the adjacent water-keeping shelf and gives no headroom."
+    },
+    {
+      "name": "Bluewater: Pool Diagnosis",
+      "reason": "The carrier Bluewater is a crowded token outside software, and at 26 characters it leaves only 4 characters of slack against Play's 30 character cap, below the 5 the contract requires for a longer locale."
+    }
+  ],
+  "searchPhrases": [
+    "pool chemistry advisor",
+    "hot tub water chemistry",
+    "pool water test results meaning"
+  ],
+  "audience": "A private pool or hot-tub owner in the US or RU who has a test result they cannot act on: the strip reads between two colour bands or two indicators disagree, and the app they already have either refuses the reading, returns a dose they cannot check, or hides the answer behind a subscription. They are not chemists, they do not want a log, and they want to know what to do next and be able to check it.",
+  "rationale": "The winner is descriptive rather than carrier-plus-job-noun because this shelf's carrier space is measurably occupied: eight carrier auditions in this session were eliminated by a named collision, including Litmus (a live Play app), Aquachek (the strip brand the leader is sold with), Brine, Atoll and Clearwater. The shelf's own titles are literal-phrase titles (Pool-Calculator, Pool Water Calculator, Pool Chemistry Calculator, Pool Math, PoolCoach: Chemistry Advisor, PoolChem: Pool Water Care), so the strongest ranking field is best spent on the token the shelf is named for plus the one word no incumbent's title uses, diagnosis, which is exactly the judgement this app sells. The trade is ownability, recorded honestly in assumptionsUnverified rather than hidden behind a coinage nobody can spell.",
+  "collisionCheck": "Web-searched the exact title, close variants and every serious carrier audition on 2026-10-02 from this machine, and screened each carrier through Play search with node scripts/scan-titles.mjs. No live app titled Pool Diagnosis surfaced. The eight carriers named in the rejected list were each eliminated by a named colliding entity (Aquachek, Litmus, Brine, Atoll, Clearwater). The nearest shelf titles are Pool-Calculator, Pool Water Calculator, Pool Chemistry Calculator, Pool Math by TFP, PoolCoach: Chemistry Advisor, PoolChem: Pool Water Care and Chemistry AI & Periodic Table, none of which uses the word diagnosis. Play does not enforce unique titles and this is an indexed reading rather than a Play Console reading, and a clean search is not trademark clearance: no register (USPTO, EUIPO, WIPO, Rospatent) was queried.",
+  "localisationCheck": "The 14 character Latin string serves both en-US and ru-RU with 16 characters of slack against Play's 30 character cap, so it fits every declared locale with room to spare. It uses only Latin letters and a single space, with no emoji, no ALL CAPS, no repeated special characters and exactly one canonical spelling, so a listener who heard it once can type it. It carries no unfortunate or homophone meaning in ru, and neither word is a price, ranking or promotional claim. The ru listing ships the same Latin string as a brand-like title rather than a machine translation, because a descriptive phrase translated per language would not be one name; the residual gap, recorded rather than hidden, is that the ru string's own discoverability for a Russian-speaking owner who searches in Cyrillic was not measured.",
+  "evidence": "docs/research/2026-10-02-advisor-and-troubleshooting-evidence.md#8-name-the-carrier-auditions-each-eliminated-by-a-measured-collision",
+  "localizedTitles": {
+    "en-US": "Pool Diagnosis",
+    "ru-RU": "Pool Diagnosis"
+  },
+  "scoringRubric": {
+    "scale": "0-5 per dimension, weighted",
+    "weights": {
+      "jobFit": 20,
+      "searchability": 15,
+      "distinctiveness": 15,
+      "radioTest": 15,
+      "uniqueness": 15,
+      "lengthFit": 10,
+      "localeSurvival": 10
+    },
+    "floor": "chosen >= 70 with no dimension below 2.5; a hard check outranks the score"
+  },
+  "assumptionsUnverified": [
+    "Ownability is the price of this choice and it is UNVERIFIED that the trade was worth making: a descriptive title is weakly protectable and no measurement in this session shows a descriptive title out-ranking a carrier-based one on this shelf, so the decision rests on the eight measured carrier collisions rather than on a ranking reading.",
+    "Trademark headroom is UNVERIFIED: no register was queried (USPTO, EUIPO, WIPO and the ru national register are all unread), so whether the string Pool Diagnosis is free in class 9 is not known, and this record does not claim clearance.",
+    "The ru-RU title is the same Latin string as the en-US title, so whether a Russian-speaking owner who searches in Cyrillic can find it was not measured, and no Cyrillic alternative was tested against the 30 character cap.",
+    "Play does not enforce unique titles and the collision screen was an indexed web and Play-search reading rather than a Play Console reading, so a live app carrying this exact title may exist unseen."
+  ]
+}

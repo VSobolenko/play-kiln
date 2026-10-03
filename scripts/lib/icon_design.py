@@ -154,6 +154,68 @@ FIELD_ANGLE_DEG = 45.0
 # The Android XML equivalent of FIELD_ANGLE_DEG, for `write_vectors`.
 FIELD_ANDROID_ANGLE = 315
 
+# The field's declared overlays: the waterline.
+#
+# The field is not one bare ramp. One translucent polygon darkens everything above the waterline in
+# `ink` and a second lightens everything below it in `lane`, so the lower half reads as lit water
+# and the pair of bands read as one surface seen across a lane - a darker field above, where the
+# `amber` minute hand needs the contrast. The two polygons share the diagonal from (0, 74) to
+# (108, 30), so together they tile the viewport exactly and neither overlaps the other.
+#
+# The geometry is declared once, here, in the 108-unit viewport the vector renderer speaks, and both
+# renderers consume this one list: `icon_field` composites it into the store raster and
+# `store-studio.write_vectors` emits it as `<path>` data, so the 512 listing icon and the launcher
+# background cannot be two different fields - which is exactly the drift this file was written from
+# (the launcher drew the waterline while the listing icon drew the bare ramp).
+#
+# A slot draws the waterline by declaring the roles it names. `field_overlays` returns nothing to a
+# palette that cannot resolve them all - the factory's earlier slots declare no `lane` - so such a
+# slot keeps the ramp it was designed with rather than half a waterline in a colour it never chose.
+FIELD_OVERLAYS: tuple[dict, ...] = (
+    {"role": "lane", "alpha": 0.24,
+     "points": ((0.0, 74.0), (108.0, 30.0), (108.0, 108.0), (0.0, 108.0))},
+    {"role": "ink", "alpha": 0.20,
+     "points": ((0.0, 0.0), (108.0, 0.0), (108.0, 30.0), (0.0, 74.0))},
+)
+
+
+def _field_overlay_path_data(points: Sequence[tuple[float, float]]) -> str:
+    """A polygon as Android path data, in the 108-unit viewport.
+
+    The first segment is always an explicit ``L`` and later segments use ``V``/``H`` where a
+    coordinate does not change; that is the form the shipped drawables carry, and reproducing it
+    keeps the emitted vector byte-identical to the file it replaces rather than merely equivalent.
+    """
+    x, y = points[0]
+    command = [f"M{x:g},{y:g}"]
+    for index, (px, py) in enumerate(points[1:]):
+        if index == 0 or (px != x and py != y):
+            command.append(f"L{px:g},{py:g}")
+        elif px == x:
+            command.append(f"V{py:g}")
+        else:
+            command.append(f"H{px:g}")
+        x, y = px, py
+    command.append("Z")
+    return "".join(command)
+
+
+def field_overlays(present_roles: Iterable[str] | None = None) -> tuple[dict, ...]:
+    """The declared field overlays, in write order, each with its role, alpha and path data.
+
+    `present_roles` is the palette roles a caller can resolve. When it is given and omits any role
+    the waterline names, the whole waterline is withheld rather than half drawn: a partial field is a
+    third picture, not a cheaper one. `None` returns the full declaration for a caller that has
+    already resolved the roles.
+    """
+    if present_roles is not None:
+        have = set(present_roles)
+        if any(overlay["role"] not in have for overlay in FIELD_OVERLAYS):
+            return ()
+    return tuple({**overlay, "data": _field_overlay_path_data(overlay["points"])}
+                 for overlay in FIELD_OVERLAYS)
+
+
 # --------------------------------------------------------------------------------------
 # Primitives
 #
@@ -292,6 +354,37 @@ STRIPES: tuple[dict, ...] = tuple(
     for top_x, bottom_x, role in _STRIPES_AXES
 )
 
+# mark-clock
+# A pace clock: one bold ring and two bold hands meeting at the pivot. The minute hand runs to 60
+# degrees and the hour hand back to 200, so the pair never settles into one straight diameter the
+# way an opposed pair would - at 48dp the two arms are what say "a time to swim, not a gauge",
+# beside `pipe`'s full-width bore. The ring's outer edge lands exactly on the circle keyline (the
+# same construction `pipe` uses) and each hand's round cap stops a stroke and a half short of the
+# dial's inner edge, so the face never fills in.
+_CLOCK_HALF = STROKE["bold"] / 2
+_CLOCK_RING_R = _CIRCLE_KEYLINE - _CLOCK_HALF  # centreline: the outer edge lands on the keyline
+_CLOCK_DIAL_R = _CLOCK_RING_R - _CLOCK_HALF  # the ring's inner edge - where a hand must not reach
+# One stroke has to stay open between a hand's ink and the dial, and the round cap is itself half a
+# bold stroke past the tip, so the tip's centreline stops one bold stroke plus one and a half regular
+# strokes inside the dial.
+_CLOCK_HAND_CLEARANCE = _CLOCK_HALF + 1.5 * STROKE["regular"]
+_CLOCK_MINUTE_R = _CLOCK_DIAL_R - _CLOCK_HAND_CLEARANCE
+_CLOCK_HOUR_R = _CLOCK_MINUTE_R * 0.68  # shorter than the minute hand, the way a clock reads
+
+
+def _clock_point(angle_deg: float, radius: float) -> tuple[float, float]:
+    """A point `radius` from the optical centre, `angle_deg` counter-clockwise from three o'clock."""
+    radians = math.radians(angle_deg)
+    return (OPTICAL_CENTER[0] + radius * math.cos(radians),
+            OPTICAL_CENTER[1] - radius * math.sin(radians))
+
+
+CLOCK: tuple[dict, ...] = (
+    ring("paper", OPTICAL_CENTER, _CLOCK_RING_R, "bold"),
+    stroke("amber", (OPTICAL_CENTER, _clock_point(60.0, _CLOCK_MINUTE_R)), "bold"),
+    stroke("paper", (OPTICAL_CENTER, _clock_point(200.0, _CLOCK_HOUR_R)), "bold"),
+)
+
 MARK_REGISTRY: dict[str, dict] = {
     "pipe": {"primitives": PIPE, "keyline": "circle",
              "note": "a pipe cross-section measured across its bore"},
@@ -299,6 +392,8 @@ MARK_REGISTRY: dict[str, dict] = {
                   "note": "a bound, marked page with three binding rings and an amber check"},
     "mark-stripes": {"primitives": STRIPES, "keyline": "circle",
                      "note": "four mown stripes converging toward a vanishing point above them"},
+    "mark-clock": {"primitives": CLOCK, "keyline": "circle",
+                   "note": "a deck pace clock: a bold ring with a minute hand and an hour hand"},
 }
 DEFAULT_MARK = "pipe"
 
@@ -546,14 +641,43 @@ def assert_mark_on_grid(mark: str | None = None) -> None:
 # --------------------------------------------------------------------------------------
 
 
-def icon_field(size: int, low: tuple[int, int, int], high: tuple[int, int, int],
-               angle_deg: float = FIELD_ANGLE_DEG) -> Image.Image:
-    """The icon's field: one exact linear ramp, no grid overlay and no bloom.
+def _composite_field_overlays(image: Image.Image, palette: Mapping[str, Iterable[int]],
+                              overlays: Sequence[dict]) -> Image.Image:
+    """Draw the declared field overlays over a rendered ramp, through the slot's own palette.
 
-    Computed per pixel in floating point rather than on a small grid and scaled up. The scaled
-    version (the previous implementation, and the reason the old field measured 0.18 luma of
+    Each overlay is alpha-composited as its own whole layer rather than drawn straight on to the
+    field, because Pillow's ``ImageDraw`` writes an RGBA fill's alpha into the pixel instead of
+    blending it - drawing on the field directly would replace the ramp with a flat colour, and
+    drawing two polygons on to one layer would replace the first where they overlap. One layer per
+    overlay keeps the raster's stacking the same as the vector's, which emits one ``<path>`` per
+    overlay in this order.
+    """
+    scale = image.size[0] / ADAPTIVE_VIEWPORT_DP
+    result = image.convert("RGBA")
+    for overlay in overlays:
+        layer = Image.new("RGBA", image.size, (0, 0, 0, 0))
+        ImageDraw.Draw(layer).polygon(
+            [(x * scale, y * scale) for x, y in overlay["points"]],
+            fill=_rgb(palette, overlay["role"]) + (round(overlay["alpha"] * 255),))
+        result = Image.alpha_composite(result, layer)
+    return result.convert("RGB")
+
+
+def icon_field(size: int, low: tuple[int, int, int], high: tuple[int, int, int],
+               angle_deg: float = FIELD_ANGLE_DEG,
+               palette: Mapping[str, Iterable[int]] | None = None) -> Image.Image:
+    """The icon's field: one exact linear ramp, plus the declared waterline when a palette is given.
+
+    The ramp is computed per pixel in floating point rather than on a small grid and scaled up. The
+    scaled version (the previous implementation, and the reason the old field measured 0.18 luma of
     high-frequency residual) rounds twice and interpolates once, which is a texture in the field
     for no benefit: the exact ramp is one plane, and a plane has no high-frequency energy at all.
+
+    `palette` is the slot's resolved palette. When it is supplied the field also carries
+    `FIELD_OVERLAYS` - the declared waterline - drawn in that palette's own roles, which is what
+    makes the store icon and the launcher background the same field. A palette that cannot resolve
+    every role the waterline names gets the ramp alone: that is a slot which never declared the
+    waterline, and it must not be handed a repainted one.
     """
     if size <= 0:
         raise SystemExit(f"BLOCKED: icon_field needs a positive size, got {size}")
@@ -577,7 +701,12 @@ def icon_field(size: int, low: tuple[int, int, int], high: tuple[int, int, int],
                 rows += bytes(int(h) for h in high)
                 continue
             rows += bytes(int(l + d * t) for l, d in zip(low, deltas))
-    return Image.frombytes("RGB", (size, size), bytes(rows))
+    image = Image.frombytes("RGB", (size, size), bytes(rows))
+    if palette is not None:
+        overlays = field_overlays(palette.keys())
+        if overlays:
+            image = _composite_field_overlays(image, palette, overlays)
+    return image
 
 
 # --------------------------------------------------------------------------------------

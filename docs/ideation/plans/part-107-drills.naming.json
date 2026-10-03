@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "slot": "part-107-drills",
+  "reconRef": "docs/ideation/2026-10-02-authored-learning-and-drills.md#8-the-name",
+  "title": "Part 107 Drills",
+  "slug": "part-107-drills",
+  "applicationId": "com.gexetr.part107drills",
+  "archetype": "descriptive",
+  "candidates": [
+    {
+      "name": "Part 107 Drills",
+      "archetype": "descriptive",
+      "score": 87,
+      "dimensions": {
+        "jobFit": 5.0,
+        "searchability": 4.5,
+        "distinctiveness": 3.5,
+        "radioTest": 5.0,
+        "uniqueness": 3.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 4.5
+      },
+      "why": "It carries the exact token a learner types (Part 107) and names the mechanism no incumbent's title uses (drills) rather than the shelf's shared category words Practice Test, Test Prep and Exam Prep, so it is findable and distinct at once; it gives up ownability because a descriptive phrase is weakly protectable, and that trade is the recorded decision at section 8 of the proposal."
+    },
+    {
+      "name": "Part 107 Drill Deck",
+      "archetype": "compound",
+      "score": 84,
+      "dimensions": {
+        "jobFit": 4.5,
+        "searchability": 4.0,
+        "distinctiveness": 4.0,
+        "radioTest": 5.0,
+        "uniqueness": 3.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 4.0
+      },
+      "why": "The compound is more distinctive than the plain phrase and still carries Part 107, but 'deck' announces a flashcard deck the app deliberately does not ship, so the word promises a shape the product is not."
+    },
+    {
+      "name": "Airmanship: Part 107 Prep",
+      "archetype": "carrier_job_noun",
+      "score": 79,
+      "dimensions": {
+        "jobFit": 4.0,
+        "searchability": 4.0,
+        "distinctiveness": 3.5,
+        "radioTest": 5.0,
+        "uniqueness": 2.5,
+        "lengthFit": 5.0,
+        "localeSurvival": 4.0
+      },
+      "why": "A real aviation-training word with a clean radio test and a real job noun behind it, but it is a dictionary term inside the very field the app sells into, so it has almost no trademark headroom, and it names flying skill rather than the knowledge the exam tests."
+    },
+    {
+      "name": "Dronelore: Part 107 Drills",
+      "archetype": "coined",
+      "score": 76,
+      "dimensions": {
+        "jobFit": 4.5,
+        "searchability": 4.0,
+        "distinctiveness": 4.0,
+        "radioTest": 4.5,
+        "uniqueness": 2.5,
+        "lengthFit": 3.0,
+        "localeSurvival": 3.5
+      },
+      "why": "A coined carrier that is pronounceable and thematically honest, but it collides with dronelore.com and the whole string is 27 characters, leaving only 3 of the 5 characters of slack the contract requires for a longer locale."
+    },
+    {
+      "name": "FAA Part 107 Exam Prep",
+      "archetype": "descriptive",
+      "score": 75,
+      "dimensions": {
+        "jobFit": 5.0,
+        "searchability": 5.0,
+        "distinctiveness": 1.0,
+        "radioTest": 5.0,
+        "uniqueness": 1.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 4.5
+      },
+      "why": "It maximises the search half and is the shelf's shared title shape, which is exactly its defect: live titles FAA Part 107 Drone Exam Prep and FAA PART 107 Exam Prep Prepia are one word away from it, which is rejection 16, so the hard check eliminates it whatever its arithmetic scores."
+    },
+    {
+      "name": "Part 107 Practice Test",
+      "archetype": "descriptive",
+      "score": 74,
+      "dimensions": {
+        "jobFit": 5.0,
+        "searchability": 5.0,
+        "distinctiveness": 1.0,
+        "radioTest": 5.0,
+        "uniqueness": 1.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 4.0
+      },
+      "why": "It is a live incumbent title in this exact form (com.edupass.part107 ships Part 107 Practice Test 2026), so it competes for a phrase a 4.9 star app with 107 reviews already owns and cannot be owned by a new listing."
+    },
+    {
+      "name": "Practice Test",
+      "archetype": "descriptive",
+      "score": 57,
+      "dimensions": {
+        "jobFit": 2.0,
+        "searchability": 4.0,
+        "distinctiveness": 1.0,
+        "radioTest": 5.0,
+        "uniqueness": 1.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 3.0
+      },
+      "why": "The shelf's head term used as the negative control: it is the phrase every leader already ranks for, it names the category rather than this app's job, and it tells a learner nothing that would make them choose it."
+    },
+    {
+      "name": "Quiz",
+      "archetype": "descriptive",
+      "score": 48,
+      "dimensions": {
+        "jobFit": 1.5,
+        "searchability": 2.0,
+        "distinctiveness": 1.0,
+        "radioTest": 5.0,
+        "uniqueness": 1.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 2.5
+      },
+      "why": "The bare category word as the second negative control: it spends Play's strongest ranking field on a head term the category owns, and it teaches a learner nothing about Part 107, drones or an exam."
+    }
+  ],
+  "rejected": [
+    {
+      "name": "Part 107 Practice Test",
+      "reason": "It is a live incumbent's exact title (com.edupass.part107 ships Part 107 Practice Test 2026, 4.9 stars over 107 reviews), so it is a collision and rejection 16 in one; a hard check outranks its 74."
+    },
+    {
+      "name": "FAA Part 107 Exam Prep",
+      "reason": "The live shelf already carries FAA Part 107 Drone Exam Prep and FAA PART 107 Exam Prep Prepia, so this is an incumbent's title with one word swapped, which is rejection 16, and the hard check outranks its 75."
+    },
+    {
+      "name": "Dronelore: Part 107 Drills",
+      "reason": "dronelore.com already uses the exact token, and at 27 characters the title leaves only 3 characters of slack against Play's 30 character cap, below the 5 the contract requires for a longer locale."
+    },
+    {
+      "name": "Airmanship: Part 107 Prep",
+      "reason": "Airmanship is a common dictionary word inside the app's own field, so it offers almost no trademark headroom and no way for a brand to compound, and it names flying skill rather than exam knowledge."
+    },
+    {
+      "name": "Part 107 Drill Deck",
+      "reason": "The word deck promises a flashcard deck the product does not ship, and it puts a coinage in front of the plainest searchable wording this shelf has, for four points of distinctiveness it does not need."
+    },
+    {
+      "name": "Flywright: Part 107 Prep",
+      "reason": "Eliminated by collision: FlyWright is a Bahamas drone training company that sells ground school and UAV exam preparation under that exact name, and Flywright Films operates in Florida, so the token is occupied by the app's own job."
+    },
+    {
+      "name": "GroundSchool",
+      "reason": "Eliminated by collision: GroundSchool is Dauntless Aviation's live FAA test-prep line, including the drone app com.dauntless.gs.faa.rdp, which is the same job on the same shelf."
+    },
+    {
+      "name": "DroneWise",
+      "reason": "Eliminated by collision: DroneWise is a live Play app (tymkow.dronewise, DroneWise Drone Weather Map) with the same carrier token, so the name is already in a user's search results."
+    },
+    {
+      "name": "Skylore",
+      "reason": "Eliminated by collision: Skylore is a live Play MMORPG (com.aigrind.skylore) with an end-user licence agreement and a store listing, so the token cannot be owned in class 9."
+    },
+    {
+      "name": "AeroDrill",
+      "reason": "Eliminated by collision: AeroDrill is Cruing's PCD cutting-tool range and a separate AERODRILL manufacturing company, so the exact token is in use outside software."
+    },
+    {
+      "name": "SkyDrill",
+      "reason": "Eliminated by collision: screened earlier in this session as a registered trademark and as a live game, so the token fails the uniqueness check before scoring."
+    },
+    {
+      "name": "Practice Test",
+      "reason": "The shelf's head term used as the negative control: it is the phrase the leaders already rank for and it names the category rather than this app's job, so a learner has no reason to prefer it."
+    }
+  ],
+  "searchPhrases": [
+    "part 107 practice test",
+    "faa part 107 exam prep",
+    "drone pilot test prep"
+  ],
+  "audience": "A US-based aspiring commercial drone operator studying for the FAA Part 107 knowledge test in the two to six weeks before a 175 dollar appointment at a PSI testing centre: someone buying a first drone for paid work, or a hobbyist turning commercial, who studies on a phone in spare minutes and cannot rely on signal while standing in a field.",
+  "rationale": "The winner is descriptive rather than carrier-plus-job-noun because this shelf's carrier space is measurably occupied: eleven carrier auditions in this session were eliminated by a collision, including FlyWright (a drone school selling UAV exam prep), GroundSchool (Dauntless Aviation's FAA test-prep line) and a live Play app for each of DroneWise, Airwise and Skylore. The shelf's own titles are literal-phrase titles, so the strongest ranking field is best spent on the token a learner actually types plus the one word that names this app's mechanism and no incumbent's title uses (drills). The trade is ownability, recorded honestly in assumptionsUnverified rather than hidden behind a coinage nobody can spell.",
+  "collisionCheck": "Web-searched the exact title, close variants and every serious carrier audition on 2026-10-02 from this machine. No live app titled Part 107 Drills surfaced, and the eleven carriers named in the rejected list were each eliminated by a named colliding entity (Dauntless GroundSchool, FlyWright, DroneWise, Airwise-Safar, Skylore, AeroDrill, PropPrep, Hangar, Azimuth, Cadet, Propwash). The nearest shelf titles are Part 107 Practice Test 2026, FAA Part 107 Pro Test Prep, FAA Part 107 Drone Test Prep, Part 107 - Practice for exam, Part 107 FAA practice test, Part 107 Ready: FAA Drone Prep, FAA PART 107 Exam Prep Prepia, FAA Part 107 Drone Exam 2026, Drone Exam: FAA Part 107 Prep and FAA Part 107 Drone Exam Prep. A Google Play search could not be run from this machine, so this is a web reading of indexed store pages and third-party mirrors rather than a Play console reading, and a clean search is not trademark clearance: no register (USPTO, EUIPO, WIPO, Rospatent) was queried.",
+  "localisationCheck": "The same 15 character Latin string serves both en-US and ru-RU with 15 characters of slack against Play's 30 character cap, so it fits every declared locale with room to spare. It uses only Latin letters, digits and single spaces, with no emoji, no ALL CAPS and no repeated special characters, and it has exactly one canonical spelling, so a listener who heard it once can type it. It carries no unfortunate or homophone meaning in ru, and the figures 107 are the exam's own name rather than a ranking or price claim. The ru listing ships it as a brand-like Latin string rather than a machine translation, because the carrier is the brand and a brand that differs per language is not one brand; the only residual gap is that the ru string's discoverability for a Russian-speaking learner was not measured.",
+  "evidence": "docs/ideation/2026-10-02-authored-learning-and-drills.md#8-the-name",
+  "localizedTitles": {
+    "en-US": "Part 107 Drills",
+    "ru-RU": "Part 107 Drills"
+  },
+  "scoringRubric": {
+    "scale": "0-5 per dimension, weighted",
+    "weights": {
+      "jobFit": 20,
+      "searchability": 15,
+      "distinctiveness": 15,
+      "radioTest": 15,
+      "uniqueness": 15,
+      "lengthFit": 10,
+      "localeSurvival": 10
+    },
+    "floor": "chosen >= 70 with no dimension below 2.5; a hard check outranks the score"
+  },
+  "assumptionsUnverified": [
+    "Ownability is the price of this choice and it is UNVERIFIED that the trade was worth making: a descriptive title is weakly protectable and no measurement in this session shows a descriptive title out-ranking a carrier-based one on this shelf, so the decision rests on the eleven measured carrier collisions rather than on a ranking reading.",
+    "Google Play search could not be run from this machine, so the collision screen is a web reading of indexed store pages and mirrors; Play does not enforce unique titles and a live app carrying this exact title may exist unseen.",
+    "Trademark headroom is UNVERIFIED: no register was queried (USPTO, EUIPO, WIPO and the ru national register are all unread), so whether the string Part 107 Drills is free in class 9 is not known, and this record does not claim clearance.",
+    "The ru-RU title is the same Latin string as the en-US title, so whether a Russian-speaking learner can find it by search was not measured, and no Cyrillic alternative was tested against the 30 character cap."
+  ]
+}

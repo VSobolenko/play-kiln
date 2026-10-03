@@ -73,6 +73,14 @@ MUTED = (170, 188, 210)
 BEZEL = (13, 18, 27)
 BEZEL_RIM = (126, 148, 176)
 
+# `lane` is deliberately not one of the `PALETTE_DEFAULTS` roles: it is a *domain* colour a slot may
+# declare (the lit water under the launcher field's waterline), not a role every pack draws with, so
+# a slot that omits it is not painted with another app's colour and is not reported as inheriting.
+# `None` is the honest state "this slot declared no such role", and it is what withholds
+# `icon_design.FIELD_OVERLAYS` from a palette that cannot colour it - a partial waterline in an
+# undeclared colour is a third picture, not a cheaper one.
+LANE = None
+
 # The reference slot's own artwork, kept as the historic fallback only. `apply_palette` overwrites
 # the module globals above with the slot being rendered, so these constants are never *the* palette
 # of a pack; they are what `resolve_palette` reaches for when a slot omits a role, which is a
@@ -185,8 +193,10 @@ def resolve_palette(
         )
     resolved = dict(PALETTE_DEFAULTS)
     for role, value in declared.items():
-        if role not in resolved:
-            continue
+        # Every declared role is kept, not only the ones `PALETTE_DEFAULTS` happens to name. The
+        # previous version skipped the rest, so a slot's own domain colour - `lane`, the waterline's
+        # lit water - was silently dropped by the resolver and could not reach `write_vectors`, which
+        # is how the launcher field and the store icon came to be two different pictures.
         try:
             resolved[role] = colours.parse_hex(value)
         except ValueError:
@@ -199,11 +209,14 @@ def resolve_palette(
 def apply_palette(palette: dict[str, tuple[int, int, int]]) -> None:
     """Install one slot's resolved palette for the single-process render pipeline."""
     global INK, INK_SOFT, INK_LIFT, AMBER, AMBER_DEEP, AMBER_PALE
-    global CYAN_DEEP, PAPER, MUTED, BEZEL, BEZEL_RIM
+    global CYAN_DEEP, PAPER, MUTED, BEZEL, BEZEL_RIM, LANE
     INK, INK_SOFT, INK_LIFT = palette["ink"], palette["ink_soft"], palette["ink_lift"]
     AMBER, AMBER_DEEP, AMBER_PALE = palette["amber"], palette["amber_deep"], palette["amber_pale"]
     CYAN_DEEP, PAPER, MUTED = palette["accent_deep"], palette["paper"], palette["muted"]
     BEZEL, BEZEL_RIM = palette["bezel"], palette["bezel_rim"]
+    # A slot that declares no `lane` gets `None`, not a default: the field's waterline is drawn only
+    # in a colour the slot chose (see the `LANE` definition above).
+    LANE = palette.get("lane")
 
 def _load_pack_model():
     """The screenshot inventory, imported from the pack's model rather than restated here.
@@ -247,9 +260,19 @@ SCREENSHOT_LIMITS = _MODEL.screenshot_windows()
 # One raw capture per journey shot. The studio composes every screenshot target from exactly these,
 # so a missing one is a hard stop rather than a target to skip.
 REQUIRED_RAW_CAPTURES = 6
-# Every file the studio writes into store/assets: 2 icons, 2 feature graphics, and the screenshot
-# targets above. Asserted against what was actually rendered so a partial pack cannot be written.
-EXPECTED_COMPOSED_ASSETS = 4 + sum(count for count, _ in SCREEN_TARGETS.values())
+# How many files a run writes, as a function of the declared locale count: two shared assets at the
+# pack root, plus one full set per locale - that locale's icon, its feature graphic and, unless this
+# is an identity-only run, the complete screenshot inventory. Derived from the same `SCREEN_TARGETS`
+# the render loop walks, so the count and the render cannot drift and a partial pack still refuses to
+# write.
+def expected_composed_assets(locale_count: int, *, identity_only: bool) -> int:
+    per_locale = 2 if identity_only else 2 + sum(count for count, _ in SCREEN_TARGETS.values())
+    return 2 + per_locale * max(locale_count, 0)
+
+
+# The one-locale total, kept as a named constant because `scripts/test-store-studio-completeness.py`
+# reads it; a run over a multi-locale slot derives its own count from the function above.
+EXPECTED_COMPOSED_ASSETS = expected_composed_assets(1, identity_only=False)
 
 # A capture that is (near) uniform cannot be a photograph of this app's UI. Every gate in the# factory reads dimensions, mode and byte size, which accept a solid colour rectangle of the right
 # size - and one was accepted as `en-US/phone-01.png` by both `store-kit --validate-only` and
@@ -455,18 +478,25 @@ def render_icon(listing: dict, studio: dict) -> Image.Image:
     artwork and the launcher artwork are the same mark at the same size, drawn from the same
     primitives. There is no second composition to keep in step.
 
-    The field is one exact linear ramp - the same ramp, at the same angle, the adaptive background
-    drawable declares - with no drafting grid and no radial blooms. Measured on the icon the owner
-    rejected: the 32px grid and the two glows left 1.40 luma of high-frequency energy in the field
-    and 2.49 luma of curvature against a best-fit plane, and at 48dp that is dirt. One ramp
-    measures 0.10 and 0.22.
+    The field is the one the adaptive background drawable declares - the same ramp at the same angle
+    plus `icon_design.FIELD_OVERLAYS`, the declared waterline - with no drafting grid and no radial
+    blooms. Measured on the icon the owner rejected: the 32px grid and the two glows left 1.40 luma
+    of high-frequency energy in the field and 2.49 luma of curvature against a best-fit plane, and at
+    48dp that is dirt.
+
+    The overlays are handed to `icon_field` through the slot's own palette, so the 512px listing
+    icon and the launcher background are one field rather than two blue squares that resemble each
+    other: the launcher used to draw the waterline while this icon drew the bare ramp, and the
+    studio's own `write_vectors` flattened the drawable to match the ramp - three answers to one
+    question. This is the single consumer that rasterises the store icon, and it now consumes the
+    one declaration.
 
     Every rendered icon is measured before it is returned, and an icon that fails a gated
     measurement stops the render with the failing legs printed: this is where the threshold gates.
     """
     mark = CURRENT_MARK
     palette = {role: colour for role, colour in _palette_roles()}
-    field = icon_design.icon_field(icon_design.CANVAS, INK, INK_LIFT)
+    field = icon_design.icon_field(icon_design.CANVAS, INK, INK_LIFT, palette=palette)
     image = field.convert("RGBA")
     image.alpha_composite(icon_design.render_mark(icon_design.CANVAS, mark, palette))
     array = np.asarray(image, dtype=np.uint8)
@@ -485,11 +515,19 @@ def render_icon(listing: dict, studio: dict) -> Image.Image:
 
 
 def _palette_roles() -> list[tuple[str, tuple[int, int, int]]]:
-    """The resolved palette as (role, colour), which is what the design system draws with."""
-    return [("ink", INK), ("ink_soft", INK_SOFT), ("ink_lift", INK_LIFT),
-            ("amber", AMBER), ("amber_deep", AMBER_DEEP), ("amber_pale", AMBER_PALE),
-            ("accent_deep", CYAN_DEEP), ("paper", PAPER), ("muted", MUTED),
-            ("bezel", BEZEL), ("bezel_rim", BEZEL_RIM)]
+    """The resolved palette as (role, colour), which is what the design system draws with.
+
+    `lane` appears only when the slot declared it. It is what tells `icon_design.field_overlays`
+    whether this palette can colour the field's waterline at all: a slot without it keeps the bare
+    ramp it was designed with rather than a repainted one.
+    """
+    roles = [("ink", INK), ("ink_soft", INK_SOFT), ("ink_lift", INK_LIFT),
+             ("amber", AMBER), ("amber_deep", AMBER_DEEP), ("amber_pale", AMBER_PALE),
+             ("accent_deep", CYAN_DEEP), ("paper", PAPER), ("muted", MUTED),
+             ("bezel", BEZEL), ("bezel_rim", BEZEL_RIM)]
+    if LANE is not None:
+        roles.append(("lane", LANE))
+    return roles
 
 
 def _print_icon_legs(mark: str, result: dict, *, label: str) -> None:
@@ -714,15 +752,46 @@ def _vector_path_xml(layers: list[dict], colors: dict[str, str]) -> str:
     )
 
 
+def _field_overlay_xml(overlays: tuple[dict, ...], colors: dict[str, str]) -> str:
+    """The background's waterline as `<path>` elements, in the order `icon_design` declares them.
+
+    The geometry is not restated here: `overlays` is `icon_design.field_overlays(...)`, the one
+    definition `icon_field` also rasterises, so the drawable and the 512px listing icon cannot drift.
+    `android:fillAlpha` is emitted rather than a 8-digit `fillColor`, because that is the form the
+    design was authored in and the two are not interchangeable to a human reading the diff.
+    """
+    return "\n".join(
+        f'    <path\n'
+        f'        android:fillAlpha="{overlay["alpha"]:.2f}"\n'
+        f'        android:fillColor="{colors[overlay["role"]]}"\n'
+        f'        android:pathData="{overlay["data"]}" />'
+        for overlay in overlays
+    )
+
+
 def write_vectors(res: Path, colors: dict[str, str]) -> list[Path]:
     """Write the adaptive background, foreground and monochrome drawables.
 
-    The background is one linear ramp and nothing else, which is the change that makes the launcher
-    icon the same picture as the store icon: it used to carry a translucent white polygon over the
-    gradient (`M0,92L58,34L86,62L108,40V108H0Z` at alpha 0.16), a second tonal field the 512px
-    listing icon never had. The two are one field now, from one declared angle.
+    The background is one linear ramp plus `icon_design.FIELD_OVERLAYS` - the declared waterline -
+    and the two renderers emit it from that single definition, which is what makes the launcher icon
+    the same picture as the 512px store icon. It used to be flattened to the ramp alone (with a
+    stray translucent white polygon, `M0,92L58,34L86,62L108,40V108H0Z` at alpha 0.16, the listing
+    icon never had); the owner chose the opposite resolution - keep the richer field and produce it
+    in both places - so the ramp is not flattened and the drawable carries the waterline.
+
+    A slot whose palette does not declare every role the waterline names gets no overlay paths at
+    all: `field_overlays` withholds the whole waterline rather than half drawing it, so such a slot
+    keeps the ramp it was designed with.
+
+    The monochrome layer draws in the palette's `paper` role, never a literal white: the launcher
+    reads the layer's alpha and tints it, so `paper` masks exactly as white would while keeping the
+    mark inside the slot's own declared palette (`icons.launcher` fails a literal `#FFFFFF`).
     """
     layers = vector_layers()
+    overlays = icon_design.field_overlays(colors.keys())
+    overlay_paths = _field_overlay_xml(overlays, colors)
+    # A slot without the waterline gets the byte-identical ramp-only body it had before this change.
+    overlay_block = f"{overlay_paths}\n" if overlay_paths else ""
     background = f"""<?xml version="1.0" encoding="utf-8"?>
 <!-- Generated by scripts/store-studio.py. Do not hand-edit: re-run the studio. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -740,10 +809,10 @@ def write_vectors(res: Path, colors: dict[str, str]) -> list[Path]:
                 android:type="linear" />
         </aapt:attr>
     </path>
-</vector>
+{overlay_block}</vector>
 """
     foreground_paths = _vector_path_xml(layers, colors)
-    monochrome_colors = {role: "#FFFFFFFF" for role in colors}
+    monochrome_colors = {role: colors["paper"] for role in colors}
     monochrome_paths = _vector_path_xml(layers, monochrome_colors)
     foreground = f"""<?xml version="1.0" encoding="utf-8"?>
 <!-- Generated by scripts/store-studio.py. Do not hand-edit: re-run the studio. -->
@@ -864,6 +933,28 @@ def default_studio(listing: dict) -> dict:
     }
 
 
+def declared_locales(listing: dict) -> list[str]:
+    """The locales the pack declares, the default first and each once.
+
+    The studio must ship one asset set per locale `scripts/store/validate.py` requires, and that
+    reader derives them from the same listing with the same order (`pack_model.Listing.declared_locales`).
+    Reading the declaration here, rather than the literal `en-US` this module used to hardcode, is what
+    lets a two-locale slot render both sets; the two readers stay in step because both walk
+    `listing["locales"]` with the default prepended.
+    """
+    raw = listing.get("locales")
+    names = [str(name) for name in raw] if isinstance(raw, dict) else []
+    default = listing.get("defaultLocale")
+    if not isinstance(default, str) or not default:
+        fallback = _MODEL.LOCALES.get("default")
+        default = fallback if isinstance(fallback, str) else ""
+    ordered: list[str] = []
+    for locale in (default, *names):
+        if locale and locale not in ordered:
+            ordered.append(locale)
+    return ordered
+
+
 def _release_approval_problem(slot: Path) -> str | None:
     """The reason identity rendering must wait, imported from ``render.py`` rather than restated.
 
@@ -963,36 +1054,55 @@ def render_slot(slot: Path, *, preview_circle: bool = False, identity_only: bool
     icon = render_icon(listing, studio)
     assets = store / "assets"
     assets.mkdir(parents=True, exist_ok=True)
-    icon_targets = [assets / "icon-512.png", assets / "en-US" / "icon-512.png"]
-    feature_targets = [assets / "feature-graphic-1024x500.png",
-                       assets / "en-US" / "feature-graphic-1024x500.png"]
+    locales = declared_locales(listing)
+    # A set per declared locale, plus the two shared root copies. `declared_locales` is the same
+    # decision `scripts/store/validate.py` reads, so the studio writes exactly the sets the pack's
+    # independent reader requires.
+    icon_targets = [assets / "icon-512.png"]
+    feature_targets = [assets / "feature-graphic-1024x500.png"]
+    for locale in locales:
+        icon_targets.append(assets / locale / "icon-512.png")
+        feature_targets.append(assets / locale / "feature-graphic-1024x500.png")
     feature_source = None if identity_only else sources[0]
     composed_items = [item for item in composed if item["headline"]]
     # (target, image, label) in write order. Nothing touches disk until the whole list is built.
+    #
+    # Every locale's set is composed from the SAME rendered image as the shared root pair. The studio
+    # holds no per-locale headline, kicker or body copy, so localising the composition would mean
+    # inventing translations it must not invent; identical pixels across locales is the deliberate
+    # decision for this change, and only the path set differs per locale. Each image is rendered once
+    # and reused, so a locale's pixels cannot drift from the default locale's.
     renders: list[tuple[Path, object, str]] = []
+    icon_render = icon.convert("RGBA")
+    # Saved as RGBA to match the mode store-kit validates and Play's expectation. The icon is
+    # full-bleed, so every pixel is opaque and the alpha channel is uniform - it carries no
+    # transparency, it just declares the channel.
     for target in icon_targets:
-        # Saved as RGBA to match the mode store-kit validates and Play's expectation. The icon is
-        # full-bleed, so every pixel is opaque and the alpha channel is uniform - it carries no
-        # transparency, it just declares the channel.
-        renders.append((target, icon.convert("RGBA"), "512x512 RGBA"))
+        renders.append((target, icon_render, "512x512 RGBA"))
+    feature_render = render_feature(listing, studio, feature_source)
     for target in feature_targets:
-        renders.append((target, render_feature(listing, studio, feature_source), "1024x500"))
+        renders.append((target, feature_render, "1024x500"))
     if not identity_only:
+        shots_rendered: list[tuple[str, object, str]] = []
         for kind, (count, dimensions) in SCREEN_TARGETS.items():
             for index in range(1, count + 1):
                 source = sources[(index - 1) % len(sources)]
                 item = composed_items[(index - 1) % len(composed_items)] if composed_items else {
                     "headline": "", "body": "", "kicker": ""}
-                target = assets / "en-US" / f"{kind}-{index:02d}.png"
-                renders.append(
-                    (target, render_screenshot(dimensions, item, source),
+                shots_rendered.append(
+                    (f"{kind}-{index:02d}.png", render_screenshot(dimensions, item, source),
                      f"{dimensions[0]}x{dimensions[1]}")
                 )
+        for locale in locales:
+            for name, image, label in shots_rendered:
+                renders.append((assets / locale / name, image, label))
 
-    # A pack is all-or-nothing, so the count is asserted before anything is written. A mismatch
-    # means this function and the inventory that describes it have diverged, and shipping the
-    # partial set is exactly the failure mode above.
-    expected = 4 if identity_only else EXPECTED_COMPOSED_ASSETS
+    # A pack is all-or-nothing, so the count is asserted before anything is written. The expected
+    # total is derived from the declared locale count, so a pack that declares two locales cannot be
+    # written as a one-locale set, and a partial set still refuses to write. A mismatch means this
+    # function and the inventory that describes it have diverged, which is exactly the failure mode
+    # above.
+    expected = expected_composed_assets(len(locales), identity_only=identity_only)
     if len(renders) != expected:
         raise SystemExit(
             f"BLOCKED: the studio rendered {len(renders)} assets but the pack must contain "
@@ -1160,7 +1270,8 @@ def _preview_mask(size: int, subpaths: list[list[tuple[float, float]]], *, even_
 def render_adaptive_icon() -> Image.Image:
     """The shipped adaptive icon, rasterised from the vector paths `write_vectors` writes.
 
-    The layer is the 108dp viewport, its field is the one declared ramp, and the mark comes from
+    The layer is the 108dp viewport, its field is the one declared ramp plus the declared waterline
+    (`icon_design.FIELD_OVERLAYS`, coloured from this slot's palette), and the mark comes from
     `icon_design.mark_layers()` - the same path data that goes into the drawable. Nothing here is
     re-derived from a second set of constants, which is what the previous version of this function
     did: it hardcoded the old two-branch mark (a ring group or a page group) and drew the
@@ -1169,7 +1280,8 @@ def render_adaptive_icon() -> Image.Image:
     """
     size = PREVIEW_CANVAS_PX
     image = icon_design.icon_field(
-        size, INK, INK_LIFT, icon_design.FIELD_ANGLE_DEG).convert("RGBA")
+        size, INK, INK_LIFT, icon_design.FIELD_ANGLE_DEG,
+        palette=dict(_palette_roles())).convert("RGBA")
     image.alpha_composite(vector_raster(size))
     return image
 

@@ -14,8 +14,12 @@ import { ICON_IDS, iconsChecks, iconsFixtures } from './icons.mjs'
 import { groundedClaimsFixtures, harnessChecks, harnessFixtures, rulesFixtures } from './harness.mjs'
 import { manifestChecks, manifestFixtures } from './manifest.mjs'
 import { deviceChecks, deviceFixtures } from './device.mjs'
+import { ideasChecks, ideasFixtures } from './ideas.mjs'
 import { namingChecks, namingFixtures } from './naming.mjs'
+import { PALETTE_IDS, paletteChecks, paletteFixtures } from './palette.mjs'
 import { policyChecks, policyFixtures } from './policy.mjs'
+import { checkSpec, specFixtures } from './spec.mjs'
+import { checkSigningExample, checkSigningFixtures } from './signing.mjs'
 import { checkHarnessRefFixtures, checkHarnessRefs, checkSecretFixtures, checkSize, slotChecks } from './project.mjs'
 
 import { localizationChecks, localizationFixtures, localizationProjectChecks } from './localization.mjs'
@@ -51,6 +55,27 @@ if (ICON_REPORTS.map((report) => report.id).join() !== ICON_IDS.join()) {
 }
 
 /**
+ * The palette legs, declared literally for the same reason `ICON_REPORTS` is: the ledger may only
+ * name an id that appears in this file as text, and the assertion below turns a drift between the
+ * literal list and the sensor's own `PALETTE_IDS` into a load-time failure instead of a fact that
+ * quietly stops being enforced.
+ */
+const PALETTE_REPORTS = [
+  { id: 'palette.declared' },
+  { id: 'palette.agreement' },
+  { id: 'palette.contrast' },
+  { id: 'palette.field-chroma' },
+  { id: 'palette.hue-structure' },
+  { id: 'palette.accent-chroma' },
+  { id: 'palette.families' },
+  { id: 'palette.duplicate' },
+  { id: 'palette.dislike' }
+]
+if (PALETTE_REPORTS.map((report) => report.id).join() !== PALETTE_IDS.join()) {
+  throw new Error('the palette group reports list has drifted from PALETTE_IDS in scripts/core/palette.mjs')
+}
+
+/**
  * Every check, in report order.
  *
  * `needsSlot` marks a check that requires a slot to inspect. A run without `--slot` still evaluates
@@ -67,14 +92,18 @@ export const CHECKS = Object.freeze([
       checkReleaseNoteFixtures(),
       iconFixtures(),
       ...asVerdicts(iconsFixtures()),
+      ...asVerdicts(paletteFixtures()),
       sixteenKbFixtures(),
       buildFixtures(),
       factFixtures(),
       harnessFixtures(),
       manifestFixtures(),
       policyFixtures(),
+      specFixtures(),
       ...asVerdicts(namingFixtures()),
       ...asVerdicts(deviceFixtures()),
+      ...asVerdicts(ideasFixtures()),
+      ...ideasChecks(),
       checkHarnessRefFixtures(),
       checkHarnessRefs(),
       rulesFixtures(),
@@ -84,6 +113,8 @@ export const CHECKS = Object.freeze([
       checkNamespaceSweep(),
       checkCopyFilter(),
       checkScratchHygiene(),
+      checkSigningExample(),
+      checkSigningFixtures(),
       checkFactLedger(),
       ...harnessChecks(),
       ...asVerdicts(uiuxFixtures()),
@@ -111,6 +142,17 @@ export const CHECKS = Object.freeze([
     reports: ICON_REPORTS,
     run: (slotDir) => [checkAdaptiveIcon(slotDir), ...iconsChecks(slotDir)]
   },
+  {
+    // The palette, added 2026-10-02 after the owner installed a slot and called the look
+    // amateurish: a high-chroma accent on a chromatic field reads as neon. The rules this measures
+    // are the encodable ones of `docs/research/2026-10-02-color-systems-and-palette-derivation.md`
+    // — WCAG contrast, the accent's hue and chroma against its field, and the chroma Material 3's
+    // own algorithm would derive. `reports` is literal for the same reason `ICON_REPORTS` is.
+    id: 'palette',
+    needsSlot: true,
+    reports: PALETTE_REPORTS,
+    run: (slotDir) => paletteChecks(slotDir)
+  },
   { id: 'apk', needsSlot: true, run: (slotDir) => apkChecks(slotDir) },
   { id: 'build', needsSlot: true, run: (slotDir) => buildChecks(slotDir) },
   { id: 'manifest', needsSlot: true, run: (slotDir) => manifestChecks(slotDir) },
@@ -118,10 +160,20 @@ export const CHECKS = Object.freeze([
   // was built, and both are read the same way — the contract on disk against the pack it produced.
   // `slot.device` sits here for the same reason: it reads a record the agent wrote about its own run
   // on the phone, so "I tested it on the device" is a claim that resolves to a file rather than prose.
+  // `slot.spec` joins them: it reads the OpenSpec change the slot is authored inside, so "every app
+  // has a specification" is the same kind of claim. `reports` is a literal for the same reason
+  // `ICON_REPORTS` and the `ui` group's list are — `checkIdsFromRegistry` reads this file as text, so
+  // a fact may only name an id that appears here as a literal `id:`.
   {
     id: 'policy',
     needsSlot: true,
-    run: (slotDir) => [...policyChecks(slotDir), ...namingChecks(slotDir), ...deviceChecks(slotDir)]
+    reports: [{ id: 'slot.spec' }],
+    run: (slotDir) => [
+      ...policyChecks(slotDir),
+      ...namingChecks(slotDir),
+      ...deviceChecks(slotDir),
+      checkSpec(slotDir)
+    ]
   },
   { id: 'project', needsSlot: true, run: (slotDir) => slotChecks(slotDir) },
   // The UI baseline, added 2026-09-30 after the owner's review of the first live app. Slot-scoped,
@@ -134,8 +186,9 @@ export const CHECKS = Object.freeze([
     // rather than by the group as a whole — "edge-to-edge is mandatory at targetSdk" is `uiux.insets`
     // and not `ui` — and `checkIdsFromRegistry` reads every `id:` in this file, so a reported id is
     // declared here for the same reason the group's own id is: the ledger may name a function that
-    // really runs, and it is this entry that runs it. `uiux.platform` joined on 2026-10-02.
-    reports: [{ id: 'uiux.insets' }, { id: 'uiux.platform' }],
+    // really runs, and it is this entry that runs it. `uiux.platform` joined on 2026-10-02, and
+    // `uiux.content-colour` on 2026-10-02 with it.
+    reports: [{ id: 'uiux.insets' }, { id: 'uiux.platform' }, { id: 'uiux.content-colour' }],
     run: (slotDir) => [...uiuxChecks(slotDir), ...settingsChecks(slotDir), ...localizationChecks(slotDir)]
   }
 ])

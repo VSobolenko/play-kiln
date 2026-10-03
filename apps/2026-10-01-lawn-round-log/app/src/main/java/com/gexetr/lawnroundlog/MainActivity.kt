@@ -1,9 +1,10 @@
 package com.gexetr.lawnroundlog
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,10 +35,16 @@ import com.gexetr.lawnroundlog.ui.unlock.PurchaseGate
  *   flow is launched from one, and it is shut down in `onDestroy` so a purchase cannot outlive the
  *   screen that started it.
  *
+ * The activity extends [AppCompatActivity] rather than a bare `ComponentActivity` for exactly one
+ * reason: the in-app language picker calls `AppCompatDelegate.setApplicationLocales`, and the
+ * published caution is that the call only takes effect when its host is an `AppCompatActivity`.
+ * `AppCompatActivity` is a `ComponentActivity`, so `enableEdgeToEdge()` and `setContent` are
+ * unaffected.
+ *
  * There is no `Application` subclass on purpose: the two stores are built from a `Context` that
  * `AppGraph` owns, and an application class would be a second place for the same wiring to drift.
  */
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
     private var billingController: BillingController? = null
 
@@ -64,7 +71,13 @@ class MainActivity : ComponentActivity() {
         // Built here rather than inside the composition so the one owner of the Play connection is a
         // field this activity also shuts down — a gate created inside `setContent` would be a value
         // `onDestroy` could not reach without a `remember` that composition may never have run.
-        val gate: PurchaseGate = BillingPurchaseGate(controller)
+        val gate: PurchaseGate = BillingPurchaseGate(
+            controller = controller,
+            // A debug build can be launched into the owned state, so the paid surface — including the
+            // CSV handoffs — can be driven on a device before the app is on Play. A release build
+            // never reaches this branch: `BuildConfig.DEBUG` is a compile-time false and R8 removes it.
+            debugOwned = debugUnlockRequested(intent),
+        )
         purchaseGate = gate
 
         setContent {
@@ -102,3 +115,23 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
     }
 }
+
+/**
+ * The launch extra a debug build honours to report the unlock as owned.
+ *
+ * It is a test hook, not a product feature: the paid surface is otherwise unreachable until the app
+ * is on Play, so the CSV handoffs could not be exercised on the device at all. Launch with
+ * `adb shell am start -n <package>/com.gexetr.lawnroundlog.MainActivity --ez com.gexetr.lawnroundlog.DEBUG_UNLOCK true`
+ * to drive it, and launch normally to see the product as a buyer does.
+ */
+private const val EXTRA_DEBUG_UNLOCK = "com.gexetr.lawnroundlog.DEBUG_UNLOCK"
+
+/**
+ * Whether this launch asked for the owned state, in a build where that is allowed.
+ *
+ * `BuildConfig.DEBUG` is the whole guard, and it is deliberate that the flag is read inside it rather
+ * than beside it: in a release build the condition is constant-folded and the extra is never read, so
+ * a shipped APK cannot be unlocked by launching it with an argument.
+ */
+private fun debugUnlockRequested(intent: Intent): Boolean =
+    BuildConfig.DEBUG && intent.getBooleanExtra(EXTRA_DEBUG_UNLOCK, false)

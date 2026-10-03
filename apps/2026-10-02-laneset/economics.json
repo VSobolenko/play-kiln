@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A pool swimmer training three to six structured sessions a week in a masters or club lane, or a triathlete doing their pool work, who builds the session by hand today or copies a coach's whiteboard and does not want another monthly training subscription.",
+  "paidUnit": "One permanent unlock of the whole app: every training focus, the guided 400 and 200 threshold pace test that puts a target time on every interval, the constraint-driven set builder that reads pool length, available minutes, strokes to avoid and the gear actually on the deck, and the share-and-print handoff, with no advertising, no account and no renewal.",
+  "priceUsd": 9.99,
+  "momentOfPayment": "On the pool deck, after the free Endurance session has been generated and swum once, at the first locked focus or the first tap on the share and print handoff, behind one clearly priced sheet with no trial clock and above all no subscription prompt.",
+  "distinctnessSentence": "Where the shelf's leaders compute sets from a fixed rotating library and sell the useful half as a recurring plan, this app computes each session from the swimmer's own constraints against authored programming rules, unlocks once instead of every month, walks the swimmer through the two time trials that turn every interval into a target time, and prints or shares the set list so the workout can be swum without a watch, a signal or an account.",
+  "evidenceRef": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#3-the-swim-shelf-and-its-leaders",
+  "day1RevenuePath": "The slot is listed against the swim workout generator query, where demand is proven by five cards in the 100K or more install bracket, by the on-job leader at 3.8 stars over 3,102 exact reviews, and by a pocket of 14 critical reviews whose two largest classes are missing features at 36 percent and the paywall at 29 percent, and the first unlock arrives through the billing capability this plan requires when the swimmer who has already swum the free session pays once for the remaining focuses and the handoff.",
+  "killCriteria": {
+    "windowDays": 90,
+    "minInstalls": 1250,
+    "minRevenueUsd": 900
+  },
+  "capabilities": {
+    "required": [
+      "billing"
+    ],
+    "deliberatelyNotEnabled": [
+      "ads"
+    ],
+    "note": "billing is what purchase_led_single_unlock collects through. ads is deliberately off: an interstitial on a pool deck is the worst possible place for one and the shelf's measured money is a subscription, so an ad-led build would reproduce the defect this recipe answers while earning less."
+  },
+  "serverRequired": false,
+  "permissions": "None. The programming rules, the pace arithmetic and every generated session ship inside the APK, so no internet permission is declared and the app works in airplane mode; no location, camera, storage, contacts, microphone, activity recognition or background work. The only declared permission is com.android.vending.BILLING from the Play Billing library.",
+  "buildEstimateAgentHours": 6,
+  "archetypesRejected": [
+    {
+      "archetype": "purchase_led_repeat_sales",
+      "revenueReason": "There is no second thing to sell to the same swimmer: the generator already answers every session they will swim, so a paid set pack would cannibalise the unlock rather than add revenue, and the shelf's repeat sale is a recurring plan, which is the mechanism this recipe exists to refuse."
+    },
+    {
+      "archetype": "ads_led_utility",
+      "revenueReason": "The arithmetic does not close on this shelf. At an assumed 2 dollars eCPM and about 3 impressions per session, 1,000 dollars per month needs roughly 500,000 impressions, about 167,000 sessions per month, against a whole shelf whose leader carries 3,102 reviews; the eCPM is an assumption rather than a reading, but the order of magnitude is the reason."
+    },
+    {
+      "archetype": "purchase_only_no_ads",
+      "revenueReason": "It keeps the price and gives up the free trial session, which is the only moment the unlock can be sold: a swimmer has to swim one generated session before believing a generator, so charging before that removes the single conversion event this product has."
+    },
+    {
+      "archetype": "subscription",
+      "revenueReason": "Banned outright by the owner on 2026-10-01 and machine enforced, since subscription is not in the ARCHETYPES list. Named here only because it is the shelf's own defect: the 2.3 star app with 10K or more installs carries two 1 star reviews about nothing but subscriptions and an account that could not be transferred."
+    }
+  ],
+  "assumptionsUnverified": [
+    "Willingness to pay 9.99 dollars once is UNVERIFIED on this shelf: none of the 10 enriched cards declares a price and 7 declare an in-app purchase, so the only measured paying behaviour is recurring in-app purchases, and no priced comparable exists to read a one-time unlock against.",
+    "Install-to-unlock conversion is assumed at 3 percent of installs; no slot in this repository has ever measured a conversion rate, so the 124 sales per month and 4,133 installs per month derived from it are arithmetic on an assumption rather than a reading.",
+    "The 15 percent service fee, the 2 percent refund allowance and the 2 percent currency conversion allowance are plan assumptions carried from the monetization strategy document rather than measurements of this developer account, and the fee tier rises above the first million dollars.",
+    "The kill floor is the repository's derived floor and not the target: minRevenueUsd = 0.30 x (90/30) x 1,000 = 900 dollars, which is the recorded 300 dollar per month lower anchor applied over the window (docs/ideation/2026-10-02-target-vs-kill-floor.md section 2.2), and minInstalls = 37 sales per month divided by the plan's own 3 percent conversion = 1,233, rounded up to 1,250. The 30 percent fraction is INFERRED from that recorded anchor and is not measured, and the install floor inherits the same 3 percent conversion this plan assumes for its target, which is more optimistic than the repository's recorded 1.9 percent median install-to-paid rate (at 1.9 percent the floor would be about 1,950 installs).",
+    "The complaint tables describe the vocabulary of the shelf, not its frequency: Play served three reviews per page, so a leader with no critical review in the sample is a leader whose complaints were not served, and the pocket percentages rest on 14 critical reviews.",
+    "The shelf's best-rated app is io.swimup.application at 4.5 stars over 1,234 exact reviews and 100K or more installs with no critical review in its sampled page, so it is UNVERIFIED that a new listing beats it on anything except price and the pacing test.",
+    "Search ranking is assumed rather than planned: nothing here shows a new listing reaching 4,133 installs per month against five incumbents already in the 100K or more bracket."
+  ]
+}

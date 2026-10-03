@@ -10,13 +10,16 @@ is which.
 The block below is the note itself, not a rendering of it. Paste it whole into the console's single
 `Заметки о выпуске` field, tags on their own lines — Play reads every `<locale>` pair out of that one
 box and shows the text on the store page. Each language is capped at 500 characters and Play
-truncates silently rather than refusing, so the two notes below are measured.
+truncates silently rather than refusing, so the note below is measured.
+
+One locale only, deliberately. The listing declares `en-US` alone, so a second note would put text on
+the store page in a language the listing does not carry and imply support the store presence does not
+provide. The app itself is bilingual (`res/values-ru/`) — that is its own decision and is unaffected,
+because Play links no requirement between an app's resource languages and the languages declared on
+its listing.
 
 ```text
 <en-US>
 First release of Lawn Round Log. The round, one-tap visits (mowed, skipped or rained off), the rained-off day push, per-customer owed balances and CSV export all work offline with no account. Free for up to eight customers; one purchase unlocks the whole round for good, with no subscription.
 </en-US>
-<ru-RU>
-Первый выпуск Lawn Round Log. Обход, визиты одним касанием (скошено, пропущено, смыто дождём), сдвиг дня из-за дождя, балансы долгов по клиентам и выгрузка в CSV работают офлайн и без аккаунта. Бесплатно до восьми клиентов; одна покупка открывает весь обход навсегда, без подписки.
-</ru-RU>
 ```

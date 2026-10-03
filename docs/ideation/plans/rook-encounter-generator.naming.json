@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "title": "Rook: Encounter Generator",
+  "slug": "rook-encounter-generator",
+  "applicationId": "com.gexetr.rookencountergenerator",
+  "archetype": "carrier_job_noun",
+  "reconRef": "docs/ideation/2026-10-02-generator-and-creative-tools.md#8-the-name-derived-recorded-rejected-alternatives-on-the-record",
+  "chosen": {
+    "archetype": "carrier_job_noun",
+    "carrier": "Rook",
+    "jobNoun": "Encounter Generator",
+    "score": 82,
+    "dimensions": {
+      "jobFit": 4.0,
+      "searchability": 3.5,
+      "distinctiveness": 4.5,
+      "radioTest": 5.0,
+      "uniqueness": 3.0,
+      "lengthFit": 5.0,
+      "localeSurvival": 4.0
+    },
+    "titles": [
+      { "locale": "en-US", "title": "Rook: Encounter Generator", "length": 25 },
+      { "locale": "ru-RU", "title": "Rook: Генератор сцен", "length": 20 }
+    ]
+  },
+  "candidates": [
+    {
+      "name": "Encounter Generator",
+      "archetype": "descriptive",
+      "score": 33,
+      "why": "Negative control: the bare two-word head phrase competes for the exact query the category leader already owns, so a new app ranks nowhere for it."
+    },
+    {
+      "name": "Generator",
+      "archetype": "descriptive",
+      "score": 22,
+      "why": "Negative control: the bare device noun spends Play's strongest ranking field on a category word and tells a user nothing about which job it does."
+    },
+    {
+      "name": "Tablewyrd",
+      "archetype": "coined",
+      "score": 55,
+      "why": "A stylised misspelling of table and wyrd fails the radio test, looks like a typo, and carries no query a game master actually types."
+    },
+    {
+      "name": "Rollfire",
+      "archetype": "evocative",
+      "score": 58,
+      "why": "Evokes dice and energy but owns no searchable phrase, so the descriptor would have to carry all the discovery on its own."
+    },
+    {
+      "name": "Scenario Forge",
+      "archetype": "compound",
+      "score": 63,
+      "why": "Forge is a crowded carrier across creator tools and the phrase loses the encounter and generator words the shelf ranks on."
+    },
+    {
+      "name": "Lair: Encounter Generator",
+      "archetype": "carrier_job_noun",
+      "score": 71,
+      "why": "Strong dungeon imagery and the right job noun, but Lair sits close to layer in speech and weakens the radio test."
+    },
+    {
+      "name": "Crypt: Encounter Generator",
+      "archetype": "carrier_job_noun",
+      "score": 74,
+      "why": "Good thematic carrier with the right job noun, but crypt is diluted by the crypto category in search and reads narrower than a whole world."
+    },
+    {
+      "name": "Rook: Encounter Generator",
+      "archetype": "carrier_job_noun",
+      "score": 82,
+      "why": "Short ownable carrier that passes the radio test, plus the exact job noun users type, inside the 30 character cap in both declared locales."
+    }
+  ],
+  "rejected": [
+    {
+      "name": "Scenario Forge",
+      "reason": "Forge is a heavily used creator-tool carrier, so it adds no distinctiveness while dropping the encounter and generator words the shelf searches for."
+    },
+    {
+      "name": "Tablewyrd",
+      "reason": "A stylised misspelling fails the radio test and reads as a typo, and the methodology rejects deliberate misspellings of common words."
+    },
+    {
+      "name": "Rollfire",
+      "reason": "Evocative but owns no query and teaches a new user nothing about encounters or generators, so discovery would rest entirely on the descriptor."
+    },
+    {
+      "name": "Encounter Generator",
+      "reason": "The bare head phrase is the negative control: it spends the 30 characters on the exact contested query the category leader already occupies."
+    },
+    {
+      "name": "Generator",
+      "reason": "A single bare category noun, which the naming methodology rejects outright because it names the category rather than the job."
+    },
+    {
+      "name": "Lair: Encounter Generator",
+      "reason": "The carrier is a homophone risk in speech and the imagery is narrower than the world the generator actually produces."
+    }
+  ],
+  "searchPhrases": [
+    "ttrpg encounter generator",
+    "dnd encounter generator",
+    "dungeon master tools",
+    "random tables rpg"
+  ],
+  "audience": "Tabletop and TTRPG game masters who run sessions from a phone and want a runnable scene on demand without a server or an account.",
+  "rationale": "The carrier is short, ownable and passes the radio test, while the job noun carries the two-to-three-word phrase the shelf's paying users already type into Play search.",
+  "collisionCheck": "Searched Play on 2026-10-02 for the exact string Rook: Encounter Generator and for the carrier Rook against tabletop tooling: no live title is that exact string and no major tabletop app uses the carrier. Play does not enforce unique titles, so this is a search and not clearance.",
+  "localisationCheck": "The carrier stays Latin in both declared locales, the ru title is 20 characters with 10 characters of slack, and neither the carrier nor the job noun carries an unfortunate meaning in ru.",
+  "localizedTitles": {
+    "en-US": "Rook: Encounter Generator",
+    "ru-RU": "Rook: Генератор сцен"
+  },
+  "evidence": "docs/research/2026-10-02-generator-and-creative-evidence.md#4-the-pocket-enriched-by-hand-demand-is-proven-the-generator-tier-is-weak",
+  "assumptionsUnverified": [
+    "No trademark register was screened; this record holds a Play search only, and a registry screen in the owner's jurisdictions could still find a conflicting mark.",
+    "No controlled experiment shows the title causes installs; the score is arithmetic over the methodology's rubric, not evidence of rank.",
+    "The carrier Rook is a common English word, so its uniqueness rests on the searched tabletop shelf rather than on a strong coined token."
+  ]
+}

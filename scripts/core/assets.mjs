@@ -8,8 +8,18 @@
 //      checked per kind. A single blanket predicate previously rejected a legal tablet asset.
 //   2. The 16:9-or-9:16 sentence the console states in EVERY screenshot field is decided by
 //      integer cross-multiplication, so an exactly-9:16 canvas is never a float near-miss.
-import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  statSync,
+  writeFileSync
+} from 'node:fs'
 import path from 'node:path'
+import { SCRATCH_DIR } from '../lib/scratch.mjs'
 import {
   expectEqual,
   expectTrue,
@@ -108,6 +118,135 @@ export function checkLimitsAgreement() {
 // Inline fixtures — the sensors this module depends on, made falsifiable.
 // ---------------------------------------------------------------------------------------------
 
+/**
+ * Builds a synthetic slot tree under scratch, runs `body`, and always cleans up.
+ *
+ * The provenance fixtures need a real tree on disk: `checkProvenance` stats files and hashes
+ * bytes, so an in-memory stand-in could not go red for the defect these legs pin.
+ */
+function withProvenanceSlot(setup, body) {
+  const dir = mkdtempSync(path.join(SCRATCH_DIR, 'kiln-provenance-'))
+  try {
+    setup(dir)
+    return body(dir)
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+}
+
+const writeProvenanceRecord = (dir, composedAssets) =>
+  writeFileSync(
+    path.join(dir, 'store', 'provenance.json'),
+    `${JSON.stringify({ composedAssets }, null, 2)}\n`,
+    'utf8'
+  )
+
+/**
+ * The `pack.provenance` legs, one per rule the check applies.
+ *
+ * The first leg is the regression check for the phase mismatch the check was written from: a slot
+ * holding `store/studio.json` and no composed media is a phase-1 slot, and it must be SKIP rather
+ * than a FAIL demanding a phase-2 record. The anti-evasion leg holds the old line's value still —
+ * composed media with the declaration deleted still fails for the missing record.
+ */
+function provenanceFixtureCases() {
+  return [
+    [
+      'regression: store/studio.json with no composed media is SKIP naming no composed media (this FAILed before the fix)',
+      () =>
+        withProvenanceSlot(
+          (dir) => {
+            mkdirSync(path.join(dir, 'store'), { recursive: true })
+            writeFileSync(path.join(dir, 'store', 'studio.json'), '{}\n', 'utf8')
+          },
+          (dir) => {
+            const result = checkProvenance(dir)
+            expectEqual(result.verdict, 'SKIP', 'verdict')
+            expectTrue(result.detail.includes('no composed media'), result.detail)
+          }
+        )
+    ],
+    [
+      'composed media under store/assets/ with no provenance record is a FAIL',
+      () =>
+        withProvenanceSlot(
+          (dir) => {
+            mkdirSync(path.join(dir, 'store', 'assets'), { recursive: true })
+            writeFileSync(path.join(dir, 'store', 'studio.json'), '{}\n', 'utf8')
+            writeFileSync(path.join(dir, 'store', 'assets', 'icon-512.png'), 'png-bytes', 'utf8')
+          },
+          (dir) => {
+            const result = checkProvenance(dir)
+            expectEqual(result.verdict, 'FAIL', 'verdict')
+            expectTrue(result.detail.includes('no store/provenance.json'), result.detail)
+          }
+        )
+    ],
+    [
+      'composed media with a record whose sha256 matches the file on disk is a PASS',
+      () =>
+        withProvenanceSlot(
+          (dir) => {
+            const rel = 'store/assets/icon-512.png'
+            const file = path.join(dir, 'store', 'assets', 'icon-512.png')
+            mkdirSync(path.dirname(file), { recursive: true })
+            writeFileSync(file, 'png-bytes', 'utf8')
+            writeProvenanceRecord(dir, [{ file: rel, sha256: sha256(file) }])
+          },
+          (dir) => expectEqual(checkProvenance(dir).verdict, 'PASS', 'verdict')
+        )
+    ],
+    [
+      'composed media with a record whose sha256 disagrees is a FAIL that prints the real hash',
+      () =>
+        withProvenanceSlot(
+          (dir) => {
+            const rel = 'store/assets/icon-512.png'
+            const file = path.join(dir, 'store', 'assets', 'icon-512.png')
+            mkdirSync(path.dirname(file), { recursive: true })
+            writeFileSync(file, 'png-bytes', 'utf8')
+            writeProvenanceRecord(dir, [{ file: rel, sha256: 'deadbeef' }])
+          },
+          (dir) => {
+            const result = checkProvenance(dir)
+            expectEqual(result.verdict, 'FAIL', 'verdict')
+            const actual = sha256(path.join(dir, 'store', 'assets', 'icon-512.png'))
+            expectTrue(result.detail.includes(actual.slice(0, 12)), result.detail)
+          }
+        )
+    ],
+    [
+      'anti-evasion: composed media with store/studio.json deleted still FAILs for the missing record',
+      () =>
+        withProvenanceSlot(
+          (dir) => {
+            mkdirSync(path.join(dir, 'store', 'assets'), { recursive: true })
+            writeFileSync(path.join(dir, 'store', 'assets', 'icon-512.png'), 'png-bytes', 'utf8')
+            // store/studio.json is deliberately absent: the check must key on the media, not the
+            // declaration, so removing the declaration cannot switch it off.
+          },
+          (dir) => {
+            const result = checkProvenance(dir)
+            expectEqual(result.verdict, 'FAIL', 'verdict')
+            expectTrue(result.detail.includes('no store/provenance.json'), result.detail)
+          }
+        )
+    ],
+    [
+      'an empty store/assets/ directory is not composed media, so the verdict is SKIP (no image claims a build)',
+      () =>
+        withProvenanceSlot(
+          (dir) => mkdirSync(path.join(dir, 'store', 'assets'), { recursive: true }),
+          (dir) => {
+            const result = checkProvenance(dir)
+            expectEqual(result.verdict, 'SKIP', 'verdict')
+            expectTrue(result.detail.includes('no composed media'), result.detail)
+          }
+        )
+    ]
+  ]
+}
+
 export function checkAssetFixtures() {
   return guard('assets.fixtures', () => {
     const fixtures = []
@@ -150,6 +289,15 @@ export function checkAssetFixtures() {
       'a release-note block with two tags counts two languages',
       () => expectEqual(countNoteLanguages('<en-US>\nhello\n</en-US>\n<ru-RU>\nпривет\n</ru-RU>'), 2, 'tag count')
     ])
+
+    // -----------------------------------------------------------------------------------------
+    // pack.provenance — the trigger is composed media, not the studio.json declaration
+    // -----------------------------------------------------------------------------------------
+    //
+    // These legs drive the real `checkProvenance` over a synthetic slot tree, because the defect
+    // they pin was a phase mismatch between two files and not a formatting bug: a fixture that
+    // asserted on a string would not have gone red for it.
+    fixtures.push(...provenanceFixtureCases())
 
     const failures = []
     for (const [label, body] of fixtures) {
@@ -529,6 +677,14 @@ export function checkReleaseNotes(slotDir) {
   })
 }
 
+/**
+ * The command that makes a `privacyPolicyUrl` real, named inside the FAIL because the reader of a FAIL
+ * is the operator. `pack.placeholders` reads a slot directory and does not carry the slug the command
+ * needs, so the placeholder is literal — the same `<slug>` `scripts/store/validate.py` prints for this
+ * field, and the runbook is `docs/privacy-policy-hosting.md`.
+ */
+export const PUBLISH_PRIVACY_REMEDY = 'node scripts/publish-privacy.mjs --slot <slug>'
+
 export function checkPlaceholderHosts(slotDir) {
   return guard('pack.placeholders', () => {
     const assets = playAssets()
@@ -538,18 +694,28 @@ export function checkPlaceholderHosts(slotDir) {
     const problems = []
     for (const field of ['privacyPolicyUrl', 'contactEmail', 'websiteUrl', 'supportUrl']) {
       const value = raw[field]
+      const remedy = field === 'privacyPolicyUrl' ? ` — publish one with \`${PUBLISH_PRIVACY_REMEDY}\`` : ''
       if (typeof value !== 'string' || value.trim() === '') {
-        if (field === 'privacyPolicyUrl') problems.push('privacyPolicyUrl is empty; it has no default')
+        if (field === 'privacyPolicyUrl') problems.push(`privacyPolicyUrl is empty; it has no default${remedy}`)
         continue
       }
       if (field === 'contactEmail') continue
+      // A non-`https` scheme was never checked before this point: `hostOf` reads the hostname off a
+      // value that may carry `http:`, and `isPlaceholderHost` compares hosts only, so the pass
+      // message's "no insecure scheme" was a claim this loop did not make. Enforced here for every URL
+      // field, which is what makes that sentence true.
+      const scheme = explicitScheme(value)
+      if (scheme !== null && scheme !== 'https:') {
+        problems.push(`${field}: ${value} uses ${scheme.replace(':', '')}, and the pack requires an https address${remedy}`)
+        continue
+      }
       const host = hostOf(value)
       if (!host) {
-        problems.push(`${field}: ${value} has no usable host`)
+        problems.push(`${field}: ${value} has no usable host${remedy}`)
         continue
       }
       if (isPlaceholderHost(host, assets.placeholderHosts)) {
-        problems.push(`${field}: ${value} points at the reserved host ${host}`)
+        problems.push(`${field}: ${value} points at the reserved host ${host}${remedy}`)
       }
     }
     if (typeof raw.contactEmail !== 'string' || raw.contactEmail.trim() === '') {
@@ -559,6 +725,12 @@ export function checkPlaceholderHosts(slotDir) {
       ? pass('pack.placeholders', 'no reserved documentation host, no insecure scheme')
       : fail('pack.placeholders', problems.join('; '))
   })
+}
+
+/** An explicit URL scheme (`http:`, `https:`, …), lowercased, or `null` when the value carries none. */
+export function explicitScheme(value) {
+  const match = /^([A-Za-z][A-Za-z0-9+.-]*):/.exec(value.trim())
+  return match ? `${match[1].toLowerCase()}:` : null
 }
 
 export function hostOf(value) {
@@ -575,25 +747,65 @@ export function isPlaceholderHost(host, hosts) {
 }
 
 /**
+ * Whether the pack ships composed media.
+ *
+ * Composed media is what `scripts/store/render.py` writes into `store/assets/` — the icon, the
+ * feature graphic and the screenshot sets — so its presence on disk, not the *declaration* in
+ * `store/studio.json`, is what makes `store/provenance.json` required.
+ *
+ * The distinction is the whole rule, because the two files belong to different phases of this
+ * factory. `store/studio.json` is authored before the UI is styled (`.cursor/rules/visual-identity.mdc`,
+ * stage 1); `store/provenance.json` is written only by `scripts/media-capture.mjs` in phase 2, which
+ * refuses to run at all without the owner's recorded release approval. Keying the requirement on the
+ * declaration therefore demanded a phase-2 artifact of every phase-1 slot, so every slot in
+ * development was permanently red on this row — a gate that cannot be green in the state the
+ * pipeline puts a slot in teaches the operator to read past it.
+ *
+ * Keying on the media is also strictly stronger than the line it replaces: a slot with composed
+ * images and no record fails whether or not `store/studio.json` is present, so deleting the
+ * declaration cannot switch the check off (the anti-evasion property the old line protected).
+ * A `store/assets/` directory that exists but holds no file is not composed media: there is no image
+ * on disk claiming a build, so there is nothing to attest.
+ */
+export function hasComposedMedia(slotDir) {
+  const assetsDir = path.join(slotDir, 'store', 'assets')
+  if (!existsSync(assetsDir)) return false
+  const holdsAFile = (dir) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        if (holdsAFile(path.join(dir, entry.name))) return true
+      } else if (entry.isFile()) {
+        return true
+      }
+    }
+    return false
+  }
+  return holdsAFile(assetsDir)
+}
+
+/**
  * Verifies the committed images against the build they claim to come from.
  *
  * The record has two lists and they are not the same kind of evidence. `composedAssets` are the
  * committed store assets, so each one must hash to what the record says. `rawCaptures` live under
  * the gitignored `store/captures/`, so their absence is expected and is reported as a note rather
  * than a failure — treating them as evidence would make every clean checkout fail.
+ *
+ * The trigger is the presence of composed media (`hasComposedMedia`), not the declaration in
+ * `store/studio.json`: see that function for why.
  */
 export function checkProvenance(slotDir) {
   return guard('pack.provenance', () => {
     const store = path.join(slotDir, 'store')
     const record = path.join(store, 'provenance.json')
-    const composesMedia = existsSync(path.join(store, 'studio.json'))
+    const composesMedia = hasComposedMedia(slotDir)
     if (!existsSync(record)) {
       return composesMedia
         ? fail(
             'pack.provenance',
-            'the pack declares itself composed (store/studio.json) but ships no provenance record'
+            'the pack ships composed images under store/assets/ but no store/provenance.json binds them to a recorded build'
           )
-        : skip('pack.provenance', 'not a composed pack')
+        : skip('pack.provenance', 'no composed media under store/assets to attest')
     }
     const data = JSON.parse(readFileSync(record, 'utf8').replace(/^\uFEFF/, ''))
     const committed = data.composedAssets || data.assets || data.files

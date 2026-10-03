@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A saz, baglama or oud player who already uses a free ad-funded niche tuner and is tired of two things: full-screen ads cutting a tuning session short, and the microtonal makam intervals (komma, perde offsets) being rounded away by equal-tempered software.",
+  "paidUnit": "One in-app purchase that unlocks every traditional tuning (Kara Duzen, Baglama Duzeni, Misket, oud and makam sets), the perde/komma fret reference, the sustained drone tone generator, and removes all advertising for the life of the install.",
+  "momentOfPayment": "At the moment the player first reaches for something the free tier does not read: a non-equal temperament tuning, the drone, or simply wants a tuning session that no ad can interrupt.",
+  "distinctnessSentence": "One paid tuner that reads the makam intervals in cents and keeps a stable lock on the low saz and oud courses while never showing an ad, with every traditional tuning included in a single one-time $4.99 unlock instead of split across a $15/week subscription or a full-screen ad every thirty seconds.",
+  "evidenceRef": "docs/research/2026-10-02-niche-real-time-tools-evidence.md#3-the-pocket-measured",
+  "priceUsd": 4.99,
+  "killCriteria": {
+    "windowDays": 90,
+    "minInstalls": 3700,
+    "minRevenueUsd": 900
+  },
+  "day1RevenuePath": "The app installs free with the tuner and one standard tuning usable, is listed against the saz tuner, baglama tuner and oud tuner queries where the two 1M+ incumbents sit at only 4.2 and 4.4 stars, and offers the single unlock the first time the player opens a microtonal tuning, the drone, or an ad-free session.",
+  "assumptionsUnverified": [
+    "The 2% install-to-unlock conversion is an assumption carried from docs/monetization-strategy.md; no slot in this repository has ever measured a real install-to-purchase rate.",
+    "Play install counts are rounded buckets and the review sample is Play's own three-per-page selection, so the true size of the pocket and the frequency of each complaint are unmeasured.",
+    "No trademark screen of the name Rast in class 9 has been run; a clean Play search is not trademark clearance.",
+    "The 15% service fee, 2% refund allowance and 2% currency allowance are plan assumptions, not measurements taken from this developer account."
+  ]
+}

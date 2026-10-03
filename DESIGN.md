@@ -75,9 +75,10 @@ repair that one.
 
 ## Verifying the identity
 
-- `node scripts/verify.mjs --slot <slug>` — a pack that declares
-  `store/studio.json` is composed and must bind its assets to a recorded build via
-  `store/provenance.json`.
+- `node scripts/verify.mjs --slot <slug>` — a pack that **ships composed media** (a `store/assets/`
+  tree holding at least one file) must bind its assets to a recorded build via
+  `store/provenance.json`; the `store/studio.json` declaration is authored in phase 1, before that
+  record can exist.
 - `python scripts/visual-qa.py --slot <slug>` — independent pixel measurements: palette vs the
   app's Kotlin palette, caption ink and edge clipping, WCAG contrast, pairwise similarity of the six
   phone shots, adaptive-mask clipping of the icon, thumbnail legibility.

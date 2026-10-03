@@ -12,13 +12,14 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -50,6 +51,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gexetr.lawnroundlog.R
 import com.gexetr.lawnroundlog.domain.Customer
@@ -170,9 +172,10 @@ private fun RoundScreen(
 ) {
     val rows = if (selectedTab == TAB_TODAY) state.due else state.ordered
 
-    // Horizontal safe-drawing insets only: the hero gradient is deliberately full-bleed under the
-    // status bar, so no top inset is applied here — that would leave a bare strip above the hero.
-    // The sides are inset so nothing lands under a display cutout in landscape.
+    // Horizontal safe-drawing insets only: the hero gradient stays deliberately full-bleed under the
+    // status bar, and `RoundHero`'s own content carries the status-bar inset — so the title clears the
+    // clock and the punch-hole cutout without a bare strip being painted above the gradient. The sides
+    // are inset so nothing lands under a display cutout in landscape.
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -196,9 +199,19 @@ private fun RoundScreen(
         )
 
         if (rows.isEmpty()) {
+            // Two different situations wear the same empty slot. A round with no customers at all is
+            // asking to be started; a day nobody is left due on is a finished day. Rendering the
+            // first-run copy over a completed round would tell the operator to add customers he
+            // already has -- which is exactly what "Due today" did while it fell back to the whole
+            // round whenever nothing was due.
+            val roundIsEmpty = state.customers.isEmpty()
             RoundEmptyState(
-                title = stringResource(R.string.round_empty_title),
-                body = stringResource(R.string.round_empty_body),
+                title = stringResource(
+                    if (roundIsEmpty) R.string.round_empty_title else R.string.round_none_due_title,
+                ),
+                body = stringResource(
+                    if (roundIsEmpty) R.string.round_empty_body else R.string.round_none_due_body,
+                ),
                 // `weight`, not `fillMaxSize`, in a Column: an unweighted filler takes the whole
                 // remaining height and measures the pinned `RoundActions` sibling at zero.
                 modifier = Modifier
@@ -267,10 +280,17 @@ private fun RoundHero(
                         MaterialTheme.colorScheme.secondaryContainer,
                     ),
                 ),
-            )
-            .padding(horizontal = 20.dp, vertical = 20.dp),
+            ),
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // The gradient is the full-bleed field; the status-bar inset and the padding belong to the
+        // content, so the mark, the day and the owed total sit below the clock and the camera cutout
+        // while the colour still runs to the window edge behind them.
+        Column(
+            modifier = Modifier
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(horizontal = 20.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RoundMark(
                     modifier = Modifier.size(32.dp),
@@ -513,32 +533,54 @@ private fun RoundActions(
                 .navigationBarsPadding()
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Button(
-                    onClick = onAddCustomer,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    GlyphAdd()
-                    Spacer(Modifier.width(8.dp))
-                    Text(text = stringResource(R.string.action_add_customer))
-                }
-                OutlinedButton(
-                    onClick = onPushDay,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text(text = stringResource(R.string.round_push_day))
-                }
+            // One action per row, not two sharing one. Side by side each button was a weighted half
+            // of the bar, and the label — after the glyph and Material's 24dp content padding — was
+            // left a quarter of the line, so "Add customer" broke one word per line (measured on the
+            // phone: 237px of 477px available). A full-width row is what leaves a label room to hold
+            // one line at the default font scale and to wrap on whole words, not mid-phrase, when
+            // the font scale grows. `heightIn` is the touch-target floor, never a cap: the box grows
+            // around a wrapped label instead of clipping it.
+            Button(
+                onClick = onAddCustomer,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp),
+            ) {
+                GlyphAdd()
+                Spacer(Modifier.width(8.dp))
+                Text(text = stringResource(R.string.action_add_customer))
+            }
+            Spacer(Modifier.height(10.dp))
+            OutlinedButton(
+                onClick = onPushDay,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp),
+            ) {
+                Text(text = stringResource(R.string.round_push_day))
             }
             Spacer(Modifier.height(4.dp))
+            // The four doors share the row equally. Without a weight each button took its intrinsic
+            // width and, at Material's default 12dp side padding, the total overflowed — so the last
+            // child was squeezed to a few dp and its label broke mid-word ("Abo / ut").
+            //
+            // A quarter each is still only ~87dp on a 360dp-wide screen, and the longest label this app
+            // declares is measured rather than assumed: Russian "О приложении" needs ~82dp at the
+            // default label size, so with the old 4dp gaps and 4dp side padding it had only 79dp and
+            // broke after its first word — the same defect in the other declared locale, invisible in
+            // the English screenshot. The gaps here are the minimum that still separates the doors,
+            // and `IconTextButton` now sets its own label size, so every label but the unlock sentence
+            // sits on one line with slack to spare.
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconTextButton(
                     glyph = { GlyphDate() },
                     label = stringResource(R.string.history_title),
                     onClick = onHistory,
+                    modifier = Modifier.weight(1f),
                 )
                 IconTextButton(
                     glyph = { GlyphLock() },
@@ -546,16 +588,19 @@ private fun RoundActions(
                         if (unlocked) R.string.unlock_unlocked else R.string.unlock_title,
                     ),
                     onClick = onUnlock,
+                    modifier = Modifier.weight(1f),
                 )
                 IconTextButton(
                     glyph = { GlyphSettings() },
                     label = stringResource(R.string.settings_title),
                     onClick = onSettings,
+                    modifier = Modifier.weight(1f),
                 )
                 IconTextButton(
                     glyph = { GlyphInfo() },
                     label = stringResource(R.string.about_title),
                     onClick = onAbout,
+                    modifier = Modifier.weight(1f),
                 )
             }
         }
@@ -571,22 +616,38 @@ private fun RoundActions(
  *
  * The glyph is a composable rather than an `ImageVector`, which is what lets the slot draw its own
  * iconography instead of depending on Material's.
+ *
+ * `modifier` is passed in so a caller can give the button an equal share of its row
+ * (`Modifier.weight(1f)`), and `heightIn` keeps a single-line door a 48 dp target at whatever width it
+ * is given. The content padding is narrower than Material's 12 dp default precisely because four of
+ * these share one row, and the label is set smaller than `labelSmall` for the same measured reason —
+ * see the size comment at the `Text` below.
  */
 @Composable
 private fun IconTextButton(
     glyph: @Composable () -> Unit,
     label: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     TextButton(
         onClick = onClick,
-        modifier = Modifier.widthIn(min = 48.dp),
+        modifier = modifier.heightIn(min = 48.dp),
+        contentPadding = PaddingValues(horizontal = 2.dp, vertical = 8.dp),
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             glyph()
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
+                // 10 sp rather than `labelSmall`'s 11 sp, chosen by measurement rather than by taste:
+                // the longest label this app declares needs ~82 dp at 11 sp, a quarter of a 360 dp
+                // screen leaves ~84.5 dp once the row's gaps and this button's own padding are taken
+                // out, and the Russian label broke after its first word. At 10 sp that label needs
+                // ~74.5 dp, so the slack is ~10 dp — enough for a step of the system font scale, and
+                // the sentence-length unlock label still gets its second line from `maxLines`.
+                fontSize = 10.sp,
+                lineHeight = 13.sp,
                 fontWeight = FontWeight.Medium,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,

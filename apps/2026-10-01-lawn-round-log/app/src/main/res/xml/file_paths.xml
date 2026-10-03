@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    What the export FileProvider is allowed to serve, and nothing else.
+
+    The one entry is the app's own cache directory, which is where `HistoryViewModel.shareCsv`
+    writes the CSV before handing its Uri to the chooser. A cache path is deliberately narrow: the
+    grant covers a file the app just produced for one share, so there is no way for a receiving app
+    to read the round's stored record (that lives in the app's private files) by asking for a path
+    this provider never exposes. No permission is declared anywhere for this: a granted Uri is the
+    permission (`.cursor/rules/security-devsecops.mdc`, Android's FileProvider contract).
+-->
+<paths>
+    <cache-path name="exports" path="exports/" />
+</paths>

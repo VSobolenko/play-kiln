@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "slot": "laneset",
+  "reconRef": "docs/ideation/2026-10-02-planners-and-optimisers.md#2-the-shelf-and-the-leader-first-screen",
+  "claims": [
+    {
+      "id": "computes-the-session",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "Every session is computed from the swimmer's own constraints against the programming rules this app ships, so the main set is a new arrangement of distances, strokes and send-offs each time rather than a slice of a fixed rotating library: reading the pool length, the minutes on offer, the day's focus, the strokes to avoid and the gear actually on the deck, and deriving the session from those.",
+      "comparison": {
+        "incumbent": "com.gizmodus.myswimcoach",
+        "limitation": "Its own 2 star reviewer says the sets it generates are very repetitive, which is the signature of sets sliced out of a fixed rotating library rather than derived from the swimmer's constraints.",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote",
+        "finding": "com.gizmodus.myswimcoach, 4.6 stars over 2,771 exact reviews and 100K or more installs with an in-app purchase, carries the 2 star review \"in terms of the sets that the app generates are very repetitive and not very good for\", classified missing-feature, and com.SwimTrainer.SwimTrainer at 2.7 stars over 10K or more installs carries a 1 star review from a swimmer who wanted custom workouts ready to go without planning them himself."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "test",
+        "ref": "app/src/test/java/com/gexetr/laneset/domain/SetGeneratorTest.kt",
+        "symbol": "differentPoolLengthsProduceDifferentMainSets",
+        "assertion": "Run `node scripts/run-slot-tests.mjs --slot laneset --rerun`: `differentPoolLengthsProduceDifferentMainSets`, `differentMinuteBudgetsProduceDifferentMainSets`, `differentGearOnDeckProducesDifferentMainSets` and `differentAvoidedStrokesProduceDifferentMainSets` each build from the same constraints with a single field changed and assert the main set differs, while `identicalConstraintsProduceIdenticalSessions` asserts matching constraints and pace reproduce the same session. `everyGeneratedIntervalCarriesATargetTime`, `strokesToAvoidAreNeverEmitted`, `onlyDeclaredGearIsUsed` and `theSessionFitsInsideTheMinuteBudget` hold the rest of the promise. `SetGenerator.generateSession` derives the arrangement from `DeterministicRandom(seedFor(constraints, pacePer100Seconds))` over a canonical key of pool length, minutes, focus, avoided strokes and gear, so the main set is a function of the swimmer's own constraints rather than a slice of a fixed library."
+      }
+    },
+    {
+      "id": "pace-test-drives-every-target",
+      "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "fit",
+      "promise": "The app walks the swimmer through a 400 and a 200 time trial, computes their threshold pace per 100 from those two swims, and prints that target on every interval of every session, so no set is ever a bare distance with no time to swim it in and the pacing survives into the next session without asking again.",
+      "comparison": {
+        "incumbent": "com.myswimpro.android.app",
+        "limitation": "Its own 1 star reviewer reports that the test workouts that set up the dynamic pacing have no real guidance, so the pacing half is either unguided or sold as a separate analysis product.",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#23-what-the-leaders-own-users-wrote"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#23-what-the-leaders-own-users-wrote",
+        "finding": "MySwimPro, the on-job leader at 3.8 stars over 3,102 exact reviews and 100K or more installs with an in-app purchase, carries the 1 star review \"Swim workouts seem legit, however no real guidance to do the test workouts to get the dynamic pacing in place. Analysis is extra, 50, 100 or 150 bucks\", and paywall is 2 of the 3 critical reviews sampled on that app."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "test",
+        "ref": "app/src/test/java/com/gexetr/laneset/domain/PaceModelTest.kt",
+        "symbol": "thresholdPaceIsHalfTheGapBetweenTheTwoTrials",
+        "assertion": "Run `node scripts/run-slot-tests.mjs --slot laneset --rerun`: `thresholdPaceIsHalfTheGapBetweenTheTwoTrials` asserts a 320 s 400 m and a 150 s 200 m trial produce an 85 s threshold per 100 m, `intervalTargetScalesWithDistance` asserts that pace prints 85 s on a 100 m interval and 170 s on a 200 m, `aSlowerFourHundredGivesASlowerThresholdPace` asserts the ordering, and `anImpossibleTrialPairIsRejected` refuses a 400 m that is not slower than the 200 m. `PaceModel.intervalTargetSeconds` is the one function every `SetBlock.targetTimeSeconds` is derived from (`SetGenerator.generateSession` and `CoachSetParser.parse` both call it), so no interval is a bare distance with no time."
+      }
+    },
+    {
+      "id": "takes-it-to-the-pool",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "The finished session leaves the phone in a form the swimmer can use at the pool: one share action that sends the whole set list as text and one printable workout card, so the session can be swum off paper or a message instead of a wet screen, and without owning or wearing a supported watch.",
+      "comparison": {
+        "incumbent": "com.SwimTrainer.SwimTrainer",
+        "limitation": "Its own praise is for pushing workouts to a Garmin watch, which is the handoff this whole shelf assumes; nothing measured on the shelf produces a printable or shareable set list for a swimmer who trains without one.",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote",
+        "finding": "The shelf's handoff is a watch: com.SwimTrainer.SwimTrainer at 2.7 stars over 10K or more installs draws the 2 star review \"as well as the ease of sending workouts to my Garmin Forerunner 955\", while of the 10 enriched cards on the swim workout generator shelf 7 declare an in-app purchase and 0 declare a price, and no reviewed incumbent described printing or sharing a set list."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/laneset/ui/export/SessionExport.kt",
+        "symbol": "shareIntent",
+        "assertion": "Read `ui/export/SessionExport.kt`: `shareIntent` builds `Intent(Intent.ACTION_SEND)` with `putExtra(Intent.EXTRA_TEXT, buildSetListText(session))`, so the whole set list leaves as text through the system chooser, and `createDocumentIntent` builds `Intent(Intent.ACTION_CREATE_DOCUMENT)` with `writePdfCard` behind it, so the same set list leaves as a printable PDF card the swimmer chooses a folder for. Both are rendered from the one `buildSetListText` / `blockLine` pair, so every interval's distance, stroke, target and rest reaches the payload; `CoachImportScreen.kt` calls `SessionExport.buildSetListText` too, so what the swimmer approves and what leaves the phone cannot disagree."
+      }
+    },
+    {
+      "id": "no-subscription-one-unlock",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "trust",
+      "promise": "One purchase and then everything: no renewal, no trial clock, no expiry and no advertising anywhere in the app, against a shelf whose leader sells the useful half as a recurring plan and whose weakest app sells nothing but subscriptions.",
+      "comparison": {
+        "incumbent": "com.myswimpro.android.app",
+        "limitation": "The useful half is a recurring plan behind a short trial, which is the charge its own critical reviewers make and the rent this recipe replaces with one price.",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#23-what-the-leaders-own-users-wrote"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote",
+        "finding": "Paywall is 2 of the 3 critical reviews sampled on MySwimPro, the on-job leader at 3.8 stars over 3,102 exact reviews and 100K or more installs, including the 1 star review \"I was under the impression there was at least some stuff that was part of the free app usage (not the 7 day\", and paywall is 4 of the 14 critical reviews in the shelf pocket, 29 percent."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/laneset/data/BillingManager.kt",
+        "symbol": "UNLOCK_PRODUCT_ID",
+        "assertion": "Read `data/BillingManager.kt`: the entire paid surface is `BillingManager.UNLOCK_PRODUCT_ID = \"laneset_unlock\"`, one `ProductType.INAPP` non-consumable that `acknowledge` never consumes, and the entitlement is a single `StateFlow` of `Boolean` named `isUnlocked`, seeded `false` and re-established from Play by `restoreOwnedPurchases` on every `connect`. There is no subscription product, no renewal, no expiry and no trial clock anywhere in the file. `app/build.gradle.kts` depends only on the billing capability and `billing-ktx`, and a grep for `gms.ads`, `AdView`, `MobileAds`, `play-services-ads` and the other ad SDK names across `apps/2026-10-02-laneset` returns no match, so no advertising is compiled into the app."
+      }
+    },
+    {
+      "id": "open-a-coach-workout",
+      "weight": "supporting",
+      "jobStage": "before",
+      "depthFamily": "data_in",
+      "promise": "A workout already written by a coach can be pasted in and is parsed into the same structured, paced session as a generated one, so the club sets a swimmer already has become part of the app instead of a separate photograph or a re-typed list.",
+      "comparison": {
+        "incumbent": "com.myswimpro.android.app",
+        "limitation": "The shelf's own model is that the app supplies the workout, so a set a coach wrote arrives as text the swimmer retypes or ignores; no enriched incumbent advertises reading a written practice in.",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#3-the-swim-shelf-and-its-leaders"
+      },
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#7-claim-ledger",
+        "finding": "No incumbent's reviewers were recorded asking to import a coach's written workout, so this is inferred from the job itself rather than read off the shelf; it is the payload that satisfies the contract's before stage and the data_in family, and it is stated as an inference rather than as a reading of this shelf."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/laneset/ui/importer/CoachImportScreen.kt",
+        "symbol": "readClipboardText",
+        "assertion": "Read `ui/importer/CoachImportScreen.kt`: `readClipboardText` reads `ClipboardManager.primaryClip` and hands the text to `CoachImportViewModel.onPasteFromClipboard`, which parses it with the same `CoachSetParser.parse` the rest of the app uses and writes the accepted `Session` through `SessionStore.save`, so a coach's written practice becomes the same structured, paced session a generated one is. `CoachSetParserTest.parsesAMultiLinePracticeIntoSectionsAndIntervals` and `recognisesStrokeNamesAfterTheDistance` prove the parse returns distances, repetitions, strokes, send-offs and rests with pace-derived targets, and `theParsedSessionStatesItsOwnMinuteTotal` proves the parsed set reports its own totals."
+      }
+    },
+    {
+      "id": "offline-by-construction",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "trust",
+      "promise": "The programming rules, the pace arithmetic and every generated session live in the APK: the app opens, computes a full session and shares it with the phone in airplane mode and with no account, so a swimmer standing on a deck with no signal still gets a workout.",
+      "comparison": {
+        "incumbent": "com.tenklakessoftware.swimmetry",
+        "limitation": "Its own 1 star reviewer lost access after a phone upgrade because the account and its subscription could not be transferred, which is what an account-backed shelf costs a user on a pool deck.",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote",
+        "finding": "Account is 1 of the 14 critical reviews in the shelf pocket, and it is on com.tenklakessoftware.swimmetry at 2.3 stars over 10K or more installs, which carries the 1 star review \"I upgraded my phone and couldn't transfer my Swimmetry account, so I canceled my subscription\"; the same shelf's leaders ship account-backed platforms rather than an offline generator."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/AndroidManifest.xml",
+        "symbol": "com.android.vending.BILLING",
+        "assertion": "Read `app/src/main/AndroidManifest.xml`: the only uses-permission element the slot's own source declares is `com.android.vending.BILLING`, and the packaged manifest additionally carries `android.permission.INTERNET` and `android.permission.ACCESS_NETWORK_STATE`, merged in by the Google Play Billing library that collects the one-time unlock; no code under `app/src/main/java` opens a socket, so the network permissions are the billing library's alone. `res/xml/network_security_config.xml` sets `cleartextTrafficPermitted=\"false\"`, and the app declares no sign-in or account surface anywhere under `app/src/main`. The generator (`domain/SetGenerator.kt`), the pace arithmetic (`domain/PaceModel.kt`), the parser (`domain/CoachSetParser.kt`) and the handoff (`ui/export/SessionExport.kt`) are pure Kotlin objects with no socket, so the app opens, computes a session and shares it with the phone in airplane mode and no account."
+      }
+    },
+    {
+      "id": "session-survives-interruption",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "durability",
+      "promise": "A generated session survives the interruptions a pool visit actually has, a phone call, a rotation or a trip back to the locker, and comes back with the same set, the same interval targets and the same position in it rather than regenerating something else.",
+      "comparison": {
+        "incumbent": "com.SwimTrainer.SwimTrainer",
+        "limitation": "Its own reviewers report the app working and then failing at the moment a session ends, so the session a swimmer was in the middle of is exactly what the shelf loses.",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote",
+        "finding": "Crash is 2 of the 14 critical reviews in the shelf pocket, 14 percent, and broken is 3 of the 14, 21 percent, including com.SwimTrainer.SwimTrainer at 2.7 stars over 10K or more installs, whose 2 star review reports that the app worked great at first and now crashes every time the swimmer tries to end a workout."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/AndroidManifest.xml",
+        "symbol": "dataExtractionRules",
+        "assertion": "Read `AndroidManifest.xml`: the app declares `android:dataExtractionRules`, `android:fullBackupContent` and `android:allowBackup=\"true\"`, the durability surface this family names, with the rules in `res/xml/data_extraction_rules.xml` and `res/xml/backup_rules.xml`. The in-progress session itself is persisted on-device rather than left to backup: `data/SessionStore.kt` writes it through `preferencesDataStore` and the versioned `SessionSerializer`, and `app/src/test/java/com/gexetr/laneset/data/SessionSerializationTest.kt` proves the round-trip — `thePositionInsideTheSetSurvives` restores the same position, `aSessionRoundTripsWithItsConstraintsAndSet` restores the same set and targets, `aMalformedPayloadDegradesToNothingInsteadOfThrowing` keeps a corrupt payload from taking the app down, and `SessionProgressTest.aStoredPositionNamingAMissingSectionClampsToTheStart` proves a stale position is clamped rather than trusted."
+      }
+    }
+  ],
+  "jobCoverage": {
+    "before": {
+      "claimId": "pace-test-drives-every-target"
+    },
+    "during": {
+      "claimId": "computes-the-session"
+    },
+    "after": {
+      "claimId": "takes-it-to-the-pool"
+    }
+  }
+}

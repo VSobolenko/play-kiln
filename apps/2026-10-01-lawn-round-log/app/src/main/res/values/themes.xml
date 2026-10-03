@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--
-      The platform theme only needs to avoid a wrong-coloured window before Compose draws.
+      The platform theme only has to avoid a wrong-coloured window before Compose draws, and to be an
+      AppCompat theme. MainActivity is an AppCompatActivity — the host the in-app per-app language
+      picker needs, because `AppCompatDelegate.setApplicationLocales` only takes effect there — and an
+      AppCompatActivity throws at startup unless its activity theme is an AppCompat one.
 
-      It deliberately does NOT parent from `Theme.Material3.DayNight.NoActionBar`: that style
-      lives in the Material Components *View* library, which a Compose-only app does not need.
-      Dark mode is handled by values-night/themes.xml, and edge-to-edge plus transparent system
-      bars are applied programmatically by enableEdgeToEdge() in MainActivity, which is the
-      current AndroidX recommendation.
+      It deliberately does NOT parent from `Theme.Material3.DayNight.NoActionBar` or
+      `Theme.MaterialComponents.*`: those styles live in the Material Components *View* library, which
+      a Compose-only app does not bundle.
 
-      In-app styling always comes from PlayKilnTheme (MaterialTheme.colorScheme).
+      `DayNight` resolves the light and dark variants itself, so the window background is the one
+      `values-night/colors.xml` already provides and there is no `values-night/themes.xml` any more —
+      a second, non-AppCompat parent in the `-night` configuration would crash the activity in dark
+      mode.
+
+      Edge-to-edge plus transparent system bars are applied programmatically by enableEdgeToEdge() in
+      MainActivity, which is the current AndroidX recommendation, and in-app styling always comes from
+      MaterialTheme in Compose (LawnRoundLogTheme).
     -->
-    <style name="Theme.PlayKilnSlot" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="Theme.PlayKilnSlot" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionModeOverlay">true</item>
         <item name="android:windowBackground">@color/playkiln_window_background</item>

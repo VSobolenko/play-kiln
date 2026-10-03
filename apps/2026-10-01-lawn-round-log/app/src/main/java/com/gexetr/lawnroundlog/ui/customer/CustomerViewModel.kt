@@ -25,6 +25,16 @@ data class CustomerEditorState(
     val rateText: String = "",
     val nameInvalid: Boolean = false,
     val rateInvalid: Boolean = false,
+    // The three fields the form never shows but must not lose. They are carried here because the
+    // save path hands a whole `Customer` back to the round's writer, which replaces the stored row
+    // with it verbatim: a draft built from the five editable fields alone would arrive with
+    // `position = 0` and `createdAt = 0L`, and since `Round.ordered` sorts by exactly those two, an
+    // operator who corrected a phone number would silently move that customer to the head of the
+    // round. The order is the product's central promise, so editing a field must not be able to
+    // rewrite it.
+    val position: Int = 0,
+    val createdAt: Long = 0L,
+    val active: Boolean = true,
 ) {
     val isNew: Boolean get() = customerId == null
 }
@@ -57,6 +67,9 @@ class CustomerViewModel : ViewModel() {
             phone = customer.phone,
             notes = customer.notes,
             rateText = formatAmountInput(customer.rateUsd),
+            position = customer.position,
+            createdAt = customer.createdAt,
+            active = customer.active,
         )
     }
 
@@ -108,6 +121,9 @@ class CustomerViewModel : ViewModel() {
             phone = draft.phone.trim(),
             notes = draft.notes.trim(),
             rateUsd = rate ?: 0.0,
+            active = draft.active,
+            position = draft.position,
+            createdAt = draft.createdAt,
         )
     }
 }

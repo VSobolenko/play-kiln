@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "sets": [
+    {
+      "library": "Material Symbols",
+      "version": "737e3324305806514d7909874fa1818ae1808232",
+      "spdx": "Apache-2.0",
+      "sourceUrl": "https://github.com/google/material-design-icons",
+      "licenceFile": "apps/2026-10-02-laneset/icons/LICENSES/Apache-2.0.txt",
+      "attribution": null,
+      "fetchedAt": "2026-10-02",
+      "fetchedBy": "agent",
+      "icons": [
+        {
+          "name": "arrow_back",
+          "file": "app/src/main/res/drawable/ic_arrow_back.xml",
+          "sha256": "dd9bf60925461855adac98253b7fbd8300c27c3067bbe953dcd8d7aa55166420",
+          "sourcePath": "symbols/android/arrow_back/materialsymbolsoutlined/arrow_back_24px.xml"
+        },
+        {
+          "name": "add",
+          "file": "app/src/main/res/drawable/ic_add.xml",
+          "sha256": "2d84581dddbb9456df493d14bd45403460218f29baf96be1a84d40305558233a",
+          "sourcePath": "symbols/android/add/materialsymbolsoutlined/add_24px.xml"
+        },
+        {
+          "name": "close",
+          "file": "app/src/main/res/drawable/ic_close.xml",
+          "sha256": "d384afc1ca28deb5f4c6897c1019e2fc15e2e3b36855b43a58b5bb13251a781b",
+          "sourcePath": "symbols/android/close/materialsymbolsoutlined/close_24px.xml"
+        },
+        {
+          "name": "settings",
+          "file": "app/src/main/res/drawable/ic_settings.xml",
+          "sha256": "076b18345ac9a65b0b901646134f687925b2b9bf947fbc26f06b7967b62f1ef6",
+          "sourcePath": "symbols/android/settings/materialsymbolsoutlined/settings_24px.xml"
+        },
+        {
+          "name": "share",
+          "file": "app/src/main/res/drawable/ic_share.xml",
+          "sha256": "8b0fc0af2aced4bc5ca6edf26cbd49d07eaf7c491a53e56ea9812c2af192e293",
+          "sourcePath": "symbols/android/share/materialsymbolsoutlined/share_24px.xml"
+        },
+        {
+          "name": "print",
+          "file": "app/src/main/res/drawable/ic_print.xml",
+          "sha256": "3fd0608619dd05fce124826259b1375ffc70304007bef516b062cfc2656c4a8b",
+          "sourcePath": "symbols/android/print/materialsymbolsoutlined/print_24px.xml"
+        },
+        {
+          "name": "timer",
+          "file": "app/src/main/res/drawable/ic_timer.xml",
+          "sha256": "d541eecf853b0846f151863325b6f7a932680e1c238547ae229a9fcaffcaf26a",
+          "sourcePath": "symbols/android/timer/materialsymbolsoutlined/timer_24px.xml"
+        },
+        {
+          "name": "delete",
+          "file": "app/src/main/res/drawable/ic_delete.xml",
+          "sha256": "30bea716d69593d6fe318c8320aab05921eddcfa380fba31e77666d425dfa8da",
+          "sourcePath": "symbols/android/delete/materialsymbolsoutlined/delete_24px.xml"
+        },
+        {
+          "name": "check",
+          "file": "app/src/main/res/drawable/ic_check.xml",
+          "sha256": "192b67e5cb45604255c9e6f28936bf1ed6abdd0cb346fe0191b2558bcf0b9633",
+          "sourcePath": "symbols/android/check/materialsymbolsoutlined/check_24px.xml"
+        },
+        {
+          "name": "edit",
+          "file": "app/src/main/res/drawable/ic_edit.xml",
+          "sha256": "8bfbd823ce3533ef9f7a344966c3ad958e8f396a7fe56b98024f475b64cbf5bb",
+          "sourcePath": "symbols/android/edit/materialsymbolsoutlined/edit_24px.xml"
+        },
+        {
+          "name": "info",
+          "file": "app/src/main/res/drawable/ic_info.xml",
+          "sha256": "e7b82aa7d74bd8228e935ca3bb83194986cb5b74c8ca0dc946acb9d7afa59eff",
+          "sourcePath": "symbols/android/info/materialsymbolsoutlined/info_24px.xml"
+        },
+        {
+          "name": "pool",
+          "file": "app/src/main/res/drawable/ic_pool.xml",
+          "sha256": "4ab34034bbbc483fc39cf10515e60496df34ba0ded027e0d5de93d62e64c323d",
+          "sourcePath": "symbols/android/pool/materialsymbolsoutlined/pool_24px.xml"
+        },
+        {
+          "name": "water_drop",
+          "file": "app/src/main/res/drawable/ic_water_drop.xml",
+          "sha256": "ad8977bbf3ad24ce50f5842b1f4f4a223672a27ebc1ae5f9942279527aa3e375",
+          "sourcePath": "symbols/android/water_drop/materialsymbolsoutlined/water_drop_24px.xml"
+        }
+      ]
+    }
+  ]
+}

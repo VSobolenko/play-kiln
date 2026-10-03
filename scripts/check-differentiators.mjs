@@ -28,7 +28,8 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { basename, dirname, join, relative, resolve, sep } from 'node:path'
 import process from 'node:process'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { parseDifferentiators, summarizeDifferentiators, validateDifferentiatorRefs } from './lib/slot-differentiators.mjs'
+import { crudReport, depthFindings, parseDifferentiators, summarizeDifferentiators, validateDifferentiatorRefs } from './lib/slot-differentiators.mjs'
+import { baselineApplies } from './core/baseline.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const usage =
@@ -175,6 +176,16 @@ function main() {
     `contract schema — ${summary.total} promise(s), ${summary.core} core, ${summary.shipped} shipped, ${summary.narrowed} narrowed, ${summary.dropped} dropped, ${summary.deferred} deferred`
   )
 
+  // The CRUD report is a note and never a gate. The predicate measures vocabulary, and the
+  // repository's own `edit-every-record` row escapes it because it carries a contrast clause that
+  // may be a sourced difference (docs/research/2026-10-02-depth-encoding-and-detectability.md §1.3),
+  // so a FAIL here would fire on correct prose. It prints so the owner can read it at checkpoint 1.
+  const crud = crudReport(result.value, { file: relative(ROOT, file).split(sep).join('/'), raw: readFileSync(file, 'utf8') })
+  if (crud.length > 0) {
+    line('INFO', `CRUD report (human-read, never gating): ${crud.length} promise(s) read as basic record operations`)
+    for (const entry of crud) line('INFO', `  ${entry}`)
+  }
+
   let blocked = false
 
   if (!slotDir) {
@@ -201,6 +212,29 @@ function main() {
   } else {
     for (const problem of refs.errors) line('BLOCKED', problem)
     blocked = true
+  }
+
+  // The depth half: does the contract cover the user's before/during/after, and does at least one
+  // shipped handoff carry its family's token in the artifact that proves it
+  // (`.cursor/rules/app-depth.mdc`). Baseline-scoped exactly as the core is, so a slot that predates
+  // the rule prints the finding as a note and a slot created from it is blocked. `baselineApplies`
+  // is the derivation itself, imported rather than restated.
+  const depth = depthFindings(result.value, {
+    slotDir,
+    isFile,
+    readFile: (candidate) => readFileSync(candidate, 'utf8')
+  })
+  if (depth.length > 0) {
+    const state = baselineApplies(slotDir)
+    if (state.applies) {
+      for (const finding of depth) line('BLOCKED', finding)
+      blocked = true
+    } else {
+      line('NOTE', `the depth contract carries ${depth.length} finding(s) that do not gate here: ${state.reason}`)
+      for (const finding of depth) line('NOTE', `  ${finding}`)
+    }
+  } else {
+    line('PASS', 'job coverage covers before, during and after, and a shipped handoff carries its family token')
   }
 
   reportWeakened(result.value)

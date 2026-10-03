@@ -38,10 +38,17 @@ was built.
   "schemaVersion": 1,
   "slot": "<the slot's kebab-case slug>",
   "reconRef": "docs/research/<file>.md#<section>",
+  "jobCoverage": {
+    "before": { "refusal": { "reason": "<why this job has no before stage>", "decidedBy": "scout", "recordedAt": "<YYYY-MM-DD>" } },
+    "during": { "claimId": "long-high-demand-runs" },
+    "after":  { "claimId": "exports-the-runs" }
+  },
   "claims": [
     {
       "id": "long-high-demand-runs",
       "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
       "promise": "<what the user gets here that the incumbents do not give them>",
       "evidence": {
         "strength": "MEASURED",
@@ -55,6 +62,26 @@ was built.
         "symbol": "longRun",
         "assertion": "<what a reader runs, and what they see happen>"
       }
+    },
+    {
+      "id": "exports-the-runs",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "<the handoff: the result leaves the device in a form the user's other tool reads>",
+      "comparison": {
+        "incumbent": "<package or title>",
+        "limitation": "<what that app does not do>",
+        "source": "docs/research/<file>.md#<section>"
+      },
+      "evidence": { "...": "as above" },
+      "status": "shipped",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/java/<package>/<File>.kt",
+        "symbol": "shareCsv",
+        "assertion": "<what a reader runs, and what they see happen>"
+      }
     }
   ]
 }
@@ -65,10 +92,14 @@ was built.
 | `schemaVersion` | Exactly `1`. |
 | `slot` | The slot's kebab-case slug. The gate checks it against the directory name, so a contract copied from another slot fails instead of passing as this slot's recon. |
 | `reconRef` | `docs/research/<file>.md` or `docs/ideation/<file>.md`, optionally with `#section`. The file must exist. |
+| `jobCoverage` | Binds each of the job's three stages — `before`, `during`, `after` — to a claim id or a written refusal. `during` is never a refusal, and `after` is refusable only by the owner. See "The job's shape" below. |
 | `claims` | At least `3` promises, at least `2` of them `core`. |
 | `claims[].id` | Kebab-case, unique. It is named in gate output, so a drop is reported by name. |
 | `claims[].weight` | `core` or `supporting`. A `core` promise is one of the reasons the app was selected; losing it changes what the product is. |
+| `claims[].jobStage` | `before`, `during` or `after`. Which part of the user's job this promise serves. |
+| `claims[].depthFamily` | One family from the closed set in "The job's shape". A *connective* family is a handoff that counts toward the floor. |
 | `claims[].promise` | One sentence: what the user gets here that the existing apps in this category do not give them. |
+| `claims[].comparison` | Optional. `{ incumbent, limitation, source }` — the app this promise beats and what that app does not do, with the recon source. Printed for a human, never auto-passed. |
 | `claims[].evidence.strength` | `MEASURED`, `ON RECORD`, `INFERRED` or `UNVERIFIED` — the labels `.cursor/rules/ideation-gate.mdc` already requires. |
 | `claims[].evidence.source` | The recon document the claim came from. The file must exist, so deleting the proposal that justifies a promise breaks that promise's gate. |
 | `claims[].evidence.finding` | What recon observed. A `MEASURED` finding must contain a number — a measurement nobody took is not a measurement. |
@@ -79,6 +110,41 @@ None of the free-text fields may be a placeholder. The validator rejects the lit
 text such as `<who pays>`; any text containing `lorem`; and three or more consecutive `x`
 characters as a whole word. The patterns are **imported** from `scripts/lib/slot-economics.mjs`
 rather than restated, because a second copy of a rule is a second thing to drift.
+
+## The job's shape — stages, families and the connective floor
+
+A claim is not only a promise. It also says **where in the user's job** it sits and **what kind of work**
+it does, so the list cannot be three ways to edit a record and nothing that finishes the job. The
+normative rule is `.cursor/rules/app-depth.mdc`; this section is the field contract that agrees with it.
+
+- **`jobStage`** is one of `before`, `during` and `after` — what the user brings or prepares, the act
+  the app is named for, and what they do with the result.
+- **`depthFamily`** is one family from a closed set: `core_operation` (the middle, never a handoff), the
+  *connective* families `data_in`, `data_out`, `durability`, `reminder`, `widget`, `find` and `bulk`,
+  and the reportable-only `insight`, `speed`, `fit`, `access`, `collaboration` and `trust`. The exact
+  token a connective family's proof artifact must contain is in the rule, not repeated here —
+  `data_in` brings the user's own content in through whichever door the job uses: the document picker or
+  the clipboard, the gallery's `PickVisualMedia` picker, or a camera capture (`TakePicture` /
+  `ACTION_IMAGE_CAPTURE`). Playing the user's own media is **not** a handoff, because nothing crosses the
+  app's boundary; the camera is, because the captured bytes enter the app.
+- **`jobCoverage`** binds each of the three stages to a `claimId`, or — where the job genuinely lacks
+  that stage — to a `refusal` carrying a `reason`, a `decidedBy` and a `recordedAt`. **`during` is never
+  refusable**: it is the act the app is named for, and refusing it means there is no app. `before` may be
+  refused by the scout, with the reason it measured. **`after` may be refused only by the owner, in his
+  own words** — the handoff is the most valuable capability the contract promises, so giving it up is a
+  product decision recorded exactly as weakening a `core` promise is: `decidedBy` is `"owner"` and the
+  refusal carries the same `ownerDecision { words, recordedAt }`. A scout-recorded `after` refusal, or a
+  missing or empty owner record, is a failure naming the field. On any stage the `reason` is real text,
+  not a token.
+- **The connective floor.** At least one `shipped` claim must be a connective family whose proof
+  artifact actually contains that family's API. Three ways to edit a record and no way to get it out is
+  the defect the floor exists to stop.
+- **`comparison`** names the incumbent a claim beats and what it does not do. It is printed for a human,
+  never auto-passed, because its truth is a claim about a competitor that only recon can source.
+
+Applicability is **derived, not hand-listed**: `scripts/core/baseline.mjs` reads the slot's creation
+date from the registry, so the slots that predate this section carry their findings as a printed note
+while every slot created after it is gated.
 
 ## Status is the whole mechanism
 
@@ -106,7 +172,9 @@ to make, and it is recorded in his words:
 This is the same discipline as the release approval (`.cursor/rules/authorization.mdc`,
 `scripts/lib/release-approval.mjs`): an approval exists only in the owner's own words, never
 inferred from an agent's confidence. A `supporting` promise needs no owner decision — it needs a
-reason in writing, because the point is that no promise disappears silently.
+reason in writing, because the point is that no promise disappears silently. The same record is what
+a refusal of the `after` stage carries — the owner's decision to ship without the handoff — and it is
+validated by the same helper, so the two paths cannot drift apart.
 
 ## Proof, and why it is typed
 
@@ -144,6 +212,12 @@ that lives only on the machine that ran the capture is not a proof.
   `differentiators.json` in the working tree does not switch the check off. A slot with no contract
   at all predates this gate: it is reported `UNVERIFIED` (never PASS), on the same reasoning as
   `verifyEconomics`.
+- **The job's shape is checked by the same gate.** `slot.differentiators` (in
+  `scripts/core/policy.mjs`) verifies the three stages, that `during` is never a refusal, that a `before`
+  refusal carries its reason and decider while an `after` refusal is the owner's in his own words, that
+  at least one `shipped` claim's proof artifact contains its connective family's API, and that a
+  `comparison` names its source. Its fixture suite proves each leg can fail, so the floor is a check
+  rather than a hope.
 - **The contract is a build input for the release approval.** It is not in
   `scripts/lib/release-approval.mjs`'s exclusion list, unlike `economics.json` and
   `capabilities.json`, and that is deliberate: the digest is of "the app the owner reviews", and

@@ -1,10 +1,7 @@
 package com.gexetr.lawnroundlog.ui.settings
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
-import android.provider.Settings
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,16 +17,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,9 +41,12 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.os.LocaleListCompat
 import com.gexetr.lawnroundlog.R
 import com.gexetr.lawnroundlog.ui.AppearanceMode
 import com.gexetr.lawnroundlog.ui.ScreenHeader
+import java.util.Locale
+import org.xmlpull.v1.XmlPullParser
 
 /**
  * The settings surface: language, appearance, and the four preferences the rest of the app reads.
@@ -70,6 +73,10 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    // Whether the in-app language picker is open. `rememberSaveable` because applying a language makes
+    // AppCompat recreate the activity to re-read the resources, and a dialog that vanished under the
+    // operator mid-choice would look like a tap that did nothing.
+    var languagePickerOpen by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -115,12 +122,8 @@ fun SettingsScreen(
             item {
                 ActionRow(
                     title = stringResource(R.string.settings_language),
-                    body = if (perAppLanguageIsAvailable()) {
-                        stringResource(R.string.settings_language_summary)
-                    } else {
-                        stringResource(R.string.settings_language_summary_legacy)
-                    },
-                    onClick = { openAppLanguageSettings(context) },
+                    body = stringResource(R.string.settings_language_summary),
+                    onClick = { languagePickerOpen = true },
                 )
             }
 
@@ -172,6 +175,25 @@ fun SettingsScreen(
             }
         }
     }
+
+    if (languagePickerOpen) {
+        // The declared tags are parsed once per opening rather than on every recomposition, and the
+        // currently-applied tag is read from the one place that actually holds it — the AppCompat
+        // runtime — so the dialog opens with the right row already selected.
+        val declaredTags = remember { declaredLanguageTags(context) }
+        val appliedTag = AppCompatDelegate.getApplicationLocales().let { locales ->
+            if (locales.isEmpty) null else locales.get(0)?.toLanguageTag()
+        }
+        LanguagePickerDialog(
+            declaredTags = declaredTags,
+            appliedTag = appliedTag,
+            onSelect = { tag ->
+                languagePickerOpen = false
+                applyAppLanguage(tag)
+            },
+            onDismiss = { languagePickerOpen = false },
+        )
+    }
 }
 
 /**
@@ -214,6 +236,87 @@ private fun AppearanceChoice(
                 )
             }
         }
+    }
+}
+
+/**
+ * Picks one of the languages this app declares, without leaving the app.
+ *
+ * [appliedTag] is what the AppCompat runtime currently holds: `null` means "follow the phone", which
+ * is the first row. Every row is one radio target at 48 dp, the same shape as [AppearanceChoice] — a
+ * stacked row per option wraps at any font scale and reads the same to a screen reader, where a
+ * segmented control would have to shrink the type to fit.
+ */
+@Composable
+private fun LanguagePickerDialog(
+    declaredTags: List<String>,
+    appliedTag: String?,
+    onSelect: (String?) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(R.string.settings_language)) },
+        text = {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                LanguageOptionRow(
+                    label = stringResource(R.string.settings_language_system),
+                    selected = appliedTag == null,
+                    onClick = { onSelect(null) },
+                )
+                for (tag in declaredTags) {
+                    // A computed value, never a literal: a language's name in its own language is a
+                    // fact the platform's locale data carries, and hardcoding it would be a string to
+                    // translate into every language this app ever adds.
+                    val label = languageDisplayName(tag)
+                    LanguageOptionRow(
+                        label = label,
+                        selected = appliedTag == tag,
+                        onClick = { onSelect(tag) },
+                    )
+                }
+            }
+        },
+        // Each row applies its own choice, so there is no separate confirm step. Cancel is the only
+        // other way out, and it changes nothing.
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.action_cancel))
+            }
+        },
+    )
+}
+
+/** One selectable language row: the whole row is the target, and the radio is state, not a button. */
+@Composable
+private fun LanguageOptionRow(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .selectable(
+                selected = selected,
+                role = Role.RadioButton,
+                onClick = onClick,
+            )
+            .heightIn(min = 48.dp)
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        RadioButton(
+            selected = selected,
+            // The row carries the click and the name, exactly as the appearance rows do.
+            onClick = null,
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+        )
     }
 }
 
@@ -380,34 +483,60 @@ private fun formatAmount(value: Double): String =
     if (value == value.toLong().toDouble()) value.toLong().toString() else value.toString()
 
 /**
- * Whether the platform offers the per-app language picker.
+ * Switches the app's own language, leaving the phone's language alone.
  *
- * The picker arrived with Android 13, alongside the `android:localeConfig` this slot declares. Below
- * it the row says which screen it actually opens rather than promising one that does not exist.
+ * A null [languageTag] means "follow the phone". `AppCompatDelegate` is the published backport: on
+ * Android 13+ it forwards to the platform's per-app locale, and below it AppCompat stores the choice
+ * and re-applies it before the first composition. The system settings screen is deliberately NOT
+ * opened: the operator asked this app to change language, and sending him to a device-wide screen to
+ * change every app he owns is a different request.
  */
-private fun perAppLanguageIsAvailable(): Boolean =
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-
-/**
- * Opens Android's own language picker for this app.
- *
- * Deliberately the system picker and not a second in-app one: `android:localeConfig` already tells
- * Android which languages this app ships, so a picker built here would be a second source of truth
- * that can disagree with the one the system, the launcher and Play all read.
- *
- * The `runCatching` is not decoration. A device whose Settings app is disabled or absent — a stripped
- * emulator image, a managed profile that blocks the intent — throws `ActivityNotFoundException`, and
- * a settings row that crashes the app is worse than a row that does nothing.
- */
-fun openAppLanguageSettings(context: Context) {
-    val packageUri = Uri.fromParts(PACKAGE_URI_SCHEME, context.packageName, null)
-    val intent = if (perAppLanguageIsAvailable()) {
-        Intent(Settings.ACTION_APP_LOCALE_SETTINGS).setData(packageUri)
+internal fun applyAppLanguage(languageTag: String?) {
+    val locales = if (languageTag == null) {
+        LocaleListCompat.getEmptyLocaleList()
     } else {
-        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(packageUri)
+        LocaleListCompat.forLanguageTags(languageTag)
     }
-    runCatching { context.startActivity(intent) }
+    AppCompatDelegate.setApplicationLocales(locales)
 }
 
-/** The scheme of a `package:` URI. Named so the literal is not repeated at the call site. */
-private const val PACKAGE_URI_SCHEME: String = "package"
+/**
+ * The language tags this app declares, read from `res/xml/locales_config.xml`.
+ *
+ * That file is the single declaration of the app's languages: `android:localeConfig` is what the
+ * system, the launcher and Play all read, so the picker is built from it rather than from a second
+ * list in Kotlin that could silently disagree with it.
+ *
+ * `runCatching` is not decoration: a device or managed profile that refuses the resource would
+ * otherwise crash the settings screen, and a picker offering only "System default" is better than a
+ * screen that dies.
+ */
+private fun declaredLanguageTags(context: Context): List<String> {
+    return runCatching {
+        val parser = context.resources.getXml(R.xml.locales_config)
+        val tags = mutableListOf<String>()
+        while (parser.next() != XmlPullParser.END_DOCUMENT) {
+            if (parser.eventType != XmlPullParser.START_TAG) continue
+            if (parser.name != LOCALE_TAG) continue
+            val tag = parser.getAttributeValue(ANDROID_NAMESPACE, LOCALE_NAME_ATTRIBUTE)
+            if (!tag.isNullOrBlank()) tags.add(tag)
+        }
+        parser.close()
+        tags
+    }.getOrDefault(emptyList())
+}
+
+/** A language's own name ("English", "Русский"), title-cased, from the platform's own locale data. */
+private fun languageDisplayName(tag: String): String {
+    val locale = Locale.forLanguageTag(tag)
+    return locale.getDisplayName(locale).replaceFirstChar { first -> first.titlecase(locale) }
+}
+
+/** The `android:` namespace every attribute in `res/xml/` is written in. */
+private const val ANDROID_NAMESPACE: String = "http://schemas.android.com/apk/res/android"
+
+/** The element `res/xml/locales_config.xml` declares each language with. */
+private const val LOCALE_TAG: String = "locale"
+
+/** The attribute `res/xml/locales_config.xml` names each language tag in. */
+private const val LOCALE_NAME_ATTRIBUTE: String = "name"

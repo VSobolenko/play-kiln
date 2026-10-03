@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.gexetr.lawnroundlog.data.SettingsStore
 import com.gexetr.lawnroundlog.ui.AppearanceMode
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -49,19 +48,12 @@ enum class SettingsDraftProblem {
  * a preference is written stays one layer down. The screen calls [setConfirmBeforeDelete] and the
  * click is over — it never touches a file.
  *
- * **Appearance is held in memory, and that is a recorded limitation rather than a design choice.**
- * `SettingsStore` — the frozen data-layer contract this slot was built against — publishes exactly
- * four preferences and no appearance flow, and the layers below `ui/` belong to other writers. So the
- * choice is *applied* for real (it travels through `MainActivity` into `LawnRoundLogTheme`, which is
- * what makes it a behaviour and not a stored flag) and it is **not persisted**: closing the app
- * returns it to following the system. The fix is one property and one setter on `SettingsStore`, and
- * [setAppearance] is the only call site that would change.
+ * Appearance follows the same DataStore path as the other preferences: the theme changes immediately
+ * and the stored choice restores when the process returns, so Settings never offers a temporary mode.
  */
 class SettingsViewModel(private val store: SettingsStore) : ViewModel() {
 
-    private val appearance = MutableStateFlow(AppearanceMode.FOLLOW_SYSTEM)
-
-    private val draftProblem = MutableStateFlow<SettingsDraftProblem?>(null)
+    private val draftProblem = kotlinx.coroutines.flow.MutableStateFlow<SettingsDraftProblem?>(null)
 
     private data class StoredPreferences(
         val currencySymbol: String,
@@ -99,7 +91,7 @@ class SettingsViewModel(private val store: SettingsStore) : ViewModel() {
 
     val state: StateFlow<SettingsUiState> = combine(
         stored,
-        appearance,
+        store.appearance,
     ) { preferences, mode ->
         SettingsUiState(
             appearance = mode,
@@ -118,7 +110,7 @@ class SettingsViewModel(private val store: SettingsStore) : ViewModel() {
     val problem: StateFlow<SettingsDraftProblem?> = draftProblem
 
     fun setAppearance(mode: AppearanceMode) {
-        appearance.value = mode
+        viewModelScope.launch { store.setAppearance(mode) }
     }
 
     /**

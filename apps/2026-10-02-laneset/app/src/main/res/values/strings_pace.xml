@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The guided pace test's own words.
+
+  This is the surface the promise `pace-test-drives-every-target` lives on, so the copy carries the
+  product: the two swims are not two bare number fields, each one states in words why it is swum and
+  what the pair is turned into. The English here is the source the Russian tree translates, key for
+  key — Android merges every `values/*.xml` into one resource table, and `scripts/core/policy.mjs`
+  compares the two trees in both directions, so a key in one and not the other is a failure.
+
+  The one format-bearing pair is `pace_result_trials_summary` and `pace_error_400_not_slower`: both
+  take the two trial times as `%1$s` / `%2$s` in that order, and the argument order is part of the
+  contract between the two trees (the locale check compares the format arguments, not just the keys).
+-->
+<resources>
+    <string name="pace_title" translatable="true">Pace test</string>
+    <string name="pace_back" translatable="true">Back</string>
+
+    <!-- Stated before step 1, so the swimmer knows what the two swims are for. -->
+    <string name="pace_intro" translatable="true">Two swims set the pace behind every interval in your set. Swim them once, fresh, and the plan is built around you instead of a table.</string>
+
+    <!-- Step 1 — the 400 m. -->
+    <string name="pace_step_400_label" translatable="true">Step 1 of 2: the 400 m</string>
+    <string name="pace_step_400_reason" translatable="true">Swim 400 m at a steady, hard effort: the fastest pace you could hold through a long set, not a sprint. This is the slower of the two swims, and it sets the top of your pace line.</string>
+    <string name="pace_time_400_label" translatable="true">400 m time</string>
+    <string name="pace_next_action" translatable="true">Next: the 200 m</string>
+
+    <!-- Step 2 — the 200 m, and the one way back to step 1 when a time was mistyped. -->
+    <string name="pace_step_200_label" translatable="true">Step 2 of 2: the 200 m</string>
+    <string name="pace_step_200_reason" translatable="true">Now swim 200 m all out, as fast as you can go. The gap between this swim and the 400 m is what turns two times into a threshold pace, and that pace lands on every interval you build afterwards.</string>
+    <string name="pace_time_200_label" translatable="true">200 m time</string>
+    <string name="pace_save_action" translatable="true">Save my pace</string>
+    <string name="pace_change_400_action" translatable="true">Change the 400 m time</string>
+
+    <!-- Field help: the accepted shapes, shown until an entry has to be explained. -->
+    <string name="pace_time_hint" translatable="true">6:40</string>
+    <string name="pace_time_format_help" translatable="true">Minutes and seconds, like 6:40 or 3:10.5. Plain seconds are read too: 400 works.</string>
+
+    <!-- The result, shown once both times are in. -->
+    <string name="pace_result_incomplete" translatable="true">Both swims are needed before the pace can be worked out.</string>
+    <string name="pace_result_title" translatable="true">Your threshold pace</string>
+    <string name="pace_result_hero_headline" translatable="true">Threshold pace</string>
+    <string name="pace_result_trials_summary" translatable="true">From %1$s over 400 m and %2$s over 200 m</string>
+    <string name="pace_result_supporting" translatable="true">Every interval of a new set now carries this time per 100 m, so the send-offs suit you rather than a table. The pace is kept on this phone and reused without asking again.</string>
+    <string name="pace_result_trial_400_label" translatable="true">400 m trial</string>
+    <string name="pace_result_trial_200_label" translatable="true">200 m trial</string>
+
+    <!-- Changing the trials: re-run the flow, or clear what is stored. -->
+    <string name="pace_retry_action" translatable="true">Swim the trials again</string>
+    <string name="pace_reset_action" translatable="true">Clear my trial times</string>
+    <string name="pace_reset_supporting" translatable="true">Clearing forgets both times and the pace worked out from them. Until the test is swum again, sessions fall back to the shipped default pace.</string>
+
+    <!-- Refusals. The 400 m one names what was read, so a typo is visible on the screen. -->
+    <string name="pace_error_unreadable" translatable="true">That is not a time this app can read. Write minutes and seconds, like 6:40, or plain seconds, like 400.</string>
+    <string name="pace_error_not_positive" translatable="true">A trial time has to be more than zero.</string>
+    <string name="pace_error_400_not_slower" translatable="true">The 400 m time (%1$s) has to be slower than the 200 m time (%2$s): the longer swim takes longer. Check both times.</string>
+</resources>

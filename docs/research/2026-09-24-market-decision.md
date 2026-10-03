@@ -512,6 +512,19 @@ ML), the archetype with the strongest existing commercial evidence, and a distin
 where every clause answers a complaint a real user wrote down. Candidate 2 has the more intense pain
 but a smaller market, a heavier build, and its loudest pain belongs to users who cannot switch.
 
+> **Corrected 2026-10-02 — the "no camera" clause is a dated reading, not the factory's position.**
+> The measurement above is kept as written, because it is the record of why Candidate 1 was chosen.
+> What changed on 2026-10-02 is what it is read as implying. The owner opened the phone's free, local
+> capabilities, in his own words: *«есть камеры, есть фотопикер, есть галерея, картинки, музыка.
+> Использовать телефон на полную, а мы используем только пару кнопок»*. The costs to avoid are now
+> **a server, an account, a paid API, ML that needs a server, and a runtime permission that buys
+> nothing**; a capability that is local and free — the Photo Picker
+> (`ActivityResultContracts.PickVisualMedia`, which asks for **no runtime permission at all**), the
+> gallery, the user's own media, the motion sensors, the camera — is not a cost and may be the job's
+> own core. "No camera" stays a legitimate answer for a job with no photograph in it; it is no longer
+> a factory-level refusal. Rule: `.cursor/rules/ideation-gate.mdc` § "Budget: about one hour, not
+> eight".
+
 **Prerequisite, not a decision:** the environment blockers in §1.2 must be repaired before any slot
 can be built or verified. Market selection can continue in parallel; slot work cannot start while
 `kiln-status.mjs` reports `NOT READY`.

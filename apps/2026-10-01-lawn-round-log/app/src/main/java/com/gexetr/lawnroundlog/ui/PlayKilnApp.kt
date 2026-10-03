@@ -1,24 +1,33 @@
 package com.gexetr.lawnroundlog.ui
 
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -129,7 +138,6 @@ fun PlayKilnApp(
     val backStack: NavBackStack<NavKey> = rememberNavBackStack(RoundDestination)
     val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>()
 
-    val roundState by round.state.collectAsStateWithLifecycle()
     val settingsState by settings.state.collectAsStateWithLifecycle()
     val settingsProblem by settings.problem.collectAsStateWithLifecycle()
     val pendingCustomer by round.pendingCustomer.collectAsStateWithLifecycle()
@@ -155,82 +163,102 @@ fun PlayKilnApp(
         }
     }
 
-    NavDisplay(
-        backStack = backStack,
-        onBack = { backStack.popOne() },
-        sceneStrategies = listOf(listDetailStrategy),
-        // A real transition, not the instant swap an unconfigured host performs: a pushed screen
-        // arrives from the end of the stack and leaves the way it came. `popTransitionSpec` is the
-        // mirror image, so predictive back has a continuous gesture to preview.
-        transitionSpec = {
-            slideInHorizontally(initialOffsetX = { width -> width / 4 }) togetherWith
-                slideOutHorizontally(targetOffsetX = { width -> -width / 4 })
-        },
-        popTransitionSpec = {
-            slideInHorizontally(initialOffsetX = { width -> -width / 4 }) togetherWith
-                slideOutHorizontally(targetOffsetX = { width -> width / 4 })
-        },
-        entryProvider = entryProvider {
-            entry<RoundDestination>(
-                metadata = ListDetailSceneStrategy.listPane(
-                    detailPlaceholder = { DetailPlaceholder() },
-                ),
-            ) {
-                RoundRoute(
-                    round = round,
-                    settings = settingsState,
-                    unlocked = unlocked,
-                    onOpenCustomer = { customerId -> backStack.push(CustomerDestination(customerId)) },
-                    onAddCustomer = { backStack.push(CustomerDestination(null)) },
-                    onOpenHistory = { backStack.push(HistoryDestination) },
-                    onOpenUnlock = { backStack.push(UnlockDestination) },
-                    onOpenSettings = { backStack.push(SettingsDestination) },
-                    onOpenAbout = { backStack.push(AboutDestination) },
-                )
-            }
-            entry<CustomerDestination>(metadata = ListDetailSceneStrategy.detailPane()) { destination ->
-                CustomerRoute(
-                    round = round,
-                    customerId = destination.customerId,
-                    settings = settingsState,
-                    unlocked = unlocked,
-                    onBack = { backStack.popOne() },
-                    onRequestUnlock = { backStack.push(UnlockDestination) },
-                    onSave = commitCustomer,
-                )
-            }
-            entry<HistoryDestination>(metadata = ListDetailSceneStrategy.detailPane()) {
-                HistoryRoute(
-                    round = round,
-                    settings = settingsState,
-                    unlocked = unlocked,
-                    onBack = { backStack.popOne() },
-                    onRequestUnlock = { backStack.push(UnlockDestination) },
-                )
-            }
-            entry<UnlockDestination>(metadata = ListDetailSceneStrategy.detailPane()) {
-                UnlockScreen(gate = purchaseGate, onBack = { backStack.popOne() })
-            }
-            // The settings state is collected here, at the host, and handed to the surface as a value
-            // with callbacks. The activity-scoped ViewModel stays the one owner of the preferences —
-            // a second one inside this entry would be a second copy of the same stored value.
-            entry<SettingsDestination>(metadata = ListDetailSceneStrategy.detailPane()) {
-                SettingsScreen(
-                    settings = settingsState,
-                    problem = settingsProblem,
-                    onAppearanceChange = settings::setAppearance,
-                    onCurrencyChange = settings::setCurrencySymbol,
-                    onDefaultAmountChange = settings::setDefaultVisitAmount,
-                    onConfirmBeforeDeleteChange = settings::setConfirmBeforeDelete,
-                    onHapticsChange = settings::setHapticsEnabled,
-                    onBack = { backStack.popOne() },
-                )
-            }
-            entry<AboutDestination>(metadata = ListDetailSceneStrategy.detailPane()) {
-                AboutRoute(onBack = { backStack.popOne() })
-            }
-        },
-    )
+    // The app's content is rooted in a Surface so that every destination inherits a content colour.
+    // Without it there is no `LocalContentColor` between the window and the first screen, so Compose
+    // falls back to `Color.Black` and any Text or Icon that omits an explicit colour is invisible on
+    // this slot's dark background. `Surface` derives `contentColor` from its `color`, so rooting the
+    // host in the theme's own `background` gives every default-coloured glyph `onBackground` — and
+    // the drawn background becomes the theme's rather than the XML window background behind it.
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
+    ) {
+        NavDisplay(
+            backStack = backStack,
+            onBack = { backStack.popOne() },
+            sceneStrategies = listOf(listDetailStrategy),
+            // A real transition, not the instant swap an unconfigured host performs: a pushed screen
+            // arrives from the end of the stack and fades back out the way it came. Only the incoming
+            // screen moves — the outgoing one fades in place — because two full-screen layers moving
+            // every frame is the stutter the owner measured on the test phone, and a one-third slide
+            // still says which direction the screen came from. `popTransitionSpec` is the mirror
+            // image, so predictive back has a continuous gesture to preview.
+            transitionSpec = {
+                slideInHorizontally(
+                    animationSpec = tween(durationMillis = 180, easing = LinearOutSlowInEasing),
+                    initialOffsetX = { width -> width / 3 },
+                ) + fadeIn(tween(durationMillis = 140)) togetherWith
+                    fadeOut(tween(durationMillis = 120))
+            },
+            popTransitionSpec = {
+                slideInHorizontally(
+                    animationSpec = tween(durationMillis = 180, easing = LinearOutSlowInEasing),
+                    initialOffsetX = { width -> -width / 3 },
+                ) + fadeIn(tween(durationMillis = 140)) togetherWith
+                    fadeOut(tween(durationMillis = 120))
+            },
+            entryProvider = entryProvider {
+                entry<RoundDestination>(
+                    metadata = ListDetailSceneStrategy.listPane(
+                        detailPlaceholder = { DetailPlaceholder() },
+                    ),
+                ) {
+                    RoundRoute(
+                        round = round,
+                        settings = settingsState,
+                        unlocked = unlocked,
+                        onOpenCustomer = { customerId -> backStack.push(CustomerDestination(customerId)) },
+                        onAddCustomer = { backStack.push(CustomerDestination(null)) },
+                        onOpenHistory = { backStack.push(HistoryDestination) },
+                        onOpenUnlock = { backStack.push(UnlockDestination) },
+                        onOpenSettings = { backStack.push(SettingsDestination) },
+                        onOpenAbout = { backStack.push(AboutDestination) },
+                    )
+                }
+                entry<CustomerDestination>(metadata = ListDetailSceneStrategy.detailPane()) { destination ->
+                    CustomerRoute(
+                        round = round,
+                        customerId = destination.customerId,
+                        settings = settingsState,
+                        unlocked = unlocked,
+                        onBack = { backStack.popOne() },
+                        onRequestUnlock = { backStack.push(UnlockDestination) },
+                        onSave = commitCustomer,
+                    )
+                }
+                entry<HistoryDestination>(metadata = ListDetailSceneStrategy.detailPane()) {
+                    HistoryRoute(
+                        round = round,
+                        settings = settingsState,
+                        unlocked = unlocked,
+                        onBack = { backStack.popOne() },
+                        onRequestUnlock = { backStack.push(UnlockDestination) },
+                    )
+                }
+                entry<UnlockDestination>(metadata = ListDetailSceneStrategy.detailPane()) {
+                    UnlockScreen(gate = purchaseGate, onBack = { backStack.popOne() })
+                }
+                // The settings state is collected here, at the host, and handed to the surface as a value
+                // with callbacks. The activity-scoped ViewModel stays the one owner of the preferences —
+                // a second one inside this entry would be a second copy of the same stored value.
+                entry<SettingsDestination>(metadata = ListDetailSceneStrategy.detailPane()) {
+                    SettingsScreen(
+                        settings = settingsState,
+                        problem = settingsProblem,
+                        onAppearanceChange = settings::setAppearance,
+                        onCurrencyChange = settings::setCurrencySymbol,
+                        onDefaultAmountChange = settings::setDefaultVisitAmount,
+                        onConfirmBeforeDeleteChange = settings::setConfirmBeforeDelete,
+                        onHapticsChange = settings::setHapticsEnabled,
+                        onBack = { backStack.popOne() },
+                    )
+                }
+                entry<AboutDestination>(metadata = ListDetailSceneStrategy.detailPane()) {
+                    AboutRoute(onBack = { backStack.popOne() })
+                }
+            },
+        )
+    }
 }
 
 /** One pop, and only when there is something to pop. */
@@ -271,9 +299,15 @@ internal fun ScreenHeader(
         color = MaterialTheme.colorScheme.surfaceContainer,
         tonalElevation = 3.dp,
     ) {
+        // The status-bar inset is applied here, in the one header every non-round screen shares, so a
+        // new screen cannot be born with its title under the clock and the punch-hole camera. The
+        // Surface above deliberately carries no inset: its `surfaceContainer` colour still paints to
+        // the window edge behind the status bar, and only the header's *content* moves down — which is
+        // the modern edge-to-edge look, decided once instead of per screen.
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.statusBars)
                 .padding(horizontal = 8.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -307,7 +341,9 @@ internal fun ScreenHeader(
                     )
                 }
             }
-            actions()
+            CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 48.dp) {
+                actions()
+            }
         }
     }
 }

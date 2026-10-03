@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "slot": "rook-encounter-generator",
+  "reconRef": "docs/ideation/2026-10-02-generator-and-creative-tools.md#4-the-wedge-one-sentence-every-clause-answering-a-recorded-complaint",
+  "claims": [
+    {
+      "id": "whole-scene-one-press",
+      "weight": "core",
+      "promise": "One press returns a whole runnable scene - a location, who is in it, why the party is there, a complication, a reward and a name - rather than a single table result the game master has to interpret.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-generator-and-creative-evidence.md#5-what-the-incumbents-users-actually-complain-about-measured",
+        "finding": "com.axehigh.rpg.encounters (3.3 stars, 10K+ installs) prints a 3-star review asking to 'add a way to get an random result from' tables that are 'all there and they are awesome' - the tables exist and no generator sits on top; missing-feature is 3 of 24 critical reviews across the two RPG shelves read."
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet. The scene composer, its authored table set and the single-press result are the first deliverables the build owes."
+    },
+    {
+      "id": "authored-library-large",
+      "weight": "core",
+      "promise": "The generator is backed by a large authored library of scene parts shipped inside the app and usable offline, so a game master does not exhaust the material after a handful of sessions.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-generator-and-creative-evidence.md#5-what-the-incumbents-users-actually-complain-about-measured",
+        "finding": "com.dndcharactersheet.app (3.0 stars, 10K+ installs, 103 reviews) prints a 1-star review reading 'this app is very unfinished there are only a small handful of races, classes and backgrounds', and a second 3-star review on the same app reads 'Looks great but needs content.'"
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet. The library's size and coverage are the part of the build most likely to be quietly cut, so the promise stays deferred until a test counts the shipped entries."
+    },
+    {
+      "id": "reliable-reroll-no-loss",
+      "weight": "supporting",
+      "promise": "Every part of a scene re-rolls in place without crashing and without discarding the parts already kept, so generation survives a live session.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-generator-and-creative-evidence.md#5-what-the-incumbents-users-actually-complain-about-measured",
+        "finding": "crash and broken classes are 8 of 24 critical reviews across the two RPG shelves: com.dmtools (2.5 stars, 10K+ installs) reads 'app kept crashing during game play, would remove player characters from the initiative order randomly', and com.axehigh.rpg.encounters reads 'when I refresh it crashes and I get nothing new'."
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet. Per-part re-roll with preserved state has to be built and then exercised on the attached device before it can be called shipped."
+    },
+    {
+      "id": "on-device-nothing-uploaded",
+      "weight": "supporting",
+      "promise": "A scene lives entirely on the device, so nothing is uploaded and no remote service can delete it or lose it in the middle of a session.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-generator-and-creative-evidence.md#5-what-the-incumbents-users-actually-complain-about-measured",
+        "finding": "social.petrol.playmat (2.1 stars, 10K+ installs) reads 'Takes ages for you to upload items/tokens to the apps Inventory, Only for the app to delete them after a few minutes', and com.vansteinengroentjes.apps.ddfive (3.3 stars, 500K+ installs) reads 'when I logged in, my characters were gone'."
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet. The claim is proved only by a build that declares no network permission and a run that generates, keeps and reopens a scene with the device in airplane mode."
+    },
+    {
+      "id": "permanent-pack-purchase",
+      "weight": "supporting",
+      "promise": "The library is bought as permanent themed packs rather than rented - no subscription - and no advertisement is placed over the roll.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-generator-and-creative-evidence.md#5-what-the-incumbents-users-actually-complain-about-measured",
+        "finding": "paywall is 5 of 24 critical reviews across the two RPG shelves, including com.vansteinengroentjes.apps.ddfive reading 'The purchase options are definitely not ready for purchase. I expect much more functionality for paying'; ads is 2 of 24, both on com.rpgautomails.fatedice at 2.6 stars reading 'Full screen ads every few rolls'; and 8 of 8 enriched worldbuilding incumbents declare IAP while 0 declare ads."
+      },
+      "status": "deferred",
+      "deferredReason": "No slot exists yet. The billing capability, the one-time unlock and the 'no ad over a roll' rule all have to exist in the shipped build before this promise can be proved."
+    }
+  ]
+}

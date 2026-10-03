@@ -119,6 +119,13 @@ export const MARK_VECTOR_NAMES = Object.freeze([
   'ic_launcher_background.xml',
   'ic_launcher_monochrome.xml'
 ])
+
+/** The Android 13+ monochrome layer: a mask the platform tints, so its fill colour is not identity. */
+const MONOCHROME_VECTOR = 'ic_launcher_monochrome.xml'
+/** The only fills that mean anything in that mask. The studio writes the eight-digit white. */
+const MASK_FILLS = new Set(['#FFFFFF', '#000000'])
+/** A literal's six-digit colour, so `#RRGGBBAA` compares as `#RRGGBB`. */
+const opaqueColour = (colour) => (colour.length === 9 ? colour.slice(0, 7) : colour)
 const DRAWABLE_EXT = /\.xml$/i
 const MARK_ARTIFACT = /^ic_launcher/i
 
@@ -444,6 +451,15 @@ const PATH_DATA_ATTR = /(?:[\w.-]+):pathData\s*=/
  * `PASS`. It is skipped when the slot declares no palette at all — a killed slot with only headlines
  * (the historic `pipe-sizing` studio) has no identity to be off, and inventing a finding there is the
  * false positive F9 warns about.
+ *
+ * The palette criterion does not reach the Android 13+ monochrome layer. That layer is a mask: the
+ * platform tints it and discards the colour it carries, so its fill is not an identity decision, and
+ * a neutral mask value is legitimate there even when no palette role is white. The studio writes
+ * `#FFFFFFFF`, and a slot whose palette has no white role was failing a criterion that cannot mean
+ * anything about a file the system repaints (measured on `2026-10-01-lawn-round-log`, whose palette
+ * is a garden palette with no pure white and whose launcher art is its own). The geometry criterion
+ * above still applies to the mask, and a non-neutral fill in it is still a finding, so this is the
+ * criterion scoped to what it can be about rather than a file exempted from it.
  */
 export function launcherProblems({ slotVectors = {}, scaffoldVectors = {}, palette = [] }) {
   const problems = []
@@ -468,7 +484,10 @@ export function launcherProblems({ slotVectors = {}, scaffoldVectors = {}, palet
       continue
     }
     if (paletteRoles.size === 0) continue
-    const offPalette = colours.filter((colour) => !paletteHasRole(colour, paletteRoles))
+    const mask = name === MONOCHROME_VECTOR
+    const offPalette = colours.filter(
+      (colour) => !paletteHasRole(colour, paletteRoles) && !(mask && MASK_FILLS.has(opaqueColour(colour)))
+    )
     if (offPalette.length > 0) {
       problems.push(
         `${slot.rel}:${line}: the launcher vector has its own geometry, but fill colour(s) ` +
@@ -1505,6 +1524,25 @@ export function iconsFixtures() {
             'with no declared palette there is no identity to be off'
           )
           expectTrue(paletteHasRole('#FFFFFFFF', paletteRoleSet(['#FFFFFF'])), 'an eight-digit white matches a six-digit palette white')
+          const maskVectors = (fill) => ({
+            [MONOCHROME_VECTOR]: {
+              rel: `${DRAWABLE_REL}/${MONOCHROME_VECTOR}`,
+              text: OWN_FOREGROUND.replace('#3D2E7C', fill)
+            }
+          })
+          const maskScaffold = {
+            [MONOCHROME_VECTOR]: { rel: 'scaffold/…', text: scaffoldVector(MONOCHROME_VECTOR) }
+          }
+          expectEqual(
+            launcherProblems({ slotVectors: maskVectors('#FFFFFFFF'), scaffoldVectors: maskScaffold, palette: ['#123456'] }),
+            [],
+            'the monochrome mask admits the neutral white the platform tints, even when no palette role is white'
+          )
+          expectEqual(
+            launcherProblems({ slotVectors: maskVectors('#FF00FF'), scaffoldVectors: maskScaffold, palette: ['#123456'] }).length,
+            1,
+            'a non-neutral fill in the mask is still a finding, so the allowance is not a blanket exemption'
+          )
           expectSlotVerdict(
             'icons.launcher',
             {

@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "slot": "part-107-drills",
+  "reconRef": "docs/ideation/2026-10-02-authored-learning-and-drills.md#7-the-promise-contract",
+  "claims": [
+    {
+      "id": "suas-only-content",
+      "weight": "core",
+      "promise": "No item in the app covers manned-aircraft material: every question and every generated drill is scoped to the FAA Part 107 sUAS knowledge elements, so a learner never spends study time on fixed-wing or private-pilot content the exam does not test.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-02-authored-learning-and-drills.md#34-what-the-weakest-incumbents-users-actually-wrote-measured",
+        "finding": "com.part107.faa.exam, 4.0 stars over 440 exact reviews and 10K or more installs, draws the review \"Its decent for a general study. However there are topics that are specifically fixed wing topics only\", a missing-feature class that is 1 of the 6 critical reviews read in the pocket, while the same pocket's 11 visible cards are 11 of 11 Part 107 exam-prep apps with 8 of the 11 unrated."
+      },
+      "status": "deferred",
+      "deferredReason": "The item set is not authored yet; the promise is resolved when every shipped item and every generator template carries an ACS knowledge code from the Part 107 sUAS element list and a test proves no item references an airplane, private-pilot or manned-aircraft element."
+    },
+    {
+      "id": "every-answer-cited",
+      "weight": "core",
+      "promise": "Every item shows why its answer is right, naming the authority behind it, the 14 CFR section or the FAA ACS knowledge code, on the answer screen itself and never behind the unlock, so a learner can check the app against the regulation instead of trusting it.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-02-authored-learning-and-drills.md#34-what-the-weakest-incumbents-users-actually-wrote-measured",
+        "finding": "The weakest rated incumbent, night_coding.android.part107 at 3.5 stars over 34 exact reviews and 1K or more installs, has accuracy as a complaint class in 1 of its 3 critical reviews, reading \"DO NOT USE THIS APP!!. I just uninstalled. There are too many questions that are WRONG! You can't pass a test if the study guide is giving you inaccur\", and accuracy is 1 of the 6 critical reviews in the pocket."
+      },
+      "status": "deferred",
+      "deferredReason": "No answer screen exists yet; the promise is resolved when a test asserts that an answered item renders its citation string with the ACS code or CFR section, and that the citation is visible without the billing entitlement."
+    },
+    {
+      "id": "generated-drills-validated",
+      "weight": "core",
+      "promise": "The weather and airspace drills are computed from the authored METAR and TAF grammar and the 14 CFR Part 107 limits rather than drawn from a fixed bank, and every generated item is validated against those rules before it is shown, so the drill set cannot go stale and the app cannot present an impossible weather report.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-02-authored-learning-and-drills.md#35-what-the-2026-entrants-own-listings-claim-measured",
+        "finding": "The four richest incumbents advertise fixed question banks in their own listings, read on 2026-10-02: com.sima.part claims \"more than 350 questions\", com.dauntless.gs.faa.rdp claims \"500+\", com.droneprep.app claims \"1000+ practice questions\" and com.appark.part107.part107 claims \"over 1,000 fresh practice items\", while the same shelf carries an accuracy complaint 1 of 6 critical reviews about wrong questions in a fixed bank."
+      },
+      "status": "deferred",
+      "deferredReason": "Neither generator exists yet; the promise is resolved when a test generates a large batch of weather items from the grammar and asserts every one parses as a valid METAR or TAF, with zero items shown that fail validation."
+    },
+    {
+      "id": "no-ads-no-renewal",
+      "weight": "supporting",
+      "promise": "The drill and answer surfaces carry no advertising at any point in a session, and the app never asks for a renewal: one purchase, then the whole bank including every explanation.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-02-authored-learning-and-drills.md#34-what-the-weakest-incumbents-users-actually-wrote-measured",
+        "finding": "Ads and paywall are each 2 of the 6 critical reviews read in the pocket, 33 percent each, on com.part107.faa.exam at 4.0 stars over 440 exact reviews and 10K or more installs, including the verbatim review \"This app could be so amazing if there weren't literally constant pornographic ads\" and \"The amount of ads in this app are rough and disruptive BUT if you pay for the week/month subscription they (mostly disappear)\"."
+      },
+      "status": "deferred",
+      "deferredReason": "No billing or ad surface exists yet; the promise is resolved when the shipped app declares no advertising SDK, has no renewal or expiry path, and a test proves the item and answer screens render with no ad slot between items."
+    },
+    {
+      "id": "resumable-session",
+      "weight": "supporting",
+      "promise": "A drill session is a saved run: leaving the screen by back, by an interruption or by a stray gesture returns to the same item with the same answer state, never to the start of the set.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-02-authored-learning-and-drills.md#34-what-the-weakest-incumbents-users-actually-wrote-measured",
+        "finding": "night_coding.android.part107, 3.5 stars over 34 exact reviews, draws the 2 star review \"great app if you could just fix the swipe right bug that exits whatever question set you are in with no way of getting back into the test/question set\", a broken-feature class that is 1 of the 3 critical reviews on that app and 1 of the 6 critical reviews in the pocket."
+      },
+      "status": "deferred",
+      "deferredReason": "The session state is unbuilt; the promise is resolved when a test advances a mock part way, recreates the session holder and asserts the same item index and the same recorded answers are restored."
+    },
+    {
+      "id": "offline-by-construction",
+      "weight": "supporting",
+      "promise": "The item set, both drill engines and every explanation live in the APK: a learner can open a full session, answer, read the citation and see a result with the phone in airplane mode and with no account, the only network use in the app's life being the purchase or restore flow.",
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/ideation/2026-10-02-authored-learning-and-drills.md#4-the-wedge-in-one-sentence-functionality-and-content",
+        "finding": "No locked-content, login or offline complaint appeared among the 6 critical reviews read in the pocket, so this requirement is inferred from the job, a learner studying on a phone in spare minutes and standing in a field where signal cannot be relied on, and from the lane's own definition of an offline authored bank; it is stated as an inference rather than as a reading of this shelf."
+      },
+      "status": "deferred",
+      "deferredReason": "No network policy exists yet; the promise is resolved when a test runs the session, answer and citation path with no network available and no account created, and asserts the only declared network path is the billing flow."
+    }
+  ]
+}

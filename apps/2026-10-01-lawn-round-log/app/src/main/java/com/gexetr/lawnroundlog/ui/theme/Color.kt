@@ -10,32 +10,37 @@ import androidx.compose.ui.graphics.Color
 // source of truth, shared with the app"). A pack whose palette has drifted from the app it
 // describes is a screenshot of a different app.
 //
-// The ground is a cut lawn: a deep turf green field, chalk-off-white ink, and exactly one lime
-// reserved for work that has just been done. That is a decision about the user, not a mood - he
-// stands at a kerb in direct sunlight with the mower running and gloves on, so the contrast is
-// deliberately far above the Material baseline, and the first thing he needs to read at arm's
-// length is which rows are already cut.
+// The ground is a cut lawn read the Material 3 way: a near-neutral deep turf field (HCT chroma
+// 7-11, so it reads green without competing), chalk-off-white ink, and exactly one restrained
+// brass-gold accent reserved for work that has just been done. The accent sits ~60 degrees of hue
+// from the field and at 1.2x the chroma Material 3's own algorithm derives at its hue and tone, so
+// it stands out by hue rather than by being louder than a saturated field - the defect the
+// previous lime-on-green version shipped (`docs/research/2026-10-02-color-systems-and-palette-derivation.md`
+// section 0). That is a decision about the user, not a mood - he stands at a kerb in direct
+// sunlight with the mower running and gloves on, so the contrast is deliberately far above the
+// Material baseline, and the first thing he needs to read at arm's length is which rows are
+// already cut.
 //
 // The Material baseline seed and dynamic (wallpaper) colour are both off, on purpose: the same
 // round has to look the same on every phone the operator picks up.
 
 /** studio role `ink` - the deepest turf; the field's dark end. */
-internal val TurfDeep = Color(0xFF12301C)
+internal val TurfDeep = Color(0xFF242C24)
 
 /** studio role `ink_soft` - the mid turf. */
-internal val TurfMid = Color(0xFF1B4126)
+internal val TurfMid = Color(0xFF323C32)
 
 /** studio role `ink_lift` - the lifted turf; the field's light end. */
-internal val TurfLift = Color(0xFF275B33)
+internal val TurfLift = Color(0xFF485348)
 
-/** studio role `amber` - the cut accent: the colour of a stripe that has just been mown. */
-internal val CutLime = Color(0xFFC9F04A)
+/** studio role `amber` - the cut accent: dry cut grass, brass rather than lime. */
+internal val CutLime = Color(0xFFF8D46A)
 
 /** studio role `amber_deep` - the accent's darker end, for glows and for light-theme ink. */
-internal val CutLimeDeep = Color(0xFF6E9A22)
+internal val CutLimeDeep = Color(0xFF886507)
 
 /** studio role `amber_pale` - the accent's palest wash. */
-internal val CutLimePale = Color(0xFFEAF9C6)
+internal val CutLimePale = Color(0xFFFCE6B1)
 
 /** studio role `accent_deep` - a cool chalk-slate; the second hue that gives the field depth. */
 internal val ChalkSlate = Color(0xFF1E6E6A)
@@ -47,7 +52,7 @@ internal val Chalk = Color(0xFFF6F4E4)
 internal val ChalkMuted = Color(0xFFBBD0B2)
 
 /** studio role `bezel` - the device mock-up's frame. */
-internal val FrameInk = Color(0xFF0A1A10)
+internal val FrameInk = Color(0xFF131913)
 
 /** studio role `bezel_rim` - the frame's rim highlight. */
 internal val FrameRim = Color(0xFF7C9A82)
@@ -58,7 +63,7 @@ internal val FrameRim = Color(0xFF7C9A82)
 // never chose.
 
 /** A pale turf wash: containers on the light scheme. */
-internal val TurfWash = Color(0xFFDCEBD3)
+internal val TurfWash = Color(0xFFDFE8DB)
 
 /** The light scheme's dim surface - chalk one step down. */
 internal val ChalkDim = Color(0xFFE7E8D6)
@@ -79,10 +84,10 @@ internal val SlateLight = Color(0xFF7FD3CB)
 internal val OliveDeep = Color(0xFF3F5E0C)
 
 /** The dark scheme's surface - the field one step up from the background. */
-internal val TurfSurface = Color(0xFF16381F)
+internal val TurfSurface = Color(0xFF2A322A)
 
 /** The dark scheme's raised surface and variant. */
-internal val TurfSurfaceLift = Color(0xFF1F4B29)
+internal val TurfSurfaceLift = Color(0xFF3B453B)
 
 /** The dark scheme's outline. */
 internal val TurfLine = Color(0xFF4E7355)

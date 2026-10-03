@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "slot": "laneset",
+  "reconRef": "docs/ideation/2026-10-02-planners-and-optimisers.md#5-the-naming-decision",
+  "title": "Laneset: Swim Set Builder",
+  "slug": "laneset",
+  "applicationId": "com.gexetr.laneset",
+  "archetype": "compound",
+  "candidates": [
+    {
+      "name": "Laneset: Swim Set Builder",
+      "archetype": "compound",
+      "score": 90,
+      "dimensions": {
+        "jobFit": 5,
+        "searchability": 4.5,
+        "distinctiveness": 4.5,
+        "radioTest": 5,
+        "uniqueness": 4.5,
+        "lengthFit": 4.5,
+        "localeSurvival": 4.5
+      },
+      "why": "The carrier Laneset fuses the two words the discipline actually uses, a lane and a set, so it is sayable once and spellable from hearing it; the job half names the mechanism no incumbent's title names (a builder of sets rather than a training plan or a tracker), it keeps the shelf's head token swim, and at 25 characters it leaves 5 characters of slack under Play's 30 with no affix, no emoji and no price or ranking text."
+    },
+    {
+      "name": "Setline: Swim Set Builder",
+      "archetype": "compound",
+      "score": 82,
+      "dimensions": {
+        "jobFit": 4.5,
+        "searchability": 4,
+        "distinctiveness": 4,
+        "radioTest": 5,
+        "uniqueness": 2,
+        "lengthFit": 4.5,
+        "localeSurvival": 4
+      },
+      "why": "A clean compound with the same job half and one character more of slack, but the carrier is already a live Play product (com.setline.app, Setline by Lukas Media), so the token is in a user's search results and uniqueness collapses to 2, which is the hard-check elimination rather than a scoring loss."
+    },
+    {
+      "name": "Blocksmith: Swim Sets",
+      "archetype": "coined",
+      "score": 85,
+      "dimensions": {
+        "jobFit": 5,
+        "searchability": 4,
+        "distinctiveness": 5,
+        "radioTest": 4.5,
+        "uniqueness": 2,
+        "lengthFit": 5,
+        "localeSurvival": 4
+      },
+      "why": "The strongest purely distinct carrier in the field, because a training block is the exact unit a swimmer thinks in, but BlockSmith is a live Play app (com.jerus.blocksmith by After Silence Lab), so the token is occupied and the name is eliminated by collision whatever it scores."
+    },
+    {
+      "name": "Lapwheel: Swim Set Builder",
+      "archetype": "metaphorical",
+      "score": 78,
+      "dimensions": {
+        "jobFit": 4,
+        "searchability": 3.5,
+        "distinctiveness": 4.5,
+        "radioTest": 4.5,
+        "uniqueness": 4,
+        "lengthFit": 4,
+        "localeSurvival": 3.5
+      },
+      "why": "Metaphorical and memorable, but a lap wheel reads as a physical pool device and the carrier carries no swim token, so a listener who heard it once is as likely to type lapwheel as lap wheel, and it spends a third of the title on a metaphor instead of on the swim job the shelf ranks."
+    },
+    {
+      "name": "Poolcraft: Swim Sets",
+      "archetype": "coined",
+      "score": 74,
+      "dimensions": {
+        "jobFit": 4,
+        "searchability": 3.5,
+        "distinctiveness": 4,
+        "radioTest": 4.5,
+        "uniqueness": 3,
+        "lengthFit": 5,
+        "localeSurvival": 3.5
+      },
+      "why": "Pronounceable and distinct, but the craft suffix is claimed by a games genre on Play, where Forge and Craft titles are idle RPGs, so the token reads as a game rather than a pool tool and the carrier stops being ownable in the class the app ships in."
+    },
+    {
+      "name": "Swim Set Builder",
+      "archetype": "descriptive",
+      "score": 71,
+      "dimensions": {
+        "jobFit": 4.5,
+        "searchability": 4.5,
+        "distinctiveness": 2,
+        "radioTest": 5,
+        "uniqueness": 2,
+        "lengthFit": 5,
+        "localeSurvival": 4
+      },
+      "why": "It states the job plainly and is the phrase a swimmer would type, which is exactly its defect: it is a category phrase rather than a brand, it offers no carrier for a brand to compound into, and a title that is only the job description cannot be told apart from the incumbent that already ranks for it."
+    },
+    {
+      "name": "Swim Workout Builder",
+      "archetype": "descriptive",
+      "score": 62,
+      "dimensions": {
+        "jobFit": 4.5,
+        "searchability": 5,
+        "distinctiveness": 1.5,
+        "radioTest": 5,
+        "uniqueness": 1.5,
+        "lengthFit": 5,
+        "localeSurvival": 3.5
+      },
+      "why": "It is the shelf's own head term in the order most titles use, so a new listing would compete for a phrase the incumbents with 100K or more installs already own, and it competes directly with the descriptive titles on this shelf's front page rather than stating anything a swimmer can prefer."
+    },
+    {
+      "name": "Planner",
+      "archetype": "descriptive",
+      "score": 40,
+      "dimensions": {
+        "jobFit": 1.5,
+        "searchability": 2,
+        "distinctiveness": 1,
+        "radioTest": 5,
+        "uniqueness": 1,
+        "lengthFit": 5,
+        "localeSurvival": 2.5
+      },
+      "why": "The bare category noun used as the required negative control: it spends Play's strongest ranking field on a head term the category owns, it names no job, no audience and no swim, and it must lose to every serious candidate above, which it does on every dimension that matters."
+    }
+  ],
+  "rejected": [
+    {
+      "name": "Setline: Swim Set Builder",
+      "reason": "Eliminated by collision: Setline ships on Play as com.setline.app by Lukas Media, so the exact carrier token is already in a user's search results and the name cannot be owned in this class."
+    },
+    {
+      "name": "Blocksmith: Swim Sets",
+      "reason": "Eliminated by collision: BlockSmith ships on Play as com.jerus.blocksmith by After Silence Lab, so a stronger distinctiveness score is outranked by a hard check, exactly as the naming rule orders it."
+    },
+    {
+      "name": "Laneforge: Swim Set Builder",
+      "reason": "Eliminated by collision with a genre: a Play search for the forge token returns an idle RPG page (Mapforge, ArcForge, StoryForge, DreamForge, Auto Forge, Forge Master, Forgeland), so the carrier would be read as a game."
+    },
+    {
+      "name": "Poolcraft: Swim Sets",
+      "reason": "The craft suffix reads as a building or crafting game, so the token is not ownable in the software class the app ships in, and the carrier carries no swim token for the shelf's ranking."
+    },
+    {
+      "name": "Swim Set Builder",
+      "reason": "It is a category description rather than a name: it offers no carrier for a brand to compound into and cannot be told apart from the incumbents already ranking for the job phrase."
+    },
+    {
+      "name": "Planner",
+      "reason": "The bare category noun as the required negative control: it names the category rather than this app's job and must lose to every serious candidate, which it does."
+    }
+  ],
+  "searchPhrases": [
+    "swim workout generator",
+    "swim set builder",
+    "swim training plan app"
+  ],
+  "audience": "A pool swimmer training three to six structured sessions a week in a masters or club lane, or a triathlete doing pool work, who already knows what a main set is, builds the session by hand today or copies a coach's whiteboard, trains without a supported watch or a reliable signal on the deck, and does not want another monthly training subscription.",
+  "rationale": "The field was generated before it was judged: eight candidates spanning four archetypes, with the carrier space screened on Play first and three auditions eliminated by a live collision (Setline, BlockSmith) or by a genre (the forge token space). The winner is a compound rather than a bare descriptive phrase because the shelf is already saturated with descriptive titles that share the head term, and Play's strongest ranking field is spent better on a carrier that can compound plus one job noun no incumbent's title uses; the swim token is kept in the title because the shelf's own leaders hold it in theirs. The job half was deliberately narrowed from the fuller phrase Swim Workout Builder to Swim Set Builder to buy back the characters of slack the locale rule requires, accepting a small ASO cost against the query swim workout generator in exchange for a title that survives every declared locale inside Play's cap.",
+  "collisionCheck": "Screened on Play from this machine on 2026-10-02, one query per candidate token, and the reading is recorded in the evidence file section 5. For laneset the 29-card result page carried no app with that token in its title, the nearest being Allsets: Gym Workout Planner (com.strongomatic.android), LiveSet (com.cognitechs.liveset) and Everyset (com.castifi). The carrier auditions were then screened the same way: blocksmith returned the live app com.jerus.blocksmith, setline returned the live app com.setline.app, and laneforge returned an idle RPG genre page. This is a storefront search reading only, not a register: no trademark database was queried, Play does not enforce unique titles, and a clean search is not clearance, so the exact string Laneset is UNVERIFIED in class 9.",
+  "localisationCheck": "The title was measured in both declared locales against Play's 30 character cap. The en-US string Laneset: Swim Set Builder is 25 characters, 5 of slack, and the ru-RU string Laneset: план тренировок is 24 characters, 6 of slack, so neither locale overflows and both keep the slack the contract asks for. Both use only letters, one colon and single spaces, with no emoji, no ALL CAPS and no repeated symbols, and each has exactly one canonical spelling, so a listener who heard it once can type it. The carrier stays a Latin brand token in both locales rather than a machine translation, because a brand that differs per language is not one brand, and the job half is a human-authored Russian phrase rather than machine output. The residual gap is that the Russian phrase's discoverability for a Russian-speaking swimmer was not measured, and the ru title uses a shorter job noun than the en title, so the two locales do not state the job in the same words.",
+  "evidence": "docs/ideation/2026-10-02-planners-and-optimisers.md#5-the-naming-decision",
+  "localizedTitles": {
+    "en-US": "Laneset: Swim Set Builder",
+    "ru-RU": "Laneset: план тренировок"
+  },
+  "scoringRubric": {
+    "scale": "0-5 per dimension, weighted",
+    "weights": {
+      "jobFit": 20,
+      "searchability": 15,
+      "distinctiveness": 15,
+      "radioTest": 15,
+      "uniqueness": 15,
+      "lengthFit": 10,
+      "localeSurvival": 10
+    },
+    "floor": "chosen >= 70 with no dimension below 2.5; a hard check outranks the score"
+  },
+  "assumptionsUnverified": [
+    "That the carrier Laneset is free in trademark class 9 is UNVERIFIED: no register was queried, not USPTO, EUIPO, WIPO or Rospatent, and this record does not claim clearance. The deciding action is a class 9 search before the first upload.",
+    "The collision screen is a Play storefront search from one signed-out session rather than a Play Console reading, and Play does not enforce unique titles, so a live app carrying the same token may exist outside the pages that were read.",
+    "Whether the shortened job half costs installs is UNVERIFIED: Swim Set Builder was chosen over Swim Workout Builder to satisfy the slack rule, and no measurement in this session shows how much of the query swim workout generator a title without the word workout can hold.",
+    "Whether a Russian-speaking swimmer finds the app by the Russian phrase was not measured, and no Cyrillic alternative carrier was screened against the 30 character cap."
+  ]
+}

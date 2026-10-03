@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Laneset's default (en) words.
+
+  This file holds two things and no third. The **preserved** keys are the ones the app shell owns and
+  this screen only reads: the app's identity, the host's placeholder for an empty detail pane, the
+  About surface and the Settings surface. The **home** keys are this screen's own vocabulary — the
+  constraints form, the generated session, the runner and the handoff — and they are the product's
+  own words.
+
+  Three rules hold across the block, and each is a defect that already happened once somewhere in this
+  factory:
+
+  - **Every user-facing word is here, never in Kotlin.** A literal is a string a translator cannot
+    reach and `scripts/core/localization.mjs` reports it.
+  - **The Russian tree carries the same keys with the same format arguments.** Android merges every
+    file in values/ into one table and `scripts/core/policy.mjs` compares the two trees in both
+    directions, so a key or an argument in one and not the other is a failure rather than a fallback.
+  - **Every placeholder is positional.** A bare percent is read as a defect wherever the string is
+    formatted, so the copy uses forms like the first and second argument by number.
+
+  The numbers in the block are the pool's own: metres, whole minutes, and times as a pace clock reads
+  them. A stroke or a piece of gear is lower case because it is read mid-sentence in a set line.
+-->
+<resources>
+
+    <!-- The app's identity. The store title lives in naming.json; this is the same carrier, and the
+         app_idea line is the one this screen does not rewrite. -->
+    <string name="app_name" translatable="true">Laneset: Swim Set Builder</string>
+    <string name="app_idea" translatable="true">A swim set builder that computes each session from the swimmer\'s own constraints (minutes, pool length, focus, strokes to avoid, gear on deck) against authored programming rules, walks them through the two pace trials that put a target time on every interval, and prints or shares the set list; one-time unlock, offline, no account.</string>
+
+    <!-- Read by ui/PlayKilnApp.kt for the empty detail pane beside Home. Not this screen's key, and
+         not renamed: another worker reads it, and deleting it breaks the host. -->
+    <string name="home_pick_section" translatable="true">Choose a section to open it here.</string>
+
+    <!-- Home's top bar and identity header. The header repeats the carrier beside the one sentence
+         that says what the app does, and the top bar carries it alone at its own width. -->
+    <string name="home_title" translatable="true">Laneset</string>
+    <string name="home_tagline" translatable="true">Swim sets built from your own constraints.</string>
+    <string name="home_about_action" translatable="true">About</string>
+
+    <!-- Before anything is built. The empty state has to sell the first build without a price on it:
+         the free tier is a whole session, so this says what arrives rather than what is missing. -->
+    <string name="home_empty_title" translatable="true">No set on the deck yet</string>
+    <string name="home_empty_body" translatable="true">Choose your pool, your minutes and your focus, then build a set. Every interval comes out with a target time on it.</string>
+
+    <!-- The generated session: the hero, the totals, the runner and the list. -->
+    <string name="home_session_header" translatable="true">Your set</string>
+    <string name="home_block_headline" translatable="true">%1$d × %2$d m</string>
+    <string name="home_pace_value_default" translatable="true">Targets use the app\'s default pace of %1$s /100 m. The two trials replace it with your own.</string>
+    <string name="home_pace_value_yours" translatable="true">Targets use your own measured pace.</string>
+    <string name="home_trials_action" translatable="true">Swim the 400 m and 200 m trials</string>
+    <string name="home_trials_locked_action" translatable="true">Unlock the guided pace test</string>
+    <string name="home_stat_distance" translatable="true">Distance</string>
+    <string name="home_stat_time" translatable="true">Time</string>
+    <string name="home_stat_intervals" translatable="true">Intervals</string>
+    <string name="home_stat_pace" translatable="true">Pace /100 m</string>
+    <!-- The unit formatters: a pool length and a minute budget are read as one value with its unit,
+         so the number and the unit cannot be separated by a translator. -->
+    <string name="home_meters_value" translatable="true">%1$d m</string>
+    <string name="home_minutes_value" translatable="true">%1$d min</string>
+    <string name="home_setlist_header" translatable="true">The whole set</string>
+    <string name="home_setlist_supporting" translatable="true">Every line carries its target, so you can read it off the clock.</string>
+    <string name="home_discard_action" translatable="true">Discard this set</string>
+
+    <!-- The runner: where the swimmer is, and how they move through the set. The two actions are
+         words rather than glyphs, so TalkBack reads them without a description. -->
+    <string name="home_runner_rep" translatable="true">Rep %1$d of %2$d</string>
+    <string name="home_runner_progress" translatable="true">Block %1$d of %2$d · %3$d reps left</string>
+    <string name="home_runner_back" translatable="true">Back</string>
+    <string name="home_runner_next" translatable="true">Next</string>
+    <string name="home_runner_complete" translatable="true">That is the last repetition. The set is swum.</string>
+
+    <!-- One line of the set list. The block line, then its target and rest, then the gear it needs. -->
+    <string name="home_block_line" translatable="true">%1$d × %2$d m %3$s</string>
+    <string name="home_block_target_rest" translatable="true">Target %1$s · rest %2$s</string>
+    <string name="home_block_gear" translatable="true">Gear: %1$s</string>
+    <string name="home_section_totals" translatable="true">%1$d m · %2$s</string>
+
+    <!-- The constraints form. The focus control is the strip; the rest are chip sets, because a
+         choice a swimmer has to scroll to see is a choice they do not know they have. -->
+    <string name="home_constraints_header" translatable="true">Build a set</string>
+    <string name="home_pool_label" translatable="true">Pool length</string>
+    <string name="home_minutes_label" translatable="true">Minutes available</string>
+    <string name="home_focus_locked_note" translatable="true">Endurance is free. The other focuses are part of the unlock, because their targets depend on the pace your own two trials measure.</string>
+    <string name="home_stroke_avoid_label" translatable="true">Strokes to leave out</string>
+    <string name="home_strokes_supporting" translatable="true">Leave out what hurts today. At least one stroke stays in.</string>
+    <string name="home_gear_label" translatable="true">Gear on deck</string>
+    <string name="home_gear_supporting" translatable="true">The set only uses what you actually brought.</string>
+    <string name="home_constraints_stale" translatable="true">Your constraints changed. Build again to use them.</string>
+    <string name="home_build_action" translatable="true">Build my set</string>
+    <string name="home_rebuild_action" translatable="true">Build again</string>
+
+    <!-- The handoff, and the one purchase. The export and import actions stay on screen whether or
+         not they are owned, so a locked tap is a route to what the unlock gives rather than a
+         control that is not there. -->
+    <string name="home_handoff_header" translatable="true">Take it to the pool</string>
+    <string name="home_handoff_supporting" translatable="true">Share the set list as text, or save a one-page card you can print.</string>
+    <string name="home_handoff_locked" translatable="true">Sharing and printing a finished set are part of the unlock.</string>
+    <string name="home_handoff_action" translatable="true">Share or print the set</string>
+    <string name="home_import_action" translatable="true">Open a coach workout</string>
+    <string name="home_import_locked" translatable="true">Reading a workout a coach wrote is part of the unlock.</string>
+    <string name="home_unlock_action" translatable="true">See what the unlock gives</string>
+
+    <!-- A refused action, said in the page rather than in a message that is gone before it is read. -->
+    <string name="home_notice_keep_one_stroke" translatable="true">A set needs at least one stroke. Turn one back on.</string>
+    <string name="home_notice_generation_failed" translatable="true">These constraints do not make a set. Change one and build again.</string>
+    <string name="home_notice_dismiss" translatable="true">Dismiss</string>
+
+    <!-- The vocabulary the domain's enums are mapped onto. One key per constant. -->
+    <string name="home_section_warm_up" translatable="true">Warm-up</string>
+    <string name="home_section_main_set" translatable="true">Main set</string>
+    <string name="home_section_cool_down" translatable="true">Cool-down</string>
+    <string name="home_stroke_freestyle" translatable="true">freestyle</string>
+    <string name="home_stroke_backstroke" translatable="true">backstroke</string>
+    <string name="home_stroke_breaststroke" translatable="true">breaststroke</string>
+    <string name="home_stroke_butterfly" translatable="true">butterfly</string>
+    <string name="home_stroke_medley" translatable="true">medley</string>
+    <string name="home_gear_kickboard" translatable="true">kickboard</string>
+    <string name="home_gear_pull_buoy" translatable="true">pull buoy</string>
+    <string name="home_gear_fins" translatable="true">fins</string>
+    <string name="home_gear_paddles" translatable="true">paddles</string>
+    <string name="home_gear_snorkel" translatable="true">snorkel</string>
+    <string name="home_focus_speed" translatable="true">Sprint</string>
+    <string name="home_focus_threshold" translatable="true">Threshold</string>
+    <string name="home_focus_endurance" translatable="true">Endurance</string>
+    <string name="home_focus_technique" translatable="true">Technique</string>
+    <string name="home_focus_recovery" translatable="true">Recovery</string>
+
+    <!-- The focus chips carry the boundary inside the control: the free focus says so, and a locked
+         one says what a tap will open rather than only refusing. -->
+    <string name="home_focus_chip_free" translatable="true">%1$s · free</string>
+    <string name="home_focus_chip_locked" translatable="true">%1$s · by purchase</string>
+
+    <!-- The joiner between two pieces of gear. Quoted, because the space after the comma is part of
+         what a reader sees and an unquoted trailing space is not reliably preserved. -->
+    <string name="home_list_separator" translatable="true">", "</string>
+
+    <!-- The About surface. Not this screen's copy: Home only opens it. -->
+    <string name="about_title" translatable="true">About this app</string>
+    <string name="about_back" translatable="true">Back</string>
+    <string name="about_body" translatable="true">%1$s builds a swim session from your own constraints — the minutes you have, your pool length, your focus, the strokes you are leaving out and the gear on the deck — and puts a target time on every interval. Two guided pace trials, 400 m and 200 m, set the targets to your own pace, and the finished set can be shared as text or printed. One purchase opens the rest: no subscription, no account, and the app works offline.</string>
+    <string name="about_privacy_note" translatable="true">One purchase, and everything you keep — sets, pace and settings — stays in the app\'s storage on your device. The only network use is Google Play\'s own billing, which carries the one-time purchase; the app computes a full set with no signal.</string>
+    <string name="about_privacy_policy_action" translatable="true">Read the privacy policy</string>
+    <!-- The published policy address. A URL is not translatable, so it is declared `translatable="false"`
+         and lives only in values/; a copy under values-<locale>/ would be a second source of truth for one
+         address. `scripts/check-in-app-policy.mjs` measures that this exact string is present here and is
+         opened from AboutScreen.kt. -->
+    <string name="privacy_policy_url" translatable="false">https://telegra.ph/Laneset-Swim-Set-Builder--privacy-policy-10-02</string>
+
+    <!-- Settings. Every preference here is read by code outside the settings screen, because a
+         control that changes nothing teaches the user that Settings is decoration. -->
+    <string name="settings_title" translatable="true">Settings</string>
+    <string name="settings_back" translatable="true">Back</string>
+    <string name="settings_appearance_header" translatable="true">Appearance</string>
+    <string name="settings_theme_supporting" translatable="true">Choose how the app looks.</string>
+    <string name="settings_theme_system" translatable="true">Follow system</string>
+    <string name="settings_theme_light" translatable="true">Light</string>
+    <string name="settings_theme_dark" translatable="true">Dark</string>
+    <string name="settings_dynamic_color_title" translatable="true">Use wallpaper colours</string>
+    <string name="settings_dynamic_color_supported" translatable="true">Build the palette from the device wallpaper.</string>
+    <string name="settings_dynamic_color_unsupported" translatable="true">Not available on this version of Android.</string>
+    <string name="settings_language_header" translatable="true">Language</string>
+    <string name="settings_language_title" translatable="true">App language</string>
+    <string name="settings_language_summary" translatable="true">Choose the language this app uses.</string>
+    <string name="settings_language_summary_legacy" translatable="true">Change the language in Android settings.</string>
+    <string name="settings_language_unavailable" translatable="true">This device has no per-app language settings.</string>
+    <string name="settings_behaviour_header" translatable="true">Behaviour</string>
+    <string name="settings_haptics_title" translatable="true">Vibration feedback</string>
+    <string name="settings_haptics_summary" translatable="true">Vibrate when you run the main action.</string>
+</resources>

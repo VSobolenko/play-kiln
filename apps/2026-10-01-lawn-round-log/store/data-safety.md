@@ -2,8 +2,8 @@
 
 The console form is `Контент приложения → Безопасность данных`. Every answer below comes from the
 slot's real SDK surface — `capabilities.json` enables exactly one capability, `billing`, whose own
-`capability.json` declares the one row stated here — and from the app's own manifest, which requests
-no permission.
+`capability.json` declares the one row stated here — and from the **merged release manifest** of the
+built artifact, which is what settles the permission surface.
 
 **The definition in play:** Play's "collect" means **transmitting data off the device**. The round,
 the visits, the payments and the settings never leave the phone, so none of them is collected. The
@@ -43,15 +43,20 @@ with an app that ships neither.
 
 | SDK | Version | What it does here |
 |---|---|---|
-| Google Play Billing Library | 9.1.0 | Takes and restores the one-time unlock; returns the purchase record. No other SDK is bundled. |
+| Google Play Billing Library | 9.1.0 | Takes and restores the one-time unlock; returns the purchase record. |
+| `com.google.android.datatransport` (`transport-runtime`, `transport-backend-cct`) | 3.1.8 | A transitive dependency of `billing-ktx` 9.1.0, not a choice of this slot. It adds `android.permission.INTERNET`, `android.permission.ACCESS_NETWORK_STATE` and the `TransportBackendDiscovery` service to the merged manifest, and Google uses it to upload billing events. |
 
 ## Security practices
 
 - Data is encrypted in transit (HTTPS). The app refuses cleartext traffic
   (`res/xml/network_security_config.xml`, `cleartextTrafficPermitted="false"`).
 - No account, so no account-deletion path is required on the web or in-app.
-- The app declares **no** `uses-permission` of its own; the merged manifest of the built artifact is
-  what settles that, and it is measured from the artifact rather than assumed.
+- The app declares **no** `uses-permission` element in `app/src/main/AndroidManifest.xml`, but the
+  **merged release manifest** is what ships, and it declares four: `com.android.vending.BILLING`
+  (the billing library), `com.gexetr.lawnroundlog.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`
+  (AndroidX, build-generated), `android.permission.INTERNET` and
+  `android.permission.ACCESS_NETWORK_STATE` (both from `com.google.android.datatransport`). None is a
+  dangerous permission.
 - Cloud backup and device transfer are both enabled and separated, so an operator's own record is not
   silently lost when he moves phones. Only credential-shaped files the app never writes are excluded.
 
@@ -60,7 +65,14 @@ with an app that ships neither.
 - `capabilities.json` → `{"schemaVersion": 1, "enabled": ["billing"]}`.
 - `capabilities/billing/capability.json` → `dataCollected` (Financial info / Purchase history),
   `sdkDependencies` (Play Billing 9.1.0), `permissions: []`, `adsPresent: false`.
-- `app/src/main/AndroidManifest.xml` → no `uses-permission` element.
+- `app/src/main/AndroidManifest.xml` → no `uses-permission` element, but that file is not what ships.
+- Merged release manifest
+  (`app/build/intermediates/merged_manifests/release/processReleaseManifest/AndroidManifest.xml`) →
+  four `uses-permission` elements — `com.android.vending.BILLING`, the AndroidX receiver permission,
+  `android.permission.ACCESS_NETWORK_STATE`, `android.permission.INTERNET` — and the
+  `TransportBackendDiscovery` service from `com.google.android.datatransport`.
+- Signed release APK (`aapt2 dump permissions …/lawn-round-log-0.1.0-1-release.apk`) → the same four
+  permissions, confirming the merged manifest is the one that reached the artifact.
 
 ## Agent note
 

@@ -4,19 +4,19 @@
   "_mark": "`mark-stripes` is the mown-stripe fan: four bold stripes converging toward a vanishing point above them, the pattern a mower leaves on a lawn, with the two inner stripes in the cut accent and the two outer in chalk. It says mowing, it says a row, and it says 'just cut' - and it is not a page, a check, a caliper or any other slot's glyph. Geometry, in the canonical fractions scripts/lib/icon_design.py speaks (canvas = the 108dp adaptive viewport), so registering it in `MARK_REGISTRY` is mechanical: four `stroke` primitives at the declared `bold` weight (24px/512 = 0.046875), round caps, each a two-point line from top to bottom. topY = 0.350, bottomY = 0.650. (topX, bottomX, role): (0.385, 0.315, 'paper'), (0.462, 0.438, 'amber'), (0.538, 0.562, 'amber'), (0.615, 0.685, 'paper'). Measured against the grid: silhouette bbox x=[0.2916, 0.7084] y=[0.3266, 0.6734], centre exactly (0.5, 0.5) = the optical anchor; extent 0.4169 (limit 0.6667 visible); reach 0.2616 = 28.25dp = 91% of the 31.00dp circle keyline (floor 75%); ink coverage of the 66dp safe zone ~0.17 (window 0.15-0.85; measured 0.1738 of the safe square, analytic 0.1714 — the earlier ~0.24 was wrong, corrected 2026-10-02); mark outside the safe circle 0px; thinnest stroke 24px and 2.25px at 48dp (floor 16px / 1.5px).",
   "_palette": "One deliberate identity, shared with the app's own theme (app/src/main/java/com/gexetr/lawnroundlog/ui/theme/Color.kt): a mown-lawn field of deep turf green, chalk-off-white for ink and display text, and one lime reserved for work that has just been done. Roles the studio draws with: `ink`/`ink_soft`/`ink_lift` are the three ends of the background gradient, `amber` is the cut accent on the stripes and the pill outline, `amber_deep` and `amber_pale` are its darker and lighter accents, `accent_deep` is the cool chalk-slate glow that gives the field depth, `paper` is the chalk mark and the display text, `muted` is secondary text, and `bezel`/`bezel_rim` are the device mock-up frame.",
   "_claim_bounds": "Every headline must be true of the shipped build. The app keeps an ordered round of customers, records mowed/skipped/rained-off visits, pushes the round by one day, derives a running balance per customer from billable visits minus payments, exports CSV through the system file picker, and works with no account and no network in the daily path. It does not sync, does not share anything with anyone, does not schedule appointments and cannot promise a customer will pay. So 'Never lose a customer' is a guarantee the app cannot make and 'Syncs with your office' is false. Each headline below names something the app verifiably does, and the shot behind it is asserted by store/journey.json.",
-  "_headlines": "One headline per journey shot, in journey order, kept to 3-5 words so it stays readable at thumbnail size. The studio falls back to the shot title when this list is short, so a short list would silently change the pack. The order tracks the journey: the ordered round, a recorded visit, a pushed morning, the money owed, the export, and the shelf claim.",
+  "_headlines": "One headline per journey shot, in journey order, kept to 3-5 words so it stays readable at thumbnail size. The studio falls back to the shot title when this list is short, so a short list would silently change the pack. The order tracks the journey: the ordered round, a recorded visit, a pushed morning, the money owed, the ledger as the free build keeps it, and the shelf claim. Headline 5 is about the ledger and not about the export on purpose: the capture runs against the signed release build, which is the free tier, so the export action in that frame is the lock. A headline promising export over a locked door would be the one claim in this pack the shipped build does not keep; the shot's own body names the lock and says the unlock buys it.",
   "mark": "mark-stripes",
   "palette": {
-    "ink": "#12301C",
-    "ink_soft": "#1B4126",
-    "ink_lift": "#275B33",
-    "amber": "#C9F04A",
-    "amber_deep": "#6E9A22",
-    "amber_pale": "#EAF9C6",
+    "ink": "#242C24",
+    "ink_soft": "#323C32",
+    "ink_lift": "#485348",
+    "amber": "#F8D46A",
+    "amber_deep": "#886507",
+    "amber_pale": "#FCE6B1",
     "accent_deep": "#1E6E6A",
     "paper": "#F6F4E4",
     "muted": "#BBD0B2",
-    "bezel": "#0A1A10",
+    "bezel": "#131913",
     "bezel_rim": "#7C9A82"
   },
   "headlines": [
@@ -24,7 +24,7 @@
     "One tap records a visit",
     "Push a rained-off morning",
     "See who still owes",
-    "Export the whole record",
+    "Every visit, on the record",
     "Offline, and yours to keep"
   ],
   "kickers": [
@@ -32,7 +32,7 @@
     "VISITS",
     "WEATHER",
     "BALANCES",
-    "EXPORT",
+    "LEDGER",
     "OWNERSHIP"
   ],
   "featureTagline": "An offline round log for a one-man mowing round. No account, no ads, bought once.",

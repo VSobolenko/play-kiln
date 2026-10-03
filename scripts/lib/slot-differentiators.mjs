@@ -57,6 +57,17 @@ export const RESOLVED_STATUSES = Object.freeze(['shipped', 'narrowed', 'dropped'
 export const OWNER_DECISION_STATUSES = Object.freeze(['narrowed', 'dropped'])
 
 /**
+ * The only `decidedBy` a refusal on the `after` stage may name.
+ *
+ * Refusing `after` gives up the handoff — the capability that makes the user's job finishable, and
+ * the one this contract's own research ranks first (`export / backup / data portability`) — so it is
+ * a product decision rather than a scheduling note, and it is the owner's to make in his own words,
+ * exactly as weakening a `core` promise is. `before` stays the scout's to refuse with its own reason;
+ * `during` is never refusable. The normative text is `.cursor/rules/app-depth.mdc`.
+ */
+export const OWNER_DECIDER = 'owner'
+
+/**
  * What kind of artifact proves a promise. The type is what makes the `ref` checkable:
  * a promise about behaviour is proved by a test in a test source set, a promise about
  * what the user sees is proved by a resource, and a promise about how it looks is
@@ -80,6 +91,185 @@ export const PROOF_PREFIXES = Object.freeze({
 
 /** Proof types whose file must literally contain the named symbol. */
 export const SYMBOL_PROOF_TYPES = Object.freeze(['test', 'code', 'resource'])
+
+/**
+ * Where a promise sits in the user's job. The job is not the act the app is named for; it is
+ * everything the act sits inside — what the user brings to it, the act itself, and what they do
+ * with the result. A contract that names only the middle of that job is the raw-MVP defect this
+ * field makes visible, and the normative text is `.cursor/rules/app-depth.mdc`.
+ */
+export const JOB_STAGES = Object.freeze(['before', 'during', 'after'])
+
+/**
+ * The closed set of depth families a promise may declare.
+ *
+ * `core_operation` is the app's central act — the middle of the job, never a differentiator by
+ * itself, which is why it can never satisfy the handoff floor. In the middle of the list sit the
+ * **connective** families, the handoffs that let a user finish with the job: bringing their own
+ * data in, getting the result off the device, being sure the work cannot be lost, being reached,
+ * capturing without opening the app, finding it again, acting on many at once. Below them are the
+ * families the research rates presence-only (`insight`) or that are reportable and never floored.
+ * The set is closed on purpose: an unknown family is a typo a gate can name, not a new capability.
+ */
+export const DEPTH_FAMILIES = Object.freeze([
+  'core_operation',
+  'data_in',
+  'data_out',
+  'durability',
+  'reminder',
+  'widget',
+  'find',
+  'bulk',
+  'insight',
+  'speed',
+  'fit',
+  'access',
+  'collaboration',
+  'trust'
+])
+
+/**
+ * The families that count toward the handoff floor — the *connective* ones.
+ *
+ * Each names an artifact or a platform API that cannot be faked by prose, so a presence check
+ * against the proof artifact means something. `insight` is deliberately absent: the research rates
+ * a chart or a statistic presence-only, and a slot cannot satisfy the floor by declaring one. The
+ * last five families are reportable but never floored.
+ */
+export const CONNECTIVE_FAMILIES = Object.freeze([
+  'data_in',
+  'data_out',
+  'durability',
+  'reminder',
+  'widget',
+  'find',
+  'bulk'
+])
+
+/**
+ * The token an artifact must contain to prove each family, copied from the table in `.cursor/rules/app-depth.mdc`.
+ * A promise may say "exports a CSV"; the floor asks whether the artifact that proves it actually contains a way
+ * to get the file off the phone. Tokens are matched literally, because a gate that guessed at semantics would be
+ * the false positive `docs/research/2026-10-02-depth-encoding-and-detectability.md` measured — the repository's
+ * own `edit-every-record` promise survives a lexical predicate because it carries a contrast clause. What this
+ * cannot claim: a token is satisfiable by a single call site that never runs, so it raises the floor from "no
+ * output path at all" to "a named output path exists", and it does not measure depth. `data_in` takes the user's
+ * own content through the picker or the camera alike — the camera is the same handoff through a different door.
+ */
+export const FAMILY_TOKENS = Object.freeze({
+  data_in: Object.freeze([
+    'ACTION_OPEN_DOCUMENT',
+    'ACTION_GET_CONTENT',
+    'GetContent',
+    'OpenDocument',
+    'PickVisualMedia',
+    'ACTION_IMAGE_CAPTURE',
+    'TakePicture',
+    'ImageCapture',
+    'ClipData',
+    'ClipboardManager'
+  ]),
+  data_out: Object.freeze(['ACTION_SEND', 'ACTION_CREATE_DOCUMENT', 'FileProvider', 'PdfDocument', 'share']),
+  durability: Object.freeze([
+    'dataExtractionRules',
+    'fullBackupContent',
+    'UndoState',
+    'undo',
+    'rememberSaveable',
+    'SavedStateHandle'
+  ]),
+  reminder: Object.freeze(['NotificationChannel', 'WorkManager', 'NotificationManagerCompat']),
+  widget: Object.freeze(['GlanceAppWidget', 'AppWidgetProvider']),
+  find: Object.freeze(['SearchBar', 'Fts4', 'Fts5', 'MATCH', 'searchQuery']),
+  bulk: Object.freeze(['selectAll', 'toggleSelection', 'multiSelect', 'selection']),
+  insight: Object.freeze(['Canvas', 'Vico', 'chart', 'statistics', 'aggregate'])
+})
+
+/**
+ * The rough lexical predicate of `docs/research/2026-10-02-depth-encoding-and-detectability.md` §1.2:
+ * a basic record operation whose head noun is an app-internal record and which names no exit.
+ *
+ * This is a **report**, never a gate. The document measured the repository's own worst case — the
+ * gradebook's `edit-every-record` — and found it escapes the predicate because it carries a contrast
+ * clause ("instead of the incumbent's name-only editing"), which may be a true and sourced
+ * difference. Failing it would be a false positive on correct prose, so the predicate's verdict is
+ * printed for a human to read and never becomes a finding. The table is a proxy: it measures
+ * vocabulary, and depth is semantics plus market.
+ */
+const CRUD_VERB = Object.freeze([
+  'add', 'adds', 'adding', 'create', 'creates', 'created', 'creating', 'edit', 'edits', 'edited',
+  'editing', 'update', 'updates', 'updated', 'updating', 'delete', 'deletes', 'deleted', 'deleting',
+  'remove', 'removes', 'removed', 'removing', 'list', 'lists', 'listed', 'listing', 'view', 'views',
+  'viewed', 'viewing', 'show', 'shows', 'showed', 'showing', 'display', 'displays', 'displayed',
+  'displaying', 'save', 'saves', 'saved', 'saving', 'store', 'stores', 'stored', 'storing', 'enter',
+  'enters', 'entered', 'entering', 'record', 'records', 'recorded', 'recording', 'track', 'tracks',
+  'tracked', 'tracking', 'change', 'changes', 'changed', 'changing', 'manage', 'manages', 'managed',
+  'managing', 'calculate', 'calculates', 'calculated', 'calculating', 'compute', 'computes',
+  'computed', 'computing'
+])
+
+const CRUD_NOUN = Object.freeze([
+  'student', 'students', 'class', 'classes', 'mark', 'marks', 'grade', 'grades', 'entry', 'entries',
+  'row', 'rows', 'item', 'items', 'record', 'records', 'note', 'notes', 'customer', 'customers',
+  'visit', 'visits', 'field', 'fields', 'sale', 'sales', 'log', 'logs'
+])
+
+const EXIT_SIGNAL = Object.freeze([
+  'csv', 'json', 'pdf', 'file', 'files', 'backup', 'backups', 'export', 'exports', 'import',
+  'imports', 'print', 'prints', 'share', 'shares', 'shared', 'clipboard', 'picker', 'photo',
+  'photos', 'undo', 'redo', 'merge', 'merges', 'convert', 'converts', 'derive', 'derives',
+  'derived', 'sum', 'sums', 'owed', 'balance', 'balances', 'total', 'totals', 'average',
+  'averages', 'difference', 'differences', 'parent', 'invoice', 'invoices', 'reminder', 'reminders',
+  'widget', 'notification', 'notifications', 'scan', 'scans', 'chart', 'charts', 'statistics',
+  'template', 'templates'
+])
+
+const CONTRAST_ONLY = /\b(?:instead of|rather than|without|no account|offline|unlike|never|cannot|does not|doesn't)\b/i
+
+const wholeWord = (words) => new RegExp(`\\b(?:${words.join('|')})\\b`, 'i')
+
+/**
+ * The §1.2 verdict for one promise: `CRUD-shaped`, `AUDIT`, or `null` for a promise that names a
+ * handoff. Exported so the report and its fixtures agree on one predicate rather than two.
+ */
+export function crudVerdict(promise) {
+  const text = typeof promise === 'string' ? promise : ''
+  if (!wholeWord(CRUD_VERB).test(text)) return null
+  if (!wholeWord(CRUD_NOUN).test(text)) return null
+  if (wholeWord(EXIT_SIGNAL).test(text)) return null
+  return CONTRAST_ONLY.test(text) ? 'AUDIT' : 'CRUD-shaped'
+}
+
+/** The line number of each claim id in the raw JSON, so a note can name a `file:line`. */
+export function claimLines(rawText) {
+  const lines = new Map()
+  if (typeof rawText !== 'string') return lines
+  rawText.split(/\r?\n/).forEach((line, index) => {
+    const match = line.match(/"id"\s*:\s*"([^"]+)"/)
+    if (match && !lines.has(match[1])) lines.set(match[1], index + 1)
+  })
+  return lines
+}
+
+/**
+ * The CRUD report: one line per promise the lexical predicate flags, with its `file:line`.
+ *
+ * This is the machine-reported, human-audited half the rule names. It is deliberately not a
+ * finding: see the comment on the predicate above, and `.cursor/rules/app-depth.mdc`
+ * "Human-audited, reported and never auto-passed".
+ */
+export function crudReport(value, { file = 'differentiators.json', raw = '' } = {}) {
+  const lines = claimLines(raw)
+  const rows = []
+  const claims = Array.isArray(value?.claims) ? value.claims : []
+  for (const claim of claims) {
+    const verdict = crudVerdict(claim?.promise)
+    if (!verdict) continue
+    const line = lines.get(claim?.id)
+    rows.push(`${line ? `${file}:${line}` : file} claim "${claim?.id}" reads as ${verdict}`)
+  }
+  return rows
+}
 
 /**
  * Where a promise's evidence may come from: the measured research the factory keeps, or
@@ -184,16 +374,146 @@ function validateProof(proof, what, errors) {
   return type
 }
 
-function validateOwnerDecision(value, what, errors) {
+/**
+ * The one shape in which "the owner said so" is written: `{ words, recordedAt }`.
+ *
+ * Two paths carry it — a narrowed or dropped `core` promise, and a refusal of the `after` stage —
+ * and they share this function on purpose, so the two cannot drift apart
+ * (`.cursor/rules/verification-discipline.mdc`, "one source of truth, imported — never restated").
+ * `because` is the sentence that says why *this* holder needs the owner's words; the field errors
+ * it produces are identical either way.
+ */
+function validateOwnerDecision(value, what, errors, because = 'is a core promise, so narrowing or dropping it') {
   if (!isPlainObject(value)) {
     errors.push(
-      `${what} is a core promise, so narrowing or dropping it needs ownerDecision { words, recordedAt } — the owner's own words, never an agent's summary of them`
+      `${what} ${because} needs ownerDecision { words, recordedAt } — the owner's own words, never an agent's summary of them`
     )
     return
   }
   requireText(value.words, `${what}.ownerDecision.words`, errors)
   if (typeof value.recordedAt !== 'string' || Number.isNaN(Date.parse(value.recordedAt))) {
     errors.push(`${what}.ownerDecision.recordedAt must be an ISO date string (found ${describe(value.recordedAt)})`)
+  }
+}
+
+/**
+ * A `comparison` names the incumbent a promise is a difference from, so the claim carries evidence
+ * that somebody else does not already do this. Its truth is recon's business and a human reads it
+ * (`.cursor/rules/app-depth.mdc`); the schema only refuses a comparison that names nothing.
+ */
+function validateComparison(value, what, errors) {
+  if (!isPlainObject(value)) {
+    errors.push(`${what}.comparison must be { incumbent, limitation, source } (found ${describe(value)})`)
+    return
+  }
+  for (const field of ['incumbent', 'limitation', 'source']) {
+    const field_ = value[field]
+    if (typeof field_ !== 'string' || !field_.trim()) {
+      errors.push(`${what}.comparison.${field} is required and must be a non-empty string (found ${describe(field_)})`)
+    } else if (matchesPlaceholder(field_.trim())) {
+      errors.push(`${what}.comparison.${field} must name the real incumbent, not a placeholder (found "${field_.trim()}")`)
+    }
+  }
+}
+
+/**
+ * The `jobCoverage` object: each of `before`, `during` and `after` resolves to a claim in this
+ * contract or carries a written refusal.
+ *
+ * The shape is checked here because it is a fact about the file, not about a slot: a stage that
+ * points at a claim id nobody declared, or a refusal with no reason, is a broken contract on any
+ * slot. Whether the three stages are *present at all* is the baseline-scoped half
+ * (`depthFindings` below), because a contract that predates the rule must carry that finding as a
+ * note rather than a schema refusal. `during` is the act the app is named for, so it can never be
+ * refused — refusing it would say there is no app. `after` may be refused, but only by the owner in
+ * his own words, because refusing it gives up the handoff (`OWNER_DECIDER`); `before` is the scout's
+ * to refuse with a reason.
+ */
+function validateJobCoverage(coverage, seenIds, errors) {
+  if (coverage === undefined) return
+  if (!isPlainObject(coverage)) {
+    errors.push(
+      `jobCoverage must be an object with before, during and after, each a { claimId } or a { refusal } (found ${describe(coverage)})`
+    )
+    return
+  }
+
+  for (const key of Object.keys(coverage)) {
+    if (!JOB_STAGES.includes(key)) {
+      errors.push(`jobCoverage.${key} is not a job stage; the stages are ${JOB_STAGES.join(', ')}`)
+    }
+  }
+
+  for (const stage of JOB_STAGES) {
+    const entry = coverage[stage]
+    if (entry === undefined) continue
+    const what = `jobCoverage.${stage}`
+    if (!isPlainObject(entry)) {
+      errors.push(`${what} must be { claimId } or { refusal: { reason, decidedBy, recordedAt } } (found ${describe(entry)})`)
+      continue
+    }
+    const hasClaim = entry.claimId !== undefined
+    const hasRefusal = entry.refusal !== undefined
+    if (hasClaim === hasRefusal) {
+      errors.push(`${what} must be exactly one of { claimId } or { refusal } (found ${describe(entry)})`)
+      continue
+    }
+
+    if (hasClaim) {
+      if (typeof entry.claimId !== 'string' || !entry.claimId.trim()) {
+        errors.push(`${what}.claimId must be the id of a claim in this contract (found ${describe(entry.claimId)})`)
+      } else if (!seenIds.has(entry.claimId)) {
+        errors.push(
+          `${what}.claimId "${entry.claimId}" does not name a claim in this contract; a stage that points at nothing is not coverage`
+        )
+      }
+      continue
+    }
+
+    if (stage === 'during') {
+      errors.push(
+        `${what} is a refusal, but "during" is the act the app is named for and can never be refused; refusing it says there is no app`
+      )
+    }
+    const refusal = entry.refusal
+    if (!isPlainObject(refusal)) {
+      errors.push(`${what}.refusal must be { reason, decidedBy, recordedAt } (found ${describe(refusal)})`)
+      continue
+    }
+    // `reason` carries the "real text, not a label" rule every free-text field in this contract
+    // carries — a bare `none` or `n/a` is a formality, not a reason — so it goes through the same
+    // `requireText` helper as `promise` and `narrowedTo` rather than a second, weaker check. What
+    // this cannot catch, stated rather than implied: a *sentence* that is not true. No predicate
+    // reads sincerity; `.cursor/rules/app-depth.mdc`'s answer is that a human audits every refusal,
+    // so this removes the placeholder token and not the bad-faith sentence.
+    requireText(refusal.reason, `${what}.refusal.reason`, errors)
+    for (const field of ['decidedBy', 'recordedAt']) {
+      if (typeof refusal[field] !== 'string' || !refusal[field].trim()) {
+        errors.push(
+          `${what}.refusal.${field} is required: a refusal is a sentence with a reason, a decider and a date (found ${describe(refusal[field])})`
+        )
+      }
+    }
+
+    // `after` is the stage this contract exists for. The handoff is the most valuable capability it
+    // promises — the research in `.cursor/rules/app-depth.mdc` ranks export/backup/data portability
+    // first — so refusing it is not a scheduling note a scout writes; it is a decision to ship
+    // without the handoff. It therefore needs the owner's own words, in the *same* `ownerDecision`
+    // shape a narrowed or dropped `core` promise uses, validated by the same helper so the two paths
+    // cannot drift apart. `before` remains the scout's to refuse with its own reason.
+    if (stage === 'after') {
+      if (refusal.decidedBy !== OWNER_DECIDER) {
+        errors.push(
+          `${what}.refusal.decidedBy must be "${OWNER_DECIDER}", not ${describe(refusal.decidedBy)}: refusing the after stage gives up the handoff the job is finished with, so the decision is the owner's, recorded in his own words (.cursor/rules/app-depth.mdc)`
+        )
+      }
+      validateOwnerDecision(
+        refusal.ownerDecision,
+        `${what}.refusal`,
+        errors,
+        'refuses the after stage, which gives up the handoff the job is finished with, so it'
+      )
+    }
   }
 }
 
@@ -221,6 +541,19 @@ function validateClaim(claim, index, errors, seenIds) {
 
   requireText(claim.promise, `${label}.promise`, errors)
   validateEvidence(claim.evidence, label, errors)
+
+  // The depth fields are optional so every contract that parsed before this rule still parses; when
+  // they are present they must name a real stage or a real family, because a typo would silently
+  // excuse a promise from the floor rather than reporting it.
+  if (claim.jobStage !== undefined && !JOB_STAGES.includes(claim.jobStage)) {
+    errors.push(`${label}.jobStage must be one of: ${JOB_STAGES.join(', ')} (found ${describe(claim.jobStage)})`)
+  }
+  if (claim.depthFamily !== undefined && !DEPTH_FAMILIES.includes(claim.depthFamily)) {
+    errors.push(
+      `${label}.depthFamily must be one of the closed set: ${DEPTH_FAMILIES.join(', ')} (found ${describe(claim.depthFamily)})`
+    )
+  }
+  if (claim.comparison !== undefined) validateComparison(claim.comparison, label, errors)
 
   const status = claim.status
   if (!STATUSES.includes(status)) {
@@ -261,7 +594,7 @@ function validateClaim(claim, index, errors, seenIds) {
     validateOwnerDecision(claim.ownerDecision, label, errors)
   }
 
-  return { id, weight, status }
+  return { id, weight, status, jobStage: claim.jobStage, depthFamily: claim.depthFamily, proof: claim.proof }
 }
 
 /**
@@ -310,6 +643,10 @@ export function parseDifferentiators(json) {
     const row = validateClaim(claim, index, errors, seenIds)
     if (row) rows.push(row)
   })
+
+  // After every claim id is known, so a stage pointing at a claim declared later in the file still
+  // resolves. A refusal is validated here too: it is a sentence with a reason, a decider and a date.
+  validateJobCoverage(value.jobCoverage, seenIds, errors)
 
   const core = rows.filter((row) => row.weight === 'core')
   if (value.claims.length < MIN_CLAIMS) {
@@ -430,4 +767,94 @@ export function validateDifferentiatorRefs(
   }
 
   return errors.length === 0 ? { ok: true, value } : { ok: false, errors }
+}
+
+/**
+ * The depth half of the contract: does the promise list cover the user's whole job, and does it
+ * contain at least one handoff whose proof artifact actually carries the family's named token.
+ *
+ * This is separate from `validateDifferentiatorRefs` because its findings are **baseline-scoped**:
+ * a slot that predates the rule carries them as a note rather than a red row
+ * (`scripts/core/baseline.mjs`, whose derivation the core applies). The shape facts — a stage
+ * pointing at nothing, a refused `during`, a refusal missing its reason — are *not* here; they are
+ * schema errors in `parseDifferentiators`, because they are wrong on any slot, gated or not.
+ *
+ * Four findings are produced, and each names what it measured:
+ *
+ *   * no `jobCoverage` at all — the contract never said what the user does before, during and after;
+ *   * a `jobCoverage` missing a stage — coverage is all three stages or it is not coverage;
+ *   * no shipped claim in a connective family — the raw-MVP shape the rule exists to stop;
+ *   * a connective claim whose proof artifact lacks that family's token — the measured
+ *     `lawn-round-log` shape, where `domain/Csv.kt` builds a file and nothing carries it off the
+ *     phone.
+ *
+ * `readFile`/`isFile` are injected so the fixtures can drive every leg without a slot on disk.
+ */
+export function depthFindings(value, { slotDir, isFile = () => false, readFile = () => '' } = {}) {
+  const findings = []
+  const claims = Array.isArray(value?.claims) ? value.claims : []
+  const coverage = value?.jobCoverage
+
+  if (coverage === undefined) {
+    findings.push(
+      'no jobCoverage: the contract does not say what the user does before, during and after the ' +
+        "app's core act, so the handoffs the job actually has are unaccounted for. Author it at recon, " +
+        'with each stage resolving to a claim or a written refusal (.cursor/rules/app-depth.mdc)'
+    )
+  } else if (isPlainObject(coverage)) {
+    for (const stage of JOB_STAGES) {
+      if (coverage[stage] === undefined) {
+        findings.push(
+          `jobCoverage.${stage} is absent: the contract must cover before, during and after the core act, each with a claim or a written refusal`
+        )
+      }
+    }
+  }
+
+  const shippedConnective = claims.filter(
+    (claim) => claim?.status === 'shipped' && CONNECTIVE_FAMILIES.includes(claim?.depthFamily)
+  )
+  if (shippedConnective.length === 0) {
+    findings.push(
+      `no shipped claim names a connective depth family (one of ${CONNECTIVE_FAMILIES.join(', ')}): ` +
+        'the app has no handoff, so the job cannot be finished with — the middle of the job alone is ' +
+        'the defect this rule exists to stop'
+    )
+  } else {
+    for (const claim of shippedConnective) {
+      const family = claim.depthFamily
+      const tokens = FAMILY_TOKENS[family] || []
+      const label = `claim "${claim.id}" (${family})`
+      const proof = claim.proof
+      if (!isPlainObject(proof) || typeof proof.ref !== 'string') {
+        findings.push(
+          `${label} is the handoff this contract rests on, but its proof does not name an artifact to read the ${family} token from`
+        )
+        continue
+      }
+      const ref = proof.ref.split('\\').join('/')
+      const file = slotDir ? `${slotDir}/${ref}` : ref
+      if (!isFile(file)) {
+        findings.push(
+          `${label}: the proof artifact ${ref} does not resolve inside the slot, so its ${family} token cannot have been observed`
+        )
+        continue
+      }
+      if (proof.type === 'capture') {
+        findings.push(
+          `${label}: a captured frame cannot carry the ${family} token this floor is proved by (${tokens.join(', ')}); point the handoff at the code, test or resource that performs it`
+        )
+        continue
+      }
+      const text = readFile(file)
+      if (!tokens.some((token) => text.includes(token))) {
+        findings.push(
+          `${label}: ${ref} contains none of the ${family} token(s) ${tokens.join(', ')}, so the ` +
+            'artifact exists while the handoff does not — the measured lawn-round-log shape'
+        )
+      }
+    }
+  }
+
+  return findings
 }

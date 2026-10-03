@@ -46,6 +46,11 @@ polish.
 For a new idea, run `/opsx-propose` for change name `app-<slug>` (slug = short kebab-case
 derived from the idea). Read `AGENTS.md` and `openspec/specs/**` first.
 
+The change is the specification the slot is built **inside**, and it is authored here, **before the
+slot exists**: `proposal.md`, `tasks.md` and a delta spec under `specs/<capability>/`, confirmed by
+`openspec validate app-<slug>`. Step 2's scaffold refuses to create the slot without it
+(`.cursor/rules/spec-first.mdc`).
+
 Before proposing anything, apply `.cursor/rules/ideation-gate.mdc`:
 
 - Reject the topic if it is a calculator, a converter, or generic arithmetic over user-typed
@@ -75,14 +80,19 @@ Present the proposal, the tasks, and the economics plan.
 node scripts/new-slot.mjs --slug <slug> --name "<Human Title>" \
   --idea "<one line>" \
   --economics docs/ideation/plans/<slug>.economics.json \
-  --differentiators docs/ideation/plans/<slug>.differentiators.json
+  --differentiators docs/ideation/plans/<slug>.differentiators.json \
+  --naming docs/ideation/plans/<slug>.naming.json \
+  --spec app-<slug>
 ```
 
 Creates `apps/<YYYY-MM-DD>-<slug>/` from `scaffold/android-compose`, registers the attempt in
 `registry/apps.json`, copies the validated plan to `economics.json` and the promise contract to
 `differentiators.json`, and prints the
 `applicationId` (`com.gexetr.<slug>` per `scripts/lib/namespaces.mjs`). The script refuses to
-create the slot without a validated plan **and** a validated promise contract, and self-checks that
+create the slot without a validated plan, a validated promise contract, a validated naming contract,
+**and the specification authored in step 1** — it names the exact `openspec/changes/<spec>/` path it
+expected and refuses before it writes anything, so a slot cannot be born outside its change — and
+self-checks that
 no build output was copied and
 no template token or old package survived; if it reports FAIL, fix the scaffold before
 implementing anything.
@@ -118,6 +128,20 @@ worker's name on it, and it is the default this step exists to break
 Scope the app so it can be reviewed on a device quickly. Cut screens and narrow the job
 **now**, before the build, never by skipping verification later
 (`.cursor/rules/parallel-execution.mdc`).
+
+**Publish the privacy policy here, not in `/release`.** The in-app policy is a separate Play
+requirement, so the URL the app itself must open has to exist while the app is still being built:
+
+```bash
+node scripts/publish-privacy.mjs --slot <slug>
+```
+
+It renders `store/privacy.md` to a real public HTTPS page and records the URL in
+`store/listing.json`; mirror the same URL into a `translatable="false"` string in `res/values/` and
+open it from the app (`slot.inAppPolicy`, `scripts/check-in-app-policy.mjs`). Publishing rewrites the
+listing, which is part of the pack the owner approves, so doing it now is what stops it from voiding
+the approval later. **The owner is never asked for a host** — the factory publishes
+(`docs/privacy-policy-hosting.md`, `.cursor/rules/privacy-policy.mdc`).
 
 ### 4. Development verification
 

@@ -101,6 +101,43 @@ export function isPlaceholderPolicyUrl(url) {
   return PLACEHOLDER_HOSTS.some((reserved) => host === reserved || host.endsWith(`.${reserved}`))
 }
 
+/**
+ * Why a **store pack's** `privacyPolicyUrl` cannot yet be the address Play requires, or `null` when it
+ * can. The sibling of `isPlaceholderPolicyUrl`, and the difference is the caller rather than the list.
+ *
+ * `isPlaceholderPolicyUrl` above answers the in-app mirror's question — "can this app be required to
+ * *open* the address?" — so it accepts `http:` and answers a boolean. Play publishes the address on the
+ * listing, so the store field's question is stricter in two ways this function adds: the field may be
+ * **absent** (a fresh scaffold, which a string-taking boolean cannot express) and it must be an
+ * `https:` address rather than merely a URL. The reserved-host and unparseable legs are `isPlaceholderPolicyUrl`'s,
+ * called rather than restated, so the reserved list has one holder in Node.
+ *
+ * `scripts/publish-privacy.mjs` is the reader: it needs the reason, not the boolean, to decide which
+ * slots to publish and to print why a batch skipped one. `scripts/core/assets.mjs`'s `pack.placeholders`
+ * remains the single *judge* of the field — this function exists so the publisher does not restate the
+ * three states beside it.
+ */
+export function policyUrlProblem(url) {
+  if (typeof url !== 'string' || url.trim() === '') {
+    return 'the listing declares no privacyPolicyUrl, so the store page would carry no policy a reviewer can open'
+  }
+  const value = url.trim()
+  let parsed = null
+  try {
+    parsed = new URL(value)
+  } catch {
+    // Not a URL at all; the message below names the value rather than guessing what was meant.
+  }
+  if (!parsed) return `privacyPolicyUrl '${value}' is not a URL`
+  if (parsed.protocol !== 'https:') {
+    return `privacyPolicyUrl '${value}' uses ${parsed.protocol.replace(':', '')}, and Play requires a public https policy address`
+  }
+  if (isPlaceholderPolicyUrl(value)) {
+    return `privacyPolicyUrl '${value}' points at the reserved documentation host ${parsed.hostname}`
+  }
+  return null
+}
+
 function readText(file) {
   try {
     return fs.readFileSync(file, 'utf8')

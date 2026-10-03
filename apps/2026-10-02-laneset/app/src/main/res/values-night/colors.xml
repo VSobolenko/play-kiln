@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      The dark pre-Compose window background; see `values/colors.xml` for what it is for.
+
+      It is the dark scheme's own `background` role — `Color.kt`'s `NightDeep`, which is also the
+      field every composed store shot is photographed on — so the window the phone shows while the
+      app starts is the same colour as the app it becomes.
+    -->
+    <color name="playkiln_window_background">#0F151C</color>
+</resources>

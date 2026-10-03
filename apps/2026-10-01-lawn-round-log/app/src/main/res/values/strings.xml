@@ -42,6 +42,8 @@
     <string name="round_tab_all" translatable="true">Whole round</string>
     <string name="round_empty_title" translatable="true">No customers yet</string>
     <string name="round_empty_body" translatable="true">Add the people on your round and the app keeps their order, their visits, and what they still owe.</string>
+    <string name="round_none_due_title" translatable="true">Nobody left today</string>
+    <string name="round_none_due_body" translatable="true">Every customer on today\'s round has been recorded. Open Whole round to see the rest, or push the day if the weather turns.</string>
     <string name="round_detail_placeholder" translatable="true">Choose a customer to open the record here.</string>
     <string name="round_move_up" translatable="true">Move %1$s up</string>
     <string name="round_move_down" translatable="true">Move %1$s down</string>
@@ -74,7 +76,10 @@
 
     <!-- History and the CSV export. -->
     <string name="history_title" translatable="true">History</string>
-    <string name="history_count" translatable="true">%1$d entries</string>
+    <plurals name="history_count" translatable="true">
+        <item quantity="one">%1$d entry</item>
+        <item quantity="other">%1$d entries</item>
+    </plurals>
     <string name="history_empty" translatable="true">Nothing recorded yet</string>
     <string name="history_empty_body" translatable="true">Visits and payments appear here as soon as they are recorded on the round.</string>
     <string name="history_filter_all" translatable="true">All</string>
@@ -87,14 +92,19 @@
     <string name="history_edit_status" translatable="true">Outcome</string>
     <string name="history_delete_entry_body" translatable="true">Remove the entry for %1$s on %2$s?</string>
     <string name="export_csv" translatable="true">Export CSV</string>
+    <string name="export_share" translatable="true">Share CSV</string>
+    <string name="export_share_chooser" translatable="true">Share the CSV</string>
     <string name="export_done" translatable="true">Exported %1$d rows</string>
     <string name="export_failed" translatable="true">The file could not be written.</string>
 
     <!-- The single unlock. One price, no trial clock, no subscription. -->
-    <string name="unlock_title" translatable="true">Unlock the full record</string>
-    <string name="unlock_body" translatable="true">The free app holds up to %1$d customers. Unlocking keeps every customer, the whole history and the CSV export.</string>
+    <!-- The bullets name only what the purchase actually buys: the customer limit and the export.
+         The visit history and the owed balances are free in every tier, so promising them here
+         would sell the user something he already has. See store/listing.json, paragraph
+         "WHAT YOU PAY", which states the same two things. -->
+    <string name="unlock_title" translatable="true">Unlock the app</string>
+    <string name="unlock_body" translatable="true">The free app holds up to %1$d customers, and keeps every visit and every balance you record. Unlocking lifts that limit and adds the CSV export.</string>
     <string name="unlock_bullet_customers" translatable="true">As many customers as you need</string>
-    <string name="unlock_bullet_history" translatable="true">The whole visit history, editable</string>
     <string name="unlock_bullet_export" translatable="true">CSV export through the system file picker</string>
     <string name="unlock_price_label" translatable="true">One payment</string>
     <string name="unlock_price" translatable="true">$9.99</string>
@@ -102,7 +112,7 @@
     <string name="unlock_action" translatable="true">Unlock</string>
     <string name="unlock_restore" translatable="true">Restore purchase</string>
     <string name="unlock_unlocked" translatable="true">Unlocked</string>
-    <string name="unlock_owned_body" translatable="true">Thank you. Every customer, every visit and the export are yours.</string>
+    <string name="unlock_owned_body" translatable="true">Thank you. The customer limit is gone and the export is yours.</string>
     <string name="unlock_busy" translatable="true">Opening Google Play...</string>
     <string name="unlock_failed" translatable="true">The purchase did not complete. Try again, or restore an earlier purchase.</string>
     <string name="unlock_unavailable" translatable="true">Google Play is not available on this device right now.</string>
@@ -119,7 +129,7 @@
     <string name="settings_language_header" translatable="true">Language</string>
     <string name="settings_language" translatable="true">App language</string>
     <string name="settings_language_summary" translatable="true">Choose the language this app uses.</string>
-    <string name="settings_language_summary_legacy" translatable="true">Change the language in the Android settings for this app.</string>
+    <string name="settings_language_system" translatable="true">System default</string>
     <string name="settings_behaviour_header" translatable="true">Behaviour</string>
     <string name="settings_currency" translatable="true">Currency symbol</string>
     <string name="settings_currency_summary" translatable="true">Shown in front of every amount.</string>
@@ -135,6 +145,7 @@
     <!-- Confirmation before a destructive action. -->
     <string name="delete_confirm_title" translatable="true">Delete this?</string>
     <string name="delete_confirm_body" translatable="true">%1$s and every visit and payment recorded for them will be removed.</string>
+    <string name="payment_remove_confirm_body" translatable="true">The payment of %1$s recorded on %2$s will be removed, and the balance will change.</string>
 
     <!-- About, and the in-app half of the privacy policy Play requires. -->
     <string name="about_title" translatable="true">About</string>
@@ -142,5 +153,5 @@
     <string name="about_privacy_policy" translatable="true">Privacy policy</string>
     <string name="about_contact" translatable="true">Support: v.sobolenko.vs@gmail.com</string>
     <string name="about_version" translatable="true">Version %1$s</string>
-    <string name="about_privacy_url" translatable="false">https://lawn-round-log.invalid/privacy</string>
+    <string name="about_privacy_url" translatable="false">https://telegra.ph/Lawn-Round-Log--privacy-policy-10-02</string>
 </resources>

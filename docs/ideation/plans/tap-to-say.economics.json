@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A family carer, spouse or adult child who is setting up a phone for a person who cannot speak reliably after a stroke or with aphasia, buying it out of pocket in the first weeks home or at a hospital bedside, on the carer's own phone or the patient's.",
+  "paidUnit": "One permanent unlock of the full authored adult board: every ward and daily-needs tile in English and Russian, unlimited personal phrases, and the enlarged high-contrast tile layout, bought once and owned forever with no renewal, no expiry and no account.",
+  "priceUsd": 6.99,
+  "momentOfPayment": "After the free starter board has already spoken a tile out loud in the device's own text-to-speech, so the buyer has heard the app work before any sheet appears; the unlock is then offered once, with the price written on it, no trial clock and no subscription prompt.",
+  "distinctnessSentence": "Every incumbent on this shelf that lets a person speak either rents the voice back or gates it: paywall anger is 7 of the 9 critical reviews in the primary pocket and 4 of the 5 in the board pocket, one 100K-plus install app is told in its own reviews that locking the voice is insane, and the highest-install cards on the board query are titled for children with autism. This slot inverts both: the voice is free forever and the one unlock buys breadth, not speech, on a board whose every tile is an authored adult or ward need in two languages.",
+  "evidenceRef": "docs/research/2026-10-02-assistive-and-communication-evidence.md#4-the-pocket-readings",
+  "day1RevenuePath": "The slot is listed against the aphasia communication app and communication board queries, where demand is proven by a 500K-plus install leader with 3,036 exact reviews and by a paid incumbent selling at 29.99 and 89.99 dollars with 137 and 246 exact reviews; a carer who has been burned by a subscription on a 3.3 to 3.8 star app installs the free starter board, hears the device's own voice speak a tile with no account and no setup, and the first 6.99 dollar unlock arrives through the billing capability this plan requires.",
+  "killCriteria": {
+    "windowDays": 90,
+    "minInstalls": 2650,
+    "minRevenueUsd": 900
+  },
+  "capabilities": {
+    "required": [
+      "billing"
+    ],
+    "deliberatelyNotEnabled": [
+      "ads"
+    ],
+    "note": "billing is what purchase_led_single_unlock collects through. ads is deliberately off: the measured defect this recipe answers is monetisation pressure on a person trying to speak, one shelf card already declares ads behind a child-directed title, and an ad over a board mid-sentence reproduces exactly what the pocket's critical reviews are angry about."
+  },
+  "serverRequired": false,
+  "permissions": "No runtime permission beyond the billing flow's own com.android.vending.BILLING from the Play Billing library. Text-to-speech binds the device's installed engine over android.intent.action.TTS_SERVICE, which needs no permission. There is no microphone, camera, storage, contacts, location, notification or background work, and no network use for content, because every tile, phrase and translation ships inside the APK.",
+  "buildEstimateAgentHours": 6,
+  "archetypesRejected": [
+    {
+      "archetype": "purchase_led_repeat_sales",
+      "revenueReason": "There is no second thing to sell that a person who cannot speak buys again. The board is a complete vocabulary rather than a consumable, so the only repeat sale available would be extra tiles in instalments, which is selling the ability to be understood piece by piece and is the same shape as the rent the measured complaints are about. A consumable priced below the 6.99 whole-board unlock would also cannibalise it rather than add to it."
+    },
+    {
+      "archetype": "ads_led_utility",
+      "revenueReason": "The user is mid-sentence and frequently at a hospital bedside, so an interstitial is not a tolerable interruption and a banner earns nothing at this session length. Measured, the money already on this shelf is not advertising money: seven of eight enriched incumbents on the primary query declare no ads at all, one shelf card that does declare ads sits behind a child-directed title, and the pocket's critical reviews are dominated by monetisation pressure rather than by ads. An ad-led build would reproduce the complaint and still earn nothing."
+    },
+    {
+      "archetype": "purchase_only_no_ads",
+      "revenueReason": "Every incumbent that reaches real install volume here is free to download with the money taken in app: the 500K-plus leader declares an in-app purchase, as do the 100K-plus cards. The only outright-paid benchmarks on this job, Tactus at 29.99 and 89.99 dollars, reach just 1K-plus and 5K-plus installs, while the same developer's free Lite product reaches 50K-plus with 486 exact reviews. A listing price spends a proven free funnel for an unproven one."
+    },
+    {
+      "archetype": "subscription",
+      "revenueReason": "Banned outright by the owner on 2026-10-01 and machine enforced, since subscription is absent from the ARCHETYPES list. Named here only because it is precisely what the measured complaints are about: the 100K-plus install incumbents rent the voice by the month, and the strongest single review in the pocket is a buyer saying they wanted to pay and were stopped by a subscription that freezes setup."
+    }
+  ],
+  "assumptionsUnverified": [
+    "Willingness to pay 6.99 dollars outright on this exact job is UNVERIFIED. The measured one-time purchases on the shelf are CommBoards' full-version unlock, whose price is not visible on its card, and Tactus at 29.99 and 89.99 dollars; no reading in this session shows a carer buying a talking board at 6.99 rather than starting free.",
+    "Install-to-unlock conversion is assumed at 2 percent of installs. No slot in this repository has ever measured a conversion rate, so every installs and revenue figure derived from it is an assumption rather than a reading, and the 8,800 installs a month the 1,000 dollar target implies and the 2,667 a month the 900 dollar ninety day kill floor requires are the numbers most likely to be wrong. The install floor is derived from the revenue floor at this assumed conversion rather than chosen beside it, so the two kill criteria cannot contradict each other.",
+    "The 15 percent Play service fee, the 2 percent refund allowance and the 2 percent currency conversion allowance are plan assumptions carried from the assumption table in docs/monetization-strategy.md section 2.2, not measurements of this developer account, and the fee tier rises above the first million dollars a year.",
+    "The free voice is a distribution hypothesis and not a measured outcome. No reading here shows that making the voice free converts better than gating it; what the readings show is that buyers describe the locked voice and the subscription as the reason they are angry, which is a complaint about the incumbents rather than evidence about this recipe.",
+    "The adult framing is a gap in the incumbents' titles, not a demonstrated demand signal: the sensor reported that the word adult appears in no title on the board query, which is consistent both with an unserved job and with a word nobody searches, and the two readings are not separable from this session's data.",
+    "The leader's own critical complaints were not read. The complaint sensor returned 3 reviews and 0 critical for the 4.5 star, 500K-plus install leader with 3,036 exact reviews, and its query mode selects the weakest rated apps by construction, so any claim about why the leader's users are unhappy would be invented rather than measured.",
+    "Search ranking is assumed rather than planned. The shelf is led by an app with 500K-plus installs and 3,036 exact reviews, and nothing measured here shows a new listing reaching even the 2,667 installs a month the kill floor requires against it."
+  ]
+}

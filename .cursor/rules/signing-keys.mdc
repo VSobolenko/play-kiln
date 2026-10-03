@@ -1,0 +1,54 @@
+---
+description: Signing keys are the app's permanent identity — generating or rotating one needs the owner's own instruction, the key lives outside the repository, and a key without a backup is an app that cannot be updated
+alwaysApply: true
+---
+
+# The key is the app's identity, not a build detail
+
+A signing key is not configuration an agent may regenerate. It is the identity the app keeps for its
+whole life on Play: lose it and the app cannot be updated under that listing, and a new key is a
+*different* app, not a repaired one. The factory therefore treats the key as the owner's, and this rule
+is the boundary around it. The runbook a builder reads is **`docs/signing.md`**; this rule is the
+binding half, and the two answer the same question so a reader changes one place and not three.
+
+## Rules
+
+- **Generating, rotating or overwriting a signing credential requires the owner's explicit instruction
+  in the current conversation.** An agent may not create a key because the pipeline reached the
+  signing step; the owner's word is the input, not the stage. `.cursor/rules/authorization.mdc` is the
+  general rule — a signing key is the app's permanent identity and its password is the owner's to
+  choose and store — and this rule does not restate its list of forbidden commands.
+- **The release approval is checked before a key is minted.** `node scripts/sign-release.mjs --slot
+  <slug> --generate` refuses unless the owner's approval for this revision is recorded, which is the
+  same gate `.cursor/rules/release-gate.mdc` puts in front of every other release action. That refusal
+  is correct. If it fires, the fix is to ask the owner, never to weaken the check, edit the approval
+  record, or reach for `keytool` by hand — `keytool -genkeypair` is the same act through another door.
+- **The key lives outside the repository; the configuration lives inside it and is gitignored.** Keys
+  are `~/.playkiln/keystores/<applicationId>.jks`; a slot's `keystore.properties` points at that
+  outside path and is per-slot, machine-local and gitignored, so the configuration travels with the
+  project while the identity survives the project being deleted, re-cloned or absent
+  (`проект может чисто случайно отсутствовать`). The key is never committed and never printed; neither
+  is any password, or the contents of `keystore.properties`.
+- **A value that must move is changed in the module, never in a template or a document.**
+  `scripts/lib/signing.mjs` is the single source of the keystore location, the alias, the algorithm,
+  the size, the validity and the exact `keystore.properties.example` text, and `scripts/core/signing.mjs`
+  is the check that a template cannot drift from it. A second answer written into a `.example`, a
+  script or a runbook is the defect this rule was written from — two answers about where the key lives
+  is how a builder ends up asking a question the factory should answer.
+- **A key without a backup is an app that cannot be updated.** The password is machine-generated and
+  exists only in the slot's gitignored configuration, so the backup must carry the `.jks` **and** its
+  password, off this machine. Backing up a key is the step the whole arrangement exists to make
+  possible; `docs/signing.md` § "The backup" is the procedure, and it is the owner's act.
+
+## The honest limit
+
+**No program here can prove a signing key was backed up.** Nothing in this repository reads
+`~/.playkiln/keystores/` on a schedule, and a check cannot see a copy that lives somewhere it is not
+allowed to read — an unbacked-up key and a well-backed-up one are byte-identical on this machine. The
+only thing the factory can do is say so, put the backup in the runbook, and make the loss legible: a
+missing key surfaces as a `BLOCKED` release, not as a warning. Whether the durable copy exists is the
+owner's knowledge, and this rule states that limit rather than implying a check that does not exist.
+
+It also cannot decide whether a key *should* be rotated — that is a threat-model judgement, and
+`docs/play-publishing-playbook.md` §4 carries the reset/rotation reference with its
+**NEEDS-VERIFICATION** labels intact rather than a procedure invented here.

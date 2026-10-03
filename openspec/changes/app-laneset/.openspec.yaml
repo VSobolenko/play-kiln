@@ -1,0 +1,8 @@
+schema: spec-driven
+created: 2026-10-02
+goal: Ship an offline swim set builder a pool swimmer owns outright — a session
+  computed from the swimmer's own minutes, pool length, focus, avoided strokes and
+  gear against authored programming rules, a target time on every interval derived
+  from a guided 400 and 200 threshold pace test, a coach's written set parsed into
+  the same structured session, and the set list shared or printed so it can be swum
+  without a watch, a signal or an account — unlocked once instead of rented monthly.

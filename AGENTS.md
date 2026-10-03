@@ -32,8 +32,9 @@ separate commands with a second decision in between. Its contract is
 | 0.5 | Economic plan | Cursor + the **money owner** role (`.cursor/agents/money-owner.md`) | `economics.json` passing `scripts/check-economics.mjs`, plus **Human checkpoint 1:** approve the plan and its price |
 | 0.6 | Promise contract (recon's reason list) | Cursor | `differentiators.json` passing `scripts/check-differentiators.mjs`, authored from recon **before** the UI, so the reasons the app was chosen cannot be lost during the build; every promise starts `deferred` |
 | 0.7 | Naming contract (recon's derived name) | Cursor | `naming.json` passing `scripts/check-naming.mjs`, authored from recon **before** the UI beside the promise list: a scored field of candidates spanning at least three archetypes, the chosen name at ≥ 70/100, and at least one rejected alternative on the record, so an app cannot be named after its category; `new-slot.mjs` refuses to scaffold without it |
+| 0.8 | Specification (the change the slot is built inside) | Cursor + the **planner** role | An OpenSpec change at `openspec/changes/app-<slug>/` carrying `proposal.md`, `tasks.md` and a delta spec (`specs/<capability>/spec.md`), authored **before** any app code exists and passing `openspec validate app-<slug>`; `new-slot.mjs` refuses to scaffold without it — `.cursor/rules/spec-first.mdc` |
 | 1 | `/ship <idea>` | Cursor | Automatic after approval |
-| 2 | `scripts/new-slot.mjs --economics <path> --differentiators <path> --naming <path>` | Factory | Automatic isolated `apps/<date>-<slug>/` slot; **refuses to scaffold without a validated plan, promise contract and naming contract**; `--slug` and `--name` are derived from the naming contract when omitted |
+| 2 | `scripts/new-slot.mjs --economics <path> --differentiators <path> --naming <path> [--spec <change-name>]` | Factory | Automatic isolated `apps/<date>-<slug>/` slot; **refuses to scaffold without a validated plan, promise contract, naming contract and specification**; `--slug` and `--name` are derived from the naming contract when omitted and `--spec` defaults to `app-<slug>` |
 | 3 | Implement | Codex workers, orchestrated by Cursor | Automatic code, tests, and app behavior; each promise moves from `deferred` to `shipped` with a proof, or to `narrowed`/`dropped` in writing |
 | 4 | Development verification | Factory + Cursor | `scripts/run-slot-tests.mjs --rerun` plus `scripts/verify.mjs --build`, which compiles `assembleDebug` and does not sign; **fails while any promise is still deferred**; a readable diff |
 | 5 | **Human checkpoint 1.5: approve the release** | Human | The agent has already installed the debug APK on the attached phone and exercised every screen, so its observed on-device evidence (device serial, artifact hash, what appeared) is part of the handoff; the owner's act is the **product** decision — whether this is the app to ship — stated in his own words, never a test report the agent failed to produce. Recorded with `scripts/approve-release.mjs --slot <slug> --note "<owner words>"`, bound to a digest of the app's build inputs |
@@ -47,7 +48,7 @@ from stage 5, and the approval lapses by itself if the app's sources change.
 | 7 | `python scripts/store/render.py` | Factory | complete store pack |
 | 8 | `scripts/media-capture.mjs` | Factory | real-device screenshots, when a device is available |
 | 9 | `scripts/verify.mjs --build` and `/eval` | Factory + Cursor | Objective gates plus an independent verdict; repair until green |
-| 10 | Play Console submission, walked from the dashboard to `Изменения на проверке` | Cursor, driven under the owner's observation; **Human checkpoint 2** covers two steps only | The ladder is `docs/play-publishing-playbook.md` §5.1 and was measured live 2026-09-29. Every declaration answer, the release form, the save, the submit and the pre-review check are performed by the agent. Exactly two steps stay human: **uploading the five store-graphic fields** (the sandboxed browser cannot set a `file` input — an unsolved tooling limitation, deliberately recorded as such and not as a policy) and **the two first-publication legal declarations**, which are the owner's own attestation, once per app. Submitting at all still requires the stage-5 approval record, and the ladder is a recorded runbook, **not yet code** — no script performs those clicks today |
+| 10 | Play Console submission, walked from the dashboard to `Изменения на проверке` | Cursor, driven under the owner's observation; **Human checkpoint 2** covers one step only | The ladder is `docs/play-publishing-playbook.md` §5.1 and was measured live 2026-09-29. Every declaration answer, the release form, the save, the submit and the pre-review check are performed by the agent, and the two first-publication legal declarations are ticked by the agent too, once the recorded approval exists — the approval is the human checkpoint, not the click (owner's decision, recorded 2026-10-03). Exactly one step stays human: **uploading the five store-graphic fields** (the sandboxed browser cannot set a `file` input — an unsolved tooling limitation, deliberately recorded as such and not as a policy). Submitting at all still requires the stage-5 approval record, and the ladder is a recorded runbook, **not yet code** — no script performs those clicks today |
 | 11 | Earn | Human + the **money owner** role | `node scripts/check-outcomes.mjs --slot <slug>` verdicts the plan's own `killCriteria` against a recorded reading from `apps/<slot>/store/outcomes.json`; `NO-DATA` and `TOO-EARLY` are honest states, `MISSED` names the kill command, and `node scripts/kiln-status.mjs --kill <slug> --reason "<why>"` records the decision. A slot that misses its own thresholds is archived, and the archive is a decision with the numbers in it rather than an abandoned directory |
 
 One idea must take one command through this pipeline. Never silently upload, commit
@@ -77,6 +78,12 @@ catalogue**, not competing with an incumbent. `.cursor/rules/ideation-gate.mdc` 
 revenue, not novelty"; the supply heuristic in `docs/niche-selection.md` §4 is a signal about where to
 look, never a test an idea must pass. A rejection must name a revenue reason.
 
+**The surface is not restricted to what uses no device capability.** A local and free capability — the
+Android Photo Picker, the gallery, the user's own media, the motion sensors, the camera — is not a
+cost and may be the job's own core, so `.cursor/rules/ideation-gate.mdc` § "Budget: about one hour,
+not eight" names the costs to avoid as a server, an account, a paid API, ML that needs a server, and a
+runtime permission that buys nothing.
+
 Stage 0 exists because the factory's first real slot inverted it: a topic was inherited from an
 example, the market was chosen on that inheritance, and the shipped app had
 `capabilities.json` of `{"schemaVersion": 1, "enabled": []}` — no billing, no ads, no revenue
@@ -102,6 +109,39 @@ before the UI exists; every promise starts `deferred`, and stage 4 fails while a
 deferred, so a slot cannot be called done with ten of twenty reasons delivered. Losing or weakening
 a `core` promise requires the owner's own words, exactly as the release approval does. The contract
 is `docs/slot-differentiators.md` and the gate is `scripts/check-differentiators.mjs`.
+
+**Every slot is born inside a specification, and that was the last door left open.** The owner's
+rule is that every application is written inside an OpenSpec change, and on 2026-10-02
+`apps/2026-10-02-laneset/` existed with code while `openspec/changes/` held no change for it: the
+scaffold required a plan, a promise contract and a naming contract, and asked for nothing about a
+specification, so every gate returned `PASS` on a slot that was never inside the spec the owner
+required. Stage 0.8 closes it — the `planner` authors `openspec/changes/app-<slug>/` with its
+`proposal.md`, `tasks.md` and delta spec **before** `scripts/new-slot.mjs` runs, and the scaffold now
+refuses to create a slot without it, **before the directory exists**, because a slot directory that
+exists at all is half of the defect. The rule, its ban list and its one exception (harness
+configuration) are `.cursor/rules/spec-first.mdc`; the enforcement is the `slot.spec` check, and
+`openspec validate app-<slug>` is what makes a change a specification rather than a folder.
+
+**A promise list is also a ceiling, and it was one.** The owner's report after nearly two shipped
+apps: every one of them is raw. A gradebook adds, edits and deletes a student and does nothing else; a
+calculator calculates and does nothing else. The cause is mechanical — the promise list **is** a slot's
+scope, because `differentiators.json` is what the builder is obliged to deliver and every promise must
+reach `shipped` with a proof, so a contract that names only the *middle* of the user's job produces an
+app that does only the middle, with every gate green. Measured, twice: `teacher-gradebook` spends a
+`core` promise on `edit-every-record` proved by `deleteAssignment`, and `lawn-round-log` builds
+`domain/Csv.kt` while its `app/src/main` carries no `ACTION_SEND`, no `ACTION_CREATE_DOCUMENT` and no
+`FileProvider` — the CSV is constructed and the user cannot get the file off the phone. The contract
+therefore also carries the job's **shape**: `before`, `during` and `after` the core act, with `during`
+never refusable, and a **connective floor** — at least one `shipped` claim must be a handoff family
+(`data_in`, `data_out`, `durability`, `reminder`, `widget`, `find`, `bulk`) whose proof artifact
+contains that family's named API. The normative rule is `.cursor/rules/app-depth.mdc`, the human
+contract is `docs/app-depth.md`, and the external evidence is three dated research docs
+(`docs/research/2026-10-02-app-depth-anatomy.md`, `…-user-review-depth-signals.md`,
+`…-depth-encoding-and-detectability.md`). Two limits stated rather than implied: the token match is
+**textual** — `ACTION_SEND` in a class is not an off-device file at run time — and the CRUD report is a
+**note, never a gate**, because the measured `edit-every-record` row escapes a lexical predicate. What
+this removes is the *unnoticed* partial flow, not a padded contract; the owner judges the app at
+checkpoint 1.
 
 **The interface is a build input too, and it was the last thing with nothing behind it.** The factory
 had a strong visual-identity contract and no product-UI one, and the owner's review of the first live
@@ -343,9 +383,10 @@ legitimate and needs no "fix".
 `v.sobolenko.vs@gmail.com` — defined once as `DEFAULT_CONTACT_EMAIL` in
 `scripts/store/model.py` and applied as the default for every new slot, so no pack
 ships the generator's `support@example.com`. It is a public support address, not a
-secret, and does not belong in `.env`. `privacyPolicyUrl` has no default: it must be
-a hosted HTTPS URL the owner controls. A pack still pointing at a reserved
-documentation host is unfinished, and the generated human-checks list says so.
+secret, and does not belong in `.env`. `privacyPolicyUrl` is published by the
+factory rather than obtained from the owner: it must be a real public HTTPS URL,
+never a reserved-host placeholder. `docs/privacy-policy-hosting.md` is the runbook,
+and the same URL must be openable from inside the app.
 
 ## Play compliance floor
 
@@ -357,7 +398,9 @@ Before a slot is `ready`:
   HTTPS URL, and **inside the app**. A slot that declares a `privacyPolicyUrl` must let
   the user open the policy from the app; privacy prose in an About screen is not the
   policy. Only the store URL was ever checked here, and `teacher-gradebook` shipped
-  without the in-app half.
+  without the in-app half. The factory publishes the public URL itself, so the owner is
+  never asked for a host and a reserved-host placeholder never reaches a release: the
+  runbook is `docs/privacy-policy-hosting.md`, the gate is `pack.placeholders`.
 - Apps with accounts provide deletion in-app and through an external web resource.
 - Permissions are minimized; Photo Picker is preferred; foreground-service types
   are declared; exact alarms are treated as restricted.
@@ -366,8 +409,9 @@ Before a slot is `ready`:
 - Ads, content rating, target audience, review access, and AI-content declarations
   are truthful and complete.
 - The two first-publication declarations — **Developer Program Policies** and **US export
-  laws** — are acknowledged by the owner when the app is created, once per app rather than
-  per release. The export declaration is a certification about encryption the app uses, and
+  laws** — are ticked by the agent once the release approval is recorded, once per app rather than
+  per release (the approval is the human checkpoint, not the click; owner's decision, recorded
+  2026-10-03). The export declaration is a certification about encryption the app uses, and
   every slot uses encryption whether or not it imports crypto code; the factory records the
   annual BIS self-classification question as an open obligation rather than settled law.
 - "Collect" in Data safety means **transmitting data off the device**, so an app whose whole
@@ -415,7 +459,9 @@ summary is [`DESIGN.md`](./DESIGN.md).
   defaults.
 - The identity is per slot: two slots never share a mark, a palette or a component kit, for the same
   reason they never share a job (`docs/monetization-strategy.md` §1.2).
-- Evidence: `verify.mjs` requires `store/provenance.json` for a composed pack,
+- Evidence: `verify.mjs` requires `store/provenance.json` only once the pack ships composed media —
+  a `store/assets/` tree holding at least one file, not the `store/studio.json` declaration, which is
+  authored in phase 1 while the record is written in phase 2 (`.cursor/rules/visual-identity.mdc`) —
   `scripts/visual-qa.py` measures the pixels, and `media-capture.mjs` photographs the real signed
   build with asserted readings. `apps/2026-09-26-teacher-gradebook` is the reference slot.
 
@@ -487,7 +533,7 @@ harness/                          protocols, ambition, surface map, and lessons
 apps/<date>-<slug>/               isolated Android projects
 scaffold/android-compose/         new-slot template
 registry/apps.json                slot registry
-scripts/new-slot.mjs              create a slot (requires a validated --economics plan and promise contract)
+scripts/new-slot.mjs              create a slot (requires a validated --economics plan, promise contract, naming contract and an OpenSpec change; --spec defaults to app-<slug>)
 scripts/lib/namespaces.mjs        single source of truth for `com.gexetr.*`
 scripts/lib/slot-lock.mjs         the per-slot build lease: a second Gradle consumer reports the holder
 scripts/lib/gradle.mjs            the only Gradle route; fails closed when no supported JDK resolves, and hands its child process a scratch-backed environment
@@ -512,6 +558,7 @@ scripts/check-adaptive-icon.py    checks launcher-mark fit inside adaptive-icon 
 scripts/check-16k.py              measures 16 KB page-size readiness from the built APK/AAB itself
 docs/slot-economics.md            the economics.json contract and its archetype/capability pairing
 docs/slot-differentiators.md      the differentiators.json contract: promises, proofs, owner decisions
+docs/signing.md                   signing runbook: where the upload key lives, how it is made, the backup, rotation (rule: .cursor/rules/signing-keys.mdc)
 docs/ideation/                    idea proposals awaiting the owner's decision
 scripts/codex-run.mjs             durable Codex worker runner
 scripts/lib/release-approval.mjs  source digest + owner approval: the two-phase gate
@@ -523,6 +570,8 @@ scripts/core/settings.mjs         settings surface: it exists, it is reachable, 
 scripts/core/localization.mjs     born-multilingual: declared locales, real translations, no hardcoded prose
 scripts/core/naming.mjs           the naming contract check: derived rather than invented, legal, and the one the pack states
 scripts/core/device.mjs           the on-device run as a record: serial, artifact sha256 cross-checked against the built APK
+scripts/core/icons.mjs            the iconography split as a sensor: the mark a slot owns, and the licence-cleared UI icon sets it borrows
+scripts/core/palette.mjs          the palette as a measurement: WCAG contrast, and the accent's hue and chroma against Material 3's own derivation
 scripts/core/index.mjs            the check registry: every check the one entry point runs
 scripts/verify.mjs                the single verification entry point: one process, one report
 scripts/store/model.py            the pack's data model and every numeric limit, resolved once
@@ -577,8 +626,12 @@ node scripts/check-in-app-policy.mjs --slot <slug>       # the declared policy i
 
 # `slot.naming` and `slot.device` are core checks with no separate entry point: both run in the
 # `policy` group of any `verify.mjs --slot`, and both report UNVERIFIED — never a pass — when the
-# record is absent. `slot.device` reads apps/<slot>/device-verification.json and cross-checks its
-# sha256 against the built debug APK, so a record describing a different build fails.
+# record is absent. `slot.device` reads apps/<slot>/device-verification.json: when the record carries
+# `buildDigest` — the digest `scripts/lib/release-approval.mjs` computes over the slot's build inputs —
+# the revision decides, so an identical-source rebuild PASSes even though a debug APK is not
+# byte-reproducible, and a different digest FAILs naming the changed app; with no `buildDigest` it
+# cross-checks the recorded artifact sha256 against the built debug APK, and a mismatch names both
+# remedies. See `.cursor/rules/device-testing.mdc`.
 
 # the UI baseline, added 2026-09-30 after the owner reviewed the first live app. In the `ui` group
 # of a slot run, and each sensor is also readable on its own; a finding is a `file:line`, never a look.
@@ -625,15 +678,18 @@ and the ones deliberately retired with the reason.
 approval record (`apps/<slot>/release-approval.json`, gitignored) stores the owner's own words, a
 timestamp, and **two** SHA-256 digests: one of the slot's build inputs, and one — `pack-approval.mjs` —
 of the authored pack inputs the owner actually reviewed (`store/listing.json`, `store/journey.json`,
-`store/studio.json`, `store/review-notes.md`). Editing any of those invalidates the approval on the
+`store/studio.json`, `store/review-notes.md`). The build-input digest excludes the factory's own
+records of that revision — `release-approval.json` and `device-verification.json` — because each is
+written and then checked: a record that stores the revision's digest must not be an input to the digest
+it stores. The exclusion list and a reason per name are owned by `.cursor/rules/release-gate.mdc` and
+`EXCLUDED_FILE_REASONS` in the module. Editing any of those invalidates the approval on the
 next check, so "approve, then keep coding" cannot silently ship an unreviewed revision, and neither can
 "approve the app, then rewrite the listing to claim something the app does not do" — that second half
 was outside the digest entirely, and the demonstration was a one-file edit that both the pack renderer and
 `media-capture.mjs` accepted. Pipeline outputs (`store/assets/**`, `provenance.json`, `console-answers.md`)
 are deliberately **not** in the pack digest: a digest over the pipeline's own output would void its own
-PLACEHOLDER_WILL_NOT_MATCH
-`media-capture.mjs` and now `play-upload.mjs` all refuse without it — the uploader was the one script
-that talked to Google Play and never asked whether the revision was approved. `--revoke` is always safe
+approval mid-run. `media-capture.mjs` and, now, `play-upload.mjs` both refuse without it — the uploader
+was the one script that talked to Google Play and never asked whether the revision was approved. `--revoke` is always safe
 and never needs permission; recording one never does. When a release script refuses, the fix is to ask
 the owner, never to edit or delete the record.
 
@@ -730,11 +786,17 @@ fail is not a check: the manner of its failure is part of the change record in
  paid for it and the one limitation (a reused Gradle daemon keeps its original temp until it is
  stopped) are `.cursor/rules/workspace-hygiene.mdc`.
 - Archive or kill failed attempts; do not turn PlayKiln into one product repo.
-- Human approval is mandatory for the legal declarations and for releasing at all: the stage-5
+- Human approval is mandatory for releasing at all: the stage-5
  approval record is the owner's own words and is never inferred. What is **not** human any more is
  pressing the console's controls — `docs/play-publishing-playbook.md` §5.1 records the submission
- ladder as walked by the agent on 2026-09-29, and only the graphics upload and the two
- first-publication attestations stay with the owner.
+ ladder as walked by the agent on 2026-09-29, and only the graphics upload stays with the owner. The
+ two first-publication attestations are ticked by the agent once the approval is recorded, because
+ the approval is the human checkpoint and not the click — the owner's decision, recorded 2026-10-03:
+ «В нашем заводе есть правило, что перед публикацией необходимо одобрение владельца. Собственно
+ говоря, в то время и я проверяю проверку всех вот этих политик, и только после моего одобрения я
+ говорю разрешить публикацию. Поэтому, если я разрешил публикацию, значит эти галочки можно уже
+ автоматически нажимать. Потому что все проверки необходимые для публикации проводятся до начальной
+ публикации всего приложения.»
 - A slot is never scaffolded without a validated `economics.json`; the money stage is not optional.
 - A slot is never scaffolded without a validated `differentiators.json` either, and it is authored
   from recon **before** the UI. Every promise starts `deferred`, and `verify.mjs` fails while

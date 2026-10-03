@@ -40,6 +40,14 @@ The binding specification is `docs/slot-differentiators.md`; the gate is
   not an inconvenience.
 - **A promise's evidence is a recon document, not an agent's summary of one.** The `source` file
   must exist, and a `MEASURED` finding must contain the number that was measured.
+- **The contract also carries the job's shape, and a list of core operations is not enough.** Every
+  claim declares its `jobStage` (`before`, `during`, `after`) and its `depthFamily`, and a
+  `jobCoverage` object binds each stage to a claim or a documented refusal — `during` is never
+  refusable, and `after` may be refused only by the owner in his own words (the handoff is what makes
+  the job finishable, so giving it up is a product decision, recorded like a weakened `core` promise).
+  At least one `shipped` claim must be a *connective* family whose proof artifact actually
+  contains that family's API. The stages, the family set and the floor are `.cursor/rules/app-depth.mdc`;
+  the fields are specified in `docs/slot-differentiators.md`.
 
 ## How it is verified
 
@@ -49,6 +57,11 @@ The binding specification is `docs/slot-differentiators.md`; the gate is
 - `node scripts/verify.mjs --slot <slug> --build` — runs the above for every slot, and treats
   the contract as declared once it is on disk **or** in git, so deleting the file does not switch
   the check off.
+- The job's shape is verified with the same gate: the three stages resolve, `during` is never refused,
+  a `before` refusal carries its reason and decider while an `after` refusal is the owner's in his own
+  words, and the connective floor is checked against the proof
+  artifact — `slot.differentiators` in `scripts/core/policy.mjs`, with the fixture suite that proves
+  each leg can fail.
 - `node scripts/verify.mjs --slot <slug>` — drives the real checker over real and synthetic slots,
   including the inline fixture legs that must fail: a promise whose proof symbol was removed, a
   `core` promise dropped with no owner words, and a promise left `deferred`.

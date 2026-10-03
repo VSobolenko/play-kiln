@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "appName": "Laneset: Swim Set Builder",
+  "slug": "laneset",
+  "applicationId": "com.gexetr.laneset",
+  "idea": "A swim set builder that computes each session from the swimmer's own constraints (minutes, pool length, focus, strokes to avoid, gear on deck) against authored programming rules, walks them through the two pace trials that put a target…",
+  "defaultLocale": "en-US",
+  "category": "HEALTH_AND_FITNESS",
+  "tags": [
+    "swim",
+    "swimming",
+    "workout",
+    "training",
+    "offline"
+  ],
+  "contactEmail": "v.sobolenko.vs@gmail.com",
+  "locales": {
+    "en-US": {
+      "title": "Laneset: Swim Set Builder",
+      "shortDescription": "Build a paced swim set from your minutes, pool and gear. One unlock, no ads.",
+      "fullDescription": "Laneset builds the swim session you actually have time for.\n\nTell it the minutes you have, the length of your pool, the day's focus, the strokes you want to avoid and the gear that is on the deck. Laneset computes a complete main set from those constraints against authored programming rules, so each session is a new arrangement of distances, strokes and send-offs rather than a slice of a fixed rotating library.\n\nA TARGET TIME ON EVERY INTERVAL\n\nLaneset walks you through a 400 and a 200 time trial, works out your threshold pace per 100 from those two swims, and prints that target on every interval it writes. No set is a bare distance with no time to swim it in, and the pace carries into the next session without asking again.\n\nTAKE THE SET TO THE POOL\n\nShare the whole set list as text, or print a workout card, so the session can be swum from paper or from a message. Already have a workout? Paste in the set your coach wrote and Laneset parses it into the same structured, paced session it generates itself.\n\nBUILT FOR THE POOL DECK\n\n• Works with no signal — the programming rules and the pace arithmetic live in the app, so a full session is generated with the phone in airplane mode.\n• One purchase, everything included — no subscription, no renewal, no trial clock and no advertising.\n• Comes back where you left it — a generated session survives a phone call, a rotation or a trip back to the locker with the same set, the same targets and the same place.\n\nWHO IT IS FOR\n\nLaneset is for the pool swimmer training three to six structured sessions a week in a masters or club lane, and for the triathlete doing their pool work — anyone who builds the session by hand today, or copies a coach's whiteboard, and does not want another monthly training subscription.\n\nNo account, no ads, no analytics. The app's own code opens no network connection and a full session is generated with no signal; the only network use is Google Play's own billing, which carries the one-time purchase. Google Play shows the exact price in your currency before you confirm.",
+      "screenshotCaptions": [
+        "Set the pool, the minutes, the focus and the gear",
+        "A full main set computed from your own constraints",
+        "Run the two pace trials once, and keep the result",
+        "A target time on every single interval",
+        "Share the set list, or print a workout card",
+        "A session that comes back where you left it"
+      ],
+      "featureBullets": [
+        "Computes each session from your minutes, pool length, focus, avoided strokes and gear",
+        "A threshold pace from a 400 and a 200, printed on every interval",
+        "Share the set list as text, or print a workout card",
+        "Paste a coach's set and get it back structured and paced",
+        "Works with no signal and no account; one purchase, no subscription and no ads"
+      ]
+    },
+    "ru-RU": {
+      "title": "Laneset: план тренировок",
+      "shortDescription": "Тренировка по минутам, бассейну, инвентарю. Одна покупка, без рекламы.",
+      "fullDescription": "Laneset собирает тренировку, на которую у вас действительно есть время.\n\nУкажите минуты, длину бассейна, задачу дня, гребки, которые нужно исключить, и инвентарь на бортике. Laneset рассчитает основную часть по этим условиям и по заложенным правилам программирования, поэтому каждая тренировка — новая комбинация дистанций, гребков и интервалов, а не кусок фиксированной библиотеки.\n\nЦЕЛЕВОЕ ВРЕМЯ НА КАЖДОМ ИНТЕРВАЛЕ\n\nLaneset проведёт вас через два заплыва на время — 400 и 200, — рассчитает по ним пороговый темп на 100 и подставит его в каждый интервал. Ни одна серия не останется просто дистанцией без времени, за которое её нужно проплыть, а темп сохранится для следующей тренировки.\n\nВОЗЬМИТЕ ТРЕНИРОВКУ НА БАССЕЙН\n\nОтправьте весь список текстом или распечатайте карточку тренировки, чтобы плыть по бумаге или по сообщению. Есть готовая тренировка? Вставьте то, что написал тренер, и Laneset разберёт это в такую же структурированную сессию с темпом, какую строит сам.\n\nДЛЯ БОРТИКА БАССЕЙНА\n\n• Работает без сети — правила и расчёт темпа находятся в приложении, поэтому тренировка строится полностью в режиме полёта.\n• Одна покупка, всё включено — без подписки, без продления, без пробного срока и без рекламы.\n• Возвращается туда, где вы остановились — тренировка переживёт звонок, поворот экрана или поход к шкафчику: тот же набор, те же целевые времена и то же место.\n\nДЛЯ КОГО\n\nLaneset — для пловца, который тренируется три-шесть раз в неделю в дорожке мастерс или клуба, и для триатлета, делающего работу в бассейне: для тех, кто собирает тренировку вручную или переписывает её с доски тренера и не хочет ещё одну месячную подписку.\n\nБез аккаунта, без рекламы, без аналитики. Собственный код приложения не открывает сеть, и тренировка полностью собирается без сигнала; сеть используется только для оплаты через Google Play, которая проводит разовую покупку. Google Play показывает точную цену в вашей валюте до подтверждения.",
+      "screenshotCaptions": [
+        "Укажите бассейн, минуты, задачу и инвентарь",
+        "Основная часть, рассчитанная по вашим условиям",
+        "Пройдите два заплыва на время — и сохраните темп",
+        "Целевое время на каждом интервале",
+        "Отправьте список или распечатайте карточку тренировки",
+        "Тренировка возвращается на том же месте"
+      ],
+      "featureBullets": [
+        "Считает тренировку по минутам, бассейну, задаче, гребкам и инвентарю",
+        "Пороговый темп по 400 и 200 — на каждом интервале",
+        "Отправьте список текстом или распечатайте карточку тренировки",
+        "Вставьте тренировку тренера и получите её структурированной и с темпом",
+        "Работает без сети и без аккаунта; одна покупка, без подписки и рекламы"
+      ]
+    }
+  },
+  "dataSafety": {
+    "collectsData": true,
+    "reason": "The billing capability bundles Google Play Billing, which transmits purchase data to Google so the one-time unlock can be completed and restored. No data is sent to the app's developer, which has no server.",
+    "dataTypes": [
+      {
+        "type": "Financial info",
+        "purpose": "App functionality",
+        "shared": false,
+        "optional": false,
+        "notes": "Purchase history: product IDs the user bought and their entitlement state. Payment instruments are handled entirely by Google Play and never reach the app."
+      }
+    ],
+    "thirdPartySdks": [
+      {
+        "name": "Google Play Billing Library",
+        "version": "9.1.0",
+        "policyUrl": "https://developer.android.com/google/play/billing"
+      }
+    ],
+    "encryptedInTransit": true,
+    "hasAccountDeletion": false
+  },
+  "permissions": [],
+  "ads": {
+    "containsAds": false,
+    "reason": "Enabled capabilities declare no advertising SDKs; the plan deliberately does not enable ads."
+  },
+  "contentRating": {
+    "questionnaire": "notes",
+    "targetAudience": "adults-only"
+  },
+  "graphicsSource": {
+    "iconGlyph": "mark-clock",
+    "brandColor": "#0A4F60",
+    "accentColor": "#F2A25A"
+  },
+  "privacyPolicyUrl": "https://telegra.ph/Laneset-Swim-Set-Builder--privacy-policy-10-02",
+  "capabilityCompliance": {
+    "enabled": [
+      "billing"
+    ],
+    "requiresConsent": false,
+    "requiresPurchaseAuthority": false,
+    "purchaseAuthority": null
+  }
+}

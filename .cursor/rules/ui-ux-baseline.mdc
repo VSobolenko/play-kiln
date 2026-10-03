@@ -129,6 +129,39 @@ on a bar or a `Scaffold` re-introduces the very collisions it was handling.
   `contentWindowInsets`, because that bar renders under the three-button navigation bar. Check id:
   **`uiux.insets`**.
 
+## The content colour: text is only visible against the colour it is given
+
+A screen can pass every rule above and still render **invisible text**, and it did. On 2026-10-02 the
+owner's slot `apps/2026-10-01-lawn-round-log` painted its glyphs in pure `#000000` on a `#101410`
+window background on a real device (serial `R58MB3SGZVL`, system dark mode on): contrast **1.13:1**,
+measured with a per-node pixel probe against the screenshot and its matching UI hierarchy. In the
+light scheme the same code was readable, which is why no gate, no test and no review had seen it.
+
+**The mechanism, and it is not the palette.** `NavDisplay` was hosted with nothing between it and the
+window that provides a **content colour**. Compose's `Text` and `Icon` resolve their colour from
+`LocalContentColor`, whose default is `Color.Black`; only a container that sets one — `Surface`,
+`Scaffold`, `Card`, the sheet families, or an explicit `LocalContentColor` provision — replaces it.
+On the same dark background, a label inside a `Surface` measured **6.08:1** while its siblings outside
+any container measured **1.13:1** — the wrapper is the whole difference.
+
+**The fix is one wrapper at the root, and the scaffold is where it belongs.** The app's shell wraps
+its host in `Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background)`,
+which sets `contentColor = contentColorFor(containerColor)` and therefore yields `onBackground`. Put
+it in the one place that covers every destination — a root `Surface` in `setContent`, or wrapping
+`NavDisplay` — never in each screen, where the next destination re-introduces the defect. The
+pre-Compose window background (`res/values*/colors.xml`) must be the theme's own `background` role,
+so the window and the first Compose frame do not disagree. Check id: **`uiux.content-colour`**.
+
+**What the check reads, and what it refuses to.** It fires only when the module ships a dark theme
+(`res/values-night*/` or a `darkColorScheme(`) **and** a content host has no colour at or above it: no
+`Surface`/`Scaffold`/`Card`/`BottomSheet` inside the app root or wrapping the host, no
+`LocalContentColor provides …`, and no host whose `contentColor` is a real value rather than
+`Color.Unspecified`. A module with no dark theme is **not judged at all** — black on a light window
+background is readable, and that deliberate under-approximation is stated rather than inferred. Its
+honest limit is in the sensor: it reads one file at a time and cannot follow a theme composable to
+prove a colour is set inside it, and a Kotlin colour constant is not resolved — it gates on the
+declared dark theme and quotes the measured contrast only when the background is an XML `<color>`.
+
 ## The modern platform, and what reaches for it
 
 A correct app that never touches the platform is still "ordinary buttons and ordinary text". This
@@ -198,13 +231,16 @@ gate, because a source scan cannot tell a meaningful transition from a decorativ
   inset was put on a parent `Modifier.padding()` instead of the list's `contentPadding`.
 - A manifest that leaves predictive back unopted (`android:enableOnBackInvokedCallback` absent).
 - A declared M3 Expressive / `MotionScheme` **alpha** artifact at a pin that does not carry it.
+- A content host — `NavDisplay`/`NavHost` — with no `Surface`, `Scaffold`, `Card`, sheet or
+  `LocalContentColor` provision at or above it in a module that ships a dark theme, so a
+  default-coloured `Text`/`Icon` draws in Compose's default `Color.Black`.
 - Weakening `uiux.scaffold` to make a wiring task look finished. The scaffold is the point.
 
 ## How it is verified
 
 ```bash
 node scripts/verify.mjs                       # runs `uiux.scaffold` and `uiux.rule` in the `invariants` group
-node scripts/verify.mjs --slot <slug>         # runs the seven `uiux.*` slot checks, in the `ui` group
+node scripts/verify.mjs --slot <slug>         # runs the eight `uiux.*` slot checks, in the `ui` group
 node --input-type=module -e "import('./scripts/core/uiux.mjs').then(m=>console.log(m.uiuxFindings('apps/<slot>')))"
 node --input-type=module -e "import('./scripts/core/uiux.mjs').then(m=>console.log(m.textLayoutFindings('apps/<slot>')))
 ```
@@ -220,7 +256,10 @@ node --input-type=module -e "import('./scripts/core/uiux.mjs').then(m=>console.l
   `2026-09-30` (the four that already exist), a pipeline proof with no `economics.json`, and a killed
   slot carry the finding as a **note** inside a PASS; a slot created from today is gated. A finding
   that exists and is not reported would read exactly like a finding that is not there, so the note is
-  printed either way.
+  printed either way. `uiux.content-colour` declares a **later** date, `2026-10-02` — the day the
+  invisible-text defect was measured — so a slot created between the two baselines is likewise not
+  re-judged, while one created from that day is born gated. The date is per check id rather than one
+  global because two rules added a week apart do not share a birthday.
 - `uiuxFixtures()` runs in the `invariants` group and drives every sensor with a synthetic slot tree
   whose verdict is known, so a sensor that has stopped being able to fail is visible in the same
   report as the slots it judges.

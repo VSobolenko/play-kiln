@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- The app's own code opens no socket: every rule, the pace arithmetic and every session ship
+         in the APK, so a full set is computed in airplane mode. The Google Play Billing library that
+         carries the one-time unlock merges android.permission.INTERNET and
+         android.permission.ACCESS_NETWORK_STATE into the packaged manifest, and this config keeps
+         every path the app could ever take HTTPS-only instead of a permissive default. -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

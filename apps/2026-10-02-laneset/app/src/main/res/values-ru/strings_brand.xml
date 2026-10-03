@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Русская половина словаря `ui/components/Brand.kt`.
+
+  Набор ключей обязан совпадать с `values/strings_brand.xml` ключ в ключ: `scripts/core/policy.mjs`
+  сравнивает деревья в обе стороны и падает как на пропущенном ключе, так и на лишнем. Термины —
+  плавательные, а не буквальный перевод: «Holdable» в бассейне означает отрезок, который пловец
+  спокойно повторит, а не «удерживаемый».
+-->
+<resources>
+    <string name="brand_target_label">Цель</string>
+    <string name="brand_total_label">Всего</string>
+    <string name="brand_pace_label">Темп /100 м</string>
+    <string name="brand_focus_label">Фокус</string>
+    <string name="brand_status_holdable">По силам</string>
+    <string name="brand_status_tight">Впритык</string>
+    <string name="brand_status_over_pace">Выше темпа</string>
+</resources>

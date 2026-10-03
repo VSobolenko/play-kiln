@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Dark-mode window background; see values/colors.xml. -->
-    <color name="playkiln_window_background">#101410</color>
+    <!-- Dark-mode window background; see values/colors.xml. It is the dark scheme's own
+         `background`, TurfDeep in ui/theme/Color.kt, so the pre-Compose frame cannot flash a colour
+         the app never draws. Keep it equal to that constant. -->
+    <color name="playkiln_window_background">#242C24</color>
 </resources>

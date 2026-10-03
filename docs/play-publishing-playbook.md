@@ -75,19 +75,27 @@ through the API — see <https://developers.google.com/android-publisher/tracks>
 
 ## 4. Establish signing — Factory + Human
 
+**The runbook is [`docs/signing.md`](signing.md)**, and the binding boundary is
+`.cursor/rules/signing-keys.mdc`: where the key lives and why outside the repository, what
+`keystore.properties` holds, how a key is created and the approval that gates it, and the backup. This
+section keeps only what belongs to the publishing handoff — the fingerprint comparison and the rotation
+reference.
+
 **Factory:** `scripts/sign-release.mjs` configures or inspects the local upload key,
 keeps the keystore outside Git, reads ignored `keystore.properties`, and reports the
 upload-certificate SHA-256 fingerprint. `scripts/prepare-release.mjs` builds the
-release APK/AAB and verifies the APK signature.
+release APK/AAB, verifies the APK signature, and records the fingerprint in
+`dist/release-manifest.json` as `signing.fingerprintSha256`.
 
 **Human:** enroll the app in Play App Signing during the Console flow and compare the
 expected upload certificate with the factory's recorded fingerprint before upload.
 
 Factory upload-key material and Play App Signing are separate control surfaces. The
 exact external distinction between the upload key and Google's app-signing key is
-**NEEDS-VERIFICATION** because `FACTS.md` provides no signing documentation.
+**NEEDS-VERIFICATION** because `FACTS.md` provides no signing documentation; `docs/signing.md`
+records the same label for the same reason rather than resolving it by assertion.
 
-For key rotation or reset:
+For key rotation or reset — reference only, the procedure is not invented here:
 
 1. Stop release automation; do not replace a key silently.
 2. Follow the current Play Console key rotation/reset flow. The exact eligible flow,
@@ -99,6 +107,8 @@ For key rotation or reset:
 5. Re-run release preparation and verification before any upload.
 
 Sources: **NEEDS-VERIFICATION** — no official Play App Signing or key-rotation URL is present in `FACTS.md`.
+The factory's own half of this section is measured in `docs/signing.md`; `FACTS.md` remains the reason
+the external distinction stays labelled rather than stated.
 
 ## 5. Perform the first upload — Human
 
@@ -123,10 +133,12 @@ end. It is written to be followed by a human who has never opened the console an
 procedure by a bot.
 
 **Markers.** `[console]` — a console action a bot performs. `[verify]` — a read-only check.
-`[human]` — an action only the owner may take; today this family is exactly two things,
-**uploading the store graphics** and **the first-publication legal declarations**, and both are
-named in the preconditions below. Everything else in this ladder is console-mandatory and
-unattended. `NEEDS-VERIFICATION` marks a claim nobody has measured.
+`[human]` — an action only the owner may take; today this family is **uploading the store
+graphics**, named in precondition B below. The first-publication legal declarations are no longer in
+it: the agent performs them once the slot carries a recorded release approval, because the approval
+is the human checkpoint and not the click (owner's decision, recorded 2026-10-03). Everything else in
+this ladder is console-mandatory and unattended. `NEEDS-VERIFICATION` marks a claim nobody has
+measured.
 
 **Field-level detail is deliberately not restated here.** Page paths, field names, character caps,
 asset dimensions, the exact string to paste, and which slot value feeds which field are owned by the
@@ -136,17 +148,24 @@ sequences those screens; it does not duplicate them. Numbers quoted here (`Вы�
 
 #### Preconditions — what must be true before the ladder can be walked
 
-**Precondition A — the two first-publication declarations. [human]**
+**Precondition A — the two first-publication declarations. `[console]`, after the approval**
 
 - *Where:* `Панель управления` (`.../app-dashboard`) → dialog `Заявки`.
-- *What the human does:* tick `Подтвердить, что приложение соответствует Правилам программы для
-  разработчиков` and `Принять экспортное законодательство США`. These are the owner's own legal
-  attestations, they are accepted **once per app** rather than per release, and no field of the pack
-  carries them — the factory transcribes the two rows and their captions and stops. In the observed
-  run both were already ticked and the dialog's primary button was disabled, which is the evidence
-  that nothing remained to save there.
-- *What is already automated:* nothing about these two marks. Do not infer them from a slot's
-  capabilities or from its store pack.
+- *What the agent does:* tick `Подтвердить, что приложение соответствует Правилам программы для
+  разработчиков` and `Принять экспортное законодательство США`, **once the slot carries a recorded
+  release approval**. These are accepted **once per app** rather than per release, and no field of the
+  pack carries them — the factory transcribes the two rows and their captions and stops. In the
+  observed run both were already ticked and the dialog's primary button was disabled, which is the
+  evidence that nothing remained to save there.
+- *Why it is agent-performed:* the approval is the human checkpoint — the owner reviews the plan and
+  the policies before the initial publication and says so in his own words — and the click is not. The
+  owner's decision, recorded 2026-10-03: «В нашем заводе есть правило, что перед публикацией
+  необходимо одобрение владельца. Собственно говоря, в то время и я проверяю проверку всех вот этих
+  политик, и только после моего одобрения я говорю разрешить публикацию. Поэтому, если я разрешил
+  публикацию, значит эти галочки можно уже автоматически нажимать. Потому что все проверки
+  необходимые для публикации проводятся до начальной публикации всего приложения.»
+- *What is already automated:* nothing about the two marks themselves beyond this rule; do not infer
+  them from a slot's capabilities or from its store pack.
 
 **Precondition B — the store graphics. [human]**
 
@@ -171,8 +190,10 @@ sequences those screens; it does not duplicate them. Numbers quoted here (`Вы�
 - *The console's own prose on that page, verbatim:* `Следует разместить ссылку на политику
   конфиденциальности на странице приложения в Google Play и в самом приложении, даже если оно не
   предназначено для детей и не получает...` — the public URL satisfies one half of the
-  requirement and the app satisfies the other. Hosting the URL is the owner's (the factory has no
-  default for `privacyPolicyUrl`).
+  requirement and the app satisfies the other. Hosting the URL is **the factory's** act, not the
+  owner's: `node scripts/publish-privacy.mjs --slot <slug>` publishes `store/privacy.md` to a real
+  public HTTPS page during development and records the URL (`docs/privacy-policy-hosting.md`,
+  `.cursor/rules/privacy-policy.mdc`).
 - **Defect this ladder surfaced — recorded, not fixed here.** The slot ships the policy **only** as
   a URL. `AboutScreen.kt` renders the support e-mail and the prose `about_privacy_body`, and no
   `Uri.parse`, `ACTION_VIEW` or `CustomTabsIntent` exists anywhere in the slot's Kotlin, so the
@@ -307,7 +328,7 @@ sequences those screens; it does not duplicate them. Numbers quoted here (`Вы�
 
 | Step | What it is | Marker |
 |---|---|---|
-| A | First-publication declarations (`Правила программы…`, `Экспортное законодательство США`) | `[human]` |
+| A | First-publication declarations (`Правила программы…`, `Экспортное законодательство США`) | `[console]` (after the approval) |
 | B | Upload the store graphics (five image fields) | `[human]` |
 | C | Privacy policy URL in the listing **and** inside the app | `[verify]` (+ open defect) |
 | 1 | Dashboard goal `Создайте и опубликуйте выпуск` — read only | `[verify]` |

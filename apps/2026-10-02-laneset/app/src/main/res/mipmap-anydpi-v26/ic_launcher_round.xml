@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The round-masked variant. It is deliberately the same composition as `ic_launcher.xml` and not a
+  second piece of art: `mark-clock` is built on the circle keyline, so a circular mask shows exactly
+  the mark plus the field it was drawn for, and a separately drawn round icon would be a second
+  identity to keep in step. Both files must name the same foreground - `check-adaptive-icon.py`
+  refuses an adaptive icon whose launcher files disagree about which foreground they show.
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_background" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <monochrome android:drawable="@drawable/ic_launcher_monochrome" />
+</adaptive-icon>

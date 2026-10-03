@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A private pool or hot-tub owner in the US or RU who has a test result they cannot act on: the strip reads in between two colour bands, or the pH and alkalinity disagree, and the app they already have either refuses the reading, returns a dose they cannot check, or hides the answer behind a subscription.",
+  "paidUnit": "One permanent unlock of the whole diagnosis: the full authored rule base, every ranked diagnosis with its mechanism and its confirming test, and the ordered corrective plan with the amounts it will move and what not to mix, exported as text or PDF, with no advertising, no account and no renewal.",
+  "priceUsd": 5.99,
+  "momentOfPayment": "After a first free diagnosis has shown the ranked reasoning and the confirming test on the owner's own readings, at the point the ordered corrective plan is opened, behind one clearly priced unlock sheet with no trial clock and no subscription prompt.",
+  "distinctnessSentence": "Where the shelf leader reads the strip for you and hands back a dose its own users could not check, and the two adjacent engines charge a subscription or an ad per use for a log, this app asks what the strips showed in the bands the owner actually has, ranks the plausible causes with the reasoning and the one test that would confirm each, prints the amount of each corrective step with what it will move and what not to mix, and does it all in airplane mode with no ads, no account and one price.",
+  "evidenceRef": "docs/research/2026-10-02-advisor-and-troubleshooting-evidence.md#5-head-to-head-each-wedge-clause-against-the-leaders-measured-facts",
+  "day1RevenuePath": "The slot is listed against the pool chemistry advisor and hot tub water chemistry queries, where demand is proven by com.hthpools.tester.release at 4.6 stars over 1050 reviews and 100K or more installs and by com.troublefreepool.poolmath at 100K or more installs, the owner installs after the free diagnosis has shown the reasoning and the confirming test, and the first unlock arrives through the billing capability this plan requires.",
+  "killCriteria": {
+    "windowDays": 90,
+    "minInstalls": 3100,
+    "minRevenueUsd": 900
+  },
+  "capabilities": {
+    "required": [
+      "billing"
+    ],
+    "deliberatelyNotEnabled": [
+      "ads"
+    ],
+    "note": "billing is what purchase_led_single_unlock collects through. ads is deliberately off: the measured defect on the shelf's 50K or more install money engine is a video ad on every single calculation, so an ad-led build would reproduce the complaint this recipe answers."
+  },
+  "serverRequired": false,
+  "permissions": "None. The rule base, the ranking logic and every corrective plan ship inside the APK; the app declares no internet, location, camera, storage, contacts, microphone or background work, and the only network path in its life is the billing or restore flow's own com.android.vending.BILLING.",
+  "buildEstimateAgentHours": 7,
+  "archetypesRejected": [
+    {
+      "archetype": "purchase_led_repeat_sales",
+      "revenueReason": "There is nothing to re-sell. The job is one diagnosis per test session against a static authored rule base; a consumable such as extra pool profiles or more saved readings would be selling storage rather than judgement, which is the record-book shape this lane forbids, and it would cannibalise the 5.99 unlock instead of adding revenue."
+    },
+    {
+      "archetype": "ads_led_utility",
+      "revenueReason": "Advertising is the measured defect this recipe answers. com.poolchemicalcalculator.poolcalc at 3.6 stars over 210 reviews and 50K or more installs draws the complaint that the user is forced to watch a video ad EVERY SINGLE TIME they use any of the calculators, and a new listing with no install velocity would carry that same defect while the shelf's free leader outranks it."
+    },
+    {
+      "archetype": "purchase_only_no_ads",
+      "revenueReason": "Every one of the ten enriched cards on this shelf lists at zero, and five of the ten declare an in-app purchase, so the shelf's proven funnel is a free download with the money collected in app. A listing price spends that funnel on an unproven one at the exact moment a new app has no reviews to justify it."
+    },
+    {
+      "archetype": "subscription",
+      "revenueReason": "Banned outright by the owner on 2026-10-01 and machine enforced, because subscription is not in the ARCHETYPES list. Named here only because the 100K or more install community incumbent's money is exactly a subscription, and its two served critical reviews are the paywall this one-price recipe replaces."
+    }
+  ],
+  "assumptionsUnverified": [
+    "Willingness to pay 5.99 dollars outright is UNVERIFIED: the Play cards on this shelf show free with an in-app purchase and print no price, and the free leader carries more trust than any paid app on the shelf, so no reading shows a pool owner buying a diagnosis rather than accepting the free leader's dose.",
+    "Install-to-unlock conversion is assumed at 2 percent of installs; no slot in this repository has ever measured a conversion rate, so every revenue and installs figure derived from it is an assumption rather than a reading.",
+    "The 15 percent service fee, the 2 percent refund allowance and the 2 percent currency conversion allowance are plan assumptions carried from the monetization strategy document rather than measurements of this developer account, and the fee tier rises above the first million dollars.",
+    "The defect this wedge answers is read from three critical reviews the leader's own page served, and Play serves its own sample at three reviews per page; a larger complaint population may be dominated by something else entirely, and the leader remains 4.6 stars over 1050 reviews.",
+    "The reason a strip owner would defect from a free 4.6 star leader to a paid listing is a hypothesis about the checkability of a dose and not a measured outcome; no comparable on this shelf sells a diagnosis, so the nearest paid readings are on the freshwater-aquarium shelf.",
+    "Search ranking is assumed rather than planned: the shelf is led by a 100K or more install app with 1050 exact reviews, and nothing here shows a new listing reaching 205 unlocks per month against it."
+  ]
+}

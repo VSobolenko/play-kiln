@@ -21,6 +21,12 @@
  * spends Play's strongest ranking field on the head term the incumbent already owns.
  * `--slug` and `--name` are derived from that contract when omitted and must agree with it
  * when supplied, so a caller cannot name the app twice.
+ *
+ * A slot is also built *inside* a specification. The owner's rule is that every application is
+ * authored inside an OpenSpec change, so `--spec` names the change under
+ * `openspec/changes/<spec>/` and the scaffold refuses to create a slot without one. It defaults
+ * to `app-<slug>`, and the refusal fires before any file is written, because a slot directory
+ * that exists at all is half of the defect it prevents (`.cursor/rules/spec-first.mdc`).
  */
 
 import {
@@ -31,6 +37,7 @@ import {
   readdirSync,
   renameSync,
   rmSync,
+  statSync,
   writeFileSync
 } from 'node:fs'
 import { basename, dirname, extname, join, relative, resolve, sep } from 'node:path'
@@ -43,10 +50,12 @@ import {
 import { parseEconomics } from './lib/slot-economics.mjs'
 import { parseDifferentiators } from './lib/slot-differentiators.mjs'
 import { parseNaming } from './lib/slot-naming.mjs'
+import { keystorePropertiesExample } from './lib/signing.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const scaffold = join(root, 'scaffold', 'android-compose')
 const appsDir = join(root, 'apps')
+const changesDir = join(root, 'openspec', 'changes')
 const registryPath = join(root, 'registry', 'apps.json')
 const scaffoldVersion = 'android-compose-v1'
 const textExtensions = new Set([
@@ -92,7 +101,7 @@ const excludedSuffixes = ['.apk', '.aab', '.ap_', '.jks', '.keystore', '.iml']
 // carrying one.
 const workerLogSegment = /^\.kiln-.*\.log$/i
 const usage =
-  'node scripts/new-slot.mjs --slug <slug> --name "<Title>" --idea "<one line>" --economics <plan.json> --differentiators <contract.json> --naming <contract.json> [--date YYYY-MM-DD] [--package com.gexetr.<slug>] [--force]'
+  'node scripts/new-slot.mjs --slug <slug> --name "<Title>" --idea "<one line>" --economics <plan.json> --differentiators <contract.json> --naming <contract.json> [--spec <change-name>] [--date YYYY-MM-DD] [--package com.gexetr.<slug>] [--force]'
 
 function line(status, message) {
   console.log(`${status.padEnd(8)} ${message}`)
@@ -107,7 +116,8 @@ function parseArgs(argv) {
     '--package',
     '--economics',
     '--differentiators',
-    '--naming'
+    '--naming',
+    '--spec'
   ])
   const flags = new Set(['--force'])
   const parsed = { force: false }
@@ -419,6 +429,47 @@ function loadNamingPlan(file) {
   return result.value
 }
 
+/**
+ * Refuse a slot that is not written inside an OpenSpec change.
+ *
+ * The owner's rule is that every application is authored inside a specification, and
+ * `apps/2026-10-02-laneset/` was scaffolded with code while `openspec/changes/` held no change for
+ * it: the three contract flags above asked for a plan, a promise list and a name, and nothing asked
+ * for a specification. It is asked for now, and the refusal runs before any file is created, because
+ * a slot directory that exists at all is half of the defect this prevents
+ * (`.cursor/rules/spec-first.mdc`).
+ */
+function validateSpecChange(changeName) {
+  if (/[\\/]/.test(changeName) || changeName.includes('..')) {
+    throw new Error(`--spec must be a change name, not a path: ${changeName}`)
+  }
+  const changeDir = join(changesDir, changeName)
+  const missing = []
+  if (!existsSync(changeDir) || !statSync(changeDir).isDirectory()) {
+    missing.push('the change directory itself')
+  } else {
+    for (const required of ['proposal.md', 'tasks.md']) {
+      if (!existsSync(join(changeDir, required))) missing.push(required)
+    }
+    const specsDir = join(changeDir, 'specs')
+    const deltaSpecs = existsSync(specsDir)
+      ? walkFiles(specsDir).filter((file) => basename(file).toLowerCase() === 'spec.md')
+      : []
+    if (deltaSpecs.length === 0) missing.push('specs/<capability>/spec.md')
+  }
+  if (missing.length > 0) {
+    throw new Error(
+      `No OpenSpec change for this slot: expected openspec/changes/${changeName}/ to carry ` +
+        `proposal.md, tasks.md and specs/<capability>/spec.md; missing ${missing.join(', ')}.\n` +
+        'Every application is written inside a specification (`.cursor/rules/spec-first.mdc`).\n' +
+        'Author the change with the openspec-propose skill, then check it with:\n' +
+        `  openspec validate ${changeName}\n` +
+        `Usage: ${usage}`
+    )
+  }
+  line('PASS', `specification present: openspec/changes/${changeName}`)
+}
+
 function main() {
   const options = parseArgs(process.argv.slice(2))
   const idea = options.idea?.trim()
@@ -441,6 +492,13 @@ function main() {
   const economics = loadEconomicsPlan(options.economics)
   const differentiators = loadDifferentiatorsPlan(options.differentiators)
   const naming = loadNamingPlan(options.naming)
+
+  // The slot is built inside a specification, and the scaffold refuses before it writes anything when
+  // the change is absent — the directory being created is half of the defect. `--spec` defaults to
+  // `app-<slug>`, and this runs before the slug agreement below so an absent change is named as the
+  // absent change rather than as a slug clash.
+  const specChange = options.spec || `app-${options.slug || naming.slug}`
+  validateSpecChange(specChange)
 
   // The recorded naming decision is the single source of the name: `--slug` and `--name` may be
   // omitted and are then derived from it, and a supplied value must agree with it rather than
@@ -509,6 +567,17 @@ function main() {
   verifyScaffoldCopy(destination)
 
   mkdirSync(join(destination, 'dist'), { recursive: true })
+  // The signing template is written from the same module the generator reads, so a slot cannot be
+  // born with a `keystore.properties.example` that names a different keystore path than
+  // `scripts/sign-release.mjs` would use. It used to be a verbatim copy of the scaffold's file,
+  // which told the reader to run a manual `keytool -genkeypair` into `../upload.jks` — the
+  // contradiction between two answers to "where does the key live" that `scripts/core/signing.mjs`
+  // now fails.
+  writeFileSync(
+    join(destination, 'keystore.properties.example'),
+    keystorePropertiesExample(applicationId),
+    'utf8'
+  )
   writeFileSync(
     join(destination, 'economics.json'),
     `${JSON.stringify(economics, null, 2)}\n`,
@@ -550,7 +619,7 @@ function main() {
     }
   }
   writeFileSync(join(destination, '.kiln-state.json'), `${JSON.stringify(state, null, 2)}\n`, 'utf8')
-  line('PASS', 'created dist/, economics.json, differentiators.json, naming.json, and .kiln-state.json')
+  line('PASS', 'created dist/, economics.json, differentiators.json, naming.json, keystore.properties.example, and .kiln-state.json')
 
   registerSlot({
     slug,
@@ -568,6 +637,11 @@ function main() {
   console.log('\nNext:')
   line('INFO', 'implement the app')
   line('INFO', `python scripts/store/render.py --slot ${slug}`)
+  line(
+    'INFO',
+    'the store page must carry a real hosted privacy policy, not a placeholder: publish store/privacy.md and record its URL'
+  )
+  line('INFO', `node scripts/publish-privacy.mjs --slot ${slug}`)
   line('INFO', `node scripts/check-economics.mjs --slot ${slug}`)
   line('INFO', `node scripts/check-differentiators.mjs --slot ${slug} --allow-deferred`)
   line('INFO', 'every promise in differentiators.json starts deferred; the slot is not done until each one is shipped, narrowed or dropped')

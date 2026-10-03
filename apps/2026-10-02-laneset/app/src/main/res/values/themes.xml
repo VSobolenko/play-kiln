@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      The platform theme, which exists only to paint the window before Compose draws.
+
+      It deliberately does NOT parent from `Theme.Material3.*` or `Theme.MaterialComponents.*`: those
+      styles live in the Material Components *View* library, and this is a Compose-only app that does
+      not bundle it, so the theme would reference attributes nothing provides. `android:Theme.Material.Light`
+      is the platform's own parent and needs nothing from the app.
+
+      Dark mode is `values-night/themes.xml`, and edge-to-edge plus transparent system bars are
+      applied programmatically by `enableEdgeToEdge()` in `MainActivity`, which is the current
+      AndroidX recommendation rather than a theme flag.
+
+      In-app styling always comes from `PlayKilnTheme` (`MaterialTheme.colorScheme`,
+      `laneSetColors`, `laneSetTypography`) — never from this file. The one thing it carries is the
+      window background, and that value is the palette's own `background` role.
+    -->
+    <style name="Theme.PlayKilnSlot" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowBackground">@color/playkiln_window_background</item>
+    </style>
+</resources>

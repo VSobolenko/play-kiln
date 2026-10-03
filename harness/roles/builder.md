@@ -90,6 +90,7 @@ the wedge will convert                       UNVERIFIED  no priced comparable fo
 | Build speed: one Gradle invocation per build, one pinned JDK, build only what the question needs | `.cursor/rules/build-speed.mdc` |
 | Verification discipline: run it before claiming it, one source of truth imported, a rename sweeps every textual form, every defect earns a regression check | `.cursor/rules/verification-discipline.mdc` |
 | A promise ends `shipped`, `narrowed` or `dropped` with a proof that still resolves, never silently | `.cursor/rules/differentiator-contract.mdc` |
+| The job is finished, not started: a handoff claim reaches a real system surface (`ACTION_SEND`, `ACTION_CREATE_DOCUMENT`, `FileProvider`), not a class that builds a string | `.cursor/rules/app-depth.mdc` |
 | Phase 1 builds a debug APK and nothing signed, rendered or captured | `.cursor/rules/release-gate.mdc` |
 | Slot layout, the `com.gexetr.<slug>` namespace, and use of the native Kotlin + Compose stack | `.cursor/rules/project-conventions.mdc` |
 | Bounded workers with disjoint files; dispatch independent streams before serial work | `.cursor/rules/parallel-execution.mdc` |
@@ -112,3 +113,10 @@ tree, by a check that prints a `file:line`. A hand-rolled back stack behind `Nav
 toggles change nothing; a user-facing string compiled into Kotlin instead of declared as a resource;
 or a slot that ships a single language. The rule is `.cursor/rules/ui-ux-baseline.mdc` and its
 siblings, and the sensor is `scripts/core/uiux.mjs` — read its output rather than judging the look.
+
+The builder also owes the **handoff**, not only the middle. A `data_out`, `data_in` or `durability`
+claim is not delivered by a class that builds a string: the proof must reach an **actual system
+surface** — `ACTION_SEND` with a `FileProvider` URI, `ACTION_CREATE_DOCUMENT`, `PdfDocument` — or the
+builder has repeated the measured `apps/2026-10-01-lawn-round-log` defect, where `domain/Csv.kt` exists
+and the CSV has no way off the phone. The rule is `.cursor/rules/app-depth.mdc`, and the promise's
+`depthFamily` is what says which surface the proof has to contain.

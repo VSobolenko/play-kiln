@@ -6,6 +6,7 @@
     <color name="playkiln_seed_dark">#63DBA6</color>
 
     <!-- Window background shown for the few milliseconds before Compose draws its first frame.
-         Keeping it neutral prevents a white flash in dark mode. -->
-    <color name="playkiln_window_background">#FFFBFF</color>
+         It is the light scheme's own `background`, Chalk in ui/theme/Color.kt, so the pre-Compose
+         frame cannot flash a colour the app never draws. Keep it equal to that constant. -->
+    <color name="playkiln_window_background">#F6F4E4</color>
 </resources>

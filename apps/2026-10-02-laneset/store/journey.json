@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "locale": "en-US",
+  "_comment": "Six-shot journey for the Laneset store screenshots, replayed by scripts/media-capture.mjs and framed by scripts/store/render.py. Every coordinate and every expectation below was read from the live view hierarchy (`adb -s RF8Y703DR2D exec-out uiautomator dump /dev/tty`) of the signed RELEASE build (com.gexetr.laneset, versionName 0.1.0, versionCode 1, dist/laneset-0.1.0-1-release.apk, sha256 230e8a83193e53f238398f82f5ebd35e19ebda481d838007d9c3a4350f3e5c24) installed on a physical Samsung Galaxy A16 (SM-A165F), 1080x2340 / 450dpi, Android 16, device language en-US. No coordinate was estimated from a screenshot, no coordinate was carried over from another slot, and no coordinate from this file is valid on any other phone: the A16 is 450dpi where the A40 in the adjacent slot is 480dpi (read from apps/2026-10-01-lawn-round-log/store/journey.json, which records that phone as 1080x2340 / 480dpi, rather than from the device — this journey never addresses it), so the same dp lands on a different pixel. The journey declares a six-shot order that matches store/studio.json's `headlines` and `kickers` one for one, so shot N is the frame the pack's caption N describes. Each shot's `title` is that shot's studio headline verbatim, and the kicker that belongs with it is the same-index entry of studio.json's `kickers`; the reason is mechanical rather than cosmetic: `load_shots` in scripts/store-studio.py returns these shot objects, and both it (`store-studio.py:930`) and `compose_items` in scripts/visual-qa.py:373 fall back to `shot[\"title\"]` when studio.json's `headlines` list is shorter than six entries, so a descriptive title here would silently become a caption the moment that list shortened. Declaring the headline itself means the fallback and the declared caption cannot disagree.",
+  "_why_locale_is_declared": "Every expectation below is the literal text of a node, and Android resolves those strings against the *device's* language rather than the listing's, which is why this key names the language the readings are written in. media-capture's intended behaviour is to read the device's primary language off `am get-config` and refuse a mismatch before it takes the capture lock — the guard exists because an English journey against Russian resources fails every reading in every shot with 'not in the field they name', which reads like a broken journey rather than a device setting. MEASURED, and stated rather than glossed because it is a real limitation of the guard on this phone: on the A16 the guard degrades to a note. `adb -s RF8Y703DR2D shell am get-config` prints `config: mcc257-mnc1-en-rUS,ru-rRU-ldltr-sw384dp-w384dp-h832dp-normal-long-notround-nowidecg-lowdr-port-night-450dpi-finger-keysexposed-nokeys-navhidden-nonav-2340x1080-v36`, and that string begins with an `mcc257-mnc1-` prefix that the parser's grammar (`/^config:\\s*((?:[a-z]{2,3}(?:-r[A-Z]{2})?)(?:,(?:[a-z]{2,3}(?:-r[A-Z]{2})?))*(?:-|$))/m`, scripts/media-capture.mjs:165) cannot match, so `devicePrimaryLanguage` returns `null` and media-capture prints `NOTE device language - could not read it from 'am get-config'` and proceeds (media-capture.mjs:793) instead of comparing. Driven this session with the module's own exports, not by reading: `devicePrimaryLanguage(<that exact string>)` returns `null` while `journeyLanguage(this file)` returns `en`. The declaration is therefore carried by evidence rather than by the guard here — the config's own first locale is `en-rUS`, the framework reads `en-rUS`, and all 78 readings below resolved in English on four separate wiped runs — and the NOTE is the honest limit of the check, not a pass it printed.",
+  "_why_the_free_tier_is_photographed_and_not_the_unlocked_one": "The installed artifact is the real free-tier release build. The one-time purchase (product id `laneset_unlock`) gates four things, and each one has its own door in the shipped UI: the non-Endurance focuses (the strip's chips read 'Sprint · by purchase' and 'Threshold · by purchase'), the guided pace test (the session's action reads 'Unlock the guided pace test' rather than 'Swim the 400 m and 200 m trials'), the share/print handoff (the section carries 'Sharing and printing a finished set are part of the unlock.') and the coach-workout import ('Reading a workout a coach wrote is part of the unlock.'). Two of this journey's six frames — shot-03 and the locked half of shot-05 — photograph a lock or the Unlock screen, because that is what the shipped build genuinely shows a swimmer who has paid nothing. This journey never installs the debug variant, never stubs an entitlement, never taps 'Unlock the full app' and never opens Play's payment sheet, so no charge is made and the device's Play account is left alone. See `_why_the_pace_trial_shot_shows_the_unlock_screen`.",
+  "_why_the_setup_lives_in_shot_02_and_not_in_a_scene_file": "media-capture runs `pm clear com.gexetr.laneset` before shot-01, so a capture cannot inherit a scene: the session the screenshots show has to be produced by the run itself, through the app's own 'Build my set' control, which is the clickable node at [56,1980][1024,2115] — centre 540,2048, the exact coordinate shot-02 taps — measured by replaying shot-01's steps and shot-02's pre-tap steps from the shipped file and dumping the hierarchy in the state the tap lands in, not by eyeballing a screenshot. The generator is the only thing that decides the session, and it is deliberately not a random one — `domain/SetGenerator.kt:55` builds it from `DeterministicRandom(seedFor(constraints, pacePer100Seconds))` and `SetGenerator.kt:316` hashes every constraint into that seed, so one set of constraints always produces one set. That is what makes the readings in shot-02, shot-04 and shot-06 assertable at all: from the app's own defaults the build is 1900 m, 40:58, 4 intervals, opening on a main-set interval of 6 × 200 m breaststroke at 3:51 and a 1:50 /100 m default pace. Nothing in this journey types a value, so nothing in it can drift with a keyboard.",
+  "_why_every_reading_is_self_identifying": "Every expectation names a field, and for a reading the app itself computes or labels — '1900 m', '40:58', '1:50', '6 × 200 m breaststroke', 'Target 3:51 · rest 0:27' — the field is the node's own text, anchored with ^...$. That is the strongest form available on these screens, and the reason is measured rather than assumed: a Compose label and its value are stacked, not nested. On the built session the 'Total' label occupies [124,991][199,1028] and its value '40:58' occupies [124,1034][258,1097], so they neither contain nor overlap each other, and `boundsRelated` in media-capture.mjs is deliberately strict — exactly to stop the label of the *next* field satisfying the previous field's claim. A `{ \"value\": \"40:58\", \"field\": { \"label\": \"^Total$\" } }` entry would therefore be refused by the capture, not satisfied. Naming each reading's own node is what remains true and checkable here. Regex metacharacters in the values are escaped (every period is `\\\\.`, every `$` would be `\\\\$`), because an unescaped '.' matches any character and would let a near-miss node satisfy the reading. Two characters that look like ASCII but are not are kept as the app renders them: the chip joiner is U+00B7 (·) and the repetition sign is U+00D7 (×), both measured from the dump rather than typed from habit.",
+  "_why_every_scroll_is_an_extreme_or_a_repeated_drag": "Three of the six frames sit at a hard extreme of the page, and an extreme is not a position a fling can miss. shot-02 is the page top, and that is measured rather than assumed: 'Laneset' is the identity header and it reads [90,291][289,357] in that frame. shot-03 is the top of the Unlock screen, a freshly pushed destination. shot-05 is the true bottom, and both halves of that were measured — the page's last content is the section's closing action 'See what the unlock gives' at [90,2019][575,2076] (not the handoff's own last sentence, which sits above it), and one further 540,1900 → 540,600 drag applied on top of the settled bottom state left the dump byte-identical (`md5 649914bd06bcd2af3bccdcb88745ad06` both times), which is the no-op an extreme is supposed to be. Shot-01, shot-04 and shot-06 sit at intermediate offsets, and those are reached by *slow drags*, not flings: every swipe in this file runs for 1500–2000 ms, which is a drag rather than a throw, so the resting offset is a property of the content and the finger's travel rather than of a velocity. Their reproducibility is recorded here as a number rather than as the word 'reproducible', measured over six wiped runs this session on the installed artifact: shot-02, shot-03 and shot-05's before-the-shutter dumps were byte-identical in all six; shot-01's was identical in four, and in the other two 'Pool length' read [56,280][267,325] and [56,280][267,322] against [56,280][267,324] — its top edge at y=280 in all six, a 3 px spread on the bottom edge; shot-04's was identical in four, with the 'Warm-up' label at [101,296][270,343], and read [101,293][270,340] in one run and [101,299][270,346] in another, a 6 px spread; shot-06's was identical in three, with the gear chip's top edge at y=358, and read y=355, y=354 and y=356 in the other three — a 4 px spread out of 2340. Every one of the 78 readings below resolved on both sides of the shutter in all six runs, and that, not byte-equality, is what the pack depends on: a caption frame that agrees with its own assertions is the claim being made, and a few pixels of resting offset do not change what the frame shows. Shot-04 is two of those drags from the top and shot-06 is one, each starting from a state shot-02 or shot-05 already put the page in, so neither depends on where a previous shot happened to leave a fling.",
+  "_why_shot_05_photographs_a_lock": "MEASURED FINDING, recorded here so the pack does not have to be read alongside a chat report. The handoff section at the bottom of the shipped Home page renders both of its doors *always*, owned or not, and on this build it states what the unlock adds underneath each one: 'Sharing and printing a finished set are part of the unlock.' under 'Share or print the set', and 'Reading a workout a coach wrote is part of the unlock.' under 'Open a coach workout'. Tapping either one is a route to the Unlock screen, not a share sheet and not a file picker, and this journey does not tap them — it photographs the section as the free build draws it. The pack's fifth headline ('Swim it off paper') and kicker ('TAKE IT ALONG') describe the handoff the section is *for*, and the fifth caption names the unlock as the thing that opens it, so neither promises an action a free user can perform. shot-03 is the other half of the same fact: it is the screen those doors open.",
+  "_why_the_pace_trial_shot_shows_the_unlock_screen": "MEASURED FINDING. The studio's third headline is 'Two trials, one pace' and its kicker is 'PACE TRIAL', and on the free build that subject has exactly one honest screen: the session's gated action. Measured on the installed artifact, the session draws a single clickable 968x135 px button at [56,1390][1024,1525] (centre 540,1458, recomputed from those bounds) whose label is 'Unlock the guided pace test' — `home_trials_locked_action`, not `home_trials_action` — and tapping it was observed to open the Unlock screen, not the pace test. The route the free build cannot reach is the 400 m / 200 m flow that `ui/pace/PaceTestScreen.kt` owns; the two benefits that gate it are stated on the screen the tap does open, in the bullets 'The guided 400 m and 200 m pace test' and 'Every other focus: Sprint, Threshold, Technique and Recovery'. shot-03 therefore photographs the Unlock screen, which is the frame 'PACE TRIAL' is actually about on this build, rather than a mocked-up or purchase-obtained pace test. This is a finding, not a failure: the third headline is true of the shipped product, and the shot shows where a free user meets it.",
+  "_why_the_unlock_screen_shows_the_offer_without_a_purchase": "The Unlock screen was opened on the installed release build without any purchase being made, and it renders its own four benefit rows, the Purchase/One-time and Subscription/None tiles, the no-renewal sentence, the price note and the buy action from the app's resources — measured as 16 text nodes under a Back/Unlock top bar. It deliberately shows **no numeric price**: `UnlockScreen.kt:83` records the reason ('A hard-coded $9.99 is wrong outside the dollar zone'), and the price note says Google Play shows the exact localized price on its own confirmation sheet instead. The offer branch is chosen by the `when` inside `UnlockScreen.kt`'s `UnlockAction` (`UnlockScreen.kt:264`, the `when` itself at `:272`): `isUnlocked` wins first, then `UNAVAILABLE`, then `UNINITIALIZED`, and only the final `else` draws the buy `Button` — so the buy action is drawn exactly when `BillingManager`'s availability is neither UNAVAILABLE nor UNINITIALIZED — `BillingManager.kt:288` sets READY as soon as the Play Billing *service* answers OK, independently of whether the product resolves, which is why an unpublished build can still show the offer. The one state that would replace what shot-03 asserts is 'Google Play is not reachable', and it is reached only by a service timeout (`BillingManager.kt:276`, CONNECT_TIMEOUT_MS). That is the honest limit of this frame: it is the offer as five separate observations of the installed build showed it, and a phone with no reachable Play service would photograph 'Google Play is not reachable' instead.",
+  "_why_the_runner_shot_is_not_a_process_death_restore": "MEASURED LIMIT, stated rather than implied. studio.json's sixth headline is 'Back where you left it' and its `_claim_bounds` entry names 'restores a session that was interrupted', so the strongest evidence for that sentence would be a screenshot of the session after the process was killed and restarted. A media-capture journey cannot produce one: the step vocabulary is `tap`, `swipe`, `wait`, `text`, `clear` and `back`, and none of them terminates and relaunches the process, so there is no way to photograph a cold-start restore from inside the run. What shot-06 shows instead is the runner *state* the restore exists to bring back — the card advanced one repetition into the main set, reading 'Main set', 'Rep 1 of 6', '6 × 200 m breaststroke', 'Block 2 of 4 · 8 reps left' — which is the app's own record of where the swimmer is. That the journey's own tap is what produces that state was measured rather than assumed, because a reading a free run inherits would not be evidence of anything: the tap target is the 'Next' control, the clickable node at [557,1572][979,1707] (centre 768,1640, the coordinate in shot-06's step list) measured from the hierarchy after the journey's own six drags up and one drag down, and driving the runner by hand from that frame showed 'Back' walking the card back to 'Rep 1 of 1' / 'Block 1 of 4 · 9 reps left' with the label reading 'Warm-up', and one 'Next' tap from there restoring exactly 'Rep 1 of 6' / 'Block 2 of 4 · 8 reps left' with the label reading 'Main set' — so the photographed card is one step in from the start of the set, not the state the app opens on. The persistence itself is source-level and is not claimed as a photograph: `data/SessionStore.kt` is what carries the session and the runner position across process death.",
+  "_preconditions": [
+    "Target the release build, and address the phone. The debug variant carries a .debug applicationId suffix and would photograph a package that never ships, and media-capture refuses a DEBUGGABLE install itself, so the build installed here is the signed release: `node scripts/prepare-release.mjs --slot laneset` has already staged it at `apps/2026-10-02-laneset/dist/laneset-0.1.0-1-release.apk`, sha256 `230e8a83193e53f238398f82f5ebd35e19ebda481d838007d9c3a4350f3e5c24`, and the install is `adb -s RF8Y703DR2D install -r apps/2026-10-02-laneset/dist/laneset-0.1.0-1-release.apk` from the repository root. Two devices are attached to this machine, so every adb call is spelled with -s RF8Y703DR2D; a bare `adb` fails with 'more than one device/emulator' and that failure is the safety interlock, not a problem to route around.",
+    "A physical Samsung Galaxy A16 (SM-A165F) at 1080x2340 / 450dpi with the app's language set to English (en-US), because every reading below is English copy. The device must not be asleep: a locked screen swallows the taps and the first shot then fails with an empty hierarchy.",
+    "The app must be a first run. media-capture enforces this itself with `pm clear`, so the empty deck and the unpurchased state the journey builds on cannot be inherited from an earlier run, and it retries 'ime disable' until the enabled list is empty — a live keyboard would cover the form and change where the drags land.",
+    "No purchase is made by this journey and none is needed for four of the six frames. shot-03 photographs the Unlock screen's offer branch and shot-05 photographs the handoff's locked doors; neither taps a buy control, so no Play sheet and no charge is involved.",
+    "The tablet assets are composed from these same phone captures rather than captured on a tablet device, because no tablet device is attached; Play treats large-screen assets as a claim about the large-screen experience, so this phone-framed status is disclosed in store/review-notes.md instead of being passed off as a tablet capture."
+  ],
+  "supportedStepTypes": {
+    "tap": { "x": 540, "y": 1200 },
+    "swipe": { "x1": 540, "y1": 1900, "x2": 540, "y2": 1000, "durationMs": 2000 },
+    "wait": { "ms": 1200 },
+    "text": { "value": "example text" },
+    "clear": { "count": 4 },
+    "back": {}
+  },
+  "shots": [
+    {
+      "name": "shot-01",
+      "title": "Pool, minutes, focus, gear",
+      "body": "The deck form on a wiped install: the pool length, the minutes the swimmer actually has, the focus strip with its one free option and its two locked ones, the strokes to leave out and the gear that is really on the deck. Nothing here is typed — every choice is a tap, which is why a run cannot drift with a keyboard.",
+      "expect": [
+        { "value": "Pool length", "field": { "label": "^Pool length$" } },
+        { "value": "25 m", "field": { "label": "^25 m$" } },
+        { "value": "50 m", "field": { "label": "^50 m$" } },
+        { "value": "Minutes available", "field": { "label": "^Minutes available$" } },
+        { "value": "20 min", "field": { "label": "^20 min$" } },
+        { "value": "90 min", "field": { "label": "^90 min$" } },
+        { "value": "Focus", "field": { "label": "^Focus$" } },
+        { "value": "Sprint · by purchase", "field": { "label": "^Sprint · by purchase$" } },
+        { "value": "Threshold · by purchase", "field": { "label": "^Threshold · by purchase$" } },
+        { "value": "Endurance is free. The other focuses are part of the unlock, because their targets depend on the pace your own two trials measure.", "field": { "label": "^Endurance is free\\. The other focuses are part of the unlock, because their targets depend on the pace your own two trials measure\\.$" } },
+        { "value": "Strokes to leave out", "field": { "label": "^Strokes to leave out$" } },
+        { "value": "Leave out what hurts today. At least one stroke stays in.", "field": { "label": "^Leave out what hurts today\\. At least one stroke stays in\\.$" } },
+        { "value": "Gear on deck", "field": { "label": "^Gear on deck$" } },
+        { "value": "The set only uses what you actually brought.", "field": { "label": "^The set only uses what you actually brought\\.$" } },
+        { "value": "kickboard", "field": { "label": "^kickboard$" } },
+        { "value": "snorkel", "field": { "label": "^snorkel$" } }
+      ],
+      "steps": [
+        { "type": "wait", "ms": 7000 },
+        { "type": "swipe", "x1": 540, "y1": 1900, "x2": 540, "y2": 1210, "durationMs": 2000 },
+        { "type": "wait", "ms": 1200 }
+      ]
+    },
+    {
+      "name": "shot-02",
+      "title": "A main set, computed",
+      "body": "Build the set from the app's own defaults, then go to the top of the page: the hero panel is the day's main-set interval with its target time, the two hero metrics are the session's total and the pace every interval was computed against, and the tiles underneath are what the build actually adds up to. The gated action below them is the free tier's own door to the pace test.",
+      "expect": [
+        { "value": "Your set", "field": { "label": "^Your set$" } },
+        { "value": "Target", "field": { "label": "^Target$" } },
+        { "value": "6 × 200 m", "field": { "label": "^6 × 200 m$" } },
+        { "value": "3:51", "field": { "label": "^3:51$" } },
+        { "value": "breaststroke", "field": { "label": "^breaststroke$" } },
+        { "value": "Total", "field": { "label": "^Total$" } },
+        { "value": "40:58", "field": { "label": "^40:58$" } },
+        { "value": "Pace /100 m", "field": { "label": "^Pace /100 m$" } },
+        { "value": "1:50", "field": { "label": "^1:50$" } },
+        { "value": "Distance", "field": { "label": "^Distance$" } },
+        { "value": "1900 m", "field": { "label": "^1900 m$" } },
+        { "value": "Time", "field": { "label": "^Time$" } },
+        { "value": "Intervals", "field": { "label": "^Intervals$" } },
+        { "value": "Targets use the app's default pace of 1:50 /100 m. The two trials replace it with your own.", "field": { "label": "^Targets use the app's default pace of 1:50 /100 m\\. The two trials replace it with your own\\.$" } },
+        { "value": "Unlock the guided pace test", "field": { "label": "^Unlock the guided pace test$" } }
+      ],
+      "steps": [
+        { "type": "swipe", "x1": 540, "y1": 1900, "x2": 540, "y2": 1000, "durationMs": 2000 },
+        { "type": "wait", "ms": 800 },
+        { "type": "tap", "x": 540, "y": 2048 },
+        { "type": "wait", "ms": 2500 },
+        { "type": "swipe", "x1": 540, "y1": 800, "x2": 540, "y2": 2000, "durationMs": 1500 },
+        { "type": "swipe", "x1": 540, "y1": 800, "x2": 540, "y2": 2000, "durationMs": 1500 },
+        { "type": "swipe", "x1": 540, "y1": 800, "x2": 540, "y2": 2000, "durationMs": 1500 },
+        { "type": "swipe", "x1": 540, "y1": 800, "x2": 540, "y2": 2000, "durationMs": 1500 },
+        { "type": "wait", "ms": 1200 }
+      ]
+    },
+    {
+      "name": "shot-03",
+      "title": "Two trials, one pace",
+      "body": "The session's own gated action, tapped: the free build's route to the two pace trials is this screen, which is where a swimmer is told what the unlock actually adds — the guided 400 m and 200 m test, the other four focuses, the coach-workout import and the handoff — and that it is one payment with no subscription and no renewal. The screen is photographed as the free build draws it; no purchase is made.",
+      "expect": [
+        { "value": "Unlock", "field": { "label": "^Unlock$" } },
+        { "value": "One payment, not a subscription", "field": { "label": "^One payment, not a subscription$" } },
+        { "value": "Laneset is free to use. One payment opens the rest of the app, and it stays yours.", "field": { "label": "^Laneset is free to use\\. One payment opens the rest of the app, and it stays yours\\.$" } },
+        { "value": "The unlock gives you", "field": { "label": "^The unlock gives you$" } },
+        { "value": "Every other focus: Sprint, Threshold, Technique and Recovery", "field": { "label": "^Every other focus: Sprint, Threshold, Technique and Recovery$" } },
+        { "value": "The guided 400 m and 200 m pace test", "field": { "label": "^The guided 400 m and 200 m pace test$" } },
+        { "value": "Coach-workout import", "field": { "label": "^Coach-workout import$" } },
+        { "value": "Share and print a finished set", "field": { "label": "^Share and print a finished set$" } },
+        { "value": "Purchase", "field": { "label": "^Purchase$" } },
+        { "value": "One-time", "field": { "label": "^One-time$" } },
+        { "value": "Subscription", "field": { "label": "^Subscription$" } },
+        { "value": "None", "field": { "label": "^None$" } },
+        { "value": "No subscription, no trial and no renewal. You pay once and keep the unlock.", "field": { "label": "^No subscription, no trial and no renewal\\. You pay once and keep the unlock\\.$" } },
+        { "value": "Google Play shows the exact price in your currency on its confirmation sheet before you pay.", "field": { "label": "^Google Play shows the exact price in your currency on its confirmation sheet before you pay\\.$" } },
+        { "value": "Unlock the full app", "field": { "label": "^Unlock the full app$" } }
+      ],
+      "steps": [
+        { "type": "tap", "x": 540, "y": 1458 },
+        { "type": "wait", "ms": 3000 }
+      ]
+    },
+    {
+      "name": "shot-04",
+      "title": "A target on every interval",
+      "body": "Back on the session and two drags down: the whole set list, warm-up to cool-down, every line carrying the target time the pace put on it and the rest it leaves. This is the page a swimmer reads off the clock, and the numbers on it are the ones the hero panel's 1:50 produced rather than anything typed.",
+      "expect": [
+        { "value": "The whole set", "field": { "label": "^The whole set$" } },
+        { "value": "Every line carries its target, so you can read it off the clock.", "field": { "label": "^Every line carries its target, so you can read it off the clock\\.$" } },
+        { "value": "Warm-up", "field": { "label": "^Warm-up$" } },
+        { "value": "300 m · 6:19", "field": { "label": "^300 m · 6:19$" } },
+        { "value": "1 × 300 m freestyle", "field": { "label": "^1 × 300 m freestyle$" } },
+        { "value": "Target 6:19 · rest 0:00", "field": { "label": "^Target 6:19 · rest 0:00$" } },
+        { "value": "Main set", "field": { "label": "^Main set$" } },
+        { "value": "1400 m · 30:04", "field": { "label": "^1400 m · 30:04$" } },
+        { "value": "6 × 200 m breaststroke", "field": { "label": "^6 × 200 m breaststroke$" } },
+        { "value": "Target 3:51 · rest 0:27", "field": { "label": "^Target 3:51 · rest 0:27$" } },
+        { "value": "1 × 200 m butterfly", "field": { "label": "^1 × 200 m butterfly$" } },
+        { "value": "Target 3:51 · rest 0:25", "field": { "label": "^Target 3:51 · rest 0:25$" } },
+        { "value": "Cool-down", "field": { "label": "^Cool-down$" } },
+        { "value": "200 m · 4:35", "field": { "label": "^200 m · 4:35$" } },
+        { "value": "1 × 200 m freestyle", "field": { "label": "^1 × 200 m freestyle$" } },
+        { "value": "Target 4:35 · rest 0:00", "field": { "label": "^Target 4:35 · rest 0:00$" } },
+        { "value": "Discard this set", "field": { "label": "^Discard this set$" } }
+      ],
+      "steps": [
+        { "type": "back" },
+        { "type": "wait", "ms": 1800 },
+        { "type": "swipe", "x1": 540, "y1": 1900, "x2": 540, "y2": 1000, "durationMs": 2000 },
+        { "type": "wait", "ms": 600 },
+        { "type": "swipe", "x1": 540, "y1": 1900, "x2": 540, "y2": 1000, "durationMs": 2000 },
+        { "type": "wait", "ms": 1200 }
+      ]
+    },
+    {
+      "name": "shot-05",
+      "title": "Swim it off paper",
+      "body": "The handoff at the very bottom of the page, photographed on the free build: the set list leaving as text or as a printable card, and a coach's workout coming back in. Both doors are drawn and both state what the unlock adds, which is why this frame carries a lock rather than a share sheet — tapping either one is what opens shot-03's screen.",
+      "expect": [
+        { "value": "Take it to the pool", "field": { "label": "^Take it to the pool$" } },
+        { "value": "Sharing and printing a finished set are part of the unlock.", "field": { "label": "^Sharing and printing a finished set are part of the unlock\\.$" } },
+        { "value": "Share or print the set", "field": { "label": "^Share or print the set$" } },
+        { "value": "Open a coach workout", "field": { "label": "^Open a coach workout$" } },
+        { "value": "Reading a workout a coach wrote is part of the unlock.", "field": { "label": "^Reading a workout a coach wrote is part of the unlock\\.$" } },
+        { "value": "Build again", "field": { "label": "^Build again$" } },
+        { "value": "Gear on deck", "field": { "label": "^Gear on deck$" } }
+      ],
+      "steps": [
+        { "type": "swipe", "x1": 540, "y1": 1900, "x2": 540, "y2": 600, "durationMs": 1500 },
+        { "type": "swipe", "x1": 540, "y1": 1900, "x2": 540, "y2": 600, "durationMs": 1500 },
+        { "type": "swipe", "x1": 540, "y1": 1900, "x2": 540, "y2": 600, "durationMs": 1500 },
+        { "type": "wait", "ms": 1500 }
+      ]
+    },
+    {
+      "name": "shot-06",
+      "title": "Back where you left it",
+      "body": "The runner, one rep into the main set. Back to the top of the page and one drag down frames the card that holds the swimmer's place: the block it is in, which repetition of it, the line and its target, and the two controls that move through the set. It is the state the app brings back when the session is picked up again.",
+      "expect": [
+        { "value": "Main set", "field": { "label": "^Main set$" } },
+        { "value": "Rep 1 of 6", "field": { "label": "^Rep 1 of 6$" } },
+        { "value": "6 × 200 m breaststroke", "field": { "label": "^6 × 200 m breaststroke$" } },
+        { "value": "Target 3:51 · rest 0:27", "field": { "label": "^Target 3:51 · rest 0:27$" } },
+        { "value": "Block 2 of 4 · 8 reps left", "field": { "label": "^Block 2 of 4 · 8 reps left$" } },
+        { "value": "Back", "field": { "label": "^Back$" } },
+        { "value": "Next", "field": { "label": "^Next$" } },
+        { "value": "The whole set", "field": { "label": "^The whole set$" } }
+      ],
+      "steps": [
+        { "type": "swipe", "x1": 540, "y1": 800, "x2": 540, "y2": 2000, "durationMs": 1500 },
+        { "type": "swipe", "x1": 540, "y1": 800, "x2": 540, "y2": 2000, "durationMs": 1500 },
+        { "type": "swipe", "x1": 540, "y1": 800, "x2": 540, "y2": 2000, "durationMs": 1500 },
+        { "type": "swipe", "x1": 540, "y1": 800, "x2": 540, "y2": 2000, "durationMs": 1500 },
+        { "type": "swipe", "x1": 540, "y1": 800, "x2": 540, "y2": 2000, "durationMs": 1500 },
+        { "type": "swipe", "x1": 540, "y1": 800, "x2": 540, "y2": 2000, "durationMs": 1500 },
+        { "type": "wait", "ms": 600 },
+        { "type": "swipe", "x1": 540, "y1": 1900, "x2": 540, "y2": 1000, "durationMs": 2000 },
+        { "type": "wait", "ms": 900 },
+        { "type": "tap", "x": 768, "y": 1640 },
+        { "type": "wait", "ms": 1500 }
+      ]
+    }
+  ]
+}

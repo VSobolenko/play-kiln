@@ -41,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -56,6 +57,7 @@ import com.gexetr.lawnroundlog.ui.components.GlyphDelete
 import com.gexetr.lawnroundlog.ui.components.GlyphEdit
 import com.gexetr.lawnroundlog.ui.components.GlyphExport
 import com.gexetr.lawnroundlog.ui.components.GlyphLock
+import com.gexetr.lawnroundlog.ui.components.GlyphShare
 import com.gexetr.lawnroundlog.ui.components.RoundEmptyState
 import com.gexetr.lawnroundlog.ui.components.SectionStrip
 import com.gexetr.lawnroundlog.ui.components.VisitStatusPill
@@ -110,35 +112,48 @@ fun HistoryRoute(
         modifier = Modifier
             .fillMaxSize()
             .windowInsetsPadding(
-                WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+                WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal),
             )
             .imePadding(),
     ) {
         ScreenHeader(
             title = stringResource(R.string.history_title),
-            subtitle = stringResource(R.string.history_count, entries.size),
+            // A count picks a plural category, not a format: one entry, two entries. `count` selects
+            // the category and the same number fills `%1$d`, which is why it is passed twice.
+            subtitle = pluralStringResource(R.plurals.history_count, entries.size, entries.size),
             onBack = onBack,
             actions = {
-                IconButton(
-                    onClick = {
-                        if (unlocked) {
-                            createDocument.launch("lawn-round-log.csv")
-                        } else {
-                            onRequestUnlock()
-                        }
-                    },
-                    modifier = Modifier.size(48.dp),
-                ) {
-                    // One target, two states: the glyph says whether the tap exports the ledger or
-                    // opens the unlock, and the label says the same thing in words.
-                    val gateLabel = stringResource(
-                        if (unlocked) R.string.export_csv else R.string.unlock_title,
-                    )
-                    if (unlocked) {
+                if (unlocked) {
+                    // Two handoffs, two targets. Save goes through the system's document picker, so
+                    // the file lands in a folder the operator chooses and stays there; Share hands
+                    // the same document to any app that accepts one. The labels differ, so a screen
+                    // reader announces which of the two it is.
+                    IconButton(
+                        onClick = { createDocument.launch(EXPORT_FILE_NAME) },
+                        modifier = Modifier.size(48.dp),
+                    ) {
+                        val saveLabel = stringResource(R.string.export_csv)
                         GlyphExport(
-                            modifier = Modifier.semantics { contentDescription = gateLabel },
+                            modifier = Modifier.semantics { contentDescription = saveLabel },
                         )
-                    } else {
+                    }
+                    IconButton(
+                        onClick = { history.shareCsv(context, latestRecord.value) },
+                        modifier = Modifier.size(48.dp),
+                    ) {
+                        val shareLabel = stringResource(R.string.export_share)
+                        GlyphShare(
+                            modifier = Modifier.semantics { contentDescription = shareLabel },
+                        )
+                    }
+                } else {
+                    // Locked, the single action is the way to the unlock: the glyph is the lock and
+                    // the label says the same thing in words.
+                    IconButton(
+                        onClick = onRequestUnlock,
+                        modifier = Modifier.size(48.dp),
+                    ) {
+                        val gateLabel = stringResource(R.string.unlock_title)
                         GlyphLock(
                             modifier = Modifier.semantics { contentDescription = gateLabel },
                         )
@@ -207,7 +222,7 @@ fun HistoryRoute(
                 editing = null
             },
             onSetAmount = { amount ->
-                editingEntry.payment?.let { round.recordPayment(it.customerId, amount) }
+                editingEntry.payment?.let { round.restatePayment(it, amount) }
                 editing = null
             },
         )

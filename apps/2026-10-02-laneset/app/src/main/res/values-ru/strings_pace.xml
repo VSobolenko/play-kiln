@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Русская половина экрана пошагового теста темпа.
+
+  Набор ключей обязан совпадать с `values/strings_pace.xml` ключ в ключ: `scripts/core/policy.mjs`
+  сравнивает деревья в обе стороны и падает как на пропущенном ключе, так и на лишнем, а также
+  сверяет аргументы формата. Термины — плавательные, а не буквальные: «interval» здесь «отрезок»,
+  «send-off» — «старт», «swim» как существительное — «заплыв». Помощь по формату намеренно не
+  обещает запятую как разделитель десятых: `parsePaceTime` читает точку, и подсказка не должна
+  предлагать формат, который экран потом откажется принять.
+-->
+<resources>
+    <string name="pace_title" translatable="true">Тест темпа</string>
+    <string name="pace_back" translatable="true">Назад</string>
+
+    <string name="pace_intro" translatable="true">Два заплыва задают темп для всех отрезков вашего комплекса. Проплывите их один раз, на свежих силах, — и план будет построен под вас, а не под таблицу.</string>
+
+    <!-- Шаг 1 — 400 м. -->
+    <string name="pace_step_400_label" translatable="true">Шаг 1 из 2: 400 м</string>
+    <string name="pace_step_400_reason" translatable="true">Проплывите 400 м в ровном, тяжёлом темпе: это самый быстрый темп, который вы удержали бы на длинной серии, а не спринт. Это более медленный заплыв из двух, и он задаёт верхнюю границу вашего темпа.</string>
+    <string name="pace_time_400_label" translatable="true">Время на 400 м</string>
+    <string name="pace_next_action" translatable="true">Дальше: 200 м</string>
+
+    <!-- Шаг 2 — 200 м и единственный путь назад, если время введено с опечаткой. -->
+    <string name="pace_step_200_label" translatable="true">Шаг 2 из 2: 200 м</string>
+    <string name="pace_step_200_reason" translatable="true">Теперь проплывите 200 м на максимум, как только можете быстро. Разрыв между этим заплывом и 400 м и превращает два времени в пороговый темп — тот темп, который потом попадёт на каждый отрезок.</string>
+    <string name="pace_time_200_label" translatable="true">Время на 200 м</string>
+    <string name="pace_save_action" translatable="true">Сохранить мой темп</string>
+    <string name="pace_change_400_action" translatable="true">Изменить время на 400 м</string>
+
+    <!-- Подсказка к полю: допустимые формы, пока ввод не потребовал объяснения. -->
+    <string name="pace_time_hint" translatable="true">6:40</string>
+    <string name="pace_time_format_help" translatable="true">Минуты и секунды, например 6:40 или 3:10. Можно ввести и просто секунды: 400 подойдёт.</string>
+
+    <!-- Результат, когда оба времени введены. -->
+    <string name="pace_result_incomplete" translatable="true">Нужны оба заплыва, чтобы посчитать темп.</string>
+    <string name="pace_result_title" translatable="true">Ваш пороговый темп</string>
+    <string name="pace_result_hero_headline" translatable="true">Пороговый темп</string>
+    <string name="pace_result_trials_summary" translatable="true">По %1$s на 400 м и %2$s на 200 м</string>
+    <string name="pace_result_supporting" translatable="true">Теперь каждый отрезок нового комплекса получает это время на 100 м, так что старты подходят вам, а не таблице. Темп хранится на этом телефоне и используется дальше без повторных вопросов.</string>
+    <string name="pace_result_trial_400_label" translatable="true">Заплыв 400 м</string>
+    <string name="pace_result_trial_200_label" translatable="true">Заплыв 200 м</string>
+
+    <!-- Изменить результаты теста: пройти заново или стереть сохранённое. -->
+    <string name="pace_retry_action" translatable="true">Проплыть тест заново</string>
+    <string name="pace_reset_action" translatable="true">Стереть времена теста</string>
+    <string name="pace_reset_supporting" translatable="true">Стирание забывает оба времени и посчитанный по ним темп. Пока тест не пройден снова, комплексы берут встроенный темп по умолчанию.</string>
+
+    <!-- Отказы. В отказе по 400 м названы прочитанные времена, чтобы опечатка была видна на экране. -->
+    <string name="pace_error_unreadable" translatable="true">Такое время приложение прочитать не может. Напишите минуты и секунды, например 6:40, или просто секунды, например 400.</string>
+    <string name="pace_error_not_positive" translatable="true">Время заплыва должно быть больше нуля.</string>
+    <string name="pace_error_400_not_slower" translatable="true">Время на 400 м (%1$s) должно быть медленнее времени на 200 м (%2$s): более длинный заплыв занимает больше времени. Проверьте оба времени.</string>
+</resources>

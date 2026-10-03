@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <!-- API 31+ requires separate cloud-backup and device-transfer policies because users can
+         permit one restoration path without permitting the other. Keep both explicit, and keep the
+         excluded paths identical in each: a file that is secret under one path is secret under
+         both. -->
+    <cloud-backup>
+        <include domain="sharedpref" path="." />
+        <include domain="file" path="." />
+        <include domain="database" path="." />
+        <!-- DataStore preferences (files/datastore/) are device-local settings and a billing
+             entitlement that Play re-establishes; they are excluded from both paths. -->
+        <exclude domain="file" path="datastore/" />
+        <exclude domain="sharedpref" path="secrets.xml" />
+        <exclude domain="sharedpref" path="auth_tokens.xml" />
+        <exclude domain="file" path="secrets/" />
+        <exclude domain="file" path="tokens/" />
+        <exclude domain="database" path="secrets.db" />
+        <exclude domain="database" path="tokens.db" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="sharedpref" path="." />
+        <include domain="file" path="." />
+        <include domain="database" path="." />
+        <exclude domain="file" path="datastore/" />
+        <exclude domain="sharedpref" path="secrets.xml" />
+        <exclude domain="sharedpref" path="auth_tokens.xml" />
+        <exclude domain="file" path="secrets/" />
+        <exclude domain="file" path="tokens/" />
+        <exclude domain="database" path="secrets.db" />
+        <exclude domain="database" path="tokens.db" />
+    </device-transfer>
+</data-extraction-rules>

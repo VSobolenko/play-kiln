@@ -88,6 +88,61 @@ scored candidates spanning at least three archetypes, the chosen candidate at 70
 least one rejected alternative with the reason it lost, and a title inside Play's 30-character cap in
 every declared locale.
 
+## The rule: a proposal must also say which device capabilities the job uses
+
+The economics gate answers "can this earn", the promise contract answers "why would anyone install
+it", and the naming contract answers "what is it called". None of them asked what the app does with
+the phone, and the measured result was a monoculture: of the proposals on record almost every one is
+"the user types something and the app stores it" — camera 0, location 0, motion sensors 0,
+home-screen widget 0, media playback 0, while the phone has all of them. The omission was
+**structural, not a preference**: no recon contract had a field for a device capability, so a scout
+had nowhere to write "this job needs the camera" even if it wanted to, and the answer arrived as a
+silence that reads exactly like a decision. This is that field. It does not decide how far to open
+the surface — that stays the owner's choice at checkpoint 1 — it makes the current answer *declared*.
+
+Every proposal carries a **`## Device capabilities`** section answering `used` or `not used` for each
+of twelve capabilities. It is a declaration, not a tally, and the load-bearing part is the
+justification: a `used` line names the API the slot would call and what the job loses without it, so
+a job that needs nothing from the phone has to say so twelve times rather than by omission. A
+capability that needs a runtime permission must name that permission, because the proposal's own
+permissions section is where the permission-minimisation bar is read. The platform fact that keeps
+this a declaration problem rather than a cost problem: **the Android Photo Picker
+(`ActivityResultContracts.PickVisualMedia`) needs no runtime permission at all**, so "uses the photo
+picker" costs nothing against that bar, while a capability that does need one must say which. "No
+camera" is allowed; what is no longer allowed is arriving at it by accident.
+
+```markdown
+## Device capabilities
+
+Each capability is answered `used` or `not used`; a `used` line names the API and what the job
+loses without it.
+
+- camera: not used — the job is text entry; no step in it is a photograph.
+- photo picker / gallery: used — `ActivityResultContracts.PickVisualMedia`, which asks for no
+  runtime permission; without it the user retypes a reading the phone already holds.
+- media playback or capture: not used
+- microphone: not used
+- location: not used
+- motion sensors: not used
+- contacts / calendar: not used
+- notifications / reminder: used — `NotificationChannel`, `android.permission.POST_NOTIFICATIONS`;
+  without it the round is forgotten between visits.
+- home-screen widget: not used
+- share / export: used — `ACTION_SEND`, `FileProvider`; without it the record cannot leave the phone.
+- Bluetooth / USB: not used
+- files / SAF: not used
+```
+
+Those twelve are the closed set: camera, photo picker / gallery, media playback or capture,
+microphone, location, motion sensors, contacts / calendar, notifications / reminder, home-screen
+widget, share / export, Bluetooth / USB, files / SAF. Adding one is a contract change; leaving one
+unanswered is not allowed. `node scripts/verify.mjs` reads the section (`ideas.capabilities`): it
+reports a proposal with no declaration, a capability left unanswered, a `used` line that names no API
+or no loss, and a declaration that contradicts the document's own permissions prose or omits the
+manifest permission a used capability needs. What it cannot read is in the module's own comment — it
+cannot tell whether the named API is the right one, or whether the job would really miss it; that is
+the owner's question at checkpoint 1.
+
 ## What a proposal must contain
 
 An idea reaches the owner as a proposal, never as a started slot
@@ -109,6 +164,11 @@ An idea reaches the owner as a proposal, never as a started slot
   needed to reach a stated target, with the division shown.
 - Build estimate in agent hours, permissions required, capabilities required, and whether a server
   is required (and its cost if so).
+- The device capabilities the job uses, declared one line per capability in a `## Device
+  capabilities` section: twelve answers of `used` or `not used`, and for each `used` one the API the
+  slot would call, what the job loses without it, and the manifest permission it needs. This is
+  where a job that needs the camera, the microphone, the sensors, location or a widget says so — and
+  where a job that needs none of them says so too, on the record, rather than by omission.
 - The visual direction in one or two sentences — the mark, the palette's subject and the one thing
   the app's own components do that a stock Material screen does not. Two recipes must not propose
   the same direction, for the same reason they must not propose the same job

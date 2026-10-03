@@ -6,20 +6,25 @@
   "idea": "An offline lawn round log a solo mower owns outright: ordered customers, one-tap visits, owed balances and CSV export, unlocked once.",
   "defaultLocale": "en-US",
   "category": "BUSINESS",
-  "tags": ["lawn care", "round tracker", "offline", "small business"],
+  "tags": [
+    "lawn care",
+    "round tracker",
+    "offline",
+    "small business"
+  ],
   "contactEmail": "v.sobolenko.vs@gmail.com",
-  "privacyPolicyUrl": "https://lawn-round-log.invalid/privacy",
+  "privacyPolicyUrl": "https://telegra.ph/Lawn-Round-Log--privacy-policy-10-02",
   "locales": {
     "en-US": {
       "title": "Lawn Round Log",
       "shortDescription": "Offline round book for a solo mower: visits, balances, one-time unlock.",
-      "fullDescription": "Lawn Round Log is the round book a solo mower actually owns.\n\nIt is not an account and not a cloud dashboard. Your customers, the order you drive them in, every visit you log and every payment you take live on your phone, in one record you keep. Open it at the kerb in airplane mode and it works: no login, no sync, no server that has to be up before you can start.\n\nTHE ROUND, IN YOUR ORDER\nAdd each customer once and move the list into the order you actually drive. Nothing asks you for an appointment, a time slot or a calendar entry. The round is the worklist, and it stays in the order you set it.\n\nONE TAP AT THE KERB\nMark a visit mowed, skipped or rained off with a single tap. Every control is at least 48 dp, and each status is written out as a word as well as coloured, so you can read it one-handed in the sun.\n\nRAINED OFF? PUSH THE DAY\nOne action moves every customer due today forward exactly one day. Each one moves once, so nobody is moved twice and nobody is left behind, and pushing again moves them one further day.\n\nWHO OWES YOU\nEach customer carries a running balance built from his billable visits minus the payments you record. Mowed visits count; skipped and rained-off visits never do. Record a payment in one tap and remove it if you mistyped. The total owed across the whole round is on screen, and every figure is recomputed from the stored visits and payments, so it is identical after a restart.\n\nKEEP YOUR OWN COPY\nExport the stored record to a CSV file through the system file picker, and the app tells you how many rows it wrote. Edit or delete a customer, a visit or a payment; deleting more than one record asks first and names what will be removed.\n\nWHAT YOU PAY\nThe app is free for up to eight customers, with no time limit and no trial clock. One purchase unlocks the whole round for good: unlimited customers, the complete visit history, the owed balances and the export. One price, paid once. There is no subscription, no renewal and no advertising anywhere in the app, and the purchase can be restored after a reinstall.\n\nPRIVATE BY CONSTRUCTION\nThe record stays on your phone. No account is created, no analytics run, and nothing you type is uploaded. The only party involved beyond you and your customers is Google Play, and only to take the one-time payment.",
+      "fullDescription": "Lawn Round Log is the round book a solo mower actually owns.\n\nIt is not an account and not a cloud dashboard. Your customers, the order you drive them in, every visit you log and every payment you take live on your phone, in one record you keep. Open it at the kerb in airplane mode and it works: no login, no sync, no server that has to be up before you can start.\n\nTHE ROUND, IN YOUR ORDER\nAdd each customer once and move the list into the order you actually drive. Nothing asks you for an appointment, a time slot or a calendar entry. The round is the worklist, and it stays in the order you set it.\n\nONE TAP AT THE KERB\nMark a visit mowed, skipped or rained off with a single tap. Every control is at least 48 dp, and each status is written out as a word as well as coloured, so you can read it one-handed in the sun.\n\nRAINED OFF? PUSH THE DAY\nOne action moves every customer due today forward exactly one day. Each one moves once, so nobody is moved twice and nobody is left behind, and a push on a later day moves them one further day.\n\nWHO OWES YOU\nEach customer carries a running balance built from his billable visits minus the payments you record. Mowed visits count; skipped and rained-off visits never do. Record a payment in one tap and remove it if you mistyped. The total owed across the whole round is on screen, and every figure is recomputed from the stored visits and payments, so it is identical after a restart.\n\nKEEP YOUR OWN COPY\nExport the stored record to a CSV file through the system file picker, and the app tells you how many rows it wrote. Edit or delete a customer, a visit or a payment; deleting more than one record asks first and names what will be removed; that confirmation is on by default and can be turned off in Settings.\n\nWHAT YOU PAY\nThe app is free for up to eight customers, with no time limit and no trial clock. One purchase adds two things and nothing else: unlimited customers and the CSV export. The visit history and the owed balances are not part of the purchase — they are in the free app, and the unlock never takes them away. One price, paid once. There is no subscription, no renewal and no advertising anywhere in the app, and the purchase can be restored after a reinstall.\n\nPRIVATE BY CONSTRUCTION\nThe record stays on your phone. No account is created, no analytics run, and nothing you type is uploaded. The only party involved beyond you and your customers is Google Play, and only to take the one-time payment.",
       "screenshotCaptions": [
         "The round in your order: move a customer to match the drive",
         "One tap at the kerb: mowed, skipped or rained off",
         "Rained off? Push the whole round one day",
         "See who still owes you, customer by customer",
-        "Keep your own copy: export the record to CSV",
+        "Every visit on the record: the ledger is free, the CSV export unlocks once",
         "Free for eight customers, unlocked once for the whole round"
       ],
       "featureBullets": [
@@ -29,27 +34,6 @@
         "A running owed balance per customer, plus the total for the round",
         "CSV export through the system file picker, with a row count",
         "One-time unlock: free up to eight customers, no subscription"
-      ]
-    },
-    "ru-RU": {
-      "title": "Lawn Round Log",
-      "shortDescription": "Офлайн-журнал обхода: клиенты, визиты, долги, разовая покупка.",
-      "fullDescription": "Lawn Round Log — это журнал обхода, который принадлежит самому косильщику.\n\nЭто не аккаунт и не облачная панель. Клиенты, порядок объезда, каждый отмеченный визит и каждый принятый платёж хранятся на вашем телефоне, в одной записи, которая остаётся у вас. Откройте приложение у бордюра в режиме полёта — оно работает: без входа, без синхронизации и без сервера, который должен быть доступен, прежде чем вы начнёте.\n\nОБХОД В ВАШЕМ ПОРЯДКЕ\nДобавьте клиента один раз и расставьте список в том порядке, в котором вы действительно едете. Ничего не спрашивает запись на приём, время или календарь. Обход — это рабочий список, и он сохраняет заданный порядок.\n\nОДНО КАСАНИЕ У БОРДЮРА\nОтметьте визит как «скошено», «пропущено» или «смыто дождём» одним касанием. Каждый элемент управления — не меньше 48 dp, а состояние написано словом, а не только цветом, поэтому его можно прочитать одной рукой на солнце.\n\nСМЫЛО ДОЖДЁМ? СДВИНЬТЕ ДЕНЬ\nОдно действие переносит каждого клиента, запланированного на сегодня, ровно на один день вперёд. Каждый сдвигается один раз: никто не двигается дважды и никто не остаётся позади. Повторное нажатие сдвигает их ещё на день.\n\nКТО ВАМ ДОЛЖЕН\nПо каждому клиенту ведётся текущий баланс: оплачиваемые визиты минус записанные платежи. Скошенные визиты считаются, пропущенные и смытые дождём — никогда. Запишите платёж одним касанием и удалите его, если ошиблись. Общая сумма долга по всему обходу — на экране, и каждая цифра пересчитывается из сохранённых визитов и платежей, поэтому после перезапуска она такая же.\n\nДЕРЖИТЕ СВОЮ КОПИЮ\nВыгрузите запись в файл CSV через системный выбор файлов — приложение сообщит, сколько строк записало. Клиента, визит и платёж можно изменить или удалить; удаление более одной записи сначала спрашивает и называет то, что будет удалено.\n\nЧТО ВЫ ПЛАТИТЕ\nПриложение бесплатно до восьми клиентов, без ограничения по времени и без пробного счётчика. Одна покупка открывает весь обход навсегда: неограниченное число клиентов, полную историю визитов, балансы долгов и выгрузку. Одна цена, один раз. Подписки, продления и рекламы в приложении нет, а покупку можно восстановить после переустановки.\n\nПРИВАТНОСТЬ ПО УСТРОЙСТВУ\nЗапись остаётся на вашем телефоне. Аккаунт не создаётся, аналитика не работает, и ничего из введённого вами не выгружается. Единственный участник помимо вас и ваших клиентов — Google Play, и только чтобы принять разовый платёж.",
-      "screenshotCaptions": [
-        "Обход в вашем порядке: переставьте клиента под маршрут",
-        "Одно касание у бордюра: скошено, пропущено, смыто",
-        "Смыло дождём? Сдвиньте весь обход на день",
-        "Видно, кто ещё должен, по каждому клиенту",
-        "Держите свою копию: выгрузка записи в CSV",
-        "Бесплатно до восьми клиентов, разовая разблокировка"
-      ],
-      "featureBullets": [
-        "Работает офлайн, в режиме полёта и без аккаунта",
-        "Одно касание отмечает визит: скошено, пропущено, смыто",
-        "Сдвиг из-за дождя переносит всех на сегодня ровно на день",
-        "Текущий баланс долга по каждому клиенту и итог по обходу",
-        "Выгрузка в CSV через системный выбор файлов, со счётчиком строк",
-        "Разовая покупка: бесплатно до восьми клиентов, без подписки"
       ]
     }
   },
@@ -85,14 +69,16 @@
     "targetAudience": "adults-only"
   },
   "capabilityCompliance": {
-    "enabled": ["billing"],
+    "enabled": [
+      "billing"
+    ],
     "requiresConsent": false,
     "requiresPurchaseAuthority": false,
     "purchaseAuthority": null
   },
   "graphicsSource": {
-    "iconGlyph": "mower-stripe",
-    "brandColor": "#006C4C",
-    "accentColor": "#876500"
+    "iconGlyph": "mark-stripes",
+    "brandColor": "#242C24",
+    "accentColor": "#F8D46A"
   }
 }

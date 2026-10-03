@@ -97,9 +97,14 @@ reusing a slot's identity. Derive a new one per slot from that slot's own subjec
 
 ## How it is verified
 
-- `store/studio.json` is a declaration: `scripts/verify.mjs` treats a pack that declares it as
-  composed and requires `store/provenance.json` to bind the committed assets to a recorded build,
-  so `rm store/studio.json store/provenance.json` cannot drop the check.
+- `store/studio.json` is a declaration, and `scripts/verify.mjs` requires `store/provenance.json`
+  only once the pack actually **ships composed media** — a `store/assets/` tree holding at least one
+  file. The trigger is the media, not the declaration, and the difference is the two phases: the
+  declaration is authored before the UI is styled (phase 1), while the record is written only by
+  `scripts/media-capture.mjs` in phase 2, which refuses to run without the owner's release approval.
+  Keying on the media keeps the row satisfiable in phase 1 and strict in phase 2 — `rm
+  store/studio.json` with `store/assets/` populated still fails for the missing record, so deleting
+  the declaration cannot switch the check off.
 - `python scripts/visual-qa.py --slot <slug>` measures the shipped pixels independently: palette
   against the app's own Kotlin palette, caption ink and edge clipping, WCAG contrast of caption and
   mark, pairwise similarity of the six phone shots (six near-identical frames is not a pack), the
@@ -111,12 +116,23 @@ reusing a slot's identity. Derive a new one per slot from that slot's own subjec
   `scripts/core/icon.mjs` read the shipped vector and fail on ink outside the 66dp safe zone or
   beyond the circle keyline.
 - The **UI-iconography** half — the licence allowlist, the provenance record, the theme tint and the
-  one-family rule — has **no sensor yet**. `docs/icon-provenance.md` specifies the record and the
-  allowlist, and nothing reads it. Naming a check that does not exist would be the exact failure
-  this repository keeps re-learning, so it is stated plainly instead: until a program reads
-  `apps/<slot>/icons/provenance.json`, this half is a builder's obligation read back from the diff,
-  and neither `verify.mjs` nor `visual-qa.py` will catch a hand-drawn glyph or a licence that is not
-  on the allowlist.
+  one-family rule — is measured by `scripts/core/icons.mjs` in the `icon` group: seven legs
+  (`icons.mark`, `icons.launcher`, `icons.provenance`, `icons.licence`, `icons.offline`,
+  `icons.deprecated`, `icons.tint`) read `apps/<slot>/icons/provenance.json`, the launcher vectors and
+  the shipped sources, and `icons.fixtures` drives each of them so a leg that has stopped being able
+  to fail is visible in the same report as the artifact it judges. Its honest limit is stated rather
+  than implied: it proves a licence was **recorded, on an allowlist, with its text committed** — it
+  cannot prove the bytes came from where the record says, and it cannot decide the one-family rule,
+  because a glyph the app's own domain defines stays slot-owned by design.
+- The **palette** half is measured since 2026-10-02: `scripts/core/palette.mjs` runs in the `palette`
+  group and reads the declared `studio.json` palette against the slot's own `Color.kt`. It fails a
+  slot the baseline gates on WCAG contrast (4.5:1), the accent's hue offset from its fields, the field
+  chroma (a neutral is C ≤ 12), the accent's chroma against the chroma Material 3's **own** algorithm
+  derives at the same hue and tone, the indistinguishability triple and the dislike volume, and
+  reports rules 12 and 20 as measurements instead of gating them, because the research that derived
+  them says enforcing them would fail two real design systems. Its honest limit is the same shape: it
+  reads **declared** colours, so a dynamic-colour palette or a colour inside a drawable is invisible
+  to it, and it can say only that a palette is derived and legal — never that it is beautiful.
 
 None of these can say the app is beautiful. They can say the app's declared identity is the one in
 the build, the one in the pack, and the one in the pixels — and they can say two slots do not have

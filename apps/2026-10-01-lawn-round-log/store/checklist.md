@@ -1,30 +1,25 @@
-# Pre-upload checklist — Lawn Round Log
+# Google Play upload checklist — Lawn Round Log
 
-Research baseline: `docs/research/2026-09-20-android-play-ai-agents.md`
+- [ ] Run `python scripts/store/validate.py --slot lawn-round-log` and resolve every FAIL.
+- [ ] Inspect every captured screen for personal or test data.
+- [ ] Compare listing claims and captions with the release build.
+- [ ] Confirm `v.sobolenko.vs@gmail.com` is monitored; Play publishes it on the listing.
+- [ ] `store/privacy.md` is recorded at `https://telegra.ph/Lawn-Round-Log--privacy-policy-10-02` (a real host); re-run `node scripts/publish-privacy.mjs --slot lawn-round-log` after editing it, and open the live page to confirm it still describes the shipped app.
+- [ ] Audit permissions and third-party SDK behavior against `data-safety.md`.
+- [ ] Build and locally test the signed release AAB from `dist/`.
+- [ ] Enrol in Play App Signing and keep upload credentials outside the repository.
+- [ ] Complete Ads, Content rating, Target audience, App access, and Data safety declarations.
+- [ ] Upload phone, 7-inch tablet, and 10-inch tablet assets for every locale.
+- [ ] Verify edge-to-edge, orientation, text scale, and tablet layouts on representative devices.
+- [ ] For a brand-new package, upload the first AAB and complete legal declarations manually in Play Console.
 
-## Build / platform
+## Billing — create and activate what the app asks for
 
-- [ ] `compileSdk` / `targetSdk` ≥ **36**
-- [ ] `assembleDebug` passes
-- [ ] `bundleRelease` AAB produced (Play artifact)
-- [ ] `dataExtractionRules` + `backup_rules` present; secrets excluded
-- [ ] Edge-to-edge + insets verified on API 35/36 emulator
-- [ ] Predictive back OK (or temporary opt-out documented)
-- [ ] If any `.so` / NDK / native SDK: 16 KB page-size check planned (hard block 2027-02-01)
+A purchase flow that references an unknown product fails in the reviewer's session, so every
+step below has to be done, and confirmed with a real test purchase, before review submits.
 
-## Play Console
-
-- [ ] Privacy policy URL ready (`store/privacy.md` drafted)
-- [ ] Data safety form answers (`store/data-safety.md`) — even if "no data collected"
-- [ ] Ads declaration accurate
-- [ ] Content rating questionnaire
-- [ ] Target audience / Families policy if applicable
-- [ ] Package name registered / developer verification done
-- [ ] Review notes / demo account (`store/review-notes.md`)
-- [ ] Listing matches real app behavior (no vaporware)
-- [ ] If generative AI: in-app report/flag + not a thin wrapper
-
-## Signing
-
-- [ ] Upload keystore configured locally (not in git)
-- [ ] Play App Signing enrolled
+- [ ] Create each of these in Play Console → Monetize with Play → Products → In-app products: `round_log_unlock`.
+- [ ] Activate each product's purchase option. An option left in Draft *isn't returned by the Play Billing Library*, so the app behaves as if the product does not exist.
+- [ ] Add the account that will test purchases to Play Console → Settings → License testing. An account added only as an internal tester on a track is **not** a license tester, and a purchase made by it is charged **real money**.
+- [ ] Use `node scripts/play-upload.mjs --slot lawn-round-log --track internal --dry-run` before any live upload.
+- [ ] Obtain explicit human approval before committing a Play edit.

@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "slot": "tap-to-say",
+  "reconRef": "docs/ideation/2026-10-02-assistive-and-communication.md#9-the-name",
+  "title": "TapToSay: AAC Board",
+  "slug": "tap-to-say",
+  "applicationId": "com.gexetr.taptosay",
+  "archetype": "carrier_job_noun",
+  "candidates": [
+    {
+      "name": "TapToSay: AAC Board",
+      "archetype": "carrier_job_noun",
+      "score": 82,
+      "dimensions": {
+        "jobFit": 4.0,
+        "searchability": 4.0,
+        "distinctiveness": 3.5,
+        "radioTest": 5.0,
+        "uniqueness": 3.5,
+        "lengthFit": 5.0,
+        "localeSurvival": 4.0
+      },
+      "why": "The carrier names the exact physical act the user performs, tap a tile and it says the words, which is the whole product in two syllables of ordinary English; that matters more here than on any other shelf in this factory, because the person using the board may have lost the ability to read, so a metaphor the buyer has to decode is a real cost and an instruction is a feature. It carries the typed job noun AAC Board that the shelf's own buyers type, holds 19 characters so it keeps 11 of slack against the 30 character cap, and has exactly one canonical spelling, which is the radio test at its strongest because a ward nurse or a speech therapist may pass this app on by voice alone. It gives up ownability honestly: a two-word English instruction phrase is weak trademark headroom, and that trade is the recorded decision in the rationale below."
+    },
+    {
+      "name": "PhrasePilot: AAC Board",
+      "archetype": "carrier_job_noun",
+      "score": 81,
+      "dimensions": {
+        "jobFit": 3.5,
+        "searchability": 4.0,
+        "distinctiveness": 4.5,
+        "radioTest": 4.5,
+        "uniqueness": 4.0,
+        "lengthFit": 4.5,
+        "localeSurvival": 3.5
+      },
+      "why": "The runner-up, and the honest gap between it and the winner is one point: pilot as a verb does mean to guide, which is what the board does when it surfaces the likely need first, and this is the more brandable and more ownable of the two. It loses on the two dimensions this audience weights hardest. Its claim is a metaphor rather than an interaction, so a user who cannot read gets nothing from it, and it degrades in the second locale, where a Russian-speaking buyer reads pilot as aviation and must be told what the name means. It also spends a character more on the carrier and keeps three less slack."
+    },
+    {
+      "name": "SpeakHarbor: AAC Board",
+      "archetype": "evocative",
+      "score": 78,
+      "dimensions": {
+        "jobFit": 2.5,
+        "searchability": 3.5,
+        "distinctiveness": 4.5,
+        "radioTest": 4.5,
+        "uniqueness": 4.5,
+        "lengthFit": 4.5,
+        "localeSurvival": 4.0
+      },
+      "why": "A genuinely evocative and clean option with the best trademark headroom of the three serious candidates, screened at one unrelated Play card and nothing else. It loses because a harbour is a feeling and not a job: with the metaphor scored honestly it falls apart against the others on job fit, and a carer scanning a search result for a way to let a parent speak learns nothing from the word harbour, while the descriptor after the separator is left to carry the entire meaning on its own."
+    },
+    {
+      "name": "TalkLoom: AAC Board",
+      "archetype": "compound",
+      "score": 72,
+      "dimensions": {
+        "jobFit": 3.5,
+        "searchability": 2.5,
+        "distinctiveness": 4.0,
+        "radioTest": 4.0,
+        "uniqueness": 4.0,
+        "lengthFit": 4.0,
+        "localeSurvival": 3.5
+      },
+      "why": "No live title contains the string talkloom, which is a clean collision result, and the compound is pronounceable and thematically honest about weaving words together. It is eliminated by what Play itself did with the token: a search for it was fuzzy-matched to WhatsApp, Messenger, KakaoTalk and Snapchat, meaning the joined word carries no index weight of its own, so the carrier half of the title would earn nothing and the whole findability burden would fall on the descriptor. A carrier the store cannot see is not a carrier."
+    },
+    {
+      "name": "AAC Board",
+      "archetype": "descriptive",
+      "score": 51,
+      "dimensions": {
+        "jobFit": 1.5,
+        "searchability": 3.0,
+        "distinctiveness": 1.0,
+        "radioTest": 5.0,
+        "uniqueness": 1.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 2.5
+      },
+      "why": "The first negative control: the shelf's own head term, used to prove the field eliminates something. Every incumbent that matters already bids on these two words, including a 500K-plus install leader with 3,036 exact reviews, and a new listing with no ratings cannot rank on the phrase it shares with all of them. It is easy to say and easy to type, which is exactly why it is worth nothing as an asset."
+    },
+    {
+      "name": "Talker",
+      "archetype": "descriptive",
+      "score": 49,
+      "dimensions": {
+        "jobFit": 1.0,
+        "searchability": 3.5,
+        "distinctiveness": 1.0,
+        "radioTest": 5.0,
+        "uniqueness": 1.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 2.0
+      },
+      "why": "The second negative control: the AAC field's own word for the physical device a person carries, so it names the hardware category rather than this app's job and collides conceptually with every speech-generating device on the shelf. It scores no better than the head term on distinctiveness and uniqueness and is the reason the chosen name leads with an interaction instead of a thing."
+    }
+  ],
+  "rejected": [
+    {
+      "name": "TalkTiles: AAC Board",
+      "reason": "Eliminated by collision and by rejection 16 in one: org.velassi.talktiles ships a live AAC app titled TalkTiles AAC Cards, so this is an incumbent's title with one word swapped, in the same category, for the same job, which is the pattern Play's Spam policy targets and a hard check outranks any score."
+    },
+    {
+      "name": "WordLoom: AAC Board",
+      "reason": "Eliminated by collision: com.wordloom.app ships WordLoom: Word Search Puzzles with 100-plus installs, and the same carrier token sat on a 3.9 star Play card with 14 exact reviews, so the string is already in a user's search results and cannot be owned in class 9."
+    },
+    {
+      "name": "TalkBridge: AAC Board",
+      "reason": "Eliminated by collision twice over: com.talkbridge and com.margaspt.talkbridge are both live Play apps titled TalkBridge, one of them with 1K-plus installs and a declared in-app purchase, so the exact carrier is taken by two listings the search page will show next to ours."
+    },
+    {
+      "name": "BoardSpeak: AAC Board",
+      "reason": "Eliminated because it is a mirror of a live title rather than a name of its own: com.SpeakBoard ships SpeakBoard, the same two words reversed, so the carrier reads as a copy of an existing listing and the distinctiveness it appeared to have is an artefact of word order."
+    },
+    {
+      "name": "PhrasePilot: AAC Board",
+      "reason": "The genuine runner-up and clean on Play, rejected at 81 against the winner's 82 on the two dimensions this audience weights hardest: its promise is a metaphor that a user who cannot read cannot use, and in the second locale pilot reads as aviation and needs explaining."
+    },
+    {
+      "name": "AAC Board",
+      "reason": "The shelf's head term used as the negative control: it is the phrase every incumbent already ranks for, it names the category rather than this app's job, and it gives a carer no reason to prefer this listing over the 500K-plus install leader that already bids on the same two words."
+    },
+    {
+      "name": "Talker",
+      "reason": "The second negative control: it is the field's own word for the hardware rather than a name for the job, it cannot be owned, and it tells a carer nothing about what makes this board different from the speech-generating device they may already have been offered."
+    }
+  ],
+  "searchPhrases": [
+    "aphasia communication app",
+    "communication board adults",
+    "adult aac board"
+  ],
+  "audience": "An adult who cannot speak reliably after a stroke or with aphasia, and the family carer or ward nurse who sets the phone up for them: the buyer is the carer, who is spending their own money in the first weeks home or at a hospital bedside, has usually already tried one free AAC app and been stopped by a subscription, a sign-up or a locked voice, and needs the app to work with no wifi and nothing to approve.",
+  "rationale": "The winner is carrier plus job noun because the shelf has no name space left for anything else: eleven carrier auditions were screened on Play in this session and five were eliminated by a named live collision, including TalkTiles against org.velassi.talktiles and WordLoom against com.wordloom.app, and two more were eliminated structurally as mirrors of live titles. Among the survivors the field is genuinely close, and the record says so rather than pretending otherwise: the winner is 82 and the runner-up is 81, and the one point that separates them is the dimension this audience weights hardest, job fit. The person using a bedside board may have lost the ability to read, so a carrier that names the physical interaction is usable by the patient and a carrier that names a metaphor is usable only by the carer who installed it. The price of that choice is ownability, a two-word English instruction phrase is weakly protectable, and it is recorded in assumptionsUnverified rather than hidden behind a coinage a nurse cannot spell out loud.",
+  "collisionCheck": "Play search was screened for the chosen title, the runner-up, and every serious carrier audition on 2026-10-02 from this machine using enrich-market.mjs, which reads the store result page and the app detail cards. The exact string TapToSay returned no visible results at all, and SpeakHarbor returned one unrelated card, a UK radio app. Five carriers were eliminated by a named colliding entity: TalkTiles by org.velassi.talktiles shipping TalkTiles AAC Cards, WordLoom by com.wordloom.app shipping WordLoom: Word Search Puzzles, TalkBridge by both com.talkbridge and com.margaspt.talkbridge, BoardSpeak by com.SpeakBoard shipping SpeakBoard, and TalkLoom by a Play fuzzy match that reached WhatsApp, Messenger, KakaoTalk and Snapchat instead of any title containing the token. WordTile was also screened and eliminated by multiple live word-puzzle games. A clean Play search is not clearance: Play does not enforce unique titles, several live apps may share one, and no live listing carrying this exact title was observed rather than proved absent.",
+  "localisationCheck": "The title was measured character by character against Play's 30 character cap in both declared locales rather than estimated. The English title TapToSay: AAC Board is 19 characters and keeps 11 characters of slack. The Russian title keeps the carrier in Latin as the brand and transcreates the descriptor rather than machine translating it, reading TapToSay: doska obshcheniya in Cyrillic at 23 characters with 7 characters of slack, so both locales sit inside the cap without relying on English being short. The carrier is Latin letters only, with no diacritics, no emoji, no ALL CAPS, no repeated special characters and exactly one canonical spelling, so a listener who hears it once can type it in either market. The word TapToSay carries no unfortunate or homophone meaning in Russian, and the descriptor is an ordinary phrase for a communication board rather than a clinical or ranking claim. Whether a Russian-speaking buyer can find the app by that Russian descriptor was not measured, and it is listed as an unverified assumption rather than claimed.",
+  "evidence": "docs/ideation/2026-10-02-assistive-and-communication.md#9-the-name",
+  "localizedTitles": {
+    "en-US": "TapToSay: AAC Board",
+    "ru-RU": "TapToSay: доска общения"
+  },
+  "scoringRubric": {
+    "scale": "0-5 per dimension, weighted",
+    "weights": {
+      "jobFit": 20,
+      "searchability": 15,
+      "distinctiveness": 15,
+      "radioTest": 15,
+      "uniqueness": 15,
+      "lengthFit": 10,
+      "localeSurvival": 10
+    },
+    "floor": "chosen 82 out of 100 with no dimension below 2.5; a hard check outranks the score, which is why two clean candidates were still eliminated by collision"
+  },
+  "assumptionsUnverified": [
+    "Ownability is the price of this choice and it is UNVERIFIED that the trade was worth making: a two-word English instruction phrase is weakly protectable, and no measurement in this session shows an instruction-shaped carrier out-ranking a coined one on this shelf, so the decision rests on the measured collision field rather than on a ranking reading.",
+    "Trademark headroom is UNVERIFIED. No register was queried, so the USDA, EUIPO, WIPO and the Russian national register are all unread and whether the string TapToSay is free in class 9, downloadable software, is not known. This record does not claim clearance, and a clean Play search is not a substitute for one.",
+    "Whether the applicationId com.gexetr.taptosay is free on Play is UNVERIFIED: no tool in this repository queries package availability, and only a create-app attempt in Play Console or a package search would settle it.",
+    "The Russian descriptor was authored rather than read from user text: no Russian-language review or search phrase in this session showed that buyers type the phrase for a communication board, so the Russian title is a reasoned transcreation and not a measured query.",
+    "The scoring numbers are a judgement, not a measurement. The one point separating the chosen name from the runner-up is an honest assessment of job fit for a user who may not be able to read, and a different reader could award those dimensions differently; the record keeps the near-tie visible rather than manufacturing a gap."
+  ]
+}

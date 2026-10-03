@@ -127,6 +127,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
+    // `AppCompatDelegate.setApplicationLocales` is the engine of the per-app language picker, and it
+    // lives in the AndroidX AppCompat runtime rather than in `activity-compose`.
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)

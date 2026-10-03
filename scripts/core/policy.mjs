@@ -8,15 +8,18 @@
 //   `slot.differentiators`  <- `verify.mjs` `verifyDifferentiators()` (the module is imported)
 //   `slot.uiCoverage`       <- `verify.mjs` `verifyUiCoverage()` and `scripts/check-ui-coverage.mjs`
 //
-// Why the locale and UI-coverage rule sets are restated here instead of imported. Both sources are
-// CLI scripts whose last statement calls `main()` unconditionally, so importing either one would
-// execute it against the core's own `process.argv` (and spawn nothing). The core's contract is that
-// a check is a function the entry point calls in-process — `specs/factory-core/spec.md`: "It SHALL
-// import the checks it runs. The only subprocess it may spawn is the build tool" — so the tables
-// that carry those rules say below which file and line they were copied from, and the fixtures in
-// `policyFixtures()` pin the behaviour each table produces. `scripts/lib/slot-differentiators.mjs`
-// *is* a module and is imported rather than restated, per `.cursor/rules/verification-discipline.mdc`
-// ("One source of truth, imported — never restated").
+// Why the locale rule set is restated here instead of imported, while the UI-coverage tables are not.
+// `scripts/check-locales.mjs` is a CLI script whose last statement calls `main()` unconditionally,
+// so importing it would execute it against the core's own `process.argv` (and spawn nothing); the
+// locale table therefore says below which file and line it was copied from. The UI-coverage tables
+// are the opposite case, and this is the direction the rule allows: they live here, and
+// `scripts/check-ui-coverage.mjs` imports them, which is safe because this module has no top-level
+// side effect. The core's contract is that a check is a function the entry point calls in-process —
+// `specs/factory-core/spec.md`: "It SHALL import the checks it runs. The only subprocess it may
+// spawn is the build tool" — and the fixtures in `policyFixtures()` pin the behaviour each table
+// produces. `scripts/lib/slot-differentiators.mjs` *is* a module and is imported rather than
+// restated, per `.cursor/rules/verification-discipline.mdc` ("One source of truth, imported —
+// never restated").
 //
 // Two rules every check here obeys. A missing input is never a pass: an absent `store/listing.json`,
 // an absent `differentiators.json`, an absent `res/xml/locales_config.xml` or an absent ViewModel
@@ -28,11 +31,18 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import path from 'node:path'
 import {
+  CONNECTIVE_FAMILIES,
+  crudReport,
+  crudVerdict,
+  DEPTH_FAMILIES,
+  depthFindings,
+  JOB_STAGES,
   parseDifferentiators,
   summarizeDifferentiators,
   validateDifferentiatorRefs
 } from '../lib/slot-differentiators.mjs'
-import { expectEqual, expectTrue, fail, guard, pass, ROOT, unverified } from './lib.mjs'
+import { baselineVerdict } from './baseline.mjs'
+import { expectEqual, expectTrue, fail, guard, pass, ROOT, unverified, VERDICT } from './lib.mjs'
 
 /** Slot-relative, POSIX-shaped path, for a message a human reads. */
 const rel = (file) => path.relative(ROOT, file).split(path.sep).join('/')
@@ -450,6 +460,16 @@ export function checkLocales(slotDir) {
 // proof against the slot on disk, and — the teeth — fails while any promise is still `deferred`,
 // which is what stops a slot being called done with ten of twenty reasons delivered.
 //
+// Since 2026-10-02 the same check carries the **depth** half (`.cursor/rules/app-depth.mdc`): a
+// promise list that names only the record-keeping middle of the job produces exactly that app while
+// every gate reports PASS, so `depthFindings` asks whether `jobCoverage` covers `before`, `during`
+// and `after`, and whether at least one shipped claim is a *connective* handoff whose proof artifact
+// actually contains the family's named token. The measured defect is `apps/2026-10-01-lawn-round-log`:
+// it builds `domain/Csv.kt` and has no `ACTION_SEND`, no `ACTION_CREATE_DOCUMENT` and no
+// `FileProvider`, so the CSV is constructed and the user cannot get the file off the phone. Those
+// findings are baseline-scoped through `baselineVerdict`; the CRUD report beside them is a note that
+// never gates, because the predicate measures vocabulary and depth is semantics plus market.
+//
 // One half does not survive the port, and it is stated rather than implied: the legacy wrapper also
 // looked for `differentiators.json` in git, so deleting the file from the working tree was a `FAIL`
 // ("committed but missing from the working tree") rather than an `UNVERIFIED`. Reading git means
@@ -515,11 +535,36 @@ export function checkDifferentiators(slotDir) {
     }
 
     const { total, core, shipped, narrowed, dropped, deferred } = result.summary
-    return pass(
-      'slot.differentiators',
+    const summary =
       `contract schema — ${total} promise(s), ${core} core, ${shipped} shipped, ${narrowed} narrowed, ` +
-        `${dropped} dropped, ${deferred} deferred`
-    )
+      `${dropped} dropped, ${deferred} deferred`
+
+    // The CRUD report is a note and never a finding. `docs/research/2026-10-02-depth-encoding-and-
+    // detectability.md` §1.3 measured the repository's own `edit-every-record` row escaping the
+    // lexical predicate because it carries a contrast clause, which may be a true and sourced
+    // difference; a FAIL here would fire on correct prose. It prints so the owner can read it at
+    // checkpoint 1 (`.cursor/rules/app-depth.mdc`, "Human-audited, reported and never auto-passed").
+    const crud = crudReport(result.value, { file: rel(file), raw: json })
+    const withCrud = crud.length
+      ? `${summary}; CRUD report (human-read, never gating): ${crud.join('; ')}`
+      : summary
+
+    // The depth floor — does the contract cover the user's whole job, and does at least one shipped
+    // handoff carry its family's token in the artifact that proves it — is baseline-scoped through
+    // `baselineVerdict`, exactly as `uiux.*`, `settings.*` and `locale.*` are: a slot created before
+    // the rule reports the finding as a note, a slot created from it is gated.
+    const depth = depthFindings(result.value, {
+      slotDir,
+      isFile: (candidate) => {
+        try {
+          return statSync(candidate).isFile()
+        } catch {
+          return false
+        }
+      },
+      readFile: (candidate) => readText(candidate)
+    })
+    return baselineVerdict('slot.differentiators', slotDir, depth, withCrud)
   })
 }
 
@@ -543,7 +588,8 @@ export function checkDifferentiators(slotDir) {
 /**
  * Operations the store listing promises, with the promise each one keeps.
  *
- * Copied verbatim from `scripts/check-ui-coverage.mjs` (its `REQUIRED`). The `claim` text is a
+ * This is the single home of the table: `scripts/check-ui-coverage.mjs` imports it rather than
+ * restating it, so that CLI and `slot.uiCoverage` cannot drift apart. The `claim` text is a
  * quotation or a close paraphrase of `store/listing.json`'s `fullDescription`, so this table can be
  * checked against the listing it guards rather than trusted — and a reviewer adding a feature is the
  * person who should add its line.
@@ -580,7 +626,42 @@ export const REQUIRED = Object.freeze({
   moveToNextFreeDesk: 'the listing sells seating plans a teacher does not redraw',
   requestExport: 'the listing sells CSV and PDF export',
   requestBackup: 'the listing sells writing "your whole record to one file you keep"',
-  restoreBackup: 'the listing sells restoring that file later'
+  restoreBackup: 'the listing sells restoring that file later',
+  // --- laneset (apps/2026-10-02-laneset) ---
+  // The swim set builder's claimed operations. The listing is `store/listing.json`'s
+  // `fullDescription`; each operation is the control its sentence depends on, and every one is
+  // reachable from a screen today, so this table checks the slot instead of refusing to speak.
+  onEvent: 'the listing sells configuring "the minutes you have, the length of your pool, the day\'s focus, the strokes you want to avoid and the gear that is on the deck", then computing the set from them',
+  onPasteFromClipboard: 'the listing sells "Paste in the set your coach wrote"',
+  onRead: 'the listing sells that Laneset "parses it into the same structured, paced session it generates itself"',
+  onAccept: 'the listing sells the pasted set becoming "the same structured, paced session it generates itself"',
+  buy: 'the listing sells "One purchase, everything included" for the one-time unlock',
+  // --- lawn-round-log (apps/2026-10-01-lawn-round-log) ---
+  // The round book's claimed operations. The listing is `store/listing.json`'s `fullDescription`;
+  // each operation is the control its sentence depends on. Measured before this row was written:
+  // with it `uiCoverageFrom` returns 0 problems over 33 reachable operations (2 notes: `clearStatus`,
+  // `shutdown`, both lifecycle calls), and the extended table run over every slot in `apps/` leaves
+  // every other slot at 0 problems. `restore` is shared with laneset, whose own unlock screen
+  // restores a purchase, so its claim is worded for both rather than for one.
+  upsertCustomer: 'the listing sells "Add each customer once" and "Edit or delete a customer"',
+  move: 'the listing sells "move the list into the order you actually drive"',
+  mark: 'the listing sells "Mark a visit mowed, skipped or rained off with a single tap"',
+  pushByOneDay: 'the listing sells "One action moves every customer due today forward exactly one day"',
+  recordPayment: 'the listing sells "Record a payment in one tap"',
+  removePayment: 'the listing sells "and remove it if you mistyped"',
+  restatePayment: 'the listing sells "Edit or delete a customer, a visit or a payment" (payment)',
+  deleteCustomer: 'the listing sells "Edit or delete a customer, a visit or a payment" (customer)',
+  deleteVisit: 'the listing sells "Edit or delete a customer, a visit or a payment" (visit)',
+  restateVisit: 'the listing sells "Edit or delete a customer, a visit or a payment" (visit status)',
+  exportCsv: 'the listing sells "Export the stored record to a CSV file through the system file picker"',
+  shareCsv: 'the listing sells keeping "your own copy"; the share control hands the CSV off the device',
+  purchase: 'the listing sells "One purchase adds two things and nothing else" — the unlock control',
+  restore: 'the listing sells that the one-time purchase can be restored after a reinstall',
+  setConfirmBeforeDelete: 'the listing sells a delete confirmation "on by default and can be turned off in Settings"',
+  startNew: 'the listing sells "Add each customer once" (the editor entry point)',
+  startEdit: 'the listing sells "Edit or delete a customer" (the editor entry point)',
+  setFilter: 'the listing sells every visit "on the record" (the history filter)',
+  clearExportStatus: 'the listing sells the app telling "you how many rows it wrote"'
 })
 
 /** Operations that are deliberately not called from a screen, with the reason they are not. */
@@ -1064,6 +1145,378 @@ export function policyFixtures() {
         }
         const result = contractProblems(JSON.stringify(value), fixtureFs())
         expectTrue(result.errors.some((entry) => entry.includes('proof.ref')), result.errors.join('; '))
+      }
+    ])
+
+    // ---- slot.differentiators: the depth contract (jobCoverage + the handoff floor) -----------
+    //
+    // The findings this half produces are baseline-scoped, so the two applicability fixtures call
+    // `baselineVerdict` directly on the two real slots — a pre-baseline product slot, which must
+    // only ever carry a note, and a slot created at the baseline, which must be gated. Both dates
+    // come from registry/apps.json through `baseline.mjs`, never from a literal in this file.
+
+    const depthContract = (overrides = {}) => {
+      const value = JSON.parse(contract())
+      value.jobCoverage = {
+        before: { claimId: 'c-thing' },
+        during: { claimId: 'b-thing' },
+        after: { claimId: 'a-thing' }
+      }
+      value.claims[0] = { ...value.claims[0], jobStage: 'after', depthFamily: 'data_out' }
+      return { ...value, ...overrides }
+    }
+    const depthFs = (present, readFile = () => 'object Thing { fun thing() {} }') => ({
+      ...fixtureFs(present),
+      readFile
+    })
+    // The same contract with its connective claim moved from the exit door to the entry one, so the
+    // `data_in` token half of the floor can be driven on its own. `data_in` is the family the camera
+    // tokens were added to (`.cursor/rules/app-depth.mdc`), so the legs below are the only fixtures
+    // that exercise them.
+    const dataInContract = () => {
+      const value = depthContract()
+      value.claims[0] = { ...value.claims[0], depthFamily: 'data_in' }
+      return value
+    }
+
+    cases.push([
+      'RULE jobCoverage is authored — a contract with no jobCoverage reports the missing-coverage finding',
+      () => {
+        const findings = depthFindings(JSON.parse(contract()), depthFs())
+        expectTrue(findings.some((entry) => entry.includes('no jobCoverage')), findings.join('; '))
+      }
+    ])
+
+    cases.push([
+      'RULE the handoff floor — a contract whose shipped claims are all core_operation reports the floor finding',
+      () => {
+        expectTrue(!CONNECTIVE_FAMILIES.includes('core_operation'), 'core_operation must never count as connective')
+        const value = depthContract()
+        value.claims.forEach((claim) => {
+          claim.depthFamily = 'core_operation'
+        })
+        const findings = depthFindings(value, depthFs())
+        expectTrue(
+          findings.some((entry) => entry.includes('no shipped claim names a connective depth family')),
+          findings.join('; ')
+        )
+      }
+    ])
+
+    cases.push([
+      'RULE the handoff floor — a data_out claim whose artifact builds a CSV but carries no share intent reports the token finding',
+      () => {
+        // The measured lawn-round-log shape: `domain/Csv.kt` builds a file, and no ACTION_SEND,
+        // ACTION_CREATE_DOCUMENT or FileProvider carries it off the phone.
+        const findings = depthFindings(depthContract(), depthFs(undefined, () => 'object Csv { fun csvFor() = "a,b" }'))
+        expectTrue(findings.some((entry) => entry.includes('data_out token')), findings.join('; '))
+        expectTrue(findings.some((entry) => entry.includes('lawn-round-log shape')), findings.join('; '))
+      }
+    ])
+
+    cases.push([
+      'RULE the handoff floor — the same claim with ACTION_SEND in its artifact clears the floor (no findings)',
+      () => {
+        const findings = depthFindings(
+          depthContract(),
+          depthFs(undefined, () => 'Intent(Intent.ACTION_SEND).setType("text/csv")')
+        )
+        expectEqual(findings, [], 'findings')
+      }
+    ])
+
+    cases.push([
+      'RULE the handoff floor — a data_in claim whose artifact builds a CSV but reaches for no picker or camera reports the token finding',
+      () => {
+        // The `data_in` mirror of the lawn-round-log shape, written as the same kind of test so the
+        // two read alike: the artifact exists and the handoff does not. `data_in` is the door the
+        // user's own content comes in through — the picker, the clipboard, or the camera — so a class
+        // that only parses a string has none of them, and the floor says so rather than reading the
+        // claim's prose. `parseCsv` is deliberately a name the token list cannot match by accident.
+        const findings = depthFindings(dataInContract(), depthFs(undefined, () => 'object Importer { fun parseCsv() = "a,b" }'))
+        expectTrue(findings.some((entry) => entry.includes('data_in token')), findings.join('; '))
+        expectTrue(findings.some((entry) => entry.includes('lawn-round-log shape')), findings.join('; '))
+      }
+    ])
+
+    cases.push([
+      'RULE the handoff floor — each camera token satisfies data_in, because the camera is the same handoff through a different door',
+      () => {
+        // The picker (`PickVisualMedia`) was already a `data_in` token; the owner's 2026-10-02
+        // decision made the phone's free, local camera one too (`.cursor/rules/app-depth.mdc`). This
+        // leg drives all three camera tokens the rule names — `ACTION_IMAGE_CAPTURE` (the system
+        // camera intent), `TakePicture` (`ActivityResultContracts.TakePicture`) and `ImageCapture`
+        // (the CameraX use case) — because a token listed but never matched is the silent no-op this
+        // suite exists to catch: the floor would pass on a claim it never actually checked. What it
+        // cannot prove, and does not claim, is that the call site runs or that the captured image is
+        // used — the token match is textual, the limit the module header states.
+        const artifacts = [
+          ['ACTION_IMAGE_CAPTURE', 'startActivity(Intent(MediaStore.ACTION_IMAGE_CAPTURE))'],
+          ['TakePicture', 'val takePicture = ActivityResultContracts.TakePicture()'],
+          ['ImageCapture', 'ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).build()']
+        ]
+        for (const [token, source] of artifacts) {
+          const findings = depthFindings(dataInContract(), depthFs(undefined, () => source))
+          expectEqual(findings, [], `the ${token} artifact was refused`)
+        }
+      }
+    ])
+
+    cases.push([
+      'RULE jobCoverage — "during" is the act the app is named for and can never be refused',
+      () => {
+        const value = depthContract()
+        value.jobCoverage.during = { refusal: { reason: 'the visit is the job', decidedBy: 'scout', recordedAt: '2026-10-02' } }
+        const result = contractProblems(JSON.stringify(value), fixtureFs())
+        expectEqual(result.stage, 'schema', 'stage')
+        expectTrue(result.errors.some((entry) => entry.includes('can never be refused')), result.errors.join('; '))
+      }
+    ])
+
+    cases.push([
+      'RULE a refusal is a sentence with a reason, a decider and a date — one missing fails',
+      () => {
+        const value = depthContract()
+        value.jobCoverage.after = { refusal: { reason: 'the job truly ends at the visit', recordedAt: '2026-10-02' } }
+        const result = contractProblems(JSON.stringify(value), fixtureFs())
+        expectEqual(result.stage, 'schema', 'stage')
+        expectTrue(result.errors.some((entry) => entry.includes('refusal.decidedBy')), result.errors.join('; '))
+      }
+    ])
+
+    // ---- the `after` refusal is the owner's decision, not the scout's (2026-10-02) -------------
+    // Refusing `after` discards the handoff, so it needs the owner's own words exactly as weakening
+    // a `core` promise does. One fixture per leg: a scout refusing `after` fails, the owner's words
+    // pass, an empty owner record fails naming the field, and `before` stays the scout's to refuse.
+
+    cases.push([
+      'RULE after refusal — a scout may not refuse the after stage, which is the owner\'s decision',
+      () => {
+        const value = depthContract()
+        value.jobCoverage.after = {
+          refusal: {
+            reason: 'The round record is finished on the phone and nothing is sent anywhere.',
+            decidedBy: 'scout',
+            recordedAt: '2026-10-02'
+          }
+        }
+        const result = contractProblems(JSON.stringify(value), fixtureFs())
+        expectEqual(result.stage, 'schema', 'stage')
+        expectTrue(result.errors.some((entry) => entry.includes('refusal.decidedBy')), result.errors.join('; '))
+        expectTrue(result.errors.some((entry) => entry.includes('"owner"')), result.errors.join('; '))
+        expectTrue(result.errors.some((entry) => entry.includes('ownerDecision')), result.errors.join('; '))
+      }
+    ])
+
+    cases.push([
+      'RULE after refusal — the owner refusing the after stage in his own words parses',
+      () => {
+        const value = depthContract()
+        value.jobCoverage.after = {
+          refusal: {
+            reason: 'The round record is finished on the phone and nothing is sent anywhere.',
+            decidedBy: 'owner',
+            recordedAt: '2026-10-02',
+            ownerDecision: {
+              words: 'the round record stays on the phone, we ship it without an export',
+              recordedAt: '2026-10-02T19:00:00.000Z'
+            }
+          }
+        }
+        const result = contractProblems(JSON.stringify(value), fixtureFs())
+        expectEqual(result.errors, [], 'errors')
+        expectEqual(result.stage, 'ok', 'stage')
+      }
+    ])
+
+    cases.push([
+      'RULE after refusal — an owner refusal whose owner record is empty fails, naming the field',
+      () => {
+        const value = depthContract()
+        value.jobCoverage.after = {
+          refusal: {
+            reason: 'The round record is finished on the phone and nothing is sent anywhere.',
+            decidedBy: 'owner',
+            recordedAt: '2026-10-02',
+            ownerDecision: { words: '   ', recordedAt: '2026-10-02' }
+          }
+        }
+        const result = contractProblems(JSON.stringify(value), fixtureFs())
+        expectEqual(result.stage, 'schema', 'stage')
+        expectTrue(result.errors.some((entry) => entry.includes('ownerDecision.words')), result.errors.join('; '))
+      }
+    ])
+
+    cases.push([
+      'RULE after refusal — a missing owner record fails, while the same refusal on before is the scout\'s',
+      () => {
+        const value = depthContract()
+        value.jobCoverage.after = {
+          refusal: {
+            reason: 'The round record is finished on the phone and nothing is sent anywhere.',
+            decidedBy: 'owner',
+            recordedAt: '2026-10-02'
+          }
+        }
+        const result = contractProblems(JSON.stringify(value), fixtureFs())
+        expectEqual(result.stage, 'schema', 'stage')
+        expectTrue(result.errors.some((entry) => entry.includes('ownerDecision')), result.errors.join('; '))
+
+        const scout = depthContract()
+        scout.jobCoverage.before = {
+          refusal: {
+            reason: 'There is nothing to prepare: the log starts empty on the first drive.',
+            decidedBy: 'scout',
+            recordedAt: '2026-10-02'
+          }
+        }
+        const before = contractProblems(JSON.stringify(scout), fixtureFs())
+        expectEqual(before.errors, [], 'errors')
+        expectEqual(before.stage, 'ok', 'stage')
+      }
+    ])
+
+    cases.push([
+      'RULE a refusal reason that is a placeholder token fails; the token check cannot read sincerity',
+      () => {
+        const value = depthContract()
+        value.jobCoverage.before = { refusal: { reason: 'none', decidedBy: 'scout', recordedAt: '2026-10-02' } }
+        const result = contractProblems(JSON.stringify(value), fixtureFs())
+        expectEqual(result.stage, 'schema', 'stage')
+        expectTrue(result.errors.some((entry) => entry.includes('refusal.reason')), result.errors.join('; '))
+      }
+    ])
+
+    cases.push([
+      'RULE coverage resolves — a stage pointing at a claim id nobody declared fails',
+      () => {
+        const value = depthContract()
+        value.jobCoverage.before = { claimId: 'no-such-claim' }
+        const result = contractProblems(JSON.stringify(value), fixtureFs())
+        expectEqual(result.stage, 'schema', 'stage')
+        expectTrue(result.errors.some((entry) => entry.includes('does not name a claim')), result.errors.join('; '))
+      }
+    ])
+
+    cases.push([
+      'RULE the family set is closed — an unknown depthFamily fails, naming the set',
+      () => {
+        const value = depthContract()
+        value.claims[0].depthFamily = 'export'
+        const result = contractProblems(JSON.stringify(value), fixtureFs())
+        expectEqual(result.stage, 'schema', 'stage')
+        expectTrue(result.errors.some((entry) => entry.includes('depthFamily')), result.errors.join('; '))
+      }
+    ])
+
+    cases.push([
+      'RULE comparison — a comparison missing its limitation fails, and a complete one parses',
+      () => {
+        const broken = depthContract()
+        broken.claims[0].comparison = { incumbent: 'com.yardbook.app', source: 'docs/research/2026-09-30-policy-fixture.md#1' }
+        const result = contractProblems(JSON.stringify(broken), fixtureFs())
+        expectEqual(result.stage, 'schema', 'stage')
+        expectTrue(result.errors.some((entry) => entry.includes('comparison.limitation')), result.errors.join('; '))
+
+        const complete = depthContract()
+        complete.claims[0].comparison = {
+          incumbent: 'com.yardbook.app',
+          limitation: 'its export is a screenshot rather than a file an accountant can read',
+          source: 'docs/research/2026-09-30-policy-fixture.md#1'
+        }
+        expectEqual(contractProblems(JSON.stringify(complete), fixtureFs()).errors, [], 'a complete comparison was refused')
+      }
+    ])
+
+    cases.push([
+      'RULE baseline — a pre-baseline slot carries a depth finding as a note, never a FAIL',
+      () => {
+        const dir = path.join(ROOT, 'apps', '2026-09-26-teacher-gradebook')
+        const verdict = baselineVerdict('slot.differentiators', dir, ['a depth finding'], 'summary')
+        expectEqual(verdict.verdict, VERDICT.PASS, `verdict (${verdict.detail})`)
+        expectTrue(verdict.detail.includes('note:'), `the finding was not reported as a note: ${verdict.detail}`)
+        expectTrue(verdict.detail.includes('2026-09-30 baseline'), `the derivation was not named: ${verdict.detail}`)
+      }
+    ])
+
+    cases.push([
+      'RULE baseline — a slot created at the baseline turns the same depth finding into a FAIL',
+      () => {
+        const dir = path.join(ROOT, 'apps', '2026-10-01-lawn-round-log')
+        const verdict = baselineVerdict('slot.differentiators', dir, ['a depth finding'], 'summary')
+        expectEqual(verdict.verdict, VERDICT.FAIL, `verdict (${verdict.detail})`)
+        expectTrue(verdict.detail.includes('a depth finding'), `the gated finding was not reported: ${verdict.detail}`)
+      }
+    ])
+
+    cases.push([
+      'RULE the CRUD report is a note, never a finding — a bare record operation prints and does not gate',
+      () => {
+        const value = JSON.parse(contract())
+        value.claims[0].promise = 'Adds a student and deletes a row.'
+        const raw = JSON.stringify(value, null, 2)
+        expectEqual(crudVerdict(value.claims[0].promise), 'CRUD-shaped', 'crud verdict')
+        const report = crudReport(value, { file: 'differentiators.json', raw })
+        expectTrue(report.some((entry) => entry.startsWith('differentiators.json:')), report.join('; '))
+        expectTrue(report.some((entry) => entry.includes('a-thing')), report.join('; '))
+
+        const gated = depthContract()
+        gated.claims[1].promise = 'Adds a student and deletes a row.'
+        expectEqual(
+          depthFindings(gated, depthFs(undefined, () => 'Intent.ACTION_SEND')),
+          [],
+          'a CRUD-shaped promise produced a gating finding'
+        )
+      }
+    ])
+
+    cases.push([
+      'RULE the CRUD report — the measured edit-every-record row is AUDIT because of its contrast clause, not CRUD-shaped',
+      () => {
+        const promise =
+          'Every class, student, category, assignment, mark, attendance record, note, contact and seat can ' +
+          "be created, edited and deleted, instead of the incumbent's name-only editing."
+        expectEqual(crudVerdict(promise), 'AUDIT', 'crud verdict')
+        const value = JSON.parse(contract())
+        value.claims[0].promise = promise
+        const report = crudReport(value, { file: 'differentiators.json', raw: JSON.stringify(value) })
+        expectEqual(report.length, 1, 'the row was not reported exactly once')
+      }
+    ])
+
+    cases.push([
+      'RULE the CRUD report NEGATIVE CONTROL — a promise that names a handoff is not reported',
+      () => {
+        expectEqual(crudVerdict('Imports the class list from a CSV the teacher already has.'), null, 'crud verdict')
+      }
+    ])
+
+    cases.push([
+      'the real lawn-round-log contract still parses and its five original claims survive unchanged',
+      () => {
+        const file = path.join(ROOT, 'apps', '2026-10-01-lawn-round-log', 'differentiators.json')
+        const parsed = parseDifferentiators(readFileSync(file, 'utf8'))
+        expectTrue(parsed.ok, `the live contract was refused: ${parsed.ok ? '' : parsed.errors.join(' | ')}`)
+        // The claim COUNT is deliberately not pinned, and the reason is recorded rather than left to
+        // a reader's trust. This fixture proves one direction — the back-compatible read of a real,
+        // pre-existing contract — and `.cursor/rules/app-depth.mdc` now REQUIRES that contract to
+        // grow a connective claim. A pinned total therefore failed on the contract working as
+        // intended (the slot's authorised handoff claim `csv-off-the-phone`, `data_out`, proved by
+        // `ACTION_SEND`), which is a drift trap rather than a protection. What IS pinned is the half
+        // that carries the regression's value: the five original ids are still present, in their
+        // original relative order, so a promise that was reworded away, reordered or dropped is
+        // still caught.
+        const ids = parsed.value.claims.map((claim) => claim.id)
+        const originals = [
+          'offline-round-no-account',
+          'round-not-a-calendar',
+          'owed-per-customer',
+          'bought-once',
+          'one-handed-in-sunlight'
+        ]
+        let matched = 0
+        for (const id of ids) if (id === originals[matched]) matched += 1
+        expectEqual(matched, originals.length, 'the five original claim ids, still present in order')
       }
     ])
 

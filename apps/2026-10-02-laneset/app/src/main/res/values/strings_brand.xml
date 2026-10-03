@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The brand component vocabulary's own words.
+
+  These are the labels `ui/components/Brand.kt` renders inside the panel it owns: the interval hero
+  and the set-verdict pill. They live in their own file rather than in `strings.xml` because they
+  belong to the component set rather than to a screen — Android merges every `values/*.xml` into one
+  resource table, and `scripts/core/localization.mjs` reads all of them, so a separate file is a
+  grouping decision and not a second source of truth.
+
+  Every key here is referenced by exactly one call site and takes no format arguments. The set is
+  declared in `values/` and `values-ru/` together: a key declared in only one tree is the
+  missing-default-resource error Android reports rather than a translation.
+-->
+<resources>
+    <!-- PaceHeroPanel: the label above the interval's distance and stroke. -->
+    <string name="brand_target_label">Target</string>
+    <!-- PaceHeroPanel: the first hero metric, the session's total time. -->
+    <string name="brand_total_label">Total</string>
+    <!-- PaceHeroPanel: the second hero metric, the threshold pace per 100 m. -->
+    <string name="brand_pace_label">Pace /100 m</string>
+    <!-- FocusSelectorStrip: the label above the focus chips. -->
+    <string name="brand_focus_label">Focus</string>
+    <!-- StatusPill: the send-off is comfortably repeatable at the computed pace. -->
+    <string name="brand_status_holdable">Holdable</string>
+    <!-- StatusPill: the send-off leaves almost no rest at the computed pace. -->
+    <string name="brand_status_tight">Tight</string>
+    <!-- StatusPill: the target is faster than the swimmer's threshold pace. -->
+    <string name="brand_status_over_pace">Over pace</string>
+</resources>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Русская половина двух «дверей данных»: список уходит с телефона, тренировка тренера приходит в приложение.
+    Набор ключей совпадает с res/values/strings_export.xml, формат-аргументы тоже.
+-->
+<resources>
+
+    <!-- Передача списка -->
+    <string name="export_sheet_title">Передать тренировку</string>
+    <string name="export_sheet_supporting">Возьмите её с собой в бассейн.</string>
+    <string name="export_close">Закрыть</string>
+    <string name="export_share_action">Поделиться текстом</string>
+    <string name="export_share_supporting">Отправить весь список в мессенджер.</string>
+    <string name="export_print_action">Сохранить карточку для печати</string>
+    <string name="export_print_supporting">Записать PDF на одну страницу в выбранное место.</string>
+    <string name="export_share_chooser_title">Поделиться списком</string>
+    <string name="export_pdf_file_name">laneset-set-list.pdf</string>
+    <string name="export_share_failed">На этом телефоне нет приложения, которое примет список. Попробуйте карточку для печати.</string>
+    <string name="export_print_saved">Карточка сохранена.</string>
+    <string name="export_print_failed">Не удалось записать карточку в это место. Попробуйте другое.</string>
+
+    <!-- Импорт тренировки тренера -->
+    <string name="import_title">Импорт тренировки от тренера</string>
+    <string name="import_back">Назад</string>
+    <string name="import_intro">Уже есть тренировка от тренера? Вставьте её сюда — Laneset прочитает её в такую же тренировку с расчётом темпа: каждый отрезок получит целевое время по вашему пороговому темпу и длине бассейна.</string>
+    <string name="import_example_header">Как записывают тренировку</string>
+    <string name="import_example_body">Строка-заголовок Warm up, Main set или Cool down начинает группу, дальше — по строке на каждый отрезок. Laneset понимает пару «повторения и дистанция», например 8 x 100 free on 1:45, одиночную дистанцию вроде 300, слово стиля free, back, breast, fly или IM, время отправления on 1:45 или @1:10 и явный отдых rest 20. Заголовки групп и названия стилей — те английские слова, которые пишут в бассейне; всё остальное — числа.</string>
+    <string name="import_field_label">Тренировка тренера</string>
+    <string name="import_field_placeholder">Warm up 300 free</string>
+    <string name="import_read_action">Прочитать тренировку</string>
+    <string name="import_clear_field">Очистить поле</string>
+    <string name="import_clipboard_action">Вставить из буфера</string>
+    <string name="import_empty_hint">Вставленная тренировка появится здесь, отрезок за отрезком, до сохранения.</string>
+    <string name="import_status_empty">Сначала вставьте тренировку — поле пустое.</string>
+    <string name="import_status_clipboard_empty">В буфере обмена нет текста. Сначала скопируйте тренировку или введите её вручную.</string>
+    <string name="import_status_nothing">Не распознано ни одного отрезка. В каждой строке нужна пара «повторения и дистанция», например 8 x 100, или одна дистанция вроде 300.</string>
+    <string name="import_status_needs_pace">Сначала проплывите две контрольные дистанции. Без порогового темпа нечего ставить в целевое время отрезка.</string>
+    <string name="import_unreadable_header">Эти строки прочитать не удалось:</string>
+    <string name="import_unreadable_line">Строка %1$d</string>
+    <string name="import_review_header">Что прочитал Laneset</string>
+    <string name="import_review_supporting">Именно в таком виде список уйдёт в мессенджер или на печать.</string>
+    <string name="import_stat_distance">Дистанция</string>
+    <string name="import_stat_time">Общее время</string>
+    <string name="import_stat_pace">Пороговый темп</string>
+    <string name="import_stat_intervals">Отрезки</string>
+    <string name="import_meters_value">%1$d м</string>
+    <string name="import_pace_value">%1$s /100 м</string>
+    <string name="import_accept_action">Сохранить эту тренировку</string>
+    <string name="import_saved">Сохранено. Тренировка ждёт вас на главном экране.</string>
+
+</resources>

@@ -49,8 +49,10 @@ import kotlin.math.min
 // over a tallied number, and the section strip is the app's one navigation-looking control.
 //
 // The rest of the vocabulary — the 24 dp working glyphs the round, the ledger, the customer form and
-// the shell are built from — is in `Glyphs.kt` beside this file, and is drawn to the same rules the
-// mark is: geometry, not an icon font.
+// the shell are built from — is in `Glyphs.kt` beside this file. Those glyphs are NOT drawn here and
+// are not slot geometry: they are a licence-cleared library set (Tabler Icons v3.48.0, MIT) vendored
+// into `res/drawable/ic_*.xml`, with the provenance record at `icons/provenance.json` and the licence
+// text at `icons/LICENSES/MIT.txt`. Only the mark above is the slot's own drawing.
 //
 // Ground rules these components are held to, all of them measured by `node scripts/verify.mjs`
 // (scripts/core/uiux.mjs): no fixed `width`/`height`/`size` on anything that holds text, so a label

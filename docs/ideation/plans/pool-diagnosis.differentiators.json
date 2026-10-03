@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "slot": "pool-diagnosis",
+  "reconRef": "docs/research/2026-10-02-advisor-and-troubleshooting-evidence.md#5-head-to-head-each-wedge-clause-against-the-leaders-measured-facts",
+  "jobCoverage": {
+    "before": { "claimId": "works-from-observed-bands" },
+    "during": { "claimId": "ranked-diagnosis-with-reasoning" },
+    "after": { "claimId": "plan-leaves-the-app" }
+  },
+  "claims": [
+    {
+      "id": "ranked-diagnosis-with-reasoning",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "The app names the most likely causes in order and gives the reason for each, together with the one reading or observation that would confirm or rule it out, so a pool owner can check the judgement against their own water instead of trusting a single confident answer.",
+      "comparison": {
+        "incumbent": "com.hthpools.tester.release (HTH Test to Swim)",
+        "limitation": "its own users report that the suggested dosage does not add up and that an in-between strip colour fails outright, so it returns an answer without the reasoning or the confirming test that would let the owner check it",
+        "source": "docs/research/2026-10-02-advisor-and-troubleshooting-evidence.md#4-what-the-leaders-own-users-complain-about-quoted"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-advisor-and-troubleshooting-evidence.md#4-what-the-leaders-own-users-complain-about-quoted",
+        "finding": "The shelf leader com.hthpools.tester.release, 4.6 stars over 1050 exact reviews and 100K or more installs, served 3 critical reviews of its 3-read sample, including the 1 star review that the app told the user to add 34 pounds of pH down and the user then spent over 100 dollars on chemicals, and a second 1 star review that when the strip colour falls in between the app only says analysis unsuccessful."
+      },
+      "status": "deferred",
+      "deferredReason": "The rule base and the ranking surface do not exist yet; the promise is resolved when a test feeds an authored reading to the ranking engine and asserts the output names each cause with its reason string and its confirming observation, ordered by likelihood."
+    },
+    {
+      "id": "ordered-plan-explains-itself",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "The app hands back a corrective plan as an ordered set of steps, each with the amount it will move, the reason it is ordered there, what not to mix with it and what to re-test afterwards, so an owner can act on the plan without being able to spend a hundred dollars on a dose nobody could check.",
+      "comparison": {
+        "incumbent": "com.biolabinc.pooltime (Pool Time ClearPool Expert)",
+        "limitation": "a 50K or more install app whose own users write that it only lets them enter what the strip shows and gives no recommendation at all, and that telling you what is wrong without telling you how to fix it is not helpful",
+        "source": "docs/research/2026-10-02-advisor-and-troubleshooting-evidence.md#4-what-the-leaders-own-users-complain-about-quoted"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-advisor-and-troubleshooting-evidence.md#4-what-the-leaders-own-users-complain-about-quoted",
+        "finding": "The leader's 1 star review reads that the app told the user to add 34 pounds of pH down and that the user spent over 100 dollars acting on it, while com.biolabinc.pooltime at 1.8 stars with 50K or more installs draws the 1 star review that there are no recommendations based on the entered values and the 3 star review that telling you what is wrong is not helpful without how to fix it."
+      },
+      "status": "deferred",
+      "deferredReason": "The authored corrective steps do not exist yet; the promise is resolved when a test asserts a produced plan renders each step with its amount, its reason, its conflict warning and its re-test instruction, and that no step renders as a bare quantity."
+    },
+    {
+      "id": "works-from-observed-bands",
+      "weight": "supporting",
+      "jobStage": "before",
+      "depthFamily": "fit",
+      "promise": "The app accepts the readings an owner actually has, the coarse colour bands and the observations they can see, including the in-between colours and the disagreements between two indicators, instead of demanding an exact number it cannot receive or refusing the diagnosis when the strip is ambiguous.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-advisor-and-troubleshooting-evidence.md#4-what-the-leaders-own-users-complain-about-quoted",
+        "finding": "The leader's own 1 star review reads that the true levels are never really known because colors may fall in between, that half a bottle of test strips was wasted, and that the app only says analysis unsuccessful, and its 2 star spa review reports that the app insisted on entering the spa size in feet so the user had to enter ridiculous numbers to reach 429 gallons."
+      },
+      "status": "deferred",
+      "deferredReason": "The input surface is unbuilt; the promise is resolved when a test submits an in-between band reading and a spa-sized volume and asserts the app returns a ranked diagnosis rather than an unsuccessful-analysis error, with no exact-number field required."
+    },
+    {
+      "id": "plan-leaves-the-app",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "The owner can take the diagnosis and its corrective plan out of the app as text or a PDF and send it to whoever helps with the pool or keeps it for the next test, so the judgement is not trapped on one screen.",
+      "comparison": {
+        "incumbent": "com.hthpools.tester.release (HTH Test to Swim)",
+        "limitation": "no served review of the leader mentions taking the plan off the device, and the nearest measured ask on the shelf is a 50K or more install mid-tier app whose user wants the app to build a shopping list of everything needed to fix the issues, which the app does not do",
+        "source": "docs/research/2026-10-02-advisor-and-troubleshooting-evidence.md#5-head-to-head-each-wedge-clause-against-the-leaders-measured-facts"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-advisor-and-troubleshooting-evidence.md#5-head-to-head-each-wedge-clause-against-the-leaders-measured-facts",
+        "finding": "Across the 3-read leader sample and the 11 critical reviews read across the shelf there is no export complaint and no export claim, and the nearest measured ask is on the 50K or more install 1.8 star mid-tier, whose review wants the app to build a shopping cart of everything needed to fix the issues; the clause is therefore a difference from the shelf rather than an answer to the leader's own complaint, and it is recorded as such."
+      },
+      "status": "deferred",
+      "deferredReason": "No share or document path exists yet; the promise is resolved when a test asserts the diagnosis renders through an ACTION_SEND share intent and an ACTION_CREATE_DOCUMENT or PdfDocument export, and that the exported text carries the ranked causes and the ordered plan."
+    },
+    {
+      "id": "remembers-the-pool-profile",
+      "weight": "supporting",
+      "jobStage": "before",
+      "depthFamily": "durability",
+      "promise": "The pool's own facts, its volume, surface, sanitizer and the owner's usual target ranges, are kept between sessions so the owner supplies them once and every later diagnosis is computed against their own pool rather than a default.",
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/research/2026-10-02-advisor-and-troubleshooting-evidence.md#4-what-the-leaders-own-users-complain-about-quoted",
+        "finding": "Inferred from the leader's 2 star spa review, in which the app insisted on a size in feet and forced the user to enter ridiculous numbers for a 429 gallon spa, a mis-fit that a remembered per-pool profile prevents; it is stated as an inference about the job rather than as a reading of a complaint about lost settings."
+      },
+      "status": "deferred",
+      "deferredReason": "The profile store is unbuilt; the promise is resolved when a test saves a pool profile through rememberSaveable or SavedStateHandle, recreates the holder and asserts the saved volume and targets are restored rather than defaulted."
+    },
+    {
+      "id": "no-ads-no-account-one-unlock",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "trust",
+      "promise": "The diagnosis carries no advertising at any point in a session, never requires an account, and is bought once: paying the single price unlocks every diagnosis and every plan with no renewal.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-advisor-and-troubleshooting-evidence.md#7-willingness-to-pay-the-measured-reading",
+        "finding": "5 of the 10 enriched cards on the shelf declare an in-app purchase and 2 of 10 declare ads, and the served critical reviews name the cost directly: com.poolchemicalcalculator.poolcalc at 3.6 stars over 210 reviews and 50K or more installs is told the user is forced to watch a video ad EVERY SINGLE TIME any calculator is used and must create an account, and com.troublefreepool.poolmath at 100K or more installs is told it requires a subscription to keep more than one day of log."
+      },
+      "status": "deferred",
+      "deferredReason": "No billing or ad surface exists yet; the promise is resolved when the shipped app declares no advertising SDK, has no renewal or expiry path, and a test proves the diagnosis and plan surfaces render with no ad slot and no login gate."
+    }
+  ]
+}

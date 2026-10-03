@@ -1,11 +1,14 @@
 package com.gexetr.scaffold.ui
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
@@ -61,30 +64,39 @@ fun PlayKilnApp(hapticsEnabled: Boolean = false) {
     val backStack: NavBackStack<NavKey> = rememberNavBackStack(HomeDestination)
     val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>()
 
-    NavDisplay(
-        backStack = backStack,
-        onBack = { backStack.pop() },
-        sceneStrategies = listOf(listDetailStrategy),
-        entryProvider = entryProvider {
-            entry<HomeDestination>(
-                metadata = ListDetailSceneStrategy.listPane(
-                    detailPlaceholder = { DetailPlaceholder() },
-                ),
-            ) {
-                HomeRoute(
-                    onNavigateToAbout = { backStack.push(AboutDestination) },
-                    onNavigateToSettings = { backStack.push(SettingsDestination) },
-                    hapticsEnabled = hapticsEnabled,
-                )
-            }
-            entry<AboutDestination>(metadata = ListDetailSceneStrategy.detailPane()) {
-                AboutScreen(onBack = { backStack.pop() })
-            }
-            entry<SettingsDestination>(metadata = ListDetailSceneStrategy.detailPane()) {
-                SettingsRoute(onBack = { backStack.pop() })
-            }
-        },
-    )
+    // Without this Surface nothing between the window and `NavDisplay` provides a content colour, so
+    // `LocalContentColor` keeps Compose's default `Color.Black` and every default-coloured Text/Icon
+    // is invisible when the window background is dark. `Surface` sets
+    // `contentColor = contentColorFor(containerColor)`, and this `background` yields `onBackground`.
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
+    ) {
+        NavDisplay(
+            backStack = backStack,
+            onBack = { backStack.pop() },
+            sceneStrategies = listOf(listDetailStrategy),
+            entryProvider = entryProvider {
+                entry<HomeDestination>(
+                    metadata = ListDetailSceneStrategy.listPane(
+                        detailPlaceholder = { DetailPlaceholder() },
+                    ),
+                ) {
+                    HomeRoute(
+                        onNavigateToAbout = { backStack.push(AboutDestination) },
+                        onNavigateToSettings = { backStack.push(SettingsDestination) },
+                        hapticsEnabled = hapticsEnabled,
+                    )
+                }
+                entry<AboutDestination>(metadata = ListDetailSceneStrategy.detailPane()) {
+                    AboutScreen(onBack = { backStack.pop() })
+                }
+                entry<SettingsDestination>(metadata = ListDetailSceneStrategy.detailPane()) {
+                    SettingsRoute(onBack = { backStack.pop() })
+                }
+            },
+        )
+    }
 }
 
 /** One pop, and only when there is something to pop. */

@@ -38,6 +38,8 @@
     <string name="round_tab_all" translatable="true">Весь маршрут</string>
     <string name="round_empty_title" translatable="true">Клиентов пока нет</string>
     <string name="round_empty_body" translatable="true">Добавьте людей в маршрут — приложение сохранит их порядок, визиты и то, что они ещё должны.</string>
+    <string name="round_none_due_title" translatable="true">На сегодня всё</string>
+    <string name="round_none_due_body" translatable="true">Все клиенты сегодняшнего маршрута отмечены. Откройте «Весь маршрут», чтобы увидеть остальных, или сдвиньте день, если испортится погода.</string>
     <string name="round_detail_placeholder" translatable="true">Выберите клиента, чтобы открыть запись здесь.</string>
     <string name="round_move_up" translatable="true">Поднять %1$s выше</string>
     <string name="round_move_down" translatable="true">Опустить %1$s ниже</string>
@@ -70,7 +72,15 @@
 
     <!-- История и экспорт в CSV. -->
     <string name="history_title" translatable="true">История</string>
-    <string name="history_count" translatable="true">Записей: %1$d</string>
+    <plurals name="history_count" translatable="true">
+        <!-- Русский выбирает четыре формы: одну запись, две-четыре записи, пять и больше записей,
+             а также «other» для дробных счётчиков, которые CLDR относит к родительному
+             единственному — «1,5 записи». -->
+        <item quantity="one">%1$d запись</item>
+        <item quantity="few">%1$d записи</item>
+        <item quantity="many">%1$d записей</item>
+        <item quantity="other">%1$d записи</item>
+    </plurals>
     <string name="history_empty" translatable="true">Пока ничего не записано</string>
     <string name="history_empty_body" translatable="true">Визиты и платежи появятся здесь сразу после того, как вы запишете их в маршруте.</string>
     <string name="history_filter_all" translatable="true">Все</string>
@@ -83,14 +93,19 @@
     <string name="history_edit_status" translatable="true">Результат</string>
     <string name="history_delete_entry_body" translatable="true">Удалить запись для %1$s за %2$s?</string>
     <string name="export_csv" translatable="true">Экспорт в CSV</string>
+    <string name="export_share" translatable="true">Поделиться CSV</string>
+    <string name="export_share_chooser" translatable="true">Отправить CSV</string>
     <string name="export_done" translatable="true">Экспортировано строк: %1$d</string>
     <string name="export_failed" translatable="true">Не удалось записать файл.</string>
 
     <!-- Единственная покупка. Одна цена, без пробного срока и без подписки. -->
-    <string name="unlock_title" translatable="true">Открыть всю запись</string>
-    <string name="unlock_body" translatable="true">В бесплатной версии — до %1$d клиентов. Покупка сохраняет всех клиентов, всю историю и экспорт в CSV.</string>
+    <!-- Пункты перечисляют только то, что покупка действительно даёт: лимит клиентов и экспорт.
+         История визитов и балансы бесплатны на любом уровне, поэтому обещать их здесь значило бы
+         продавать то, что у пользователя уже есть. Та же пара утверждений — в store/listing.json,
+         абзац "WHAT YOU PAY". -->
+    <string name="unlock_title" translatable="true">Открыть приложение</string>
+    <string name="unlock_body" translatable="true">В бесплатной версии — до %1$d клиентов, и все визиты и балансы сохраняются. Покупка снимает это ограничение и добавляет экспорт в CSV.</string>
     <string name="unlock_bullet_customers" translatable="true">Столько клиентов, сколько нужно</string>
-    <string name="unlock_bullet_history" translatable="true">Вся история визитов с возможностью правки</string>
     <string name="unlock_bullet_export" translatable="true">Экспорт в CSV через системный выбор файла</string>
     <string name="unlock_price_label" translatable="true">Один платёж</string>
     <string name="unlock_price" translatable="true">$9.99</string>
@@ -98,7 +113,7 @@
     <string name="unlock_action" translatable="true">Разблокировать</string>
     <string name="unlock_restore" translatable="true">Восстановить покупку</string>
     <string name="unlock_unlocked" translatable="true">Открыто</string>
-    <string name="unlock_owned_body" translatable="true">Спасибо. Все клиенты, все визиты и экспорт теперь ваши.</string>
+    <string name="unlock_owned_body" translatable="true">Спасибо. Ограничение по клиентам снято, экспорт доступен.</string>
     <string name="unlock_busy" translatable="true">Открываем Google Play…</string>
     <string name="unlock_failed" translatable="true">Покупка не завершилась. Попробуйте снова или восстановите прежнюю покупку.</string>
     <string name="unlock_unavailable" translatable="true">Google Play сейчас недоступен на этом устройстве.</string>
@@ -115,7 +130,7 @@
     <string name="settings_language_header" translatable="true">Язык</string>
     <string name="settings_language" translatable="true">Язык приложения</string>
     <string name="settings_language_summary" translatable="true">Выберите язык этого приложения.</string>
-    <string name="settings_language_summary_legacy" translatable="true">Измените язык в настройках Android для этого приложения.</string>
+    <string name="settings_language_system" translatable="true">Как в системе</string>
     <string name="settings_behaviour_header" translatable="true">Поведение</string>
     <string name="settings_currency" translatable="true">Символ валюты</string>
     <string name="settings_currency_summary" translatable="true">Показывается перед каждой суммой.</string>
@@ -131,6 +146,7 @@
     <!-- Подтверждение перед необратимым действием. -->
     <string name="delete_confirm_title" translatable="true">Удалить это?</string>
     <string name="delete_confirm_body" translatable="true">%1$s, а также все его визиты и платежи будут удалены.</string>
+    <string name="payment_remove_confirm_body" translatable="true">Платёж %1$s от %2$s будет удалён, и баланс изменится.</string>
 
     <!-- О приложении и вторая половина политики конфиденциальности, которую требует Play. -->
     <string name="about_title" translatable="true">О приложении</string>

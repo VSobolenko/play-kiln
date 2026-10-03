@@ -503,9 +503,49 @@ def _field_domain(mask: np.ndarray, size: int | None = None) -> np.ndarray:
     return ~grown
 
 
-def field_high_frequency_rms(icon: np.ndarray, mask: np.ndarray, sigma: float = 2.0) -> float:
-    """RMS of the icon minus its own low-pass, on the pixels the mark does not occupy."""
+_DECLARED_FIELD_CACHE: dict[tuple, np.ndarray] = {}
+
+
+def declared_field(shape: tuple[int, int], palette: Mapping[str, Iterable[int]],
+                   angle_deg: float = design.FIELD_ANGLE_DEG) -> np.ndarray:
+    """The field the design system declares for a palette: the ramp plus `FIELD_OVERLAYS`.
+
+    Reconstructed through `icon_design.icon_field` - the very call `store-studio.render_icon` makes -
+    so the reference is the renderer's own definition rather than a second description of it. A slot
+    whose palette declares the waterline roles gets the waterline; one that does not gets the bare
+    ramp. The field legs below measure against this, which is what lets them gate a field that is a
+    declared *two-plane* surface (a ramp plus a waterline) rather than forbidding one: fitting a
+    single plane through a waterline reads 4.6 luma of "curvature" that is a deliberate edge, and the
+    previous threshold would have refused the design the owner chose to keep.
+
+    Cached because a test run measures half a dozen marks on one palette: the field is deterministic
+    and pure, and recomputing it per mark would only make the suite slower, not truer.
+    """
+    size = int(shape[0])
+    ink = tuple(int(v) for v in palette["ink"][:3])
+    ink_lift = tuple(int(v) for v in palette["ink_lift"][:3])
+    overlays = tuple((overlay["role"], overlay["alpha"], overlay["data"])
+                     for overlay in design.field_overlays(palette.keys()))
+    key = (size, round(angle_deg, 3), ink, ink_lift, overlays)
+    if key not in _DECLARED_FIELD_CACHE:
+        image = design.icon_field(size, ink, ink_lift, angle_deg, palette=palette)
+        _DECLARED_FIELD_CACHE[key] = np.asarray(image.convert("RGB"), dtype=np.float64)
+    return _DECLARED_FIELD_CACHE[key]
+
+
+def field_high_frequency_rms(icon: np.ndarray, mask: np.ndarray, sigma: float = 2.0,
+                             reference: np.ndarray | None = None) -> float:
+    """RMS of the icon minus its own low-pass, on the pixels the mark does not occupy.
+
+    When `reference` is given - the field the design declares - the declared field is subtracted
+    first, so the leg measures the energy the renderer added that the declaration does not explain
+    (a drafting grid, a bloom, the wrong waterline). Without a reference it measures the icon's own
+    texture, which is what the pre-change renderer is shown failing on.
+    """
     luma = luminance(icon)
+    if reference is not None:
+        declared = luminance(reference) if reference.ndim == 3 else reference
+        luma = luma - declared
     residual = luma - ndimage.gaussian_filter(luma, sigma)
     keep = _field_domain(mask)
     if not keep.any():
@@ -513,11 +553,18 @@ def field_high_frequency_rms(icon: np.ndarray, mask: np.ndarray, sigma: float = 
     return float(np.sqrt(np.mean(residual[keep] ** 2)))
 
 
-def field_linear_ramp_rms(icon: np.ndarray, mask: np.ndarray) -> float:
-    """RMS residual of the field against its best-fit linear ramp, mark excluded.
+def field_linear_ramp_rms(icon: np.ndarray, mask: np.ndarray,
+                          reference: np.ndarray | None = None) -> float:
+    """RMS residual of the field against the field the design declares, mark excluded.
 
-    A single gradient *is* a ramp, so this is near zero. A field carrying a radial bloom is not (a
-    bloom is a bump, and a bump is curvature), and the drafting grid adds to it as well.
+    A single gradient *is* a ramp, so against a ramp this is near zero. A field carrying a radial
+    bloom is not (a bloom is a bump, and a bump is curvature), and the drafting grid adds to it as
+    well. A declared waterline is not curvature either - it is two planes meeting at a declared edge,
+    so `reference` (which carries that edge) leaves only quantisation, while the previous single-plane
+    fit read the edge itself as 4.6 luma of defect.
+
+    With no `reference` the best-fit single plane is still the fallback: that is the path the
+    falsification controls take, and it is what makes the pre-change field measurable as a failure.
     """
     height, width = icon.shape[:2]
     keep = _field_domain(mask)
@@ -525,6 +572,9 @@ def field_linear_ramp_rms(icon: np.ndarray, mask: np.ndarray) -> float:
     if ys.size < 16:
         return 0.0
     values = luminance(icon)[ys, xs]
+    if reference is not None:
+        declared = luminance(reference) if reference.ndim == 3 else reference
+        return float(np.sqrt(np.mean((values - declared[ys, xs]) ** 2)))
     coefficients = _plane_fit(np.stack([np.ones_like(xs), xs, ys], axis=1).astype(np.float64), values)
     residual = values - _plane_field((height, width), coefficients)[ys, xs]
     return float(np.sqrt(np.mean(residual ** 2)))
@@ -749,13 +799,25 @@ def evaluate_icon(icon: np.ndarray, palette: dict, mark: str | None = None,
     name = mark or design.DEFAULT_MARK
     alpha = (icon[..., 3] if icon.shape[-1] == 4 else np.full(icon.shape[:2], 255)).astype(np.int16)
 
-    mask = mark_mask(icon, field, palette, name)
+    # The field the design declares: the caller's own render when it has one (`render_icon` passes
+    # it), otherwise reconstructed from the palette through `icon_design.icon_field` - the renderer's
+    # own definition. `None` only when the palette cannot name the ramp ends, which is the legacy
+    # path the falsification controls take.
+    if field is not None:
+        reference = np.asarray(field, dtype=np.float64)
+        if reference.ndim == 2:
+            reference = np.repeat(reference[..., None], 3, axis=2)
+    elif "ink" in palette and "ink_lift" in palette:
+        reference = declared_field(icon.shape[:2], palette)
+    else:
+        reference = None
+    mask = mark_mask(icon, reference, palette, name)
     masks = {"silhouette": mask, **role_masks(icon, palette, name, mask)}
     silhouette = silhouette_stats(icon, mask, name)
     stroke = thinnest_stroke_px(masks)
     counter = smallest_counter_px(masks)
-    texture = field_high_frequency_rms(icon, mask)
-    linearity = field_linear_ramp_rms(icon, mask)
+    texture = field_high_frequency_rms(icon, mask, reference=reference)
+    linearity = field_linear_ramp_rms(icon, mask, reference=reference)
     periodicity = field_grid_periodicity(icon, mask)
     downscaled = downscale_contrast(icon, mask)
     survival = mask_survival(icon, mask)

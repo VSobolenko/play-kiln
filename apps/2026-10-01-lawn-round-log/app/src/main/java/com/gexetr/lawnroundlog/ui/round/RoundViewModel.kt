@@ -150,6 +150,12 @@ class RoundViewModel(private val store: RoundStore) : ViewModel() {
         apply(Round.setPayment(record, customerId, todayIso, amountUsd))
     }
 
+    /** Correcting a payment the operator already recorded keeps that payment's own date; a
+     *  fresh one would be dated today and would leave the original in place. */
+    fun restatePayment(payment: Payment, amountUsd: Double) {
+        apply(Round.setPayment(record, payment.customerId, payment.dateIso, amountUsd))
+    }
+
     /** Removing a payment is setting it back to zero; the domain has one operation for both. */
     fun removePayment(payment: Payment) {
         apply(Round.setPayment(record, payment.customerId, payment.dateIso, 0.0))
@@ -171,7 +177,8 @@ class RoundViewModel(private val store: RoundStore) : ViewModel() {
         // `dueOn` answers "who is on today's round"; when the record carries no schedule at all the
         // fallback is the whole ordered round, because a day list that empties itself would ask the
         // operator to schedule an appointment — which this app is deliberately not.
-        val due = Round.dueOn(record, todayIso).ifEmpty { ordered }
+        val hasVisitsToday = record.visits.any { visit -> visit.dateIso == todayIso }
+        val due = Round.dueOn(record, todayIso).ifEmpty { if (hasVisitsToday) emptyList() else ordered }
         val balances = record.customers.associate { customer -> customer.id to Balance.balanceFor(record, customer.id) }
         val statuses = record.visits
             .filter { visit -> visit.dateIso == todayIso }

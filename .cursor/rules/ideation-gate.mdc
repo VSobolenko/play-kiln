@@ -221,18 +221,65 @@ consumable purchases.
 # Budget: about one hour, not eight
 
 The owner's limit is roughly **one hour of agent wall-clock per slot**. The first slot consumed
-about eight hours, mostly on evidence infrastructure for an app that had no market. This changes
-what a good idea is:
+about eight hours, mostly on evidence infrastructure for an app that had no market. The target is a
+**direction, not a measurement**: the fastest slot so far is still measured in hours, and every recipe
+in `docs/ideation/2026-09-26-five-recipes.md` estimates 3.5–6. Report the elapsed time rather than the
+target. This changes what a good idea is:
 
 - **Buildability is a first-class criterion.** An idea with a strong market and a 20-hour build is a
   worse recipe than a good market with a 3-hour build. Score it explicitly.
-- **Prefer the cheapest shape that can still earn**: no server, no account, no dangerous permission,
-  no camera, no ML, offline by construction.
+- **The cheapest shape narrows the surface, never the job.** Avoid the costs, not the capabilities:
+  **a server, an account, a paid API, ML that needs a server, and a runtime permission that buys
+  nothing**. A capability that is **local and free** is not a cost and may be the job's own core —
+  the Android Photo Picker (`ActivityResultContracts.PickVisualMedia`), the gallery, playing or
+  capturing the user's own media, the motion sensors, and the camera. The permission arithmetic is
+  how such a capability is named rather than refused wholesale: the Photo Picker asks for **no
+  runtime permission at all**, while the camera needs `CAMERA`, so a capability states the permission
+  it needs and what the job loses without it. Narrow the *screens*, not the user's job. The owner's
+  decision, recorded 2026-10-02, in his own words: *«есть камеры, есть фотопикер, есть галерея,
+  картинки, музыка. Использовать телефон на полную, а мы используем только пару кнопок»* — use the
+  phone fully instead of only a couple of buttons. It is **not** a blanket permission policy, so
+  location, notifications and Bluetooth are not opened wholesale and a job that wants one still has
+  to justify it. The owner's report, recorded 2026-10-02: *"we get a raw app that can do only one
+  thing"* — a gradebook that only adds, edits and deletes, a calculator that only calculates — and his
+  standard is *"I want quality apps, and quality matters to me more than the feature count."* A raw app
+  earns nothing, so a narrower job is not the saving; dropping the handoffs is what produced that report.
+- **Cut scope means cut screens, servers and permissions — never the job's handoffs.** The job is three
+  stages — **before**, **during**, **after** — and the contract must cover all three, with at least one
+  connective (handoff) claim (`.cursor/rules/app-depth.mdc`; `docs/slot-differentiators.md`). The
+  mechanism is measured there: a contract that names only the record-keeping middle produces an app
+  that does only the middle while every gate is green.
+- **Depth costs build time, and the owner accepted that cost.** A complete job takes longer than a
+  CRUD middle, and the trade is deliberate: a raw app that ships inside the hour is worth nothing.
+  Budget the handoffs at stage 0 rather than discovering them at the end, and never close the gap by
+  dropping one.
 - **A server is a cost to state, not a detail to discover.** If a plan sells credit that costs real
   money to serve, `docs/monetization-strategy.md` §3.7 makes a server-side `PurchaseAuthority`
   mandatory, which makes the slot a server project. Say so before the idea is approved, not after.
 - **Do not build evidence infrastructure for an unvalidated idea.** Prove there is a market first;
   provenance chains and capture pipelines only matter once something is worth shipping.
+
+# Games are a legitimate proposal, not a priority
+
+The factory is **not limited to productivity tools**: a game is a legitimate proposal when its
+economics work, and the owner's instruction, recorded 2026-10-02, is *«мы не ограничены»* — we are
+not limited. Games are neither forbidden nor prioritised — the same wedge sentence, the same revenue
+arithmetic and the same gates decide — and a game is not a shortcut around the utility-shaped rules.
+
+Two frictions are stated here rather than discovered at the gate, because a scout that proposes a
+game must meet them while writing the proposal, not after:
+
+- **A game's core loop is `core_operation`, which never counts toward the connective floor.** The
+  depth contract requires at least one `shipped` handoff whose proof artifact contains its family's
+  API (`.cursor/rules/app-depth.mdc:66`, and the `core_operation` row at `:77`), so a game would have
+  to carry a real handoff — a share, an export, a durability claim — to satisfy it. The contract is
+  **not** weakened for games; the owner chose "do not prioritise" over rewriting it.
+- **The build budget is written for a utility.** A game's art, tuning and playtesting are a larger and
+  differently-shaped cost than the one-hour direction assumes, so a game proposal scores its
+  buildability honestly (`.cursor/rules/parallel-execution.mdc`).
+
+A game that cannot state its wedge in one sentence and show its revenue arithmetic is refused by the
+same line as a utility, and nothing here prioritises a game over one.
 
 # Authorization
 

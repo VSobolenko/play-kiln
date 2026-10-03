@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      The dark counterpart of `values/themes.xml`; the same reasoning applies, with
+      `android:Theme.Material.NoActionBar` as the platform's dark parent so the window never flashes
+      light while Compose starts.
+
+      The difference from the light file is only where `@color/playkiln_window_background` resolves:
+      `values-night/colors.xml` redefines it as the dark scheme's own `background` role.
+    -->
+    <style name="Theme.PlayKilnSlot" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowBackground">@color/playkiln_window_background</item>
+    </style>
+</resources>

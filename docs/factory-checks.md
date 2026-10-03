@@ -56,7 +56,7 @@ group and print `file:line` findings.
 
 | Module | Check ids | What it decides |
 |---|---|---|
-| `scripts/core/uiux.mjs` | `uiux.navigation`, `uiux.adaptive`, `uiux.text-layout`, `uiux.motion`, `uiux.a11y`, `uiux.insets`, `uiux.platform`, `uiux.scaffold`, `uiux.rule`, `uiux.fixtures` | Navigation 3 hosts its own back stack; a multi-destination slot reads the window size class; text can wrap and grow; screens animate; every interactive element has a name and a 48 dp target; the keyboard is placed; content is not drawn under the status bar, the camera cutout or the gesture bar; and the app behaves like a modern Android app — predictive back opted in, no alpha Material 3 Expressive artifact on a pinned BOM; and the scaffold carries all of it before any slot does |
+| `scripts/core/uiux.mjs` | `uiux.navigation`, `uiux.adaptive`, `uiux.text-layout`, `uiux.motion`, `uiux.a11y`, `uiux.insets`, `uiux.platform`, `uiux.content-colour`, `uiux.scaffold`, `uiux.rule`, `uiux.fixtures` | Navigation 3 hosts its own back stack; a multi-destination slot reads the window size class; text can wrap and grow; screens animate; every interactive element has a name and a 48 dp target; the keyboard is placed; content is not drawn under the status bar, the camera cutout or the gesture bar; and the app behaves like a modern Android app — predictive back opted in, no alpha Material 3 Expressive artifact on a pinned BOM; default-coloured text is visible against the colour it is drawn on rather than falling back to Compose's black on a dark background; and the scaffold carries all of it before any slot does |
 | `scripts/core/settings.mjs` | `settings.surface`, `settings.reachable`, `settings.language`, `settings.theme`, `settings.behaviour`, `settings.strings`, `settings.persistence`, `settings.documented` | a settings surface exists, is reachable from the app, and every preference in it reaches the code that acts on it — a toggle that changes nothing is theatre |
 | `scripts/core/localization.mjs` | `locale.multilingual`, `locale.placeholder`, `locale.hardcoded`, `locale.pseudolocale` | a slot is born multilingual; a declared tree is a translation rather than a copy or a sentinel; no user-facing prose is compiled into Kotlin; no pseudolocale ships |
 | `scripts/core/baseline.mjs` | — (shared) | **which slots a new rule gates.** The creation date comes from `registry/apps.json` and "is this an app at all" from the presence of an `economics.json`, so the four slots that already existed carry a finding as a printed note instead of a permanent red row, while every slot created from 2026-09-30 is gated. A finding that exists and is not reported would read exactly like a finding that is not there, so the note is printed either way |
@@ -125,6 +125,36 @@ group beside `slot.differentiators`, and `naming.fixtures` runs in `invariants` 
 | `node scripts/check-naming.mjs --naming <path> [--validate-only]` | a contract that is not in a slot yet, which is how `new-slot.mjs` validates it before anything is written | `PASS` — `naming schema — title "Sunstone: Lawn Round Log", archetype carrier_job_noun, 5 candidate(s), 1 rejected` |
 | `node scripts/verify.mjs --only invariants`, row `naming.fixtures` | the sensor can still fail — 12 inline fixtures including `Calculator`, `My Calculator`, `CALCULATOR`, a 31-character title, and a pack whose title disagrees with the approved name | `PASS  naming.fixtures  12 fixtures` |
 
+### The specification a slot is written inside, added 2026-10-02
+
+The owner's rule is that every application is authored inside an OpenSpec change, and it was violated
+in a way nothing could see: `apps/2026-10-02-laneset/` was scaffolded with code while
+`openspec/changes/` held no change for it. `scripts/new-slot.mjs` required `--economics`,
+`--differentiators` and `--naming` and asked for nothing about a specification, and no check under
+`scripts/core/` read a slot's change — so the slot passed every gate while sitting outside the
+specification the owner requires. `.cursor/rules/spec-first.mdc` states the boundary; the `slot.spec`
+half runs in the `policy` group beside `slot.differentiators`, `slot.naming` and `slot.device`, and
+its scope is **derived, not hand-listed**: `SPEC_BASELINE` in `scripts/core/baseline.mjs` is the day
+the rule was measured, so a slot created before it carries the finding as a note while every slot
+from that date is gated.
+
+The **pre-creation half is stronger than the sensor**, and it is what makes the ungoverned slot
+impossible to create rather than merely detected: `scripts/new-slot.mjs` now takes
+`--spec <change-name>` (defaulting to `app-<slug>`) and **refuses before it writes anything** when
+`openspec/changes/<spec>/` is missing or lacks `proposal.md`, `tasks.md` or a `specs/**/spec.md`,
+naming the expected path and the remedy — authored with the `openspec-propose` skill and checked with
+`openspec validate <change-name>`.
+
+| Command | What it decides | Observed 2026-10-02 |
+|---|---|---|
+| `node scripts/verify.mjs --slot <slug>`, row `slot.spec` | the slot is written inside an OpenSpec change: `openspec/changes/app-<slug>/` — or a change whose `proposal.md` names the slot by a word-boundary token — carries `proposal.md`, `tasks.md` and at least one `specs/<capability>/spec.md`; a slot with no change is a finding, and one created before the baseline is a printed note | the sensor is `scripts/core/spec.mjs`, registered under `slot.spec` in the `policy` group (`scripts/core/index.mjs`); this pass did not run it |
+| `node scripts/new-slot.mjs --economics <p> --differentiators <p> --naming <p> --slug <slug>` with no matching change | the scaffold refuses **before any file is created**, so the slot directory that was half of the original defect cannot exist | `FAIL` — `No OpenSpec change for this slot: expected openspec/changes/app-<slug>/ …`, exit 1, and `apps/` unchanged |
+
+Its honest limit, stated rather than implied: the sensor proves a specification **exists and is
+well-formed**, never that the app matches it — a slot can hold a valid, empty specification and pass.
+That judgement stays with the owner at checkpoint 1, exactly as the naming and promise contracts'
+own limits state.
+
 ### The device-run record, added 2026-10-02
 
 The owner's correction: an agent ran `/forge`, wrote some code, and stopped asking him to install and
@@ -134,14 +164,50 @@ run**, and that rule said so out loud. The run is an artifact now —
 `apps/<slot>/device-verification.json`, carrying the serial, the timestamp, the artifact path and its
 sha256, and at least three observations of what was tapped and what appeared. `scripts/core/device.mjs`
 carries both halves, so `slot.device` runs in the `policy` group beside `slot.differentiators` and
-`device.fixtures` runs in `invariants` on every verify. Its honest limit: it proves a record exists and
-agrees with the artifact, not that the run happened — a fabricated record passes it, and the rule says
-so rather than implying more.
+`device.fixtures` runs in `invariants` on every verify.
+
+What decides whether the record still describes the app under review is the **revision, not the
+artifact's bytes** — and the reason is measured, not stylistic: a debug APK is not byte-reproducible
+across builds, so an artifact-hash-only comparison read an identical-source rebuild as a stale install
+and forced a truthful record to be hand-edited after every rebuild. A record may therefore carry
+`buildDigest` — the digest `releaseSourceDigest` in `scripts/lib/release-approval.mjs` computes over
+the slot's build inputs, **imported by `scripts/core/device.mjs` rather than copied** — and when it
+equals the slot's current digest the row `PASS`es whatever the artifact's bytes hash to, the detail
+naming the revision as the fact that carried the verdict. A differing digest `FAIL`s, naming the
+changed app and the remedy (drive the journey again on the phone). A record with **no** `buildDigest`
+falls back to the artifact cross-check, and a mismatch names **both** remedies. Because a record that
+stores the revision's digest must not sit inside the digest it stores, `device-verification.json` is
+one of the input list's exclusions (`.cursor/rules/release-gate.mdc`).
+
+Its honest limit: it proves a record names **this revision** — or, with no `buildDigest`, agrees with
+the built artifact — never that the run happened, that the taps were real, or that an observation
+describes what was on the screen. A fabricated record passes it, and the rule says so rather than
+implying more.
 
 | Command | What it decides | Observed 2026-10-02 |
 |---|---|---|
-| `node scripts/verify.mjs --slot <slug>`, row `slot.device` | the record names a serial, a parseable timestamp, a 64-hex artifact sha256 and at least 3 observations, and — when the debug APK is built — **recomputes the APK's hash and fails on a disagreement**, so a record about a different build fails instead of standing in for this one | `UNVERIFIED`, exit 2, on `lawn-round-log` — it carries no `device-verification.json` |
-| `node scripts/verify.mjs --only invariants`, row `device.fixtures` | the sensor can still fail — 16 inline fixtures including a stale hash against a real dummy artifact, 2 observations, a non-hex hash, a missing serial and a wrong `schemaVersion`, with "no record at all" asserted as `UNVERIFIED` rather than `FAIL` | `PASS  device.fixtures  16 fixtures` |
+| `node scripts/verify.mjs --slot <slug>`, row `slot.device` | the record names a serial, a parseable timestamp, a 64-hex artifact sha256 and at least 3 observations; when it carries a 64-hex `buildDigest` the **revision** decides — a match `PASS`es even when the APK bytes differ, a mismatch `FAIL`s naming the changed app — and only with no `buildDigest` is the built APK's hash recomputed and a disagreement failed, naming both remedies | `PASS` on `lawn-round-log` — `on-device run on serial R58MB3SGZVL … with 9 observation(s); apkSha256 matches … as built` (the record carries no `buildDigest`, so the fallback ran) |
+| `node scripts/verify.mjs --only invariants`, row `device.fixtures` | the sensor can still fail — 20 inline fixtures including a rebuild whose `buildDigest` matches but whose APK bytes differ (must `PASS`), a digest that no longer matches (must `FAIL` naming the changed app), a hash mismatch with no digest (must name both remedies), 2 observations, a non-hex `buildDigest`, a missing serial and a wrong `schemaVersion`, with "no record at all" asserted as `UNVERIFIED` rather than `FAIL` | `PASS  device.fixtures  20 fixtures` |
+
+### The pack-provenance trigger, corrected 2026-10-02
+
+`pack.provenance` used to treat the presence of `store/studio.json` as "the pack declares itself
+composed" and demand `store/provenance.json`. The two files belong to different phases: the
+declaration is authored before the UI is styled (`.cursor/rules/visual-identity.mdc`), while the
+record is written only by `scripts/media-capture.mjs` in phase 2, which refuses without the owner's
+recorded release approval — so every slot in development was permanently red on this row. The check
+now keys on the pack **shipping composed media** — a `store/assets/` tree holding at least one file,
+through `hasComposedMedia(slotDir)` in `scripts/core/assets.mjs` — so media with no record is `FAIL`,
+no media is `SKIP`, and deleting the `store/studio.json` declaration cannot switch the check off
+(the anti-evasion property the old line also held).
+
+| Command | What it decides | Observed 2026-10-02 |
+|---|---|---|
+| `node scripts/verify.mjs --slot <slug>`, row `pack.provenance` | when `store/assets/` holds at least one file, `store/provenance.json` exists and every committed asset hashes to what the record says; no composed media is `SKIP` rather than a demand for a phase-2 record | `PASS` on `teacher-gradebook` — `18 committed asset(s) match the recorded build; 6 raw capture(s) under the gitignored captures/ not checked` |
+| `node scripts/verify.mjs --only invariants`, row `assets.fixtures` | the sensor can still fail — the six provenance legs (`store/studio.json` with no media must `SKIP` naming no composed media, media with no record must `FAIL`, a matching hash must `PASS`, a disagreeing hash must `FAIL` printing the real hash, the declaration deleted with media present must still `FAIL`, and an empty `store/assets/` must `SKIP`) drive the real `checkProvenance` over a synthetic tree | `PASS  assets.fixtures  18 fixtures` |
+
+Its honest limit: it proves the committed images are bound to a recorded build — never that the
+screenshots show the shipped behaviour, because the record binds a hash, not a journey.
 
 ### The iconography split and its provenance record, added 2026-10-02
 
@@ -168,16 +234,77 @@ a role of the slot's own palette — the app had no mark of its own at all.
 | `node scripts/verify.mjs --slot <slug>`, row `icons.launcher` | the launcher vectors are the slot's own rather than the scaffold's, judged by path geometry against `scaffold/android-compose` **and** by whether each fill colour is a role of the slot's palette | `FAIL` on `lawn-round-log` — all three vectors (`foreground`, `background`, `monochrome`) are the placeholder; **fires on none of them** on `teacher-gradebook`, whose vectors are its own |
 | `node scripts/verify.mjs --slot <slug>`, rows `icons.provenance` / `icons.licence` | `icons/provenance.json` resolves — schema, SPDX allowlist, every file present and hashing to what it claims — and each declared SPDX has committed, non-empty licence text | `UNVERIFIED`, exit 2, on every slot: none carries the record yet, which is true rather than a false alarm |
 | `node scripts/verify.mjs --slot <slug>`, rows `icons.offline` / `icons.deprecated` / `icons.tint` | no icon artifact is fetched at build or run time; no deprecated `material-icons-core`/`-extended` coordinate (the pinned Material 3 no longer carries it); UI iconography carries no literal colour, the mark excluded by design | `PASS` on `lawn-round-log` |
-| `node scripts/verify.mjs --only invariants`, row `icons.fixtures` | the sensor can still fail — 16 inline fixtures across the seven legs | `PASS  icons.fixtures  16 fixtures` |
+| `node scripts/verify.mjs --only invariants`, row `icons.fixtures` | the sensor can still fail — 23 inline fixtures across the seven legs | `PASS  icons.fixtures  23 fixtures` |
 
 Falsifiability was observed rather than assumed. Neutering the `icons.launcher` leg so it returned no
 problems turned `icons.fixtures` `FAIL` (`the scaffold copy is a finding: expected 1, got 0`), and the
 sensor was then restored byte-identically with its sha256 compared before and after — a check that has
 never been made to fail is not yet known to be able to.
 
+**Adversarial audit and repair, 2026-10-02** — the first delivery was audited by a separate agent and
+the audit was right about nine defects, each now fixed with a fixture that fails without the fix and a
+mutation proof that restores the file byte-identically (sha256 `b07468e7…` before and after every
+mutation). The one that mattered most was a gate that could not report at all: a provenance record
+whose `icons[].file` resolved to a **directory** made the hash read throw `EISDIR` out of
+`iconProblems`, so `iconsChecks` returned **all seven legs `UNVERIFIED`** and `iconsFindings()` threw
+— a real `icons.launcher` `FAIL` produced no row, and a malformed record masked the defect the gate
+exists to find. Two were evasions, where a scaffold copy renamed its namespace prefix
+(`a:pathData=…`) or used single-quoted attributes and reported `PASS` with its geometry unchanged.
+One had the shipped-source fetch list narrower than the build-file list, one accepted a **directory**
+as a licence file, and two read comments as code — failing on a URL or a deprecated artifact *name* in
+a comment. The leg that judges tint matched `android:color` where rule 10 is written about
+`android:fillColor`, and failed an in-app brand mark although `docs/icon-provenance.md` §9 makes that
+mark identity and it legitimately carries the palette; it now reads `fillColor` only and treats a
+literal that **is** a role of the slot's own palette on a slot-owned drawable as identity, while
+`ic_delete.xml` with `#FF0000` still `FAIL`s. The launcher leg's palette half became a real criterion
+after the prose claimed it and the code only printed it, and a header that still said *not registered
+yet* was corrected. Fixtures went 16 → 23, none weakened.
+
 Its honest limit, stated rather than implied: it cannot tell a beautiful icon set from an ugly one.
 It can say the set was licence-cleared, vendored, and tinted from the theme — the judgement of the
 mark and the palette stays with the owner at checkpoint 1.
+
+### The palette sensor, added 2026-10-02
+
+The same owner review that produced the iconography split produced this half. The palette of a built
+app read as **neon** — a high-chroma lime accent on a dark green field — and the diagnosis with
+numbers is `docs/research/2026-10-02-color-systems-and-palette-derivation.md`. The factory had a
+strong contract for *declaring* a palette and nothing that judged one, so a pack could ship the first
+palette an agent thought of and every gate returned `PASS`.
+
+`scripts/core/palette.mjs` runs in the `palette` group and reads the **declared** palette in
+`store/studio.json` against the slot's own `ui/theme/Color.kt`. Like the icon group, its `reports`
+list is written out literally because the fact ledger reads the registry as *text*, with a load-time
+assertion against the sensor's own `PALETTE_IDS`. It imports `scripts/lib/hct.mjs` and nothing else —
+the palette maths, implemented dependency-free so no npm package enters the factory, and **verified
+rather than asserted**: its 19-row `selfTest` reproduces the research document's own measured values
+(the accent's HCT `H123.4 C68.0 T89.5`, the 1.884 accent-to-container ratio the document rounds to
+1.88, `maxChromaFor` at 100.0% for the in-gamut primaries, and the derived `CRITICAL_PLANES` matching
+the reference implementation), and its WCAG half agrees with the factory's own Python `colours.py` to
+six decimal places on every pair tried — 21, 10.951179, 1.308703, 1.441378, 14.331843.
+
+| Command | What it decides | Observed 2026-10-02 |
+|---|---|---|
+| `node scripts/verify.mjs --slot <slug>`, rows `palette.declared` / `palette.agreement` | the record declares a palette whose every entry names a role that resolves to a hex, and every declared role is the colour the app's own `Color.kt` carries — `visual-identity.mdc`'s one-source-of-truth rule | `PASS` on `lawn-round-log` — 11 roles against 26 `Color.kt` constants; on `teacher-gradebook` it reports a real drift, `ink_soft` `#2A2568`, as a non-gating note |
+| `node scripts/verify.mjs --slot <slug>`, row `palette.contrast` | WCAG 4.5:1 over every `on-X`/`X` pair across light and dark | `PASS` on `lawn-round-log` — 24 pairs, weakest 5.43:1 |
+| `node scripts/verify.mjs --slot <slug>`, rows `palette.field-chroma` / `palette.hue-structure` / `palette.accent-chroma` | a field is neutral at C ≤ 12; the accent sits ≥ 40° from its fields; and the accent's chroma is within 1.5× what **Material 3's own algorithm** derives at the same hue and tone | `FAIL` on `lawn-round-log` — the accent `#C9F04A` is C68 = **1.88×** the C36.1 Material 3 derives, and its light field `#DCEBD3` sits **19.8°** away at a tone gap of 1.9 |
+| `node scripts/verify.mjs --slot <slug>`, row `palette.duplicate` | two roles a user cannot tell apart — under 1.2:1 contrast **and** under 15° hue **and** under C20, all three | `FAIL` on `lawn-round-log` — `amber_pale` `#EAF9C6` and `paper` `#F6F4E4` differ by **1.010:1** |
+| `node scripts/verify.mjs --only invariants`, row `palette.fixtures` | the sensor can still fail — 47 inline fixtures across the nine legs | `PASS  palette.fixtures  47 fixtures` |
+
+Falsifiability was observed rather than assumed, and one mutation is worth reading twice: neutering
+rule 13 turned **six** legs red, including `palette.accent-chroma` and `palette.hue-structure`, because
+those legs classify a field as chromatic with the same predicate — so the mutation confirmed the legs
+share a real dependency rather than each being independently green. The file was restored
+byte-identically after every mutation (sha256 `FB2245AB…` before and after).
+
+Its honest limits, stated rather than implied. It reads **declared** colours, so a dynamic-colour
+palette chosen at run time, a colour inside a drawable and a colour in a `remember {}` block are
+invisible to it — a green run is evidence about the declared system, never a certificate about every
+pixel. Rule 15 is an **approximation** of a vendor algorithm rather than a call into one, and it was
+not verified against Material's own output across a corpus of hues. The accent is **inferred** as the
+highest-chroma chromatic role, because no slot declares which role is the accent. And it cannot say a
+palette is beautiful: it says the palette is derived and legal, and the judgement stays with the owner
+at checkpoint 1.
 
 ### The grounded-claims duty, added 2026-10-02
 
@@ -198,6 +325,28 @@ proves the sensor can fail.
 Its honest limit, stated rather than implied: it proves the duty is **declared**, never that a
 particular sentence is true. A fabricated claim ledger passes it, and the rule says so rather than
 implying more.
+
+### The device-capability declaration, added 2026-10-02
+
+Every proposal now declares, one line per capability, which device capabilities its job uses and which
+it does not — the field that turns the factory's measured monoculture ("the user types something and
+the app stores it", with the README's reading of camera 0, location 0, motion sensors 0, home-screen
+widget 0 and media playback 0 across the proposals) from a silence into a decision.
+`docs/ideation/README.md` is the contract, `harness/roles/scout.md` binds it to the scout, and
+`scripts/core/ideas.mjs`'s `ideas.capabilities` is the sensor, in the `invariants` group. It reports a
+proposal with no declaration, a capability left unanswered, a `used` line that names no API or no
+loss, and a declaration that contradicts the document's own permissions prose or omits the manifest
+permission a `used` capability needs. The platform fact at its centre is that the Android Photo Picker
+(`ActivityResultContracts.PickVisualMedia`) asks for **no runtime permission at all**, so the
+declaration is a statement about the job rather than a cost against permission minimisation. Its scope
+is derived, not hand-listed: `PROPOSAL_CAPABILITY_BASELINE` in `scripts/core/ideas.mjs` is the day the
+field was measured, so a proposal written before it carries the finding as a printed note while every
+proposal from that date is gated.
+
+| Command | What it decides | Observed 2026-10-02 |
+|---|---|---|
+| `node scripts/verify.mjs --only invariants`, row `ideas.capabilities` | every proposal carries a `## Device capabilities` section answering `used`/`not used` for all twelve capabilities, each `used` line naming an API and the loss without it, with no contradiction against the document's own permissions prose and none missing its manifest permission | `PASS` — `12 proposal document(s) read, 0 gated finding(s); note: 12 predate the 2026-10-03 baseline and carry the finding as a note rather than a FAIL` |
+| `node scripts/verify.mjs --only invariants`, row `ideas.fixtures` | the sensor can still fail — 13 inline fixtures including a missing declaration, an unanswered capability, a `used` line with no API, a `used` line with no justification, and the negative control that a `not used` capability is not contradicted by a permissions section saying "no camera" | `PASS  ideas.fixtures  13 fixtures` |
 
 ## 2. The retired gate — `scripts/verify-slot.mjs`
 
@@ -255,6 +404,7 @@ Run in a session; none of them needs a device or a build.
 | `node scripts/check-client-secrets.mjs --slot <slug>` | no key-shaped literal or paid-provider SDK in the shipped client | `PASS` |
 | `node scripts/check-locales.mjs --slot <slug>` | declared languages have resources; a non-translatable key is declared once | `PASS` (11 languages × 518 keys; one `NOTE`) |
 | `node scripts/check-in-app-policy.mjs --slot <slug>` | the app can open the privacy policy the pack declares | `PASS` |
+| `pack.placeholders` (in the `assets` group of `node scripts/verify.mjs --slot <slug>`) | a `privacyPolicyUrl` that is absent, non-`https`, or on a reserved documentation host — the gate over the field, and it names `node scripts/publish-privacy.mjs --slot <slug>` as the remedy | `FAIL` on `2026-09-22-smoke` for `https://example.com/privacy`; `PASS` on the two published slots |
 | `node scripts/check-outcomes.mjs --slot <slug>` | the plan's kill criteria against the recorded reading | `NO-DATA`, exit 2 — the honest state for a slot with no reading |
 | `python scripts/check-adaptive-icon.py --slot <slug>` | the launcher mark fits the adaptive-icon masks | `PASS` — mark sits 4.08 dp inside the 33 dp safe zone |
 | `python scripts/visual-qa.py --slot <slug>` | a **report** over the pack's pixels (palette, ink, clipping, contrast, similarity) | exit 0, 102 013 ms, `stability verdict: PINNED` |
@@ -333,8 +483,8 @@ signing key or an approval this session does not hold.
 | `node scripts/play-upload.mjs` | needs Play credentials and an approved revision |
 | `python scripts/check-16k.py <apk> <aab>` | `[needs built artifacts]` — measures the ELF alignment of a finished build |
 | `python scripts/test-store-studio-completeness.py` | `[needs local captures]` — reads the gitignored `store/captures/raw/`, minutes-scale by design |
-| `node scripts/publish-privacy.mjs --slot <slug> --check` | publishes or verifies a hosted page; needs the owner's host |
-| `node scripts/new-slot.mjs --economics <p> --differentiators <p>` | creates a slot; run only after the owner picks an idea |
+| `node scripts/publish-privacy.mjs --slot <slug> [--check]` | `[needs network]` — `--check` only fetches the already-recorded URL; publishing creates a real public page. The **factory** publishes (Telegraph), so the owner's host is not needed — `docs/privacy-policy-hosting.md`. Run it for one slot during development; `--all` exists for a deliberate sweep across the slots that need it and a bare invocation publishes nothing |
+| `node scripts/new-slot.mjs --economics <p> --differentiators <p> --naming <p> [--spec <change>]` | creates a slot; refuses before writing anything without a validated plan, promise contract, naming contract and an existing OpenSpec change; run only after the owner picks an idea |
 
 ## 7. Live-network checks and scout tools
 
@@ -467,7 +617,7 @@ this table is the closure, kept so a reader can check the claim rather than trus
 | In-slot secret files are present only where `.gitignore` covers them | 16.11 `CORE` | `slot.secretPaths` | **honoured** |
 | No unresolved `__TOKEN__` survives in a slot | — | `slot.tokens` | **honoured** (248 files of the reference slot swept) |
 | A build-less run reports `UNVERIFIED` (exit 2), never a pass | 12.11 `CORE` | `scripts/verify.mjs`'s exit-code contract | **honoured** — the row used to be `SKIP`, which exits **0**; a caller reading only the exit code could not tell it from a full pass. That was a live defect in the successor, found by porting the row rather than inheriting it |
-| The promise contract (`differentiators.json`) | — | `slot.differentiators` in `scripts/core/policy.mjs` | **honoured**, one half excepted: git is not read, so an absent contract is `UNVERIFIED` naming the path rather than `FAIL` |
+| The promise contract (`differentiators.json`) | — | `slot.differentiators` in `scripts/core/policy.mjs` | **honoured**, one half excepted: git is not read, so an absent contract is `UNVERIFIED` naming the path rather than `FAIL`. Extended 2026-10-02 with the depth contract (`.cursor/rules/app-depth.mdc`, the reason a slot's promise list *is* its scope): the job's `before`/`during`/`after` stages must each resolve to a claim or a written refusal, `during` never refusable, and at least one `shipped` claim must be a connective family whose proof artifact contains that family's named API. The CRUD report prints and never gates — the measured `edit-every-record` row escapes a lexical predicate because it carries a contrast clause — so these rows prove the handoff was **asked for**, never that it works |
 | Declared app languages have resources | 7.6 `CORE` | `slot.locales` | **honoured** — agrees with the gate on all four slots, including the counting text |
 | A listing feature has a control in some screen | — | `slot.uiCoverage` | **honoured**, including the two `UNVERIFIED` refusals (`harness/lessons.md` 2026-09-30, review decision D6) that stop it passing a slot it cannot check |
 | The release name agrees with `dist/release-manifest.json`; a listing language with no note section fails | 7.4 `CORE` | `scripts/store/validate.py` | **honoured where it runs**: the Python validator is read-only, reproduces the golden pack verdict, and is a deliberately-run cross-check rather than a per-edit gate, because it decodes PNG pixels and 118 s is too slow for the inner loop |

@@ -1,0 +1,56 @@
+---
+description: Every slot ships a real, factory-hosted privacy policy — generated from its data practices, publicly reachable, and openable inside the app
+alwaysApply: true
+---
+
+# The policy is hosted by the factory, not requested from the owner
+
+Play asks every listing for a privacy-policy URL, and the factory answered badly: `2026-09-22-smoke`,
+`2026-09-23-pipe-proof` and `2026-09-25-pipe-sizing` all carry `https://example.com/privacy` — a
+placeholder that is not a policy — and `2026-10-02-laneset` declared none until it was published. The
+owner's instruction,
+recorded 2026-10-02, is that the factory stop leaving this to whoever remembers: *generate the policy
+and use it — no stubs, because stubs are not needed; real, immediately.*
+
+## Rules
+
+- **The policy is generated from the app's real data practices.** `store/privacy.md` is written by
+  `scripts/store/render_documents.py` from the pack's declarations, preserving human edits; it is the
+  committed source of truth. Never hand the user a policy that does not describe the shipped app.
+- **It is hosted at a real public HTTPS URL, and the factory does the hosting.** The command is
+  `node scripts/publish-privacy.mjs --slot <slug>`; the runbook is `docs/privacy-policy-hosting.md`.
+  Putting the question to the owner — "where will you host it?" — is the defect this rule exists to
+  stop.
+- **No placeholder reaches a release.** A reserved documentation host is not a final state:
+  `pack.placeholders` (`scripts/core/assets.mjs`) fails a `privacyPolicyUrl` on `example.com`,
+  `localhost`, a non-HTTPS scheme, or none at all.
+- **The same URL is reachable from inside the app.** The in-app half is a separate Play requirement,
+  measured by `slot.inAppPolicy` (`scripts/check-in-app-policy.mjs`): the URL is a
+  `translatable="false"` resource opened through `ACTION_VIEW`, `CustomTabsIntent` or
+  `LocalUriHandler`. Privacy prose in an About screen is not the policy.
+- **The URL is a build input, so publishing happens during development**, before the app is reviewed —
+  not in `/release` (`.cursor/rules/release-gate.mdc`). Rewriting the listing to publish it voids a
+  recorded release approval, so publish first and re-record only on the owner's own words.
+
+## How it is verified
+
+```bash
+node scripts/publish-privacy.mjs --slot <slug>       # publish, verify reachable, record the URL
+node scripts/publish-privacy.mjs --slot <slug> --check
+node scripts/check-in-app-policy.mjs --slot <slug>   # the app can open the declared policy
+node scripts/verify.mjs --slot <slug>                # pack.placeholders + slot.inAppPolicy
+```
+
+The publisher refuses to publish a stub and refuses to record a URL it could not fetch — the two
+guards are the `refusing to publish a stub` check and the `is not readable` check in
+`scripts/publish-privacy.mjs`. They are named by the message they print rather than by line, because
+these lines moved twice in one session while these sentences were being written: a citation that
+drifts stops being evidence.
+
+## The honest limit
+
+The publisher verifies HTTP 200 and that the body mentions the policy — it cannot prove the page
+matches the shipped app, that the markdown conversion kept every disclosure, or that the policy is
+legally adequate. Confirming that the policy still describes the app after the app's data practices
+change stays a human reading, named in the runbook § "The residual human act"; no program here can
+make that judgement.

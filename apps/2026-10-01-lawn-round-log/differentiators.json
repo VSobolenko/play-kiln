@@ -6,6 +6,8 @@
     {
       "id": "offline-round-no-account",
       "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "trust",
       "promise": "The round, its visit history and the balances open and save with the phone in airplane mode and with no account, so nothing in the daily path waits on a login or on someone else's server being up.",
       "evidence": {
         "strength": "MEASURED",
@@ -23,6 +25,8 @@
     {
       "id": "round-not-a-calendar",
       "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
       "promise": "It is a recurring seasonal round rather than an appointment book: the day's customers are an ordered list he can reorder, one tap marks a visit mowed, skipped or rained-off, and a rained-off morning pushes the whole round by a day in one action.",
       "evidence": {
         "strength": "MEASURED",
@@ -40,6 +44,8 @@
     {
       "id": "owed-per-customer",
       "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "insight",
       "promise": "A per-customer running balance shows who still owes and for what, marked off in one tap when cash or a transfer arrives, without an accounting suite and without generating an invoice document.",
       "evidence": {
         "strength": "INFERRED",
@@ -57,6 +63,8 @@
     {
       "id": "bought-once",
       "weight": "supporting",
+      "jobStage": "before",
+      "depthFamily": "trust",
       "promise": "One price, no subscription, no advertising and no renewal prompt, so the operator is not renting access to his own round.",
       "evidence": {
         "strength": "MEASURED",
@@ -74,6 +82,8 @@
     {
       "id": "one-handed-in-sunlight",
       "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "access",
       "promise": "Every control on the day list is reachable one-handed with a 48 dp target and stays legible in direct sunlight, because it is used standing at a curb with the mower running.",
       "evidence": {
         "strength": "INFERRED",
@@ -84,9 +94,33 @@
       "proof": {
         "type": "code",
         "ref": "app/src/main/java/com/gexetr/lawnroundlog/ui/round/RoundScreen.kt",
-        "symbol": "Modifier.widthIn(min = 48.dp)",
-        "assertion": "Read `ui/round/RoundScreen.kt`: the day list's controls are floored at 48 dp — the mark, move-up and move-down buttons each carry `.size(48.dp)` and the status action is `Modifier.widthIn(min = 48.dp)`; the same floor is repeated in `Brand.kt` (`heightIn(min = 48.dp)`) and every other screen. `node scripts/verify.mjs --slot lawn-round-log` independently reports `uiux.a11y`: 35 clickable elements, each with an accessible name and none with a declared extent below 48 dp. The sunlight half is the slot's own palette in `ui/theme/Color.kt`, whose light values are the ones `store/studio.json` declares and are chosen for an outdoor screen rather than for a desk."
+        "symbol": ".size(48.dp)",
+        "assertion": "Read `ui/round/RoundScreen.kt`: the day list's controls are floored at 48 dp — the open, move-up and move-down buttons each carry `.size(48.dp)`, and so does each of the three status actions, which is the literal this proof resolves against; the bottom door row is floored as well, by `Modifier.weight(1f).heightIn(min = 48.dp)` in `IconTextButton`; the same floor is repeated in `Brand.kt` (`heightIn(min = 48.dp)`) and every other screen. `node scripts/verify.mjs --slot lawn-round-log` independently reports `uiux.a11y`: 39 clickable elements, each with an accessible name and none with a declared extent below 48 dp. The sunlight half is the slot's own palette in `ui/theme/Color.kt`, whose light values are the ones `store/studio.json` declares and are chosen for an outdoor screen rather than for a desk."
+      }
+    },
+    {
+      "id": "csv-off-the-phone",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "The whole record leaves the phone as one CSV file the operator can keep or send: Save routes the document through the system's own file picker into a folder he chooses, and Share hands the same file to any app that takes one, so a parent, a bookkeeper or a spreadsheet can read the round without opening the app.",
+      "evidence": {
+        "strength": "ON RECORD",
+        "source": "docs/research/2026-10-02-user-review-depth-signals.md#2-the-extras-users-name-most-often-ranked",
+        "finding": "Two independent review datasets put export/backup/data portability among the extras users name most: bigideasdb's documented-request table counts 661 requests for \"sync, backup & data portability\", and an r/iosdev analysis of 50,000 App Store reviews counts 743 for \"Can't export data\" (Notes 201, Productivity 156, Finance 147, Fitness 134), whose users say \"My data feels trapped\"; section 3 records that in Health Auto Export and HabitKit the export engine is precisely what the paid tier sells. The counts are the sources' own and are reproduced at the label the research document gives them, not re-measured here, which is why this row is ON RECORD rather than MEASURED."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/lawnroundlog/ui/history/HistoryViewModel.kt",
+        "symbol": "ACTION_SEND",
+        "assertion": "Read `ui/history/HistoryViewModel.kt`: `shareCsv` writes the CSV into the app's own cache, wraps it in a `FileProvider` Uri and starts `Intent.ACTION_SEND` with a `text/csv` type and `FLAG_GRANT_READ_URI_PERMISSION`, so the document reaches Drive, mail or a messaging app; `ui/history/HistoryScreen.kt` offers the Save half through `ActivityResultContracts.CreateDocument(\"text/csv\")`, so the operator picks a folder and the file persists there. `rg -n \"ACTION_SEND|FileProvider|ACTION_CREATE_DOCUMENT\" apps/2026-10-01-lawn-round-log/app/src/main` returns the tokens, the manifest declares the provider with `exported=\"false\"` and no uses-permission element exists anywhere in it, and the debug APK built from this revision was installed and driven on the attached phone (serial `R58MB3SGZVL`) to open the chooser."
       }
     }
-  ]
+  ],
+  "jobCoverage": {
+    "before": { "claimId": "offline-round-no-account" },
+    "during": { "claimId": "round-not-a-calendar" },
+    "after": { "claimId": "csv-off-the-phone" }
+  }
 }
