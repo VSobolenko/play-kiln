@@ -49,8 +49,7 @@ Two measured instances, in this repository:
   "CSV export"; no promise carries it, so no proof was required to exist.
 
 That is the whole defect. It is not that the builder was lazy — it is that **nothing asked for the
-handoff**, and the budget rule (`ideation-gate.mdc`: *prefer the cheapest shape*, *cut scope*) then
-removed any reason to volunteer one.
+handoff**. This depth rule now requires one, so it cannot disappear merely because nobody volunteered it.
 
 ## The rule
 

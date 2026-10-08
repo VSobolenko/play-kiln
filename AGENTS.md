@@ -79,11 +79,19 @@ catalogue**, not competing with an incumbent. `.cursor/rules/ideation-gate.mdc` 
 revenue, not novelty"; the supply heuristic in `docs/niche-selection.md` §4 is a signal about where to
 look, never a test an idea must pass. A rejection must name a revenue reason.
 
-**The surface is not restricted to what uses no device capability.** A local and free capability — the
-Android Photo Picker, the gallery, the user's own media, the motion sensors, the camera — is not a
-cost and may be the job's own core, so `.cursor/rules/ideation-gate.mdc` § "Budget: about one hour,
-not eight" names the costs to avoid as a server, an account, a paid API, ML that needs a server, and a
-runtime permission that buys nothing.
+**The surface is not restricted to what uses no device capability or to offline/local shapes.** A local
+and free capability — the Android Photo Picker, the gallery, the user's own media, the motion sensors,
+the camera — is not a cost and may be the job's own core. A factory-written server, cloud service,
+account/backend, ML that needs a server and a paid API are also admissible: state their service cost
+in the revenue arithmetic, whether it is per-user-per-month or one-off, and how it interacts with the
+price. **So is an external service the factory does not write** — the owner's instruction, recorded
+2026-10-08: a free public feed may simply be used, so a scout that finds a weather or schedule service
+may propose the app it makes possible; only infrastructure whose cost the price cannot carry is
+refused, and that refusal is shown as a division, never as a ban on services by name. With
+subscriptions banned, a recurring per-user cost needs near-zero ongoing cost,
+`purchase_led_repeat_sales` that funds it, or paid-upfront lifetime arithmetic that still leaves
+margin. Every capability still states the permission it needs and what the job loses without it; a
+runtime permission that buys nothing remains a compliance and trust defect, not a money line.
 
 Stage 0 exists because the factory's first real slot inverted it: a topic was inherited from an
 example, the market was chosen on that inheritance, and the shipped app had
@@ -176,13 +184,10 @@ visual-identity work, which owns the look. Its rule is that an unmeasured claim 
 invented revenue is the defect it exists to prevent, and the factory has no revenue API, so a
 hand-recorded reading with an `observedAt` is the current mechanism and is labelled as such.
 
-The wall-clock target is **about one hour of agent time per slot**, and buildability is therefore a
-first-class selection criterion rather than a detail discovered during the build. That target is a
-direction, not a measurement: the first slot's scaffold-to-last-build span is on record as
-**4 h 49 m as a lower bound** (`docs/reviews/2026-09-26-slot-1-economics-postmortem.md` §1), and
-every recipe in `docs/ideation/2026-09-26-five-recipes.md` estimates 3.5–6 hours. Never cite the
-target as if it had been met; report the elapsed wall clock instead. The concrete cuts that would
-make one hour reachable are in `.cursor/rules/parallel-execution.mdc`.
+Build estimates and elapsed wall-clock readings are recorded for owner transparency. Per the owner's
+2026-10-08 instruction, they are never selection, ranking, narrowing, refusal or kill criteria: an
+idea is judged by revenue arithmetic alone, and the factory spends days on a slot when its revenue
+case supports it.
 
 ## Published namespace
 
@@ -445,7 +450,8 @@ Before a slot is `ready`:
  of 50,000 Play apps. `scripts/check-client-secrets.mjs` (rule
  `.cursor/rules/client-secrets.mdc`) scans the shipped client for key-shaped literals, paid-provider
  SDKs, direct calls to paid hosts and a keyed `google-services.json`. A slot that wants a paid capability
- must be offline by construction, or carry nothing it cannot serve without a secret. A slot-owned
+ must use a server-side environment — factory-written or external — and state its service cost in the
+ revenue arithmetic; it may not carry a client secret. A slot-owned
  `apps/<slot>/client-secrets-exempt.json` may exempt a finding, but each entry needs a reason and a
  decider, and every applied exemption is printed.
 
@@ -857,4 +863,4 @@ fail is not a check: the manner of its failure is part of the change record in
 - Never generate or rotate a signing key without the owner's explicit permission in the current
   conversation; a signing key is the app's permanent identity and its password is the owner's to
   choose and store. See `.cursor/rules/authorization.mdc`.
-- Target roughly one hour of agent wall-clock per slot, and report the actual time taken.
+- Report actual elapsed wall-clock time for transparency; never use it as an idea or kill criterion.

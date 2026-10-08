@@ -184,7 +184,7 @@ Rejected along the way, with the reason, so a later session does not redo the wo
 
 | Candidate | Why not |
 |---|---|
-| `mushroom foraging guide` | Strongest row in the whole screen (§1.3), rejected on liability: a wrong identification can kill the user, and Play policy plus common sense treat that as a content-safety problem the factory should not take on with a 4-hour build. |
+| `mushroom foraging guide` | Strongest row in the whole screen (§1.3), rejected on liability: a wrong identification can kill the user, and Play policy plus common sense treat that as a content-safety problem the factory should not take on. |
 | `beekeeping log`, `aquarium water log`, `knitting counter` | `dead-zone` verdicts — unrated competitors are evidence of failure, not vacancy (`docs/niche-selection.md`). |
 | `visual schedule autism` | ON RECORD killed, `docs/research/2026-09-24-market-decision.md` §3. |
 | `bolt torque calculator`, `electrician calculator` | Calculators. Burned. |
@@ -916,20 +916,13 @@ them: `AGENTS.md`, `.cursor/rules/*`, `scripts/`, and `apps/` are owned by anoth
   rests on an UNVERIFIED 2 % conversion. Without this capture, the next ideation document will carry
   the same unverified number, and the kill criteria will remain prose that nothing evaluates.
 
-### 6.4 Make "about one hour" real, or stop claiming it
+### 6.4 Record elapsed time without making it a criterion
 
-- **Fix.** Record in `AGENTS.md` (or a rules file if the owner prefers) the measured trajectory that
-  the one-hour budget must be timed against: ON RECORD,
-  `docs/reviews/2026-09-26-slot-1-economics-postmortem.md` §1 puts the first slot's scaffold-to-last-
-  build span at 4 h 49 m as a **lower bound** that excludes evaluation, capture and repair. Name the
-  cuts that would have to happen for one hour to hold: skip `media-capture.mjs` and compose store
-  images from a single debug-build screenshot set; skip the tablet asset sets for a first release and
-  ship the required minimum phone count; and run `--skip-build` for staging. Then have
-  `scripts/verify-slot.mjs --build` print the elapsed wall clock and the count of stages run, so a
-  regression in slot cost is visible in the output rather than timed by hand.
-- **Failure it prevents.** Every recipe in this document estimates 3–6 agent hours, and none of them
-  is a one-hour slot. The budget as written is unachievable, and an unachievable budget is worse than
-  no budget because it turns every honest estimate into a failure.
+- **Fix.** Have `scripts/verify-slot.mjs --build` print elapsed wall clock and the count of stages
+  run, so the owner can see observed delivery cost rather than infer it by hand. Build estimates and
+  elapsed time are transparent information, never an idea-selection, ranking, refusal or kill gate.
+- **Failure it prevents.** A measured delivery cost being silently converted into a reason to reject a
+  revenue-positive job.
 
 ### 6.5 A dead-zone and fortress check at the ideation boundary
 

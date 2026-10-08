@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "slot": "framecoach-swing-review",
+  "title": "FrameCoach: Swing Review",
+  "slug": "framecoach-swing-review",
+  "applicationId": "com.gexetr.framecoachswingreview",
+  "archetype": "carrier_job_noun",
+  "candidates": [
+    { "name": "Video Analysis", "archetype": "descriptive", "score": 43, "dimensions": { "jobFit": 2.5, "searchability": 4, "distinctiveness": 1, "radioTest": 5, "uniqueness": 1, "lengthFit": 5, "localeSurvival": 4 }, "why": "Negative control: it is a generic head term already used by VisualEyes: Video Analysis and does not say baseball swing review." },
+    { "name": "Swing Review", "archetype": "descriptive", "score": 65, "dimensions": { "jobFit": 4.5, "searchability": 4.5, "distinctiveness": 2, "radioTest": 5, "uniqueness": 2, "lengthFit": 5, "localeSurvival": 4.5 }, "why": "It states the job but is too descriptive to create reliable distinctiveness or trademark headroom." },
+    { "name": "FrameCoach: Swing Review", "archetype": "carrier_job_noun", "score": 88, "dimensions": { "jobFit": 4.5, "searchability": 4, "distinctiveness": 4.5, "radioTest": 5, "uniqueness": 3.5, "lengthFit": 5, "localeSurvival": 4.5 }, "why": "FrameCoach says frame-based instruction while Swing Review names the measured job; the whole title is 24 characters and has one obvious spelling." },
+    { "name": "BatFrame", "archetype": "compound", "score": 72, "dimensions": { "jobFit": 4, "searchability": 2.5, "distinctiveness": 4, "radioTest": 4.5, "uniqueness": 3.5, "lengthFit": 5, "localeSurvival": 4.5 }, "why": "It is compact and job-adjacent but leaves the review and coaching purpose out of the searchable title." },
+    { "name": "Diamond Lens", "archetype": "metaphorical", "score": 64, "dimensions": { "jobFit": 3, "searchability": 2, "distinctiveness": 4.5, "radioTest": 5, "uniqueness": 4, "lengthFit": 5, "localeSurvival": 4 }, "why": "The baseball metaphor is clear but it does not state the analysis job a coach is searching for." }
+  ],
+  "rejected": [
+    { "name": "Swing Review", "reason": "Rejected because the phrase is descriptive and does not give the product a carrier distinct from the shelf's generic analysis titles." },
+    { "name": "BatFrame", "reason": "Rejected because it drops the measured review job from the store title and makes search intent less explicit." }
+  ],
+  "searchPhrases": ["baseball swing analyzer", "baseball swing coach", "swing video analysis"],
+  "audience": "A youth, school, or private baseball coach who records a hitter on a phone and needs to show one concrete correction after practice.",
+  "rationale": "The title pairs a pronounceable carrier with the job phrase. It is a naming hypothesis, not trademark clearance, and the proposal records the collision uncertainty rather than presenting it as fact.",
+  "collisionCheck": "UNVERIFIED: the market scan did not search the exact candidate title and no trademark register was queried. Before an owner approves a slot, search Google Play plus USPTO, EUIPO/TMview, WIPO, and the Russian national register for FrameCoach and close variants in class 9. A clean search is not legal clearance.",
+  "localisationCheck": "INFERRED: the same Latin title is 25 characters in en-US and ru-RU, leaving five characters of slack. Whether Russian-speaking coaches discover it is unmeasured and needs a native-language naming review.",
+  "evidence": "docs/ideation/2026-10-08-framecoach-swing-review.md#naming",
+  "localizedTitles": { "en-US": "FrameCoach: Swing Review", "ru-RU": "FrameCoach: Swing Review" },
+  "scoringRubric": { "scale": "0-5 per dimension, weighted", "weights": { "jobFit": 20, "searchability": 15, "distinctiveness": 15, "radioTest": 15, "uniqueness": 15, "lengthFit": 10, "localeSurvival": 10 }, "floor": "chosen >= 70 with no dimension below 2.5; a hard check outranks the score" },
+  "assumptionsUnverified": ["FrameCoach may collide with an existing app or class-9 mark because no title or trademark search was executed.", "The Latin carrier may not be the best discoverable Russian locale choice."]
+}

@@ -774,3 +774,88 @@ rule a machine cannot check — a baseline may follow the measurement, a new leg
 the core. And the band is a **tolerance, not a target**: the row still prints `scripts total` against
 the 9000-line design target on every run, so the deletion this number exists for stays visible inside
 a green line rather than only in a red one.
+
+## 14. The dependency floor read from the bundle — 2026-10-08, and the two notices that produced it
+
+Google Play sent the same notice twice. On 2026-10-05 it flagged **Mark Book for Teachers**
+(`teacher-gradebook`) for shipping `androidx.fragment:fragment:1.1.0`, and the factory recorded the
+rule, constrained the transitive of `com.android.billingclient:billing` →
+`com.google.android.gms:play-services-basement`, rebuilt and shipped. On 2026-10-08 the **same
+notice** arrived for **Laneset** (`2026-10-02-laneset`) — the newest slot, which the factory had
+believed was compliant. That is the defect this section exists for, and the reason is not that the
+requirement was recorded twice; it is that it was *enforced in the wrong place*.
+
+### The leak, stated as an artifact rather than as a rule
+
+`build.fragmentConstraint` asked whether the **build script** carried a `constraints { }` block. That
+is a statement about the recipe. Play reads the **bundle**. The two disagreed on laneset, and both
+sides were measured in one run on 2026-10-08:
+
+```text
+PASS  build.fragmentConstraint  Fragment constrained ≥1.9.1 (billing present)
+PASS  deps.artifact             dist/laneset-0.1.0-1-release.aab … note: created 2026-10-02, before the
+                                2026-10-05 baseline — ships androidx.fragment:fragment:1.1.0, below the
+                                Play-flagged floor 1.9.1 — rebuild with the constraint raised
+```
+
+The constraint had been added to laneset's source **after its bundle was already compiled** (built
+2026-10-03, rule written 2026-10-05), so the source check was true while the artifact that was
+uploaded was wrong. Independently decoded from `BUNDLE-METADATA/com.android.tools.build.libraries/dependencies.pb`
+— the exact entry the console parses — the two bundles the factory had on disk said:
+
+| bundle | decoded `fragment` version |
+|---|---|
+| `laneset-0.1.0-1-release.aab` (built 2026-10-03) | **1.1.0** — the flagged one |
+| `unit-walk-0.1.0-1-release.aab` (built after the rule) | **1.9.1** — the floor |
+
+### The fix: three points, none of them a restatement
+
+| Command | What it asks | Observed 2026-10-08 |
+|---|---|---|
+| `node scripts/verify.mjs --slot <slug>`, row `build.fragmentConstraint` | does the **build script** declare the constraint (billing present)? — the cheap half that stops the defect being written | `PASS` on laneset and `PASS` on `unit-walk`: "Fragment constrained ≥1.9.1 (billing present)" |
+| the same run, row `deps.artifact` | does the **staged bundle** declare a coordinate below a floor? Reads `dist/release-manifest.json` → the `-release.aab` it names → its `dependencies.pb` | `PASS` with a printed note on laneset naming `androidx.fragment:fragment:1.1.0` below `1.9.1`; `PASS` clean on `unit-walk` |
+| `node scripts/prepare-release.mjs --slot <slug>` | the **built** bundle is decoded and compared **before anything is staged**; a below-floor coordinate throws and there is no `VERDICT: READY FOR UPLOAD` | the same predicate over the same two files: laneset `REFUSE -> androidx.fragment:fragment:1.1.0 below floor 1.9.1` (1 of 150 coordinates); `unit-walk` `0 of 163 below floor` |
+| `node scripts/verify.mjs --only invariants`, row `deps.fixtures` | the sensor can still fail — 17 inline fixtures, the artifact legs built from an in-process zip and protobuf encoder | `PASS  deps.fixtures  17 fixtures` |
+
+The floors are declared once, in `scripts/lib/play-dependency-floors.json` (coordinate, floor, why,
+and the transitive path that produced the notice) and imported by all three points through
+`scripts/lib/dependency-floors.mjs`; the decoding is `scripts/lib/aab-metadata.mjs`, dependency-free,
+so no package enters the factory to read a zip central directory and a protobuf. The release builder
+does not restate the comparison — it calls `aabDependencyCoordinates` and `outdatedCoordinates`, the
+same two functions `deps.artifact` uses.
+
+### Falsified before it was trusted
+
+The artifact legs were confirmed able to fail by breaking `decodeDependencyList`, which turned three
+legs red. The **wiring** leg — that `scripts/prepare-release.mjs` actually calls the floor comparison
+and refuses — was confirmed the same way, and this is the leg that matters most, because without it
+the fix is a rule whose enforcement can be deleted in four lines:
+
+| Input to the wiring predicate | Observed |
+|---|---|
+| `scripts/prepare-release.mjs` as written | `PASS` |
+| the same source with the `throw new ReleaseError(...)` refusal deleted | `FAIL — reports a below-floor coordinate but does not refuse the release` (mutation confirmed applied) |
+
+### Why laneset's own row is a note and not a red line
+
+`deps.artifact` takes the freshness rule's birthday (2026-10-05) through `baselineVerdict`, so the
+slots whose bundles predate the rule carry the finding as a **printed note**. That is deliberate and
+it is the honest state: a published artifact is immutable, no gate can repair it, and a permanently
+red row on a shipped app is how an operator learns to read past the gate. The note names the exact
+coordinate and version, so the finding is still legible in every run; what the baseline removes is
+only the false alarm on a bundle nobody can change.
+
+### The honest limit
+
+Three, stated rather than implied.
+
+- **The floor list is one notice behind.** Play publishes no machine-readable list of flagged
+  versions, so a floor exists only after a notice has been received — the gate cannot pre-empt a
+  coordinate Play has never complained about.
+- **The comparison is over what the bundle declares.** `deps.artifact` proves what the AAB says about
+  itself; it cannot prove the running app's behaviour, and it reports UNVERIFIED — never a pass —
+  when a bundle carries no readable `dependencies.pb`.
+- **`dist/` accumulates one bundle per version**, so `deps.artifact` deliberately reads only the
+  bundle the manifest names as current. A slot that fixed itself and shipped again still holds its
+  old, outdated bundle on disk; failing on that would be a permanent false positive on a republished
+  app.

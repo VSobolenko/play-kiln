@@ -176,7 +176,18 @@ export const CHECKS = Object.freeze([
     run: (slotDir) => paletteChecks(slotDir)
   },
   { id: 'apk', needsSlot: true, run: (slotDir) => apkChecks(slotDir) },
-  { id: 'build', needsSlot: true, run: (slotDir) => [...buildChecks(slotDir), ...depsChecks(slotDir)] },
+  {
+    // The build group carries both halves of dependency freshness, and their ids are declared
+    // literally so a ledger fact can name them: `build.fragmentConstraint` reads the build script
+    // (a proxy), and `deps.artifact` reads the staged bundle's own `dependencies.pb` — the file the
+    // console reads. The second exists because the first was green while Play flagged laneset, so
+    // the proxy is not the claim; `reports` is literal for the same reason `ICON_REPORTS` is, since
+    // `checkIdsFromRegistry` reads this file as text and an id that is only derived is unreachable.
+    id: 'build',
+    needsSlot: true,
+    reports: [{ id: 'build.fragmentConstraint' }, { id: 'deps.artifact' }],
+    run: (slotDir) => [...buildChecks(slotDir), ...depsChecks(slotDir)]
+  },
   { id: 'manifest', needsSlot: true, run: (slotDir) => manifestChecks(slotDir) },
   // `slot.naming` sits with `slot.differentiators`: both are decisions the slot recorded before it
   // was built, and both are read the same way — the contract on disk against the pack it produced.

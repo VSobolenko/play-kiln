@@ -383,5 +383,29 @@
       "AGENTS.md"
     ],
     "enforcedBy": "uiux.platform"
+  },
+  {
+    "id": "play-flags-outdated-sdks-in-the-shipped-bundle",
+    "claim": "Google Play reads the dependency inventory an App Bundle carries about itself — `BUNDLE-METADATA/com.android.tools.build.libraries/dependencies.pb`, a protobuf listing every maven coordinate and version that went into the build — and sends an 「outdated SDK」 notice when a coordinate in it is behind what its vendor declares current. The notice is about the SHIPPED ARTIFACT, not about the build script that produced it, so a source-level check cannot answer it.",
+    "source": "Two Play notices this account received, quoted verbatim by the owner: 2026-10-05 for `Mark Book for Teachers` and 2026-10-08 for `Laneset: Swim Set Builder`, both naming `androidx.fragment:fragment` version `1.1.0` and pointing at the affected `App Bundle` files; the file being read is present in the factory's own bundles and was decoded from `apps/2026-10-02-laneset/dist/laneset-0.1.0-1-release.aab`, whose inventory lists `androidx.fragment:fragment:1.1.0`. Rule: `.cursor/rules/dependency-freshness.mdc`; floors: `scripts/lib/play-dependency-floors.json`.",
+    "sourceKind": "vendor-notice",
+    "verifiedAt": "2026-10-08",
+    "verifiedBy": "owner-report",
+    "expiresAfterDays": 180,
+    "whereUsed": [
+      "AGENTS.md",
+      ".cursor/rules/dependency-freshness.mdc",
+      "docs/factory-checks.md",
+      "scripts/lib/play-dependency-floors.json",
+      "scripts/lib/aab-metadata.mjs",
+      "scripts/lib/dependency-floors.mjs",
+      "scripts/core/deps.mjs"
+    ],
+    "enforcedBy": {
+      "check": "deps.artifact",
+      "script": "scripts/core/deps.mjs",
+      "probe": "deps.artifact"
+    },
+    "gap": "partial only: `deps.artifact` reads the staged release bundle named by `dist/release-manifest.json` and fails on a coordinate below a floor recorded in `scripts/lib/play-dependency-floors.json`. It cannot know Play's full list of currently-flagged versions — that list is not published as a machine-readable document, so a floor exists only after a notice has been received, and the gate is therefore one notice behind the first occurrence of any new coordinate. It also reads the bundle's own inventory, so an artifact that omits `dependencies.pb` is reported UNVERIFIED rather than judged."
   }
 ]

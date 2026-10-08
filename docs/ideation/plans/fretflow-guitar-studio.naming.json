@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "slot": "fretflow-guitar-studio",
+  "reconRef": "docs/ideation/2026-10-08-fretflow-guitar-studio.md#naming",
+  "title": "FretFlow Guitar Studio",
+  "slug": "fretflow-guitar-studio",
+  "applicationId": "com.gexetr.fretflowguitarstudio",
+  "archetype": "carrier_job_noun",
+  "candidates": [
+    { "name": "Guitar Practice", "archetype": "descriptive", "score": 46, "dimensions": { "jobFit": 5, "searchability": 5, "distinctiveness": 1, "radioTest": 5, "uniqueness": 1, "lengthFit": 5, "localeSurvival": 4 }, "why": "Negative control: it repeats the broad measured query and cannot distinguish the linked-session workflow." },
+    { "name": "FretFlow Guitar Studio", "archetype": "carrier_job_noun", "score": 82, "dimensions": { "jobFit": 4.5, "searchability": 4, "distinctiveness": 4, "radioTest": 4.5, "uniqueness": 3.5, "lengthFit": 4.5, "localeSurvival": 4.5 }, "why": "FretFlow evokes advancing on a fretboard while Guitar Studio communicates the multi-tool practice workspace; it is 23 characters." },
+    { "name": "LoopForge Guitar", "archetype": "compound", "score": 76, "dimensions": { "jobFit": 4, "searchability": 3.5, "distinctiveness": 4, "radioTest": 4.5, "uniqueness": 3.5, "lengthFit": 5, "localeSurvival": 4.5 }, "why": "It foregrounds the loop trainer but understates ear training and recording." },
+    { "name": "SixString Session", "archetype": "metaphorical", "score": 71, "dimensions": { "jobFit": 3.5, "searchability": 2.5, "distinctiveness": 4.5, "radioTest": 5, "uniqueness": 4, "lengthFit": 5, "localeSurvival": 4 }, "why": "It is memorable but less searchable for the practice job." },
+    { "name": "Practice Lab", "archetype": "descriptive", "score": 62, "dimensions": { "jobFit": 3.5, "searchability": 3, "distinctiveness": 2.5, "radioTest": 5, "uniqueness": 2.5, "lengthFit": 5, "localeSurvival": 4.5 }, "why": "It is broad enough to collide with non-guitar music and education products." }
+  ],
+  "rejected": [
+    { "name": "Guitar Practice", "reason": "Rejected because it is the measured category phrase and gives no carrier distinct from general lesson and tuner listings." },
+    { "name": "LoopForge Guitar", "reason": "Rejected because its loop-only emphasis understates the four connected feature areas the buyer receives." }
+  ],
+  "searchPhrases": ["guitar practice app", "guitar loop trainer", "guitar ear training"],
+  "audience": "A self-directed intermediate guitar player who practices songs and technique in short home sessions.",
+  "rationale": "The chosen carrier preserves guitar discovery language while signalling a linked studio rather than another standalone tuner, tab catalogue, or generic practice log.",
+  "collisionCheck": "UNVERIFIED: neither an exact-title Play search nor trademark-register search was performed; approval requires searches of Google Play, USPTO, EUIPO/TMview, WIPO, and the relevant national register.",
+  "localisationCheck": "INFERRED: the 23-character Latin title leaves seven characters under Play's 30-character limit in en-US and ru-RU, but Russian discoverability needs native-language review.",
+  "evidence": "docs/ideation/2026-10-08-fretflow-guitar-studio.md#naming",
+  "localizedTitles": { "en-US": "FretFlow Guitar Studio", "ru-RU": "FretFlow Guitar Studio" },
+  "scoringRubric": { "scale": "0-5 per dimension, weighted", "weights": { "jobFit": 20, "searchability": 15, "distinctiveness": 15, "radioTest": 15, "uniqueness": 15, "lengthFit": 10, "localeSurvival": 10 }, "floor": "chosen >= 70 with no dimension below 2.5; a hard collision check outranks the score" },
+  "assumptionsUnverified": ["FretFlow has not been cleared against existing Play titles or class-9 marks.", "The English carrier remains intelligible and discoverable for Russian-speaking guitar players."]
+}

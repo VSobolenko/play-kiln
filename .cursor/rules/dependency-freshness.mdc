@@ -1,5 +1,5 @@
 ---
-description: Third-party deps stay on latest stable; constrain Play-flagged antiques (Fragment via Billing)
+description: Third-party deps stay on latest stable; the shipped bundle is checked for Play-flagged antiques
 alwaysApply: true
 ---
 
@@ -10,31 +10,58 @@ transitive is still a shipped SDK even when the app never imports it. The owner'
 use only the modern stack; third-party libraries must be the **latest stable**; do not leave
 an APK on what a Google Maven POM asked for years ago when a constraint can raise it.
 
-## Measured instance
+## The requirement is about the bundle, and this rule first recorded it as about the source
 
-On 2026-10-05 Play notified that Mark Book for Teachers (`teacher-gradebook`) shipped
-`androidx.fragment:fragment:1.1.0`. Gradle showed the path:
+This is the correction the rule was rewritten from on 2026-10-08, and it is the reason the same
+notice arrived **twice**.
+
+The first version of this rule — authored 2026-10-05, after Play flagged
+`Mark Book for Teachers` (`teacher-gradebook`) for `androidx.fragment:fragment:1.1.0` — recorded the
+requirement as *"a Billing slot must declare a Fragment constraint in `app/build.gradle.kts`"*, and
+`build.fragmentConstraint` measured exactly that: a regex over the build script. Its own
+"honest limit" then admitted the gap in one sentence — *"the gate reads source; it cannot prove the
+resolved APK graph"* — and that sentence is where the defect lived. **A gate that reads a proxy and
+passes is read as a gate that passed.** It did not.
+
+On 2026-10-08 the same notice arrived for `Laneset: Swim Set Builder` (`2026-10-02-laneset`), for the
+same coordinate, at `1.1.0`. Measured, and it is unambiguous:
 
 ```text
-androidx.fragment:fragment:1.1.0
-\--- com.google.android.gms:play-services-basement:18.9.0
-     \--- com.android.billingclient:billing:9.1.0
-          \--- billing-ktx → com.gexetr.capability:billing → app
+apps/2026-10-02-laneset/app/build.gradle.kts   constraints { api(libs.androidx.fragment) }  ← gate green
+apps/2026-10-02-laneset/dist/laneset-0.1.0-1-release.aab
+   BUNDLE-METADATA/com.android.tools.build.libraries/dependencies.pb
+   → androidx.fragment:fragment:1.1.0                                                      ← Play's finding
 ```
 
-Billing **9.1.0 was already the latest** stable. The app is Compose-only and does not use
-Fragment UI. GMS basement still requested Fragment 1.1.0. The fix is a dependency
-**constraint** to Fragment **1.9.1** (latest stable measured that day), not a Billing
-downgrade and not excluding GMS (Billing needs it).
+The bundle was built 2026-10-03, three days before the rule existed, so the constraint was added to
+the source *after* the artifact had already shipped. The source check was correctly green and the
+artifact was correctly flagged, and **no program had ever asked the artifact a question**. A sweep of
+every AAB the factory has built found the coordinate in four bundles, not one: `pipe-sizing 0.2.0`
+(1.1.0), `teacher-gradebook 0.1.0` (1.1.0, fixed to 1.9.1 in `0.1.1`), `lawn-round-log 0.1.0`
+(**1.5.4** — a different path entirely) and `laneset 0.1.0` (1.1.0).
+
+Two things follow, and both are now the rule:
+
+- **Every AAB carries its own dependency inventory**, at
+  `BUNDLE-METADATA/com.android.tools.build.libraries/dependencies.pb`: a protobuf listing every maven
+  coordinate (group, name, version) that went into the build. **It is the file the console reads to
+  decide whether to send the notice.** The factory had been building them for weeks and reading none.
+- **A source constraint is not evidence about an artifact.** It is a claim about what a *future* build
+  would resolve. Only the bundle can say what was shipped.
 
 ## Rules
 
 - **Third-party coordinates on the classpath are latest stable.** Prefer mainstream libraries.
   When a transitive is antique and Play-flagged, **constrain it up** — do not ship the 2019
   request GMS encoded in its POM.
-- **Known Play-outdated coordinates must not ship.** The measured instance is
-  `androidx.fragment:fragment:1.1.0`. A slot that resolves Fragment below the factory floor
-  (`1.9.1`, `FRAGMENT_FLOOR` in `scripts/core/deps.mjs`) fails the gate.
+- **A Play-flagged coordinate must not ship in the bundle.** The floors are declared once in
+  `scripts/lib/play-dependency-floors.json` — coordinate, floor, reason, and the notices that
+  produced them — and **nothing restates them**: the source check and the artifact check both import
+  that file. The measured first entry is `androidx.fragment:fragment` → floor `1.9.1`.
+- **The bundle is checked, not just the build script.** `deps.artifact` reads the `-release.aab`
+  named by `dist/release-manifest.json` (never every `.aab` under `dist/`, which accumulates one
+  bundle per version and would fail forever on a slot that has since fixed itself), decodes its
+  `dependencies.pb`, and FAILs when a listed coordinate is below its floor.
 - **Billing stays on current Play Billing.** Do not downgrade `com.android.billingclient`
   to escape the Fragment notice. Pin Fragment instead.
 - **When Billing is present, constrain Fragment.** Every living path that puts Billing on the
@@ -42,21 +69,54 @@ downgrade and not excluding GMS (Billing needs it).
   `implementation`s `capability.billing` / `billing-ktx` — carries:
   `constraints { api("androidx.fragment:fragment:<floor>") { because("…") } }`
   (catalog version ref is fine). Document in a one-line comment that Compose apps do not use
-  Fragment; the constraint only upgrades the transitive so Play stops flagging 1.1.0.
+  Fragment; the constraint only upgrades the transitive so Play stops flagging 1.1.0. This is the
+  cheap half and it stays — it prevents the defect at the source. It is simply not the proof.
 - **Do not add Fragment as an app feature.** No `implementation(libs.androidx.fragment)` for
   UI, no Fragment navigation, no Fragment-hosted screens. Constraint only. Compose owns the UI.
+- **A published bundle cannot be repaired by editing source.** A notice already received is cleared
+  only by a **new release** carrying the fixed bundle. Editing the slot and leaving its published
+  artifact in place changes nothing on Play, and a gate over the new source does not make that old
+  notice go away. Say this out loud when a notice arrives; do not report "fixed" for a source edit.
 
 ## How it is verified
 
-- `build.fragmentConstraint` / `deps.fixtures` in `scripts/core/deps.mjs`, registered in
-  `scripts/core/index.mjs`: a billing-enabled slot (or a build that depends on billing) without
-  a Fragment constraint at or above the floor FAILs; fixtures prove the check can fail.
+There are three points, and they are deliberately not the same point twice:
+
+- **`build.fragmentConstraint`** (source, `scripts/core/deps.mjs`): a billing-enabled slot (or a
+  build that depends on billing) without a Fragment constraint at or above the floor FAILs. Runs on
+  every `verify.mjs --slot <slug>`. This is what stops the defect being *written*; it says nothing
+  about any artifact, which is exactly how it passed while laneset's bundle was wrong.
+- **`deps.artifact`** (artifact, `scripts/core/deps.mjs`): the staged release bundle is decoded and
+  FAILs when it declares a coordinate below its floor. This is the check that would have caught the
+  2026-10-08 notice. Runs on every `verify.mjs --slot <slug>`, so it judges whatever is in `dist/`.
+- **The release builder refuses** (`scripts/prepare-release.mjs`): the built bundle's dependency
+  inventory is decoded and compared to the floors **before anything is staged**, and a below-floor
+  coordinate throws, so `VERDICT: READY FOR UPLOAD` is unreachable with a Play-outdated bundle and
+  no such bundle ever reaches `dist/` or a release manifest. `deps.artifact` can only report a
+  bundle that was already produced; this is the point where it is prevented. The two import the same
+  `scripts/lib/dependency-floors.mjs` and the same `aab-metadata.mjs` — the comparison is not
+  restated, only its location is.
+- **`deps.fixtures`** drives them, including the legs that must fail: a bundle declaring
+  fragment 1.1.0, a bundle at the floor, an unlisted coordinate that must *not* be judged, a bundle
+  with no readable metadata (UNVERIFIED, never a pass), a truncated protobuf, and a floors contract
+  with no recorded reason. The artifact legs were confirmed falsifiable by breaking
+  `decodeDependencyList` and watching them fail, and the **wiring** leg — that the release builder
+  actually calls the floor comparison and refuses — was confirmed falsifiable by deleting the
+  refusal from a copy of the builder and watching the leg fail.
 - Observed resolution: `./gradlew :app:dependencyInsight --dependency androidx.fragment:fragment
   --configuration releaseRuntimeClasspath` must select the floor, not 1.1.0.
 
+`deps.artifact` takes the freshness rule's own birthday (2026-10-05) through
+`baselineVerdict`, so the slots that shipped their bundle before the rule existed carry the finding
+as a **printed note** rather than a red row — their artifacts are immutable and a gate cannot repair
+them — while every slot created from that date is gated.
+
 ## The honest limit
 
-The gate reads **source** (`app/build.gradle.kts` and the version catalog). It cannot prove the
-resolved APK graph without Gradle. After changing the constraint, republish
-`capabilities/` to mavenLocal and re-run `dependencyInsight` on a billing slot before calling
-the Play notice closed.
+`deps.artifact` proves what **the bundle says about itself**. It cannot prove the running app's
+behaviour, and it cannot know Play's full list of currently-flagged versions, because that list is
+not published as a machine-readable document: **a floor exists only after a notice has been
+received**, so the gate is one notice behind the first occurrence of any *new* coordinate. It reads
+`dependencies.pb` and reports UNVERIFIED when a bundle omits it, rather than treating silence as
+compliance. The judgement that a library is current rather than merely un-flagged stays with the
+builder, who must still prefer latest stable on general principle and not only where a floor exists.

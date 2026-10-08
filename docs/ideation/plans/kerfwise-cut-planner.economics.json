@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A hobby woodworker or small-shop cabinet maker who needs to turn furniture dimensions into cut-ready material and joint instructions without carrying a laptop into the workshop.",
+  "paidUnit": "One permanent unlock of unlimited project templates, grain-aware part breakdowns, sheet and board cut-layout optimization, joint/angle solving, sensor bevel checking, and PDF/share export.",
+  "priceUsd": 9.99,
+  "momentOfPayment": "After a user completes one free small project and previews its cut diagram and export, before exporting another project or enabling the full template library.",
+  "distinctnessSentence": "Kerfwise takes a finished furniture size through grain-aware parts, stock-aware cut layouts, joint and bevel checks, phone-assisted angle verification, and a shareable cut packet instead of stopping at a cut-list, a generic angle meter, or a gallery of project photos.",
+  "evidenceRef": "docs/ideation/2026-10-08-kerfwise-cut-planner.md#market-evidence",
+  "day1RevenuePath": "A woodworker finds the app from the measured cut-list, woodworking-planner, or miter-angle searches; one complete small-project preview proves the local workflow, and Play Billing collects the permanent unlock at the second export or full-template use.",
+  "killCriteria": { "windowDays": 90, "minInstalls": 1000, "minRevenueUsd": 1000 },
+  "capabilities": { "required": ["billing"], "deliberatelyNotEnabled": ["ads"], "note": "INFERRED: a one-time premium workshop workflow uses Billing; ads are deliberately absent because 47% of critical sampled cut-list reviews mentioned ads." },
+  "serverRequired": false,
+  "permissions": "INFERRED: no runtime permission is required for the accelerometer/gyroscope or SAF document creation; Android 13+ notification permission is requested only if the user enables a local cut-session reminder; Play Billing uses com.android.vending.BILLING. No camera, microphone, location, contacts, Bluetooth, account, or server is required.",
+  "buildEstimateAgentHours": 32,
+  "archetypesRejected": [
+    { "archetype": "purchase_led_repeat_sales", "revenueReason": "INFERRED: the optimizer, solver, and export are durable on-device capabilities; selling each project as a new purchase would be artificial rather than a measured consumable." },
+    { "archetype": "ads_led_utility", "revenueReason": "MEASURED: 7 of 15 critical reviews in the cut-list scan named ads, including a complaint that an ad appeared on every click, so an ads-led version reproduces an observed reason to leave." },
+    { "archetype": "purchase_only_no_ads", "revenueReason": "MEASURED: six of eight enriched cut-list listings were free with IAP and CutList Optimizer has 1M+ installs, so an upfront listing price would discard the observed free-install funnel without paid-download evidence." },
+    { "archetype": "subscription", "revenueReason": "ON RECORD: subscriptions are forbidden by the owner's instruction; this fully local workflow has no recurring service cost that would justify one." }
+  ],
+  "assumptionsUnverified": [
+    "UNVERIFIED: 147 monthly $9.99 unlocks at a modeled $6.80 net per sale reach $1,000 net; no conversion rate or IAP price from the 1M+ leaders was observed.",
+    "INFERRED: $6.80 net assumes a 15% Play fee and a 20% reserve for tax/refund/price-localisation effects; developer fee eligibility and actual refunds were not measured.",
+    "UNVERIFIED: the $8.99 paid Miter Angle Calculator at 10+ installs and $2.99 Miter Angle at 1K+ installs establish paid comparators but do not prove a $9.99 multi-feature purchase will convert.",
+    "UNVERIFIED: a phone-class device can render sufficiently clear cutting diagrams and run the packing heuristic promptly for real cabinet projects."
+  ]
+}

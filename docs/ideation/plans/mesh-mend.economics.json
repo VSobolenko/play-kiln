@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A hobby 3D-print maker who has an existing STL or 3MF file and wants to repair and verify it on a phone before sending it to a slicer.",
+  "paidUnit": "One permanent unlock of on-device mesh repair, print-risk analysis, bed-fit transforms, hollowing, plate arrangement, and prepared-file export.",
+  "priceUsd": 9.99,
+  "momentOfPayment": "After the user imports a model and sees its free geometry report, before applying a repair or exporting the prepared model.",
+  "distinctnessSentence": "The app changes and checks an existing mesh locally, then exports the repaired, bed-fitted file instead of stopping at model viewing or printer control.",
+  "evidenceRef": "docs/ideation/2026-10-08-meshmend.md#what-the-play-shelf-measured",
+  "day1RevenuePath": "A maker finds the app from STL-repair or phone-slicing search, imports a mesh, sees the free risk preview, and buys the permanent unlock through Play Billing before repairing and exporting; the scanner measured adjacent free listings with IAP badges but not their IAP prices.",
+  "killCriteria": {
+    "windowDays": 90,
+    "minInstalls": 500,
+    "minRevenueUsd": 100
+  },
+  "assumptionsUnverified": [
+    "UNVERIFIED: no screened competitor exposed a paid-up-front price or an IAP product price, so $9.99 is an experiment rather than a measured comparable.",
+    "UNVERIFIED: 65 monthly unlocks are needed to reach $500 modeled monthly net proceeds, but no relevant Play conversion rate was measured.",
+    "INFERRED: the modeled $7.81 net per sale assumes a 15% Play fee and an 8% tax haircut on a $9.99 sticker price; actual Play fee enrollment, tax incidence, refunds, and currency are unknown.",
+    "UNVERIFIED: large real-world models may exceed phone memory or latency budgets, and the parser and repair pipeline need representative device measurements."
+  ],
+  "capabilities": {
+    "required": [
+      "billing"
+    ],
+    "deliberatelyNotEnabled": [
+      "ads"
+    ],
+    "note": "INFERRED: one permanent premium unlock uses Play Billing; ads are excluded because the local file-preparation task is occasional and focused."
+  },
+  "serverRequired": false,
+  "permissions": "INFERRED: no runtime permissions, account, or network access; SAF file selection and FileProvider share/export are user-initiated, and Play Billing supplies the purchase capability.",
+  "buildEstimateAgentHours": 185,
+  "archetypesRejected": [
+    {
+      "archetype": "purchase_led_repeat_sales",
+      "revenueReason": "INFERRED: mesh repair is a durable local capability with no variable server cost, and recon found no defensible repeat consumable to sell without inventing artificial content packs."
+    },
+    {
+      "archetype": "ads_led_utility",
+      "revenueReason": "INFERRED: model preparation is an occasional focused session rather than a frequent ad-impression habit, so ad inventory is unlikely to pay for this large local geometry build."
+    },
+    {
+      "archetype": "purchase_only_no_ads",
+      "revenueReason": "MEASURED: all eight enriched apps in the slice-to-phone set list for free, so charging before a maker can inspect their own model abandons the observed free-install funnel without paid-download precedent."
+    }
+  ]
+}

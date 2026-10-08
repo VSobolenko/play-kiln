@@ -276,10 +276,10 @@ MEASURED division; the conversion rate is UNVERIFIED (§7). At the single-unlock
 | Archetype | Verdict | Revenue reason |
 |---|---|---|
 | `purchase_led_repeat_sales` | **FIT — primary** | A maker's want is metered by the **content library**: more tables, more patterns, more themes. The measured shelf shows repeat purchase behaviour — **7 of 8** craft apps declare IAP (MEASURED). The base engine stays free; the packs are the paid unit. Capability: `billing`. **Cost to state:** each pack is authored once, so the engine must amortise authoring across packs. |
-| `purchase_led_single_unlock` | **FIT — fallback** | Honest when the paid unit is the **"keep"** itself — unlimited export/print plus the full library, one premium capability. Cheaper to build than a pack pipeline. Capability: `billing`. |
+| `purchase_led_single_unlock` | **FIT — fallback** | Honest when the paid unit is the **"keep"** itself — unlimited export/print plus the full library, one premium capability. Capability: `billing`. |
 | `ads_led_utility` | **REFUSED** | Revenue reason: TTRPG/maker tools are used **weekly-to-occasionally** (a game night, a project), and banner-only needs **11,000+ DAU** while interstitial+banner needs **2,000–6,000 DAU** for the target (ON RECORD, §2.1). A twice-a-month app needs roughly **6× the monthly audience** of a daily app to hold the same DAU. The shelf's own leaders monetise with IAP, not with ad inventory. |
 | `purchase_only_no_ads` | **REFUSED** | Revenue reason: **no paid incumbent exists** in this shape on either measured query, so the price has no demonstrated floor; and a paid-only listing forfeits the free funnel that let YarnPal reach `244,000` reviews (MEASURED). |
-| **Any AI-served generator** | **REFUSED (not an archetype — an architecture)** | Revenue reason: the three shelf winners whose *generation* is AI-served (YarnPal, Crochet AI) are paid-API products. Shipping one client-side is forbidden by `.cursor/rules/client-secrets.mdc`; shipping one server-side is a **server project** with `K = 3.0934×` unit cost and a `PurchaseAuthority` (§1.4). Either way it is not a one-hour slot, and it is not what the lane's measured on-device comparables do. |
+| **Any AI-served generator** | **Architecture requires arithmetic, not refusal** | The three shelf winners whose *generation* is AI-served use paid APIs. Shipping one client-side is forbidden by `.cursor/rules/client-secrets.mdc`; shipping one server-side is admissible with `K = 3.0934×` unit cost and a `PurchaseAuthority` (§1.4). Its proposal must show how the price funds that serving cost; elapsed build time is not a reason to refuse it. |
 
 ### 3.5 The failure mode I would bet against
 
@@ -402,7 +402,7 @@ committed practitioner.
 | Installs/mo @ 2 % for $1,000 | 12,300 | 20,500 | 13,650 |
 | Measured **paid** incumbent | **1,660** reviews @ `$3.99` (HamStudy.org) | **none** | **4,030** reviews @ `$4.49` (Rhythm Tabla & Tanpura PREMIUM) |
 | Measured free leader | 100K+–1M+ (ham/CDL) | 244,000 rev / 1M+ (YarnPal) | 14,300 rev / 1M+ (free tabla twin) |
-| Build cost driver | **high** — authoring a *correct* bank, plus correctness risk | low–medium — engine + packs | low — audio/timing engine |
+| Delivery-cost driver (owner information only) | **high** — authoring a *correct* bank, plus correctness risk | low–medium — engine + packs | low — audio/timing engine |
 | Server needed? | no (local) | **no only if procedural**; AI = server project | no (local) |
 | Primary archetype | `purchase_led_single_unlock` | `purchase_led_repeat_sales` | `purchase_led_single_unlock` |
 
@@ -454,7 +454,7 @@ Every refusal above names one of the closed list of revenue reasons (ON RECORD,
 |---:|---|---|
 | 2 | An unrated demand reading | not used — every lane produced rated incumbents |
 | 3 | A price the market will not pay / a shelf that monetises elsewhere | Lane A `ads_led_utility`; lane B `purchase_only_no_ads`; lane C `ads_led_utility` |
-| 4 | A build cost that eats the margin (incl. a server arriving late) | Lane B AI-served generator (§3.4) |
+| 4 | A serving cost that defeats the shown revenue arithmetic | Lane B AI-served generator (§3.4) |
 | 5 | A duplicate of our own catalogue | not invoked — no lane duplicates a `registry/apps.json` job identity |
 
 **Never used, and must not appear** (each is a novelty judgement wearing a revenue coat): *"this

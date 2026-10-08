@@ -84,7 +84,7 @@ the wedge will convert                       UNVERIFIED  no priced comparable fo
 | A settings surface exists and every preference in it changes real behaviour | `.cursor/rules/app-settings.mdc` |
 | A slot is born multilingual: one language besides the default ships from the first commit, every user-facing string is a resource, and a translated tree is a translation rather than a copy | `.cursor/rules/localization.mdc` |
 | The Play compliance floor: data safety, minimized permissions, edge-to-edge, backup rules, 16 KB readiness | `.cursor/rules/play-compliance.mdc` |
-| No paid-provider key or SDK in the shipped client; the capability must be offline by construction | `.cursor/rules/client-secrets.mdc` |
+| No paid-provider key or SDK in the shipped client; use a server-side environment and declare the cost and permission, never refuse on infrastructure alone | `.cursor/rules/client-secrets.mdc`, `.cursor/rules/ideation-gate.mdc` |
 | Security: validate at trust boundaries, minimize permissions, no `eval`-like execution, a reason for each dependency | `.cursor/rules/security-devsecops.mdc` |
 | Secrets, keystores and service-account JSON are never committed | `.cursor/rules/security-secrets.mdc` |
 | Build speed: one Gradle invocation per build, one pinned JDK, build only what the question needs | `.cursor/rules/build-speed.mdc` |

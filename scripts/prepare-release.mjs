@@ -17,6 +17,8 @@ import { bytesToHuman, sha256 } from './lib/play-assets.mjs'
 import { RELEASE_TASKS, runGradleTasks } from './lib/gradle.mjs'
 import { checkReleaseApproval } from './lib/release-approval.mjs'
 import { ensureSigning } from './sign-release.mjs'
+import { aabDependencyCoordinates } from './lib/aab-metadata.mjs'
+import { outdatedCoordinates } from './lib/dependency-floors.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const line = (status, message) => console.log(`  ${status.padEnd(11)} ${message}`)
@@ -320,6 +322,28 @@ function runCli() {
 
     const aabEntries = listZipEntries(sourceArtifacts[2].file)
     const nativeLibraries = aabEntries.filter((entry) => /(?:^|\/)lib\/.*\.so$/i.test(entry))
+
+    // Google Play flags an outdated SDK by reading the bundle's own dependency inventory
+    // (`BUNDLE-METADATA/com.android.tools.build.libraries/dependencies.pb`), so the floor is checked
+    // against the built AAB rather than against `app/build.gradle.kts`. A source-level constraint
+    // says what the recipe intends; this says what the bundle declares. The two disagreed on
+    // `2026-10-02-laneset`, whose Oct-3 bundle shipped `androidx.fragment:fragment:1.1.0` while its
+    // build script already carried the constraint — the recipe was fixed and the artifact was not,
+    // so the notice came back. The check runs before anything is staged, so a bundle that would be
+    // flagged never reaches `dist/` and never gets a release manifest recording it as shippable.
+    const aabCoordinates = aabDependencyCoordinates(readFileSync(sourceArtifacts[2].file))
+    if (aabCoordinates === null) {
+      line('WARN', "bundle carries no dependency inventory — Play's outdated-SDK check cannot be pre-empted")
+    } else {
+      const outdated = outdatedCoordinates(aabCoordinates)
+      for (const hit of outdated) {
+        line('FAIL', `${hit.coordinate}:${hit.version} is below the Play-flagged floor ${hit.floor} — ${hit.why}`)
+      }
+      if (outdated.length > 0) {
+        throw new ReleaseError('the bundle declares a Play-outdated coordinate; raise the constraint in app/build.gradle.kts and rebuild')
+      }
+      line('PASS', `bundle dependency inventory clean — ${aabCoordinates.length} coordinates, 0 below a declared floor`)
+    }
     const pageSizeReadiness = nativeLibraries.length === 0
       ? { status: 'ready', note: 'pure Kotlin/Java — no native libs', nativeLibraries: [] }
       : {

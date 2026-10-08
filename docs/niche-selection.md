@@ -77,7 +77,8 @@ Two secondary filters:
   than "subscription-driven": a category with subscriptions **and** one-off or ad-supported
   competitors is reachable through that shape, and a shelf being subscription-funded is not by itself
   a reason to skip it.
-- **Buildability** — the slot must be reachable by a Kotlin/Compose template with no backend.
+- **Delivery shape** — state the implementation shape, including any backend or server cost, so the
+  owner can evaluate the full revenue arithmetic; build size itself is not a selection criterion.
 
 ## 3. The screening procedure
 

@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "slot": "nightvector-astro-plan",
+  "reconRef": "docs/ideation/2026-10-08-nightvector-astro-plan.md#promise-contract",
+  "jobCoverage": {
+    "before": { "claimId": "save-a-dark-sky-scout" },
+    "during": { "claimId": "compose-the-night-plan" },
+    "after": { "claimId": "share-the-session-brief" }
+  },
+  "claims": [
+    {
+      "id": "save-a-dark-sky-scout",
+      "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "durability",
+      "promise": "The user saves an observing location and equipment profile, so a later plan uses their horizon, focal-length and tracking assumptions instead of a generic sky view.",
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/ideation/2026-10-08-nightvector-astro-plan.md#market-evidence",
+        "finding": "Inferred from the measured shelf's separate photo planner, star map and satellite tracker products: a saved local context is required to turn their separate outputs into a repeatable trip decision."
+      },
+      "status": "deferred",
+      "deferredReason": "No local scout/profile repository or location picker exists; this resolves when a recreated activity preserves a scout and a changed focal length changes its exposure recommendation."
+    },
+    {
+      "id": "compose-the-night-plan",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "The app composes one chronological plan with darkness and moon windows, named deep-sky target altitude and azimuth curves, planetary and satellite passes, weather and target-specific tracked or untracked exposure guidance.",
+      "comparison": {
+        "incumbent": "com.photopills.android.photopills",
+        "limitation": "The measured Play listing establishes a high-price photo-planning incumbent, while this proposal's unified astronomy-session sequence is a conversion hypothesis that requires a feature-by-feature market test.",
+        "source": "docs/ideation/2026-10-08-nightvector-astro-plan.md#market-evidence"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-nightvector-astro-plan.md#market-evidence",
+        "finding": "Five hand-classified astro shelves returned 141 on-job cards of 149 visible cards, while PhotoPills was measured at 4.8 stars, 8,220 displayed reviews, 100K+ installs and a 10.99-dollar paid listing."
+      },
+      "status": "deferred",
+      "deferredReason": "The ephemeris engine, altitude solver, SGP4 propagation, weather client and ordered plan renderer do not exist; this resolves when fixed time/location fixtures yield a plan with every constituent window and recommendation."
+    },
+    {
+      "id": "share-the-session-brief",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "The user exports the selected session as a compact plain-language brief through Android Sharesheet, including location, time zone, targets, conditions, moon constraints, pass warnings and exposure assumptions.",
+      "comparison": {
+        "incumbent": "com.yingwen.photographertoolspro",
+        "limitation": "Its sampled critical reviews include a report that 29 plans on a phone could not be easily transferred and another report about a purchased Location Explorer feature, so portable handoff and local clarity are a testable wedge.",
+        "source": "docs/ideation/2026-10-08-nightvector-astro-plan.md#market-evidence"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-nightvector-astro-plan.md#market-evidence",
+        "finding": "The complaint scan sampled 2 critical reviews from Planit Pro, including the verbatim start \"I have just discovered that the 29 plans that I have on my cellphone can't be easi\"."
+      },
+      "status": "deferred",
+      "deferredReason": "No brief formatter or share intent exists; this resolves when an ACTION_SEND test contains the selected session's planning fields."
+    },
+    {
+      "id": "remind-at-the-window",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "reminder",
+      "promise": "The user schedules a local reminder before a chosen dark or target-visible window, so a narrow opportunity remains actionable after planning ends.",
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/ideation/2026-10-08-nightvector-astro-plan.md#market-evidence",
+        "finding": "Inferred from the measured satellite shelf's time-sensitive passes and the job's named visibility windows; the useful outcome occurs at a future time, not while the planning screen is open."
+      },
+      "status": "deferred",
+      "deferredReason": "No notification channel or scheduled work exists; this resolves when WorkManager schedules a notification containing the selected target and time."
+    }
+  ]
+}

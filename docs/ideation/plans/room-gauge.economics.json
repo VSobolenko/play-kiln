@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A homeowner preparing a paint, tile, drywall, or flooring purchase from a real room measurement.",
+  "paidUnit": "One permanent unlock of unlimited room plans, opening-aware material quantities, editable local prices, and PDF export.",
+  "priceUsd": 14.99,
+  "momentOfPayment": "After a free first-room preview shows its corrected geometry and material quantities, before the user creates a complete PDF material sheet.",
+  "distinctnessSentence": "A homeowner can correct a sensor-assisted room trace, subtract openings, round paint, tile, drywall, flooring, and adhesive to purchasable packs, and export an offline PDF sheet in one workflow.",
+  "evidenceRef": "docs/ideation/2026-10-08-roomgauge-material-plan.md#decision-brief",
+  "day1RevenuePath": "A homeowner finds room measurement or floor-plan search, measures one room free, sees the material-plan preview, and buys the permanent unlock through Play Billing before PDF export.",
+  "killCriteria": { "windowDays": 90, "minInstalls": 1000, "minRevenueUsd": 500 },
+  "assumptionsUnverified": [
+    "UNVERIFIED: $14.99 is below the measured $19.99 CamToPlan price but no enriched free/IAP listing exposed its actual product price.",
+    "UNVERIFIED: modeled net is $11.72 per sale after a 15% Play fee and 8% tax/refund haircut, so 86 monthly unlocks target $1,000 net without a measured conversion rate.",
+    "UNVERIFIED: camera-assisted scaling needs physical-device fixtures before it can carry an accuracy promise."
+  ],
+  "capabilities": { "required": ["billing"], "deliberatelyNotEnabled": ["ads"], "note": "INFERRED: the focused renovation-purchase decision is ad-hostile; Play Billing collects one permanent export-and-plan unlock." },
+  "serverRequired": false,
+  "permissions": "INFERRED: CAMERA is the only runtime permission; Photo Picker, motion sensors, SAF, PdfDocument, FileProvider, and share/export require no account, server, paid API, or runtime permission.",
+  "buildEstimateAgentHours": 140,
+  "archetypesRejected": [
+    { "archetype": "purchase_led_repeat_sales", "revenueReason": "INFERRED: a bundled local catalogue and PDF do not consume a real recurring unit, so a repeat sale would be artificial." },
+    { "archetype": "ads_led_utility", "revenueReason": "INFERRED: ads undermine trust during a costly renovation material decision and short estimating sessions offer weak impression inventory." },
+    { "archetype": "purchase_only_no_ads", "revenueReason": "MEASURED: the enriched high-install adjacent incumbents are free/IAP, so charging before a user sees a room result gives up their measured funnel." }
+  ]
+}

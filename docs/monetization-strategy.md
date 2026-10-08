@@ -19,7 +19,7 @@ Recorded so later sessions do not re-litigate them.
 | Monetization model | **Per app, chosen from a spectrum** (§3), never a fixed default. **No model is emphasised over another** — purchase, consumable, ads and hybrid are equally first-class | Every slot's plan must name its archetype, show which alternatives it considered, and justify the choice in revenue terms (§3.6, `docs/slot-economics.md`). A slot that leads with ads must also answer "what does a rewarded view unlock" *before* its UI is designed |
 | Why there is no house default | The owner's past commercial success came from apps **without ads but with in-app purchases of content and elements**, and that history was written down as "purchase-led is the starting hypothesis" — which then **became** the default it was never meant to be: every proposal, recipe and plan in this repository chose `purchase_led_single_unlock` | The history is evidence that purchases *can* work, not a prior that they *will*. It is one data point about one owner's catalogue, not a finding about a new app's audience. State a preference only when the app's own evidence produces it |
 | Purchase kinds in scope | **One-time unlocks** and **spendable consumables (token/credit packs)** — an open-ended in-app store, not only "remove ads"; ads as a parallel stream | Packs are consumables, never entitlements (§3.2); "remove ads" is a one-time unlock (§3.1) |
-| Subscriptions | **Banned** (owner, 2026-10-01) | Out of scope: recurring entitlement needs server-side validation plus a renewal/refund/cancellation/grace-period lifecycle, which makes the slot a server project. `subscription` is not in `ARCHETYPES`, so a plan naming it fails `check-economics.mjs` (§3.3) |
+| Subscriptions | **Banned** (owner, 2026-10-01) | Out of scope: recurring entitlement needs server-side validation plus a renewal/refund/cancellation/grace-period lifecycle. This is the reason for the ban, not a ban on servers; `subscription` is not in `ARCHETYPES`, so a plan naming it fails `check-economics.mjs` (§3.3) |
 | Child-directed apps | **No ads by default; paid app, IAP, or policy-compliant ads** | The archetype cannot be a factory-wide constant: a child-directed ads configuration must satisfy the Families ads regime, while no ads remains the low-risk product choice (§3.5) |
 | Remote configuration | **Firebase Remote Config** | Ad unit ids, feature flags, pack grants, and experiment arms change without a release; needs a Firebase project and `google-services.json` per slot (both gitignored) |
 | App verification | **On a real device/emulator, after an AdMob account exists** | The ads and billing adapters are compiled and unit-tested but **not** yet verified against live services |
@@ -340,8 +340,8 @@ billing capability already models that lifecycle — `SubscriptionStatus.ACTIVE`
 `ON_HOLD`, `PAUSED`, `CANCELED`, `EXPIRED`, with `GRACE_PERIOD` counted as active on purpose so a
 paying user is not cut off during a payment retry, and `Entitlements` treating an active subscription
 as ownership — and that is exactly the point: the model is complete, and completing it in production
-is a server project with a billing backend. This factory builds slots, not servers, and the
-one-hour budget has no room for one.
+uses a server-side billing backend. The subscription ban is the deciding policy; a server itself is
+admissible for other shapes under the economics rule in `docs/slot-economics.md`.
 
 The three conditions below are kept as the record of why the position moved from *deferred* to *out
 of scope*, not as a gate that may be satisfied:
@@ -353,8 +353,8 @@ of scope*, not as a gate that may be satisfied:
 - the slot can carry the extra obligations: renewal-terms disclosure, cancellation, refund
   handling, and stricter review.
 
-A slot meeting all three still ships with the server-side lifecycle above, and is therefore a server
-project. It is not proposed. The `billing` capability stays available for one-time and consumable
+A slot meeting all three still needs the server-side lifecycle above, but it is not proposed because
+subscriptions are banned. The `billing` capability stays available for one-time and consumable
 purchases, which is what the factory uses it for.
 
 ### 3.4 Ads as a parallel revenue stream
@@ -475,9 +475,10 @@ can reach $1,000/month.
   the client-reported token (`F_fraud = 0.20`, `M_target = 0.60`) requires **3.83×** unit cost;
   confirming the token server-side (`F_fraud = 0.01`) requires **3.09×**. The gap is **$0.74 per
   $1.00** of unit cost — **$1.56** on the pack worked in §2.2.
-- **Planning consequence:** a slot that sells money-costing credit is a **server project**,
-  not just an app. That decision belongs in the plan beside the archetype (§3.6), because it
-  changes the build.
+- **Planning consequence:** a slot that sells money-costing credit needs an admissible server-side
+  authority, not just an app client. That decision, its service cost, whether it is recurring or
+  one-off, and the price/margin calculation belong in the plan beside the archetype (§3.6), because
+  they change the build and the economics.
 
 > **Naming drift found while writing this, and since fixed (verified by search, not a policy
 > claim).** The KDoc of `BillingController` and `Wallet` linked to a type named
@@ -544,8 +545,8 @@ enforced contract disagree, the contract wins, because it is the thing a program
    protects both time and account standing.
 6. **Distinctness is a gate, not a preference**, per §1.2.
 7. **Decide the fulfilment class before the paywall** (§3.7). A `SERVER_COST` pack means a
-   server, a Play Developer API confirmation path, and an authoritative balance; the factory
-   does not ship one today.
+   server, a Play Developer API confirmation path, and an authoritative balance; the service cost and
+   the recurring-cost pricing rule in `docs/slot-economics.md` must be in the plan.
 8. **Price each pack from the formula, not from a round multiple** (§2.2). A pack's price
    states its `C_unit`, the four assumed deduction rates, the target margin, and the resulting
    `K`, so a change in any assumption can be traced to a price instead of argued about.
@@ -588,8 +589,8 @@ Declaring these late causes rework, so they belong in slot setup:
    assuming one profile for the factory.
 3. Which niche or vertical the first slots target — this decides whether affiliate is
    worth more than ads.
-4. Do we need a server for `SERVER_COST` credit, and when? Any "buy tokens to use the AI"
-   slot is blocked on this (§3.7).
+4. What server design and cost model does `SERVER_COST` credit need, and when? Any "buy tokens to use
+   the AI" slot must state this in its arithmetic and satisfy §3.7.
 5. Before planning a child-directed slot, apply the sourced Families analysis in §3.5 and
    `docs/research/2026-09-23-autism-app-policy.md`; re-read its live policy links before
    publishing.

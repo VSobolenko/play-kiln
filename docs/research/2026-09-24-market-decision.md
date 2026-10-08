@@ -522,8 +522,8 @@ but a smaller market, a heavier build, and its loudest pain belongs to users who
 > (`ActivityResultContracts.PickVisualMedia`, which asks for **no runtime permission at all**), the
 > gallery, the user's own media, the motion sensors, the camera — is not a cost and may be the job's
 > own core. "No camera" stays a legitimate answer for a job with no photograph in it; it is no longer
-> a factory-level refusal. Rule: `.cursor/rules/ideation-gate.mdc` § "Budget: about one hour, not
-> eight".
+> a factory-level refusal. Rule: `.cursor/rules/ideation-gate.mdc` § "Build cost is information, never
+> a criterion".
 
 **Prerequisite, not a decision:** the environment blockers in §1.2 must be repaired before any slot
 can be built or verified. Market selection can continue in parallel; slot work cannot start while

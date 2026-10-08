@@ -558,7 +558,7 @@ behind it**. The list is closed for refusals; the reasons are the ones
 | 1 | **No statable wedge** | The one-sentence difference in **functionality or content** cannot be written. §1.2 of the strategy file: "If that sentence cannot be written, the idea is not ready." |
 | 2 | **An unrated demand reading** | The on-job apps on the shelf are unrated or tiny — "an unrated competitor is a failure signal, not a vacancy" (`docs/niche-selection.md`), and a `candidate` verdict from the relevance guard is not evidence on its own, because the guard is blind to homonym collisions. |
 | 3 | **A price the market will not pay** | The incumbents monetize at a price the market has refused, or the shelf's paying behaviour is concentrated in a different job from the one proposed. |
-| 4 | **A build cost that eats the margin** | The estimated build in agent hours against the expected revenue per hour, measured against a cheaper alternative — including a server or `SERVER_COST` requirement that arrives after approval. |
+| 4 | **A serving cost that defeats the revenue arithmetic** | A server or `SERVER_COST` requirement makes the shown expected revenue arithmetic non-viable after approval. Build estimates themselves are owner information, never a refusal criterion. |
 | 5 | **A duplicate of our own catalogue** | Near-identical functionality, content **and** experience to one of our own slots. This is the enforceable half of Play's Repetitive Content policy, and it is the one that escalates to account termination. |
 
 **Explicitly not on the list, and it must never appear as a refusal reason:**
@@ -582,7 +582,7 @@ Also absent, for the same reason — each is a novelty judgement wearing a reven
 
 **A rejection needs a revenue reason, not a novelty reason.** "The incumbents monetize at a price the
 market will not pay", "the demand reading is unrated or absent", "we cannot state the wedge in one
-sentence", "the build cost eats the margin", "it duplicates our catalogue" — those are rejections,
+sentence", "serving cost defeats the revenue arithmetic", "it duplicates our catalogue" — those are rejections,
 because each is a statement about the money. A proposal that refuses on any other ground is returned.
 
 ---

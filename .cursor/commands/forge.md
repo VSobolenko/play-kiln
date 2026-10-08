@@ -48,8 +48,9 @@ what it is waiting for, and ends the turn.
 
 `/forge` accepts a brief the way `/ship` does, with one extra rule from
 `.cursor/rules/ideation-gate.mdc`: **a brief is a shape, never a topic.** "Something for musicians,
-small and offline" narrows the *search*, and recon still has to measure a shelf before proposing
-anything on it. A brief that names a specific app the owner wants built is the one case that goes to
+small and usable offline" may name a user benefit, and recon still has to measure a shelf before
+proposing anything on it; it must not treat offline/no-backend as an infrastructure criterion. A
+brief that names a specific app the owner wants built is the one case that goes to
 `/ship` instead, because there is nothing left to recon.
 
 ## A. Recon
@@ -134,13 +135,13 @@ it and never asks him to approve a novelty:
   weak mid-tier is the pocket — say so plainly instead of treating the competition as a defect;
 - the demand evidence, with its labels, and the hand-classified job share;
 - the reasons this app wins (the promise contract), each with its weight;
-- the build estimate in agent hours, the permissions, the capabilities, and whether a server is
-  required;
+- the build estimate in agent hours, the permissions, the capabilities, and any server/cloud/account/
+  paid-API cost — whether it is per-user-per-month or one-off and how the price funds it;
 - the three numeric kill criteria;
 - the honest unknowns, listed rather than omitted.
 
 If a candidate was **refused**, say why in revenue terms — an unrated demand reading, a price the
-market will not pay, no statable wedge, a build cost that eats the margin. "This category is already
+market will not pay, no statable wedge, or serving cost that defeats the shown revenue arithmetic. "This category is already
 occupied" is not a refusal reason and must not appear as one.
 
 If recon produced more than one recipe, present them and name which one it recommends and why. If
@@ -258,7 +259,7 @@ allows, fixes what needs fixing, and publishes.
   the owner instead.
 - Never `git commit`, `git push`, `git tag` or create branches without an explicit instruction in the
   current conversation.
-- Report the actual elapsed wall clock. The one-hour target is a direction and is never cited as met.
+- Report actual elapsed wall clock for transparency; it is never a selection, ranking, refusal or kill criterion.
 - If the owner ends the session mid-chain, the state is already on disk: the proposal and both plans
   are in `docs/ideation/`, and `/ship` or `/release` can be resumed from them directly. Say which
   door to reopen and why.

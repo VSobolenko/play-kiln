@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A self-directed guitar player who practices songs and technique at home without a teacher-led subscription.",
+  "paidUnit": "A permanent offline unlock for the complete Guitar Practice Studio: drill builder, ear trainer, chord workspace, recording comparison, and progress history.",
+  "priceUsd": 6.99,
+  "momentOfPayment": "After the player has completed a limited starter drill and wants to save unlimited drills, recordings, and adaptive lessons.",
+  "distinctnessSentence": "Guitar players get one offline session loop that turns their own chord chart into a tempo-ramping drill, hears timing against the click, teaches the related ear skill, and lets them A/B-record the result without a recurring subscription.",
+  "evidenceRef": "docs/ideation/2026-10-08-fretflow-guitar-studio.md#market-evidence",
+  "day1RevenuePath": "The free starter session demonstrates tempo-ramp practice; the player buys the permanent unlock from Google Play Billing before saving more than one drill or take.",
+  "killCriteria": { "windowDays": 30, "minInstalls": 500, "minRevenueUsd": 1000 },
+  "assumptionsUnverified": [
+    "A $6.99 single unlock converts at a rate sufficient to produce 169 monthly purchases from reachable installs.",
+    "On-device onset and pitch analysis is accurate and low-latency enough across common Android microphones for timing feedback to be trusted.",
+    "The measured subscription and ad complaints describe a willingness to buy once rather than merely dissatisfaction with existing apps."
+  ]
+}

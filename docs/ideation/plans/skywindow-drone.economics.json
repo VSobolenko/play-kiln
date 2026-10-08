@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A recreational drone pilot who wants a quick, local launch-window decision before travelling to a flying spot.",
+  "paidUnit": "A one-time unlock of seven-day, altitude-aware launch windows, saved flight profiles, reminders, and shareable go/no-go briefs.",
+  "priceUsd": 4.99,
+  "momentOfPayment": "After the pilot compares today's free launch window with the next suitable window and requests the seven-day plan or a saved-profile alert.",
+  "distinctnessSentence": "SkyWindow turns free weather data into named altitude-aware launch windows with every failed threshold shown, rather than selling a forecast horizon behind a subscription or making the pilot interpret separate weather cards.",
+  "evidenceRef": "docs/ideation/2026-10-08-skywindow-drone.md#market-evidence",
+  "day1RevenuePath": "The free view provides the current-day result; the first dollar arrives when a pilot taps the seven-day window plan or a saved-profile alert and buys the one-time unlock.",
+  "killCriteria": {
+    "windowDays": 60,
+    "minInstalls": 400,
+    "minRevenueUsd": 100
+  },
+  "assumptionsUnverified": [
+    "That pilots will pay a one-time 4.99 dollar price for seven-day planning rather than retain a free competitor with in-app purchases.",
+    "That the threshold explanation and non-subscription price are enough of a wedge against the 1M-plus-install incumbents.",
+    "That Open-Meteo's forecast coverage and update cadence are adequate for the pilot's chosen launch location."
+  ]
+}

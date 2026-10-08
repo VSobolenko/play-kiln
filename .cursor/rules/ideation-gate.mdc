@@ -30,7 +30,7 @@ recon its credibility.
 
 **A rejection needs a revenue reason, not a novelty reason.** "This category is crowded" is not a
 rejection. "The incumbents monetize at a price the market will not pay", "the demand reading is
-unrated or absent", "we cannot state the wedge in one sentence", "the build cost eats the margin" —
+unrated or absent", "we cannot state the wedge in one sentence" —
 those are rejections, because each one is a statement about the money.
 
 ## The one constraint that is not negotiable, and why it is narrow
@@ -60,7 +60,7 @@ real in functionality or content, and never ship two slots that one sentence can
   with a wedge is an equally valid target. Selection by how well an idea satisfies that sentence is
   what produced the 2026-10-01 recon.
 - **A proposal is judged by its revenue arithmetic**, not by how novel it is. The decision line is
-  the expected earning, with its division shown, against the build cost.
+  the expected earning, with its division shown; build cost is recorded separately as owner information.
 - **Never refuse an idea for being similar to something on Play.** Refuse it for having no wedge, no
   demand reading, no price anyone would pay, or for duplicating *our own* catalogue.
 
@@ -135,7 +135,7 @@ money in it.
 ## Rules
 
 - **Never carry an example forward as a topic.** Extract the constraint the owner was describing
-  (small, offline, no backend, quick) and pick the topic separately, from measured demand.
+  (small, quick, or an explicitly offline user benefit) and pick the topic separately, from measured demand.
 - **Do not propose calculators, unit converters, generic arithmetic tools, or another app built
   around summing or converting numbers a user types in.** This category is explicitly burned. The
   only exception is a direct instruction from the owner naming that specific app.
@@ -209,7 +209,8 @@ product shape, and §2's arithmetic decides whether it reaches the target.
 do, there are too many nuances. So a subscription is forbidden. Everything else is fine.* Recurring
 revenue means the entitlement has to be re-established continuously: server-side validation plus a
 renewal, refund, cancellation, grace-period and failed-payment lifecycle on a schedule the client does
-not control. That is a server project with a billing backend, and this factory builds slots.
+not control. A server can be built for other admissible shapes; this lifecycle is recorded here only
+as the standing reason subscriptions remain banned.
 
 The ban is **machine-enforced, not prose**: `subscription` was removed from `ARCHETYPES`, so any plan
 naming it fails `parseEconomics`, `requiredCapabilitiesFor` and `check-economics.mjs`, with no
@@ -218,19 +219,29 @@ subscription "correct" as the record of why the position moved from *deferred* t
 they are not a gate that can be satisfied. The `billing` capability stays available for one-time and
 consumable purchases.
 
-# Budget: about one hour, not eight
+# Build cost is information, never a criterion
 
-The owner's limit is roughly **one hour of agent wall-clock per slot**. The first slot consumed
-about eight hours, mostly on evidence infrastructure for an app that had no market. The target is a
-**direction, not a measurement**: the fastest slot so far is still measured in hours, and every recipe
-in `docs/ideation/2026-09-26-five-recipes.md` estimates 3.5–6. Report the elapsed time rather than the
-target. This changes what a good idea is:
+The owner's instruction, recorded **2026-10-08**, is binding: build time is never a reason to
+refuse, rank down, narrow, deprioritise or kill an idea. An idea is judged by its **revenue
+arithmetic alone** — expected earning, with the division shown — never by how long it takes to build.
+A large build is not a defect: the factory will spend days on a slot when the revenue case supports
+it, and *"this will take 200 hours"* must never appear as a refusal reason, a ranking input or a
+kill reason. A proposal still gives the owner a build estimate, clearly labelled as an estimate, as
+information for the owner's decision; it is never a gate.
 
-- **Buildability is a first-class criterion.** An idea with a strong market and a 20-hour build is a
-  worse recipe than a good market with a 3-hour build. Score it explicitly.
-- **The cheapest shape narrows the surface, never the job.** Avoid the costs, not the capabilities:
-  **a server, an account, a paid API, ML that needs a server, and a runtime permission that buys
-  nothing**. A capability that is **local and free** is not a cost and may be the job's own core —
+- **The chosen shape narrows the surface, never the job.** Infrastructure is admissible, not a
+  refusal, ranking or narrowing criterion. The owner's 2026-10-08 instruction records that the
+  factory may write a server or use a cloud service, an account/backend, ML that needs a server, or a
+  paid API — and, in his words of the same day, **may call a free public one**: a weather feed or a
+  schedule source is a legitimate way to solve the job's problem, and finding one is a scout's work,
+  not a defect. Each such proposal states its service cost in the revenue arithmetic, whether it is
+  per-user-per-month or one-off, and how that cost interacts with the price. A recurring per-user cost
+  cannot hide behind a one-time price: since subscriptions are banned (above; see also
+  `docs/slot-economics.md`), the plan must show either near-zero ongoing cost, a
+  `purchase_led_repeat_sales` consumable/repeat-purchase that funds it, or a paid-upfront lifetime
+  calculation that still leaves margin. A runtime permission that buys nothing remains a defect — it
+  is a Play-compliance and trust surface, not a money line. A capability that is **local and free** is
+  not a cost and may be the job's own core —
   the Android Photo Picker (`ActivityResultContracts.PickVisualMedia`), the gallery, playing or
   capturing the user's own media, the motion sensors, and the camera. The permission arithmetic is
   how such a capability is named rather than refused wholesale: the Photo Picker asks for **no
@@ -244,18 +255,18 @@ target. This changes what a good idea is:
   thing"* — a gradebook that only adds, edits and deletes, a calculator that only calculates — and his
   standard is *"I want quality apps, and quality matters to me more than the feature count."* A raw app
   earns nothing, so a narrower job is not the saving; dropping the handoffs is what produced that report.
-- **Cut scope means cut screens, servers and permissions — never the job's handoffs.** The job is three
+- **Narrow scope means narrow screens and permissions — never the job's handoffs, and never a service
+  the job needs.** The job is three
   stages — **before**, **during**, **after** — and the contract must cover all three, with at least one
   connective (handoff) claim (`.cursor/rules/app-depth.mdc`; `docs/slot-differentiators.md`). The
   mechanism is measured there: a contract that names only the record-keeping middle produces an app
   that does only the middle while every gate is green.
-- **Depth costs build time, and the owner accepted that cost.** A complete job takes longer than a
-  CRUD middle, and the trade is deliberate: a raw app that ships inside the hour is worth nothing.
-  Budget the handoffs at stage 0 rather than discovering them at the end, and never close the gap by
-  dropping one.
+- **Depth is part of the product.** A complete job may take longer than a CRUD middle; a raw app
+  earns nothing. State the handoffs at stage 0 and never drop one merely to make the build smaller.
 - **A server is a cost to state, not a detail to discover.** If a plan sells credit that costs real
   money to serve, `docs/monetization-strategy.md` §3.7 makes a server-side `PurchaseAuthority`
-  mandatory, which makes the slot a server project. Say so before the idea is approved, not after.
+  mandatory. State its service cost, pricing shape and authority before the idea is approved, not
+  after.
 - **Do not build evidence infrastructure for an unvalidated idea.** Prove there is a market first;
   provenance chains and capture pipelines only matter once something is worth shipping.
 
@@ -274,9 +285,8 @@ game must meet them while writing the proposal, not after:
   API (`.cursor/rules/app-depth.mdc:66`, and the `core_operation` row at `:77`), so a game would have
   to carry a real handoff — a share, an export, a durability claim — to satisfy it. The contract is
   **not** weakened for games; the owner chose "do not prioritise" over rewriting it.
-- **The build budget is written for a utility.** A game's art, tuning and playtesting are a larger and
-  differently-shaped cost than the one-hour direction assumes, so a game proposal scores its
-  buildability honestly (`.cursor/rules/parallel-execution.mdc`).
+- **A game's art, tuning and playtesting are stated honestly.** Their estimated cost is information
+  for the owner, not a ranking input; a game is judged by the same revenue arithmetic as a utility.
 
 A game that cannot state its wedge in one sentence and show its revenue arithmetic is refused by the
 same line as a utility, and nothing here prioritises a game over one.

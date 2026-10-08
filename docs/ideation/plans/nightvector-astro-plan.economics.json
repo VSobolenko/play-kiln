@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_only_no_ads",
+  "payingUser": "An astrophotographer or visual observer planning a dark-sky trip and willing to pay once for a complete local session plan.",
+  "paidUnit": "The paid listing unlocks the complete offline-first night-session suite: target windows, moon and twilight timing, satellite passes, exposure guidance, saved scouts, weather, and shareable briefs.",
+  "priceUsd": 10.99,
+  "momentOfPayment": "At the Play purchase screen before the user creates a multi-target plan for an upcoming outing.",
+  "distinctnessSentence": "NightVector produces one offline-capable, location-specific imaging brief that joins dark-window timing, deep-sky target altitude curves, satellite passes, weather and target-specific exposure guidance, rather than making the user reconcile separate sky-map, satellite and photo-planning apps.",
+  "evidenceRef": "docs/ideation/2026-10-08-nightvector-astro-plan.md#market-evidence",
+  "day1RevenuePath": "The first dollar arrives from the paid Play listing when a trip-planning user buys the full planning suite before generating an outing brief.",
+  "killCriteria": {
+    "windowDays": 90,
+    "minInstalls": 250,
+    "minRevenueUsd": 1000
+  },
+  "assumptionsUnverified": [
+    "That a new paid, no-ad planning suite at 10.99 dollars can acquire 108 sales per month rather than being absorbed by PhotoPills, Planit Pro, Sun Surveyor or free planetarium apps.",
+    "That users value the unified target-to-brief workflow enough to buy before trying an app with a free tier or in-app purchases.",
+    "That client-only astronomy calculations plus Open-Meteo and CelesTrak data are sufficiently reliable for advisory planning at the selected location and date."
+  ]
+}

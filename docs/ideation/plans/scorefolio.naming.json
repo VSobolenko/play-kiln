@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "slot": "scorefolio",
+  "reconRef": "docs/ideation/2026-10-08-scorefolio.md#name-derivation",
+  "title": "Scorefolio",
+  "slug": "scorefolio",
+  "applicationId": "com.gexetr.scorefolio",
+  "archetype": "coined",
+  "candidates": [
+    { "name": "Scorefolio", "archetype": "coined", "score": 82, "dimensions": { "jobFit": 4.0, "searchability": 3.5, "distinctiveness": 4.5, "radioTest": 4.5, "uniqueness": 3.0, "lengthFit": 5.0, "localeSurvival": 4.0 }, "why": "A pronounceable score-plus-folio coinage says organised music pages rather than generic scanning; it is short enough for every declared locale and needs a trademark search before release." },
+    { "name": "Score Pages", "archetype": "descriptive", "score": 74, "dimensions": { "jobFit": 4.5, "searchability": 4.0, "distinctiveness": 2.5, "radioTest": 5.0, "uniqueness": 2.0, "lengthFit": 5.0, "localeSurvival": 4.0 }, "why": "Clear and searchable, but generic enough to collide with reader and sheet-music listings." },
+    { "name": "Folio: Score PDF", "archetype": "carrier_job_noun", "score": 72, "dimensions": { "jobFit": 4.0, "searchability": 4.0, "distinctiveness": 3.5, "radioTest": 4.5, "uniqueness": 2.5, "lengthFit": 5.0, "localeSurvival": 4.0 }, "why": "It names the output, but Folio is too broad a carrier to claim without a collision screen." },
+    { "name": "Staffstack", "archetype": "compound", "score": 70, "dimensions": { "jobFit": 3.5, "searchability": 2.5, "distinctiveness": 4.0, "radioTest": 4.0, "uniqueness": 3.0, "lengthFit": 5.0, "localeSurvival": 3.5 }, "why": "A musical-staff compound has character but does not make the PDF-making job immediately clear." },
+    { "name": "Music Scanner", "archetype": "descriptive", "score": 42, "dimensions": { "jobFit": 5.0, "searchability": 5.0, "distinctiveness": 1.0, "radioTest": 5.0, "uniqueness": 1.0, "lengthFit": 5.0, "localeSurvival": 3.0 }, "why": "It is the crowded category phrase already used by Sheet Music Scanner & Reader and Sheet Music Scanner Pro on the measured shelf." }
+  ],
+  "rejected": [
+    { "name": "Music Scanner", "reason": "It is a bare category phrase already carried by two measured incumbents, so it offers neither distinction nor title headroom." },
+    { "name": "Score Pages", "reason": "It describes the job but is too generic to form a protectable carrier; Scorefolio retains the job association while avoiding the phrase collision." },
+    { "name": "Folio: Score PDF", "reason": "Folio is a broad occupied word and the candidate adds a generic PDF suffix; the name loses the compact radio test without gaining measured search advantage." }
+  ],
+  "searchPhrases": ["sheet music scanner", "scan sheet music", "score to pdf"],
+  "audience": "Musicians who need to turn photographed paper sheet music into a usable rehearsal PDF for their own tablet, printer, conductor or ensemble.",
+  "rationale": "MEASURED — the shelf uses literal scanner and reader phrases, including Sheet Music Scanner & Reader and Sheet Music Scanner Pro; Scorefolio deliberately avoids a one-word variation on those titles while retaining the score-page association.",
+  "collisionCheck": "UNVERIFIED — no trademark-register or dedicated collision screen for Scorefolio has been run; this is not clearance and the owner must decide after a class-9 search.",
+  "localisationCheck": "INFERRED — Scorefolio is 10 Latin characters, leaving 20 characters under Play's 30-character title cap for en-US and ru-RU; discoverability of the Latin coinage in Cyrillic search is unmeasured.",
+  "evidence": "docs/ideation/2026-10-08-scorefolio.md#name-derivation",
+  "localizedTitles": { "en-US": "Scorefolio", "ru-RU": "Scorefolio" },
+  "scoringRubric": { "scale": "0-5 per dimension, weighted", "weights": { "jobFit": 20, "searchability": 15, "distinctiveness": 15, "radioTest": 15, "uniqueness": 15, "lengthFit": 10, "localeSurvival": 10 }, "floor": "chosen >= 70 with no dimension below 2.5; a hard collision check outranks the score" },
+  "assumptionsUnverified": ["Scorefolio has not been searched in trademark registers or a dedicated Play collision screen.", "No observed data says that a coined title outperforms the descriptive alternatives for this shelf."]
+}

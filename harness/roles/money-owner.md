@@ -42,8 +42,9 @@ money owner is expected to catch at checkpoint 1, not a preference to argue.
 
 **A subscription is never a valid answer.** It is banned by the owner (2026-10-01), and `subscription`
 is not in `ARCHETYPES`, so naming it fails `parseEconomics` and `check-economics.mjs` with no
-exemption. A plan whose honest shape needs recurring revenue is a server project; saying so is the
-correct outcome, not a problem to work around.
+exemption. A plan whose honest shape has recurring per-user cost must state near-zero ongoing cost,
+repeat purchases that fund it, or paid-upfront lifetime margin; a server is admissible, while a
+subscription remains banned.
 
 ## Its verdict vocabulary
 
@@ -95,7 +96,7 @@ the wedge will convert                       UNVERIFIED  no priced comparable fo
 | The promise contract: a reason list is a contract, and a `core` promise is not weakened without the owner's words | `.cursor/rules/differentiator-contract.mdc` |
 | Git, signing and uploading require explicit authorization; an irreversible decision waits for the owner | `.cursor/rules/authorization.mdc` |
 | The two-phase boundary: only the owner's recorded approval opens release work | `.cursor/rules/release-gate.mdc` |
-| No paid-provider key or SDK in the shipped client, and a capability only a server can serve makes the project a server project | `.cursor/rules/client-secrets.mdc` |
+| No paid-provider key or SDK in the shipped client; a server-side environment is admissible when its cost and permission are stated | `.cursor/rules/client-secrets.mdc`, `.cursor/rules/ideation-gate.mdc` |
 | MISSION.md is the factory brief | `.cursor/rules/mission.mdc` |
 
 ## What would make this role's work refusable

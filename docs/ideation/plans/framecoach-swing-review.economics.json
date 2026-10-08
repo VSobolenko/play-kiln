@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A baseball coach who reviews a hitter's swing with the player after practice.",
+  "paidUnit": "A permanent on-device unlock for reference comparison, annotation, and export.",
+  "priceUsd": 14.99,
+  "momentOfPayment": "After importing or recording a clip and tapping comparison, annotation, or export.",
+  "distinctnessSentence": "FrameCoach produces a local, annotated side-by-side swing review that a coach can hand off as a shareable artifact without a subscription, account, cloud upload, or hardware sensor.",
+  "evidenceRef": "docs/ideation/2026-10-08-framecoach-swing-review.md#market-evidence",
+  "day1RevenuePath": "A coach records or imports one swing for free, then buys the permanent unlock when handing the annotated comparison to a player.",
+  "killCriteria": { "windowDays": 60, "minInstalls": 300, "minRevenueUsd": 150 },
+  "assumptionsUnverified": [
+    "That a coach will pay 14.99 US dollars for a permanent local alternative after encountering a subscription or account requirement.",
+    "That the local comparison and export workflow is technically reliable across the Android devices the audience uses.",
+    "That 300 installs in sixty days is reachable without a paid acquisition channel."
+  ]
+}

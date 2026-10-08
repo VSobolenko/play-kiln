@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "slot": "lumintra-light-planner",
+  "reconRef": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#3-the-four-measured-structural-gaps",
+  "evidenceProvenance": {
+    "note": "The four market gaps this contract is built on were measured on 2026-10-08 by the positioning scout into .kiln/scratch/positioning-2026-10-08/, which is disposable scratch rather than a durable reference. Those six scratch files were consolidated into the durable, committed docs/research/2026-10-08-light-and-sky-session-planner-market.md, which is what every evidence.source and comparison.source below now cites with a #-anchor naming the section that carries the finding. The consolidation is labelled, not a new measurement: each finding below still names the scratch file it was actually read from, so the raw provenance is not erased, and a finding the durable record marks UNVERIFIED is not presented here as measured. The durable document is a consolidation and is not the raw measurement; the scratch originals were left in place, unmodified.",
+    "scoutFiles": [
+      {
+        "scratchPath": ".kiln/scratch/positioning-2026-10-08/C-sun-moon-light-shelf.md",
+        "consolidatedIn": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#3-the-four-measured-structural-gaps"
+      },
+      {
+        "scratchPath": ".kiln/scratch/positioning-2026-10-08/D-satellite-aurora-adjacent.md",
+        "consolidatedIn": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#4-the-satellite-shelf-the-1799-anchor-and-why-it-does-not-transfer"
+      },
+      {
+        "scratchPath": ".kiln/scratch/positioning-2026-10-08/E-money-repositioning.md",
+        "consolidatedIn": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#5-the-price-band-and-its-ceiling"
+      },
+      {
+        "scratchPath": ".kiln/scratch/positioning-2026-10-08/F-engine-gap-map.md",
+        "consolidatedIn": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#7-engine-feasibility-verdict-table"
+      }
+    ],
+    "deliberatelyExcluded": "Light pollution / Bortle class / SQM is deliberately not promised. The engine gap map rates it RISK because it needs a new bundled raster or geocoded lookup asset rather than a function call, and it is not in the engine at all. The contract promises the dark window itself, which is DELIVERABLE from the proven Sun geometry, and leaves Bortle out rather than implying it in listing copy."
+  },
+  "jobCoverage": {
+    "before": { "claimId": "pin-the-session-scout" },
+    "during": { "claimId": "compose-the-light-and-dark-brief" },
+    "after": { "claimId": "share-the-session-brief" }
+  },
+  "claims": [
+    {
+      "id": "compose-the-light-and-dark-brief",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "The app composes one chronological session brief that places the sun and the moon where they will be, names the golden, blue and civil, nautical and astronomical twilight windows, and then computes the true astronomical-dark window, so the user sees the moonless dark interval itself rather than only an object's position.",
+      "comparison": {
+        "incumbent": "com.ratana.sunsurveyor",
+        "limitation": "Its store description promises night photography with the Milky Way and adds 'total darkness for stargazing', but it sells no computed dark window and no moonless-dark interval, so the user has to infer the darkness from separate rise, set and phase screens.",
+        "source": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#3-the-four-measured-structural-gaps"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#3-the-four-measured-structural-gaps",
+        "finding": "The scout read 10 light-planner store descriptions and found 0 that name light pollution, Bortle class or a moonless-dark window; every serious incumbent plans an object's position, so the darkness itself is the gap. The finding is the scout's keyword scan of that shelf, originally recorded in .kiln/scratch/positioning-2026-10-08/C-sun-moon-light-shelf.md section 3 and consolidated in the durable record section 3."
+      },
+      "status": "deferred",
+      "deferredReason": "No session composer exists; this resolves when a fixture at a fixed date and location produces one ordered brief whose dark-window boundaries are computed from the sun reached at -18 degrees altitude and intersected with the moon's rise, set and illuminated fraction, in app/src/main/java/com/gexetr/lumintralightplanner/domain/DarkWindow.kt."
+    },
+    {
+      "id": "plan-deep-sky-targets",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "The app ships a hand-compiled list of roughly 250 famous deep-sky objects (the Messier objects plus showpiece NGC and IC entries) with magnitudes and apparent sizes and draws per-target altitude and azimuth windows for the chosen night, so the user can pick a named target and see when it clears the horizon and how it frames their lens; the object table is compiled by the slot from designations, coordinates and magnitudes, which are facts rather than a borrowed catalogue, so no third-party catalogue licence attaches to the shipped data.",
+      "comparison": {
+        "incumbent": "com.yingwen.photographertoolspro",
+        "limitation": "Its description names 'nebulae azimuth and elevation angle' and nothing more: no object catalogue, no magnitudes, no apparent sizes and no visibility window for a named target, so a deep-sky object cannot be browsed or planned by name.",
+        "source": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#3-the-four-measured-structural-gaps"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#61-openngc-deep-sky-catalogue--cc-by-sa-40-declared-in-the-upstream-readme-adjudicated",
+        "finding": "The engine gap map measured the upstream OpenNGC catalogue file at 3,877,591 bytes with V-Mag, B-Mag and MajAx/MinAx columns and found the vendored astronomy engine carries no Messier or NGC table and no catalogue magnitude data of its own, so a target table is net-new data. The source question was then settled on 2026-10-08: no permissive full deep-sky catalogue was found (OpenNGC is CC-BY-SA-4.0, declared in its README; HYG is CC-BY-SA-4.0; NGC 2000.0 and Hipparcos/Tycho are non-commercial; Stellarium's is GPL), and Wikidata, which is CC0, cannot enumerate a catalogue at all - measured in this session, instance-of Messier object returned 0, the global NGC and IC counts returned HTTP 504 and 429, and a controlled search probe confirmed the zeros were a finding rather than a broken sensor. The slot therefore compiles its own list of roughly 250 famous objects from facts, and no third-party catalogue licence attaches. Recorded in the durable record section 6.1 (licence) and its Resolution, and section 7 (engine verdict)."
+      },
+      "status": "deferred",
+      "deferredReason": "No target list exists; this resolves when the hand-compiled object table is bundled and app/src/main/java/com/gexetr/lumintralightplanner/domain/TargetWindow.kt returns an altitude window for a named object on a fixed test night."
+    },
+    {
+      "id": "predict-visible-satellite-passes",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "The app adds visible satellite passes to the same brief, predicting when a tracked object such as the ISS or a Starlink train rises above the user's saved horizon and stating the element-set epoch next to the prediction, so a satellite is one more condition inside the session plan rather than the app's whole job.",
+      "comparison": {
+        "incumbent": "com.photopills.android.photopills",
+        "limitation": "The strongest paid light planner on the shelf names no satellite feature at all, and the dedicated satellite apps in the adjacent shelf sell spotting rather than a session plan, so nobody joins pass timing to a light-and-sky brief.",
+        "source": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#4-the-satellite-shelf-the-1799-anchor-and-why-it-does-not-transfer"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#4-the-satellite-shelf-the-1799-anchor-and-why-it-does-not-transfer",
+        "finding": "The scout measured ISS Detector Pro at $17.99 with 100K+ installs and 3,189 reviews, so satellite pass timing is payable somewhere, while the light-shelf keyword scan found no light-planner description that mentions passes at all; the only 'satellite' hit on that shelf is a SunOnTrack map layer. Recorded in .kiln/scratch/positioning-2026-10-08/D-satellite-aurora-adjacent.md section 1.1 and .kiln/scratch/positioning-2026-10-08/C-sun-moon-light-shelf.md section 3, consolidated in the durable record section 4."
+      },
+      "status": "deferred",
+      "deferredReason": "No pass finder exists; this resolves when the propagation is segmented so that a three-day window returns the 15 visible rises an independent 60 second brute-force scan finds, instead of the single rise the naive one-call detector reports, and app/src/main/java/com/gexetr/lumintralightplanner/domain/PassFinder.kt surfaces the element-set epoch."
+    },
+    {
+      "id": "forecast-hourly-cloud-cover",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "insight",
+      "promise": "The app shows hourly forecast cloud cover for the session window, aligned against the dark window and the chosen target's altitude curve and labelled as a forecast with its source and model time and never as a guarantee of clear sky; it is served from api.met.no, whose CC BY 4.0 licence permits a paid app, and it shows the source's hourly total cloud cover only, with no low/mid/high cloud-layer split, so the limitation is stated rather than hidden; the non-commercial Open-Meteo free tier is not assumed.",
+      "comparison": {
+        "incumbent": "pl.guteklabs.phototime",
+        "limitation": "It is the only light planner on the shelf that claims weather, and only as a generic 'weather forecasts' line with no cloud-cover modelling and no alignment of the cover to a dark window.",
+        "source": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#3-the-four-measured-structural-gaps"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#63-apimetno--keyless-cc-by-40-with-attribution-hourly-total-cloud-only-settled",
+        "finding": "The engine gap map measured Open-Meteo as keyless but licensed for non-commercial use only, which a $9.99 paid app is not, and measured api.met.no as keyless with 89 hourly entries whose cloud_area_fraction is total cloud only, with no low_cloud_area_fraction, medium_cloud_area_fraction or high_cloud_area_fraction. api.met.no is the chosen source: its terms are settled as CC BY 4.0 with attribution, which a paid app may use, while the missing cloud-layer split is a real product limitation. Recorded in .kiln/scratch/positioning-2026-10-08/F-engine-gap-map.md section 5, consolidated in the durable record section 6.2 and section 6.3."
+      },
+      "status": "deferred",
+      "deferredReason": "No forecast client or timeline exists, and the licence is resolved to a source that permits the paid app rather than assumed; this resolves when app/src/main/java/com/gexetr/lumintralightplanner/domain/CloudForecast.kt renders an hourly total-cloud-cover ribbon against the dark window from api.met.no, with the fetch time shown and the copy saying forecast."
+    },
+    {
+      "id": "pin-the-session-scout",
+      "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "durability",
+      "promise": "The user saves a session scout, meaning an observing location with a horizon profile and an equipment profile with focal length, so every later brief for that place reuses their own setup and their saved plans survive a reinstall or a move to another phone instead of dying with the app.",
+      "comparison": {
+        "incumbent": "com.yingwen.photographertoolspro",
+        "limitation": "A sampled critical review reports that 29 saved plans on a phone could not be easily transferred to a new tablet, and another reports that a purchased location feature would not restore on the user's other devices, so the incumbent loses exactly the saved context this promise keeps.",
+        "source": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#31-the-gaps-are-not-what-users-complain-about-in-the-sampled-reviews"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#31-the-gaps-are-not-what-users-complain-about-in-the-sampled-reviews",
+        "finding": "The scout's review scan sampled 2 critical Planit Pro reviews, one reporting that 29 plans could not be easily transferred to a new tablet and another reporting a purchased location feature that would not restore on the user's second phone. Recorded in .kiln/scratch/positioning-2026-10-08/C-sun-moon-light-shelf.md section 4, consolidated in the durable record section 3.1."
+      },
+      "status": "deferred",
+      "deferredReason": "No scout store exists; this resolves when app/src/main/java/com/gexetr/lumintralightplanner/data/ScoutStore.kt restores a saved location and equipment profile after process death and the app's backup rules keep it across a reinstall, so the artifact carries a durability token such as SavedStateHandle or dataExtractionRules."
+    },
+    {
+      "id": "share-the-session-brief",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "The user sends the finished session brief off the device through the Android share sheet as a compact plain-language summary carrying the location, the light and dark windows, the chosen targets, the pass times and the forecast, so the plan can be read in the field or handed to a trip companion without a second app.",
+      "comparison": {
+        "incumbent": "com.yingwen.photographertoolspro",
+        "limitation": "Its sampled critical reviews report that saved plans and a purchased feature would not travel between the user's own devices, so a portable brief the user can send anywhere is the handoff the incumbent lacks.",
+        "source": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#31-the-gaps-are-not-what-users-complain-about-in-the-sampled-reviews"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#5-the-price-band-and-its-ceiling",
+        "finding": "The money owner's chosen shape is one $9.99 purchase-only app delivering 'one combined session brief plus a share/export handoff', priced inside a light-planner shelf whose observed one-time ceiling is $10.99, so the handoff is part of the paid unit and not an extra. Recorded in .kiln/scratch/positioning-2026-10-08/E-money-repositioning.md sections 0 and 4, consolidated in the durable record section 5."
+      },
+      "status": "deferred",
+      "deferredReason": "No brief formatter or share intent exists; this resolves when an ACTION_SEND intent carries the selected session, so app/src/main/java/com/gexetr/lumintralightplanner/share/ShareBrief.kt contains ACTION_SEND and a test asserts the shared text holds the location, windows and chosen targets."
+    },
+    {
+      "id": "search-the-deep-sky-catalogue",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "find",
+      "promise": "The user finds a target again later by searching the bundled object list by name or catalogue number and filtering by a magnitude limit, so a target picked on one trip is retrievable on the next without scrolling a full object list by hand.",
+      "comparison": {
+        "incumbent": "com.yingwen.photographertoolspro",
+        "limitation": "It exposes no searchable object catalogue at all, and the shelf's other planners surface objects by sky position rather than by a queryable name, number or magnitude filter.",
+        "source": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#3-the-four-measured-structural-gaps"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#61-openngc-deep-sky-catalogue--cc-by-sa-40-declared-in-the-upstream-readme-adjudicated",
+        "finding": "The upstream catalogue the gap map measured carries a Name column, an M Messier cross-reference and a Common names column, which confirmed that a name-and-magnitude search needs no new data category rather than proving that source could ship; the source question was settled separately on 2026-10-08 as no permissive full catalogue exists, so the slot compiles its own list of roughly 250 famous objects from facts, each carrying a designation, one or more common names, a magnitude and an apparent size, which keeps a name-and-magnitude search buildable without a third-party catalogue. Recorded in the durable record section 6.1 (licence) and its Resolution, originally read from .kiln/scratch/positioning-2026-10-08/F-engine-gap-map.md section 3.2."
+      },
+      "status": "deferred",
+      "deferredReason": "No target search exists; this resolves when a SearchBar over the compiled object list returns a target by its Messier number and narrows by a magnitude limit in a fixed test."
+    }
+  ]
+}

@@ -160,7 +160,7 @@ script here performs).
 
 | Item | Value |
 |---|---|
-| **Build estimate** | **5–6 agent hours**. The generator is small; the cost is the authored library, and that is the point of the app. Honest against the ~1 h target in `AGENTS.md`: this is not a 1-hour slot and is not presented as one. |
+| **Build estimate** | **5–6 agent hours**. The generator is small; the cost is the authored library, and that is the point of the app. This is an estimate for owner information, not a selection criterion. |
 | **Permissions** | **None.** No network, no location, no camera, no accounts. Export of a scene goes through `ACTION_SEND` / the Storage Access Framework, which require no runtime permission. |
 | **Capabilities** | `["billing"]` — Play Billing for the one-time base unlock and the themed packs. No `ads`, no server capability. |
 | **Server** | **None required.** The whole library is authored content shipped in the APK; on-device PRNG only. This is explicitly not a server project. |
@@ -195,10 +195,10 @@ command — `node scripts/kiln-status.mjs --kill rook-encounter-generator --reas
 | Candidate | Refused because |
 |---|---|
 | Logo / sticker / poster maker | **Fortress**, and the fortress is the *money*: `logo maker` 18/30 rated at ≥ 4.5 with only 5 weak; `sticker maker` 17/25 at ≥ 4.5 with 3 weak; `poster maker` 14/20 at ≥ 4.5 with 2 weak — no disposable incumbent and no reachable price pocket (**MEASURED**, §2). |
-| Pixel art editor / colour palette generator / embroidery / cross-stitch | Verdicts are candidate-to-mixed, but the build is on-device raster authoring, photo import or a fabric-chart exporter — the **build cost eats the margin** against a 5–6 hour slot, and the value would be craft-workflow-specific rather than a generator (**MEASURED**, §2). |
+| Pixel art editor / colour palette generator / embroidery / cross-stitch | Verdicts are candidate-to-mixed, but the value would be craft-workflow-specific rather than a generator; this lane's measured demand and price evidence do not establish a revenue case for it (**MEASURED**, §2). |
 | Writing prompt / plot generator | 24–25 of 30 rated, median 4.3–4.4, no weak tier to displace, and prompts compete with free LLM apps at $0 — **no price anyone would pay** (**MEASURED**, §2). |
 | Fantasy name generator | `FaNG` at 4.8★/7,300 reviews/500K+ is a strong incumbent and a name is one field of a scene, so the app would be a weaker name generator; the *scene* is the wedge instead (**MEASURED**, §4). |
-| Generic "dungeon map generator" | `Calamus` at 2.9★ is weak, but a map maker is a canvas authoring tool; refused on build cost, and its weakness is used here only as evidence that this shelf's generators disappoint (**MEASURED**, §4). |
+| Generic "dungeon map generator" | `Calamus` at 2.9★ is weak, but that weakness alone does not establish a paying wedge; it is used here only as evidence that this shelf's generators disappoint (**MEASURED**, §4). |
 | A record/log tool of any kind | Explicitly refused by the owner's brief and by this lane's hard rule — the value is not what the user typed. |
 
 ## 13. Honest unknowns

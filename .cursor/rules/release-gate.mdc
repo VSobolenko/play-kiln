@@ -142,9 +142,8 @@ Runs only after the gate passes:
    publishes — the owner helps only where a tooling limit requires a human (store-graphic file
    inputs, AAB file chooser, promo-code files).
 
-Report the release phase's own elapsed wall clock. The one-hour target is a direction and the
-release half is where the unavoidable build and capture time sits; do not present development
-time as if it covered the release.
+Report the release phase's own elapsed wall clock for transparency; do not present development time
+as if it covered the release. Elapsed time is never an idea-selection or kill criterion.
 
 ## Tooling assists — the three points where the owner's hand is needed
 

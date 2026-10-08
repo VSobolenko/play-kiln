@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "slot": "scorefolio",
+  "reconRef": "docs/ideation/2026-10-08-scorefolio.md#the-promise-contract",
+  "jobCoverage": {
+    "before": { "claimId": "batch-import-and-order" },
+    "during": { "claimId": "reviewable-score-cleanup" },
+    "after": { "claimId": "print-ready-pdf-leaves" }
+  },
+  "claims": [
+    {
+      "id": "batch-import-and-order",
+      "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "data_in",
+      "promise": "The musician can take or choose a whole set of score-page photographs, then order, rotate, replace or remove pages before making the document, instead of being limited to a one-page trial.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-scorefolio.md#complaints-read",
+        "finding": "The 100K+ install mid-tier de.halbestundeuben.app drew the Play-rendered critical-review excerpt: \"Take the picture of one page of the music sheet and that's it. Your privilege to try another pa\"; the excerpt was printed by node scripts/scan-complaints.mjs --package de.halbestundeuben.app."
+      },
+      "status": "deferred",
+      "deferredReason": "No import flow exists; proof requires a test that imports several image URIs through PickMultipleVisualMedia and preserves a user-edited page order."
+    },
+    {
+      "id": "reviewable-score-cleanup",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "Each score page is auto-cropped, perspective-corrected, rotated and contrast-adjusted, but the musician sees and can correct every proposed crop before the PDF is made rather than trusting optical note recognition to invent notation.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-scorefolio.md#complaints-read",
+        "finding": "The 500K+ install PlayScore2 app com.organum.playscore drew the excerpt: \"It is still very flawed. It will get notes and rhythms wrong constantly.\" printed by node scripts/scan-complaints.mjs --package com.organum.playscore; its scan asks users to trust recognition accuracy."
+      },
+      "status": "deferred",
+      "deferredReason": "No image pipeline exists; proof requires fixture-image tests for rotation and a UI test that changes a crop before rendering the final page."
+    },
+    {
+      "id": "print-ready-pdf-leaves",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "The ordered, cleaned pages become one print-ready PDF that the musician can share, save through the system file picker, or hand to a print app; the transformed artifact is not an archive trapped inside the app.",
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/ideation/2026-10-08-scorefolio.md#the-wedge-and-transformation",
+        "finding": "The inference follows the lane's required handoff and the measured one-page restriction on the 100K+ mid-tier app; the sampled reviews did not directly ask for PDF export, so export demand is not claimed as measured."
+      },
+      "status": "deferred",
+      "deferredReason": "No document path exists; proof requires a PdfDocument export and ACTION_SEND intent test whose output contains every ordered page."
+    },
+    {
+      "id": "one-price-no-ad-interruption",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "trust",
+      "promise": "The cleanup and export session contains no ads and no subscription: one purchase unlocks unlimited page sets for the life of the install.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-scorefolio.md#market-read",
+        "finding": "node scripts/enrich-market.mjs --query 'sheet music scanner app' --top 8 --concurrency 3 measured seven of eight enriched cards with IAP, while node scripts/scan-complaints.mjs --query 'sheet music scanner app' --top 6 --concurrency 2 classified 8 of 12 critical reviews as paywall."
+      },
+      "status": "deferred",
+      "deferredReason": "No product surface exists; proof requires no advertising SDK, no subscription product, and a test that the export flow has no ad or renewal state."
+    }
+  ]
+}

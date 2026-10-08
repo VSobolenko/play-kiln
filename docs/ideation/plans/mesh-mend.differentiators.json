@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "slot": "mesh-mend",
+  "reconRef": "docs/ideation/2026-10-08-meshmend.md#what-the-play-shelf-measured",
+  "jobCoverage": {
+    "before": {
+      "claimId": "imports-existing-model"
+    },
+    "during": {
+      "claimId": "repairs-mesh-defects"
+    },
+    "after": {
+      "claimId": "exports-prepared-model"
+    }
+  },
+  "claims": [
+    {
+      "id": "imports-existing-model",
+      "weight": "supporting",
+      "jobStage": "before",
+      "depthFamily": "data_in",
+      "promise": "The maker imports an existing STL, OBJ, or 3MF through the document picker and sees the whole source mesh before changing it, rather than being forced to recreate the model in a phone CAD editor.",
+      "comparison": {
+        "incumbent": "com.shyambarange.viewer3d (3D Viewer Pro - AR & Hologram)",
+        "limitation": "A sampled 1-star review says the app did not appear to support browsing to the reviewer's STL files in Google Drive and Downloads.",
+        "source": "docs/ideation/2026-10-08-meshmend.md#what-the-play-shelf-measured"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-meshmend.md#what-the-play-shelf-measured",
+        "finding": "The 3D Viewer Pro listing was 3 stars with 100K+ installs, and its sampled 1-star review states, \"The app did not appear to support browsing to any location. I have STL files on my Google drive and in my downloads folder on my phone.\""
+      },
+      "status": "deferred",
+      "deferredReason": "No SAF import flow exists yet; resolve only when a test opens an STL, OBJ, and 3MF through ACTION_OPEN_DOCUMENT and proves the imported geometry is preserved for inspection."
+    },
+    {
+      "id": "repairs-mesh-defects",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "The maker can inspect and repair boundary holes, non-manifold edges, degenerate faces, and inverted normals locally, preview the changed geometry against the original, and keep or reject the repair before it replaces the source.",
+      "comparison": {
+        "incumbent": "com.performance.meshview (Fast STL Viewer)",
+        "limitation": "Its Play title presents it as a viewer; the measured listing and sampled reviews do not establish a repair workflow, so the contrast is a proposed functional wedge rather than a claim that no other app repairs meshes.",
+        "source": "docs/ideation/2026-10-08-meshmend.md#what-the-play-shelf-measured"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-meshmend.md#what-the-play-shelf-measured",
+        "finding": "The 30 visible stl file repair results were hand-classified 23/30 as STL, CAD, 3D-print file, or preview tools, while the enriched Fast STL Viewer was 2.5 stars with 1M+ installs and its listing title describes viewing rather than repair."
+      },
+      "status": "deferred",
+      "deferredReason": "No mesh topology or repair engine exists yet; resolve only when malformed mesh fixtures produce the named diagnostics and repaired output while a regression test confirms the original remains unchanged until acceptance."
+    },
+    {
+      "id": "reports-print-risk",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "insight",
+      "promise": "Before export, the maker sees a spatial risk map for thin walls, steep overhangs, and bed-bound violations, with each warning tied to measured model geometry rather than a generic pass badge.",
+      "comparison": {
+        "incumbent": "com.onnex.mes3d (STL & 3D Model Viewer - Mes3D)",
+        "limitation": "The enriched listing is a viewer and its sampled critical reviews focus on a paywall for viewing; this recon did not verify whether its current build contains print-risk analysis.",
+        "source": "docs/ideation/2026-10-08-meshmend.md#what-the-play-shelf-measured"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-meshmend.md#what-the-play-shelf-measured",
+        "finding": "Mes3D was 3.2 stars, 81 displayed reviews, and 10K+ installs; one sampled 2-star review reads, \"works fine, but you can only view a few files before a paywall,\" and a sampled 1-star review reads, \"makes you pay to view stl files. what a joke.\""
+      },
+      "status": "deferred",
+      "deferredReason": "No geometry-risk analysis exists yet; resolve only when synthetic wall, overhang, and bed-fit meshes trigger known risk locations and the displayed warnings name the measured condition without calling the model guaranteed to print."
+    },
+    {
+      "id": "exports-prepared-model",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "The maker exports the accepted, transformed mesh as a new STL or 3MF and can hand it to another installed slicer without uploading the original model to a service.",
+      "comparison": {
+        "incumbent": "com.performance.meshview (Fast STL Viewer)",
+        "limitation": "The measured Play title and review sample establish viewing and file-opening complaints, not a verified prepared-file export path; the output handoff remains the proposed completion of the file-preparation job.",
+        "source": "docs/ideation/2026-10-08-meshmend.md#what-the-play-shelf-measured"
+      },
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/ideation/2026-10-08-meshmend.md#what-the-play-shelf-measured",
+        "finding": "The 30-card stl file repair search hand-classified 23/30 as STL/CAD/3D-print file or preview tools, and the sampled low-rated listings include a file-location complaint and a viewer-rendering complaint; the need to deliver a changed file follows from the owner's requested model-preparation job, not from a measured export complaint."
+      },
+      "status": "deferred",
+      "deferredReason": "No file exporter exists yet; resolve only when a test asserts ACTION_CREATE_DOCUMENT and a FileProvider-backed ACTION_SEND deliver the accepted changed STL or 3MF, and a second parser verifies the exported mesh."
+    },
+    {
+      "id": "fits-and-orients-model",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "fit",
+      "promise": "The maker can scale to explicit bed dimensions, choose a stable lay-flat orientation, and arrange multiple imported parts on a plate before the prepared file leaves the app.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-meshmend.md#what-the-play-shelf-measured",
+        "finding": "The `3d print bed orientation` scan returned mixed with 18 visible cards and 7 weak rated incumbents, while the `3d model wall thickness` scan returned candidate with 23 visible cards and 12 weak rated incumbents; these are adjacent print-preparation needs, not proof of demand for each individual transform."
+      },
+      "status": "deferred",
+      "deferredReason": "No bed model, orientation solver, or plate arrangement exists yet; resolve only when tests prove the placed geometry stays within the configured bed bounds and the exported coordinates match the accepted preview."
+    }
+  ]
+}
+

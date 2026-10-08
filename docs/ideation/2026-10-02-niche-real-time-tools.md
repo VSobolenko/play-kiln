@@ -165,7 +165,7 @@ as each is locked, and one amber accent reserved for "out of tune" — an identi
 
 | Candidate | Verdict (MEASURED) | Why refused — revenue reason |
 |---|---|---|
-| bagpipe / chanter tuner | **fortress** (median 4.60) | Demand is real but the shelf is dominated by 4.6★ apps with thousands of reviews; no reachable weak mid-tier, so the build cost buys no share. |
+| bagpipe / chanter tuner | **fortress** (median 4.60) | Demand is real but the shelf is dominated by 4.6★ apps with thousands of reviews; no reachable weak mid-tier establishes a paying wedge. |
 | sitar tuner | **fortress** (25/30 rated, median 4.50) | Same shape as bagpipes: high-rated incumbents, the wedge would be naming or colour, not functionality. |
 | tabla metronome / odd-time metronome / drumline metronome | **fortress** | Metronome jobs are owned by 4.6★ incumbents; a rhythm trainer here has no functional wedge. |
 | hangboard timer / climbing training timer | **fortress** (4.60 / 4.80) | The timing job is saturated by 4.6–4.8★ apps; no complaint pocket to answer. |

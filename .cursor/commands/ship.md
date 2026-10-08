@@ -209,8 +209,8 @@ your own confidence as approval.
 - Fixing a factory defect means adding a check to the inline fixture set of the module that
   owns the rule (`scripts/core/*.mjs`, run by `node scripts/verify.mjs`) and confirming it
   fails before the fix.
-- Report the development phase's actual elapsed wall clock. The one-hour target is a
-  direction; never cite it as met.
+- Report the development phase's actual elapsed wall clock for transparency; it is never an idea or
+  kill criterion.
 
 ## Output
 

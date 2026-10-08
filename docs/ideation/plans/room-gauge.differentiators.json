@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "slot": "room-gauge",
+  "reconRef": "docs/ideation/2026-10-08-roomgauge-material-plan.md#demand-and-objections",
+  "jobCoverage": { "before": { "claimId": "captures-correctable-room-trace" }, "during": { "claimId": "computes-opening-aware-material-plan" }, "after": { "claimId": "exports-contractor-ready-pdf" } },
+  "claims": [
+    {
+      "id": "captures-correctable-room-trace", "weight": "core", "jobStage": "before", "depthFamily": "data_in",
+      "promise": "The homeowner captures a reference-object-assisted room trace with level and tilt guidance, then corrects every wall and opening directly on the redrawing plan instead of trusting an opaque automatic scan.",
+      "comparison": { "incumbent": "CubiCasa | 2D & 3D Floor Plans", "limitation": "A sampled 2-star review says its scanned dimensions were not accurate.", "source": "docs/ideation/2026-10-08-roomgauge-material-plan.md#demand-and-objections" },
+      "evidence": { "strength": "MEASURED", "source": "docs/ideation/2026-10-08-roomgauge-material-plan.md#demand-and-objections", "finding": "The floor-plan-scanner sample had 25/29 hand-on-job cards and a CubiCasa 2-star review says, 'Pretty cool, unless you are wanting accurate dimensions.'" },
+      "status": "deferred", "deferredReason": "No capture path exists; resolve only when fixture tests compare reference-assisted and manually corrected wall values to taped dimensions and prove the sketch redraws." 
+    },
+    {
+      "id": "computes-opening-aware-material-plan", "weight": "core", "jobStage": "during", "depthFamily": "core_operation",
+      "promise": "The homeowner receives wall, floor, and ceiling quantities with doors and windows subtracted, then paint, tile, drywall, flooring, and adhesive pack counts rounded with editable waste and local prices.",
+      "comparison": { "incumbent": "Floor Plan Creator", "limitation": "The measured listing is a floor-plan tool with ads and IAP; this recon did not measure an opening-subtracted multi-material purchase plan in its listing.", "source": "docs/ideation/2026-10-08-roomgauge-material-plan.md#decision-brief" },
+      "evidence": { "strength": "INFERRED", "source": "docs/ideation/2026-10-08-roomgauge-material-plan.md#decision-brief", "finding": "The measured candidate shelves split room planning, measurement, and estimating; the proposed quantity workflow follows the homeowner's purchase job and needs direct product comparison before claiming exclusivity." },
+      "status": "deferred", "deferredReason": "No geometry or catalogue engine exists; resolve only when deterministic fixtures prove openings subtract from the correct surfaces, waste is applied once, and pack rounding matches known cases." 
+    },
+    {
+      "id": "exports-contractor-ready-pdf", "weight": "core", "jobStage": "after", "depthFamily": "data_out",
+      "promise": "The homeowner exports a locally generated PDF containing room dimensions, opening deductions, material quantities, prices, assumptions, and optional photos to a contractor or shop without an account or subscription.",
+      "comparison": { "incumbent": "Draw Floor Plan", "limitation": "A sampled 1-star review calls its export unusable even for full-subscription customers.", "source": "docs/ideation/2026-10-08-roomgauge-material-plan.md#demand-and-objections" },
+      "evidence": { "strength": "MEASURED", "source": "docs/ideation/2026-10-08-roomgauge-material-plan.md#demand-and-objections", "finding": "The floor-plan sample has 7 paywall complaints among 14 critical reviews and a Draw Floor Plan review says, 'Unusable export feature for full-subscription customers.'" },
+      "status": "deferred", "deferredReason": "No PDF/export flow exists; resolve only when a test verifies PdfDocument output via ACTION_CREATE_DOCUMENT and a FileProvider ACTION_SEND handoff." 
+    },
+    {
+      "id": "works-without-account-or-network", "weight": "supporting", "jobStage": "during", "depthFamily": "trust",
+      "promise": "The room plan, bundled catalogue, calculations, and PDF work locally without a sign-in or cellular connection after installation.",
+      "comparison": { "incumbent": "HOVER", "limitation": "A sampled 2-star review says the app cannot be used without cellular signal because it requires login.", "source": "docs/ideation/2026-10-08-roomgauge-material-plan.md#demand-and-objections" },
+      "evidence": { "strength": "MEASURED", "source": "docs/ideation/2026-10-08-roomgauge-material-plan.md#demand-and-objections", "finding": "A HOVER 2-star review states, 'Without a cellular signal, you can't use the app because it requires you to log in.'" },
+      "status": "deferred", "deferredReason": "No implementation exists; resolve only when an offline device test completes an existing room plan and writes a PDF with networking disabled." 
+    }
+  ]
+}

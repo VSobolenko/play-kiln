@@ -58,6 +58,21 @@ export const IN_APP_REVIEW_BASELINE = '2026-10-05'
 export const SPEC_BASELINE = '2026-10-02'
 
 /**
+ * The date the artifact-level dependency-freshness rule starts applying.
+ *
+ * `.cursor/rules/dependency-freshness.mdc` was authored 2026-10-05, after the first Play "outdated
+ * SDK" notice reached `teacher-gradebook`. The rule was enforced only against the *source* at the
+ * time, and on 2026-10-08 a second notice arrived for `2026-10-02-laneset`, whose bundle had shipped
+ * three days before the rule existed. `deps.artifact` closes that gap by reading the bundle itself,
+ * and it takes the rule's own birthday rather than its own: every slot created before 2026-10-05
+ * already has an immutable published bundle that a gate cannot repair, so it carries the finding as
+ * a printed note, while every slot created from that date is gated. That keeps the one property this
+ * module exists for — not one shipped app reddened for a defect it cannot fix, and no new app
+ * exempted from a rule that can.
+ */
+export const DEPS_ARTIFACT_BASELINE = '2026-10-05'
+
+/**
  * The date the device-capability declaration starts applying to a proposal.
  *
  * `scripts/core/ideas.mjs` requires every proposal under `docs/ideation/` to answer `used` or
@@ -102,7 +117,8 @@ const CHECK_BASELINES = Object.freeze({
   'review.dependency': IN_APP_REVIEW_BASELINE,
   'review.api': IN_APP_REVIEW_BASELINE,
   'review.throttle': IN_APP_REVIEW_BASELINE,
-  'review.settings': IN_APP_REVIEW_BASELINE
+  'review.settings': IN_APP_REVIEW_BASELINE,
+  'deps.artifact': DEPS_ARTIFACT_BASELINE
 })
 
 /** The date a check id's baseline starts applying, defaulting to the factory's own. */

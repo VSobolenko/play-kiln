@@ -67,11 +67,13 @@ of the plan is `node scripts/check-economics.mjs --slot <slug>`.
 
 ### Q9. Is there a server, and is its cost stated rather than discovered?
 
-- [ ] If the plan sells credit that costs real money to serve, the slot is a server project, and that
-      is recorded in `apps/<slot>/capabilities.json` before the idea is approved. Rules:
-      `.cursor/rules/ideation-gate.mdc`, `.cursor/rules/client-secrets.mdc`.
+- [ ] A server, cloud service, account/backend, ML service or paid API is admissible. The plan states
+      its service cost, whether it is per-user-per-month or one-off, and how price funds it; for
+      recurring per-user cost it states near-zero cost, repeat purchases, or paid-upfront lifetime
+      margin. A money-costing credit service also records its server-side authority before approval.
+      Rules: `.cursor/rules/ideation-gate.mdc`, `.cursor/rules/client-secrets.mdc`.
 
-### Q10. Is buildability scored, not discovered — and are the device capabilities declared?
+### Q10. Is the build estimate stated as information — and are device capabilities declared?
 
 - [ ] The proposal gives a build estimate in agent hours and names the shape it chose on purpose.
 - [ ] The proposal declares, one line per capability in a `## Device capabilities` section, which of
@@ -82,13 +84,14 @@ of the plan is `node scripts/check-economics.mjs --slot <slug>`.
       the permission it needs. The Android Photo Picker (`ActivityResultContracts.PickVisualMedia`)
       needs no runtime permission, so using it costs nothing against permission minimisation while a
       capability that does need a permission must say so. Rules: `docs/ideation/README.md`;
-      `.cursor/rules/ideation-gate.mdc` § "Budget: about one hour, not eight" — where a local and
-      free capability is not a cost and the things to avoid are a server, an account, a paid API, ML
-      that needs a server, and a runtime permission that buys nothing.
+      `.cursor/rules/ideation-gate.mdc` § "Build cost is information, never a criterion" — where a local and
+      free capability is not a cost; infrastructure cost is declared in the arithmetic; and a runtime
+      permission that buys nothing remains a defect.
 
-### Q11. Is the wall-clock number an estimate, or a target presented as a result?
+### Q11. Is elapsed time reported transparently, without becoming a criterion?
 
-- [ ] The proposal reports elapsed wall clock and never cites the one-hour direction as met. Rules:
+- [ ] The proposal labels its build estimate and reports elapsed wall clock as information for the
+      owner; neither number is a selection, ranking, refusal or kill criterion. Rules:
       `.cursor/rules/ideation-gate.mdc`, `.cursor/rules/parallel-execution.mdc`.
 
 ### Q12. Is this one slot, and was any earlier attempt closed properly?

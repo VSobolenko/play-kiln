@@ -2,7 +2,7 @@
 
 **What this is.** A decision-grade proposal of two app ideas for the owner to choose between, one of
 which I recommend. Each recipe states its demand evidence, its unit arithmetic, its reason list, its
-build cost and its kill criteria. The gate-ready halves are in
+build estimate and its kill criteria. The gate-ready halves are in
 `docs/ideation/plans/<slug>.economics.json` and `docs/ideation/plans/<slug>.differentiators.json`.
 
 **What this is not.** It is not a build instruction and neither recipe is a slot. No slot directory
@@ -384,13 +384,12 @@ structural one.
 1. **Its leader is beatable and unmonetised.** `com.spencerpages` holds `500K+` installs and 2,758
    reviews at **4.3** and declares neither ads nor IAP — the job has a proven audience and no one has
    charged for it. The pilot shelf's leaders are four free apps at 4.6–4.8, which is a harder fight
-   for the same build budget.
+   despite comparable estimated implementation work.
 2. **Its audience is one the factory's own heuristic favours.** `docs/niche-selection.md` §4: the
    opening is where "the person doing the work would never build the app". Coin collectors are
    hobbyists; the pilot shelf is populated by pilot-developers and flight-school software.
-3. **It is the cheaper of the two and the one whose domain cannot be got wrong.** A catalogue has no
-   licence arithmetic and no legal total; the whole risk is search, editing and export, which is
-   mostly testable code.
+3. **Its domain risk is more controllable.** A catalogue has no licence arithmetic and no legal
+   total; the whole risk is search, editing and export, which is mostly testable code.
 4. **Structurally**, it is a different category and a different job from the live `teacher-gradebook`,
    which is the constraint that actually bites on a catalogue of apps.
 

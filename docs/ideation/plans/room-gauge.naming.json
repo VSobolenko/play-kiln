@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "slot": "room-gauge",
+  "reconRef": "docs/ideation/2026-10-08-roomgauge-material-plan.md#decision-brief",
+  "title": "RoomGauge: Material Plan",
+  "slug": "room-gauge",
+  "applicationId": "com.gexetr.roomgauge",
+  "archetype": "carrier_job_noun",
+  "candidates": [
+    { "name": "RoomGauge: Material Plan", "archetype": "carrier_job_noun", "score": 83.5, "why": "The ownable carrier joins the measured room job to the material-plan output without claiming magic scanning.", "dimensions": { "jobFit": 4.5, "searchability": 4.0, "distinctiveness": 4.0, "radioTest": 4.5, "uniqueness": 4.0, "lengthFit": 4.5, "localeSurvival": 4.0 } },
+    { "name": "Room Estimator", "archetype": "descriptive", "score": 58, "why": "It is a bare category phrase and cannot own the integrated measurement-to-export workflow." },
+    { "name": "RoomGauge", "archetype": "coined", "score": 68, "why": "The carrier is memorable but omits the material-plan outcome users need to search for." },
+    { "name": "MeasureMint", "archetype": "compound", "score": 66, "why": "It suggests measurement but not materials, rooms, or a contractor-facing outcome." },
+    { "name": "Blueprint", "archetype": "metaphorical", "score": 55, "why": "The metaphor is broad and risks a title collision with generic plan applications." }
+  ],
+  "rejected": [
+    { "name": "Plumbline: Room Estimate", "reason": "The exact-carrier search surfaced existing Plumbline listings, including Plumbline and Plumbline by Solvyne, so the candidate has poor ownership headroom." },
+    { "name": "Room Planner Pro", "reason": "It copies the crowded planner category and promises a generic planner rather than an opening-aware material plan." }
+  ],
+  "searchPhrases": ["room measurement app", "floor plan app measure", "home renovation estimator"],
+  "audience": "A homeowner who needs a correctable room measurement and material quantities before buying renovation supplies or discussing a job with a contractor.",
+  "rationale": "Measured candidate shelves contain high-install room-planning and measurement apps, while the proposed title names the distinct material-plan result rather than a generic planner or a competitor title.",
+  "collisionCheck": "On 2026-10-08, scan-titles returned zero visible cards for RoomGauge and RoomGauge Material Plan in the signed-out Play search. This is not trademark clearance; no USPTO, EUIPO/TMview, WIPO, or Russian register was queried.",
+  "localisationCheck": "RoomGauge: Material Plan is 24 characters and RoomGauge: план материалов is 27 characters, both within Play's 30-character cap; a native Russian review remains required.",
+  "evidence": "docs/ideation/2026-10-08-roomgauge-material-plan.md#decision-brief",
+  "localizedTitles": { "en-US": "RoomGauge: Material Plan", "ru-RU": "RoomGauge: план материалов" },
+  "scoringRubric": { "scale": "0-5 per dimension, weighted", "weights": { "jobFit": 20, "searchability": 15, "distinctiveness": 15, "radioTest": 15, "uniqueness": 15, "lengthFit": 10, "localeSurvival": 10 }, "floor": "chosen >= 70 with no dimension below 2.5; a hard check outranks the score" },
+  "assumptionsUnverified": ["UNVERIFIED: visible Play absence is not trademark clearance in class 9.", "UNVERIFIED: the Russian title needs native-speaker and searchability review.", "UNVERIFIED: RoomGauge has not been tested as a brand with homeowners."]
+}

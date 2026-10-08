@@ -315,7 +315,7 @@ refuse to scaffold a plan whose floor sits below it — starting with the three 
 
 - It does **not** pick a plan. It fixes the floor all four are judged against; the choice among them
   belongs to the owner's checkpoint 1, on the wedges (the four head-to-head verdicts above are the
-  input) and on the build cost.
+  input) and on the stated build estimate as owner information, never as a criterion.
 - It does **not** prove any plan will earn. Every installs figure rests on an assumed 2 % conversion
   that no slot has ever measured.
 - It does **not** change a file. `docs/slot-economics.md`, the four `economics.json` files and the

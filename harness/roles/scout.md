@@ -125,8 +125,8 @@ restated here.
 |---|---|
 | Every factual claim carries its evidence label and every recommendation names the alternative it rejected | `.cursor/rules/grounded-claims.mdc` |
 | An example is a shape, not a topic; calculators and arithmetic tools are burned; never the same job twice; never a killed idea; demand is measured; one idea, one slot; an idea is proposed, not started | `.cursor/rules/ideation-gate.mdc` |
-| Budget: about one hour of agent time per slot, reported as elapsed rather than as a met target | `.cursor/rules/ideation-gate.mdc` |
-| A server is a cost to state before the idea is approved, not a detail to discover after | `.cursor/rules/ideation-gate.mdc` |
+| Build estimates and elapsed time are owner information, never selection, ranking, refusal or kill criteria | `.cursor/rules/ideation-gate.mdc` |
+| State a server, cloud service, account/backend or paid API cost and permission before approval; do not refuse on infrastructure alone | `.cursor/rules/ideation-gate.mdc` |
 | The reason list is authored at recon, before the UI, and becomes the promise contract | `.cursor/rules/differentiator-contract.mdc` |
 | The job's three stages are authored at recon, one claim each, with a refusal only where the job lacks a stage — `before` the scout's, `after` the owner's, `during` never refusable | `.cursor/rules/app-depth.mdc` |
 | Slot layout, the `com.gexetr.<slug>` namespace, and no factory config copied into a slot | `.cursor/rules/project-conventions.mdc` |
@@ -157,7 +157,8 @@ An **occupied shelf is evidence of demand and a point in the proposal's favour**
 3.4★ incumbent at $19.99 is a reachable pocket, and money on display is the cheapest proof a market
 pays. The question is never "is this category empty?" but "what is our wedge, and will it pay?" A
 rejection must therefore name a **revenue** reason — an unrated demand reading, a price the market will
-not pay, no statable wedge, a build cost that eats the margin — and never "this is already done".
+not pay, no statable wedge, or serving cost that defeats the shown revenue arithmetic — and never
+"this is already done".
 
 The §4 heuristic of `docs/niche-selection.md` (*users who would never build the app themselves*) is a
 **supply signal that says where to look**, not a test the idea must pass. Selecting topics by how well
@@ -174,8 +175,8 @@ out and the revenue reason for each. Two things are hard:
 
 - **A subscription is never proposed.** It is banned (owner, 2026-10-01), and `subscription` is absent
   from `ARCHETYPES`, so a plan naming it fails `check-economics.mjs` with no exemption. Recurring
-  entitlement means server-side validation plus a renewal, refund and grace-period lifecycle — a
-  server project, not a slot.
+  entitlement means server-side validation plus a renewal, refund and grace-period lifecycle — the
+  reason subscriptions are banned, not a reason to refuse another server-backed shape.
 - **"Nobody sells it that way here" is not a finding.** An ads-led utility is a finished product shape,
   not a fallback for a purchase that could not be designed, and §2's arithmetic is what decides whether
   it earns.

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "slot": "noisedose-field",
+  "reconRef": "docs/ideation/2026-10-08-noisedose-field.md#naming",
+  "title": "NoiseDose Field",
+  "slug": "noisedose-field",
+  "applicationId": "com.gexetr.noisedosefield",
+  "archetype": "carrier_job_noun",
+  "candidates": [
+    { "name": "Sound Meter", "archetype": "descriptive", "score": 42, "dimensions": { "jobFit": 4.0, "searchability": 5.0, "distinctiveness": 1.0, "radioTest": 5.0, "uniqueness": 1.0, "lengthFit": 5.0, "localeSurvival": 4.0 }, "why": "Negative control: the exact bare category phrase appears repeatedly in the measured shelf and cannot distinguish the report workflow." },
+    { "name": "NoiseDose Field", "archetype": "carrier_job_noun", "score": 80, "dimensions": { "jobFit": 4.5, "searchability": 4.0, "distinctiveness": 3.5, "radioTest": 4.5, "uniqueness": 3.0, "lengthFit": 5.0, "localeSurvival": 4.5 }, "why": "Carries the measured noise and dose job vocabulary plus Field, which signals the documented work setting without claiming compliance." },
+    { "name": "PeakReport", "archetype": "compound", "score": 74, "dimensions": { "jobFit": 4.0, "searchability": 3.0, "distinctiveness": 4.0, "radioTest": 5.0, "uniqueness": 3.0, "lengthFit": 5.0, "localeSurvival": 4.5 }, "why": "Names the export wedge clearly but loses the discovery vocabulary noise and dose." },
+    { "name": "Sonora", "archetype": "coined", "score": 68, "dimensions": { "jobFit": 3.0, "searchability": 2.5, "distinctiveness": 4.0, "radioTest": 5.0, "uniqueness": 3.0, "lengthFit": 5.0, "localeSurvival": 4.5 }, "why": "Pronounceable but too disconnected from the job for a new listing." },
+    { "name": "Signal Ledger", "archetype": "metaphorical", "score": 61, "dimensions": { "jobFit": 2.5, "searchability": 2.5, "distinctiveness": 4.0, "radioTest": 4.5, "uniqueness": 3.5, "lengthFit": 4.5, "localeSurvival": 4.0 }, "why": "Suggests recordkeeping, which violates the measurement-first product shape." }
+  ],
+  "rejected": [
+    { "name": "Sound Meter", "reason": "It is the shelf's recurring bare category phrase and cannot communicate the exposure report or peak-timeline wedge." },
+    { "name": "PeakReport", "reason": "It loses the noise and dose discovery words that the measured job uses." }
+  ],
+  "searchPhrases": ["noise dosimeter", "sound level meter app", "decibel meter app"],
+  "audience": "A facilities supervisor, venue operator, or worker documenting a quick phone-based sound-exposure observation in the field.",
+  "rationale": "NoiseDose Field retains the measured noise/dose vocabulary and adds a short work-context carrier, while avoiding a bare Sound Meter category title and avoiding a compliance promise.",
+  "collisionCheck": "UNVERIFIED: no trademark-register search or exact-title Play collision screen was run; Play titles are not unique and this is not legal clearance.",
+  "localisationCheck": "The 16-character Latin title has 14 characters of Play-title slack in both en-US and ru-RU; Russian discoverability is unmeasured.",
+  "evidence": "docs/ideation/2026-10-08-noisedose-field.md#market-evidence",
+  "localizedTitles": { "en-US": "NoiseDose Field", "ru-RU": "NoiseDose Field" },
+  "scoringRubric": { "scale": "0-5 per dimension, weighted", "weights": { "jobFit": 20, "searchability": 15, "distinctiveness": 15, "radioTest": 15, "uniqueness": 15, "lengthFit": 10, "localeSurvival": 10 }, "floor": "chosen >= 70 with no dimension below 2.5; a hard collision check outranks the score" },
+  "assumptionsUnverified": ["Trademark clearance and exact-title Play collision checks were not performed.", "Whether the English title is discoverable to a Russian-speaking user is not measured.", "The proposed carrier does not establish a claim of compliant or calibrated noise measurement."]
+}

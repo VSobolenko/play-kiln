@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A facilities supervisor, venue operator, or worker who needs a quick documented phone-based noise observation.",
+  "paidUnit": "One permanent unlock of unlimited timed microphone measurements, peak timelines, and PDF reports.",
+  "priceUsd": 4.99,
+  "momentOfPayment": "After a free live session demonstrates the meter, peak timeline, and report preview, at the first report export.",
+  "distinctnessSentence": "Where the sound-meter shelf offers a live dB reading or a recording, this app turns a timed microphone sample into an explicitly indicative exposure verdict, annotated peak timeline, and device-labelled PDF report shared outside the app with no ads, account, renewal, or compliance claim.",
+  "evidenceRef": "docs/ideation/2026-10-08-noisedose-field.md#market-evidence",
+  "day1RevenuePath": "The listing targets the measured noise dosimeter shelf, lets the user complete a free live reading, then collects the one-time unlock through Play Billing when the report export is requested.",
+  "killCriteria": { "windowDays": 90, "minInstalls": 1500, "minRevenueUsd": 200 },
+  "capabilities": { "required": ["billing"], "deliberatelyNotEnabled": ["ads"], "note": "Billing collects the single unlock. Ads are deliberately absent because ads and paywalls are measured complaints in the sampled pocket." },
+  "serverRequired": false,
+  "permissions": "android.permission.RECORD_AUDIO for live local measurement; Play Billing's com.android.vending.BILLING; no account, location, storage, contacts, or background location permission.",
+  "buildEstimateAgentHours": 7,
+  "archetypesRejected": [
+    { "archetype": "purchase_led_repeat_sales", "revenueReason": "Repeated reports are not a separate consumable product, so a second purchase would be artificial and cannibalise the unlock." },
+    { "archetype": "ads_led_utility", "revenueReason": "Ads are measured in 3 of 10 critical sampled reviews, so ad-led revenue copies a complaint the proposal is designed to remove." },
+    { "archetype": "purchase_only_no_ads", "revenueReason": "The observed shelf is primarily free-to-install, with five of eight enriched listings declaring IAP, so an upfront listing price replaces a measured discovery funnel with an unmeasured one." },
+    { "archetype": "subscription", "revenueReason": "Subscription is banned by the owner's instruction and a local measurement/report tool has no recurring service cost to justify one." }
+  ],
+  "assumptionsUnverified": [
+    "A $4.99 one-time unlock will convert enough of a free-install audience; the only directly observed paid comparator costs $2.99.",
+    "The 15 percent Play service fee and 2 percent refund or tax reserve are planning assumptions rather than a reading of this developer account.",
+    "Phone microphone variability permits a clearly-labelled indicative workflow without making a misleading safety or compliance claim.",
+    "Leading incumbents do not already export the same peak-timeline PDF at an equal or lower one-time price."
+  ]
+}

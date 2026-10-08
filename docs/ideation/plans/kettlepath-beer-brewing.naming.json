@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "slot": "kettlepath-beer-brewing",
+  "reconRef": "docs/ideation/2026-10-08-homebrew-fermentation-suite.md#Candidate-name-and-derived-identifiers",
+  "title": "Kettlepath: Beer Brewing",
+  "slug": "kettlepath-beer-brewing",
+  "applicationId": "com.gexetr.kettlepathbeerbrewing",
+  "archetype": "carrier_job_noun",
+  "candidates": [
+    {
+      "name": "Kettlepath: Beer Brewing",
+      "archetype": "carrier_job_noun",
+      "score": 80,
+      "why": "The ownable carrier is paired with the measured two-word brewing job phrase, and the title search showed no visible exact-name listing.",
+      "dimensions": {
+        "jobFit": 4.5,
+        "searchability": 3.5,
+        "distinctiveness": 4.5,
+        "radioTest": 4.0,
+        "uniqueness": 3.0,
+        "lengthFit": 4.5,
+        "localeSurvival": 4.0
+      }
+    },
+    {
+      "name": "Boilpath",
+      "archetype": "metaphorical",
+      "score": 72,
+      "why": "The process metaphor is memorable, but it needs a job descriptor and fits fermentation less well."
+    },
+    {
+      "name": "Mashway",
+      "archetype": "compound",
+      "score": 70,
+      "why": "The short compound is pronounceable, but names only the mash stage of the complete job."
+    },
+    {
+      "name": "Fermentia",
+      "archetype": "coined",
+      "score": 66,
+      "why": "The carrier is concise, but it gives no inherent recipe-design or brew-day meaning."
+    },
+    {
+      "name": "Homebrew Recipe Planner",
+      "archetype": "descriptive",
+      "score": 55,
+      "why": "The generic category phrase is clear but offers no ownable preference over established listings."
+    },
+    {
+      "name": "Beer Brewing",
+      "archetype": "descriptive",
+      "score": 30,
+      "why": "Negative control: it is only the bare category phrase and has no ownable carrier."
+    }
+  ],
+  "rejected": [
+    {
+      "name": "Mashway",
+      "reason": "It names the mash stage but under-signals the wider recipe-to-packaging job, so it is a weaker search and scope fit."
+    },
+    {
+      "name": "Homebrew Recipe Planner",
+      "reason": "The generic descriptor spends the title on the category without a distinctive reason to choose this suite."
+    }
+  ],
+  "searchPhrases": [
+    "home brewing beer",
+    "beer recipe designer",
+    "all grain brewing calculator"
+  ],
+  "audience": "An all-grain homebrewer designing a style-targeted beer recipe and carrying its ingredient and process plan through brew day and packaging.",
+  "rationale": "Kettlepath: Beer Brewing pairs a short carrier with two measured job words; a recipe-design and brew-day suite is wider than a generic brewing calculator while the name remains below Play's title cap.",
+  "collisionCheck": "MEASURED 2026-10-08: scan-titles searched Kettlepath Beer Brewing and Kettlepath: Beer Brewing; no visible card used the Kettlepath name, although fuzzy results were brewing-related. This is not trademark clearance.",
+  "localisationCheck": "MEASURED: Kettlepath: Beer Brewing is 24 characters and Kettlepath: Варка пива is 22; both remain under 30 with at least five characters of slack. Russian search quality still needs native-speaker review.",
+  "evidence": "docs/ideation/2026-10-08-homebrew-fermentation-suite.md#Candidate-name-and-derived-identifiers",
+  "localizedTitles": {
+    "en-US": "Kettlepath: Beer Brewing",
+    "ru-RU": "Kettlepath: Варка пива"
+  },
+  "scoringRubric": {
+    "scale": "0-5 per dimension, weighted",
+    "weights": {
+      "jobFit": 20,
+      "searchability": 15,
+      "distinctiveness": 15,
+      "radioTest": 15,
+      "uniqueness": 15,
+      "lengthFit": 10,
+      "localeSurvival": 10
+    },
+    "floor": "Chosen score is at least 70 and no dimension is below 2.5; a collision or title-rule failure overrides the score."
+  },
+  "assumptionsUnverified": [
+    "No USPTO, EUIPO, WIPO or Russian national class-9 register was queried, so Kettlepath is not legally cleared.",
+    "The Russian title's phrasing and searchability require review by a native speaker."
+  ]
+}

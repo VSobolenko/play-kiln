@@ -83,6 +83,23 @@ above zero. Enabling extra capabilities beyond what the archetype needs is allow
 because an ads-led utility legitimately also sells a one-time "remove ads" unlock
 (§3.6).
 
+## Infrastructure cost is part of the arithmetic
+
+A factory-written server, cloud service, account/backend, ML that needs a server, and paid API are
+admissible. They are not reasons to refuse, rank down, or narrow an idea. The owner's 2026-10-08
+instruction reversed the previous offline-only reading: each proposal instead declares the service
+cost in its revenue arithmetic, says whether it is per-user-per-month or one-off, and shows how that
+cost interacts with the price.
+
+A recurring per-user cost plus a one-time price is a losing shape: a heavy user continues to cost
+money after the single sale clears. Since subscriptions are banned (§ "Subscription is banned"), a
+proposal using a server or paid API must state which honest shape applies: near-zero ongoing cost
+(for example, a free keyless endpoint, static cache, or on-device work); a
+`purchase_led_repeat_sales` consumable/repeat purchase that funds the recurring cost; or a paid
+upfront price whose expected per-user lifetime cost still leaves margin. This is a planning rule even
+where the current JSON schema records it in the proposal's arithmetic and assumptions rather than a
+separate machine-checked key.
+
 ## There is no default archetype — it is derived
 
 **The factory has no house monetization.** All four archetypes are live options on every
@@ -105,9 +122,10 @@ naming it is rejected by `parseEconomics`, by `requiredCapabilitiesFor`, and by 
 reason the rest of this factory exists — a subscription is *recurring* revenue, so the entitlement
 must be re-established continuously, which means server-side validation plus a renewal, refund,
 cancellation, grace-period and failed-payment lifecycle honoured on a schedule the client does not
-control. That is a server project with a billing backend, not a slot this factory builds, and the
-one-hour budget has no room for it. §3.3's three tables remain the analysis of why it was previously
-only deferred; the decision has moved from *deferred* to *out of scope*.
+control. **That continuous operational obligation is the owner's reason for banning it** — not a
+prohibition on servers, which this factory may now write, and not a budget limit, which no longer
+exists. §3.3's three tables remain the analysis of why it was previously only deferred; the decision
+has moved from *deferred* to *out of scope*.
 
 **The list is not closed.** The four archetypes are the shapes whose economics and mechanics this
 factory has actually reasoned about, not the whole space of ways an app can earn. If recon finds a

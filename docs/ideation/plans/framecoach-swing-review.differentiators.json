@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slot": "framecoach-swing-review",
+  "reconRef": "docs/ideation/2026-10-08-framecoach-swing-review.md#promise-contract",
+  "jobCoverage": {
+    "before": { "claimId": "bring-your-own-clips" },
+    "during": { "claimId": "frame-accurate-swing-comparison" },
+    "after": { "claimId": "send-the-annotated-review" }
+  },
+  "claims": [
+    {
+      "id": "bring-your-own-clips",
+      "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "data_in",
+      "promise": "A coach can record a hitter or select the hitter's and reference clips locally, so analysis begins with the footage already on the phone instead of a cloud account.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-framecoach-swing-review.md#market-evidence",
+        "finding": "The measured baseball query has 28 of 30 visibly on-job cards, while the 10K+ Blast Baseball critical sample reports videos failing to upload to its cloud."
+      },
+      "status": "deferred",
+      "deferredReason": "Camera capture and the system visual-media picker do not exist until the slot is built."
+    },
+    {
+      "id": "frame-accurate-swing-comparison",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "A coach can scrub a hitter and reference swing frame by frame, use slow motion, overlay a ghosted reference, and draw arrows or angle lines on the decisive frame.",
+      "comparison": {
+        "incumbent": "com.app.OnForm",
+        "limitation": "Its 100K+ Android critical sample says drawing lines work while drag-and-form angles available on Apple cannot be generated.",
+        "source": "docs/ideation/2026-10-08-framecoach-swing-review.md#market-evidence"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-framecoach-swing-review.md#market-evidence",
+        "finding": "OnForm is measured at 3.0 stars and 100K+ installs; one of its three sampled critical reviews explicitly says Android cannot generate angles.",
+        "extra": ""
+      },
+      "status": "deferred",
+      "deferredReason": "The player, frame index, overlay renderer, measurement UI, and annotation canvas are unbuilt."
+    },
+    {
+      "id": "send-the-annotated-review",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "The coach exports a marked still, GIF, or rendered clip through Android share so the player receives the actual correction rather than a separate notification.",
+      "comparison": {
+        "incumbent": "com.app.OnForm",
+        "limitation": "Its sampled critical review says Share never works and files must be moved and communicated separately.",
+        "source": "docs/ideation/2026-10-08-framecoach-swing-review.md#market-evidence"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-framecoach-swing-review.md#market-evidence",
+        "finding": "A sampled 2-star OnForm review says Share never works; the baseball pocket has 5 paywall complaints among 12 critical reviews.",
+        "extra": ""
+      },
+      "status": "deferred",
+      "deferredReason": "The renderer, FileProvider, and ACTION_SEND handoff do not exist until the slot is built."
+    },
+    {
+      "id": "bought-once-local-tool",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "trust",
+      "promise": "The paid tool is a single permanent unlock and keeps clips and annotations on-device, so video review is not held behind a recurring plan or cloud outage.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-framecoach-swing-review.md#market-evidence",
+        "finding": "Seven of the eight enriched baseball cards declare in-app purchases, and 5 of 12 critical pocket reviews are classified paywall."
+      },
+      "status": "deferred",
+      "deferredReason": "Billing, local-only storage, and the no-account policy are not implemented."
+    }
+  ]
+}

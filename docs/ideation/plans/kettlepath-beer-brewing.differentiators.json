@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "slot": "kettlepath-beer-brewing",
+  "reconRef": "docs/ideation/2026-10-08-homebrew-fermentation-suite.md",
+  "jobCoverage": {
+    "before": {
+      "claimId": "bring-existing-recipe"
+    },
+    "during": {
+      "claimId": "solve-and-run-brew"
+    },
+    "after": {
+      "claimId": "export-reproducible-brew-sheet"
+    }
+  },
+  "claims": [
+    {
+      "id": "bring-existing-recipe",
+      "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "data_in",
+      "promise": "Import a BeerXML recipe through the system document picker so the brewer can start from an existing recipe instead of retyping it.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-homebrew-fermentation-suite.md#Measured-shelf-and-ceiling-evidence",
+        "finding": "The complaint scan sampled 3 critical BeerSmith reviews; one states: \"Loses recipes. No import of beer.xml files\". The BeerXML site defines recipe exchange as its primary purpose."
+      },
+      "status": "deferred",
+      "deferredReason": "BeerXML import has not been implemented or tested against competitor-exported fixtures."
+    },
+    {
+      "id": "solve-and-run-brew",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "Solve a style-targeted grain bill and carry its calculated ingredient, water and hop plan into the timed brew-day steps.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-homebrew-fermentation-suite.md#Measured-shelf-and-ceiling-evidence",
+        "finding": "\"all grain brewing calculator\" returned a candidate verdict, with 46 of 50 visible titles hand-classified on-job."
+      },
+      "status": "deferred",
+      "deferredReason": "The recipe solver, schedule and independent numerical fixtures have not been implemented."
+    },
+    {
+      "id": "named-hop-model",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "trust",
+      "promise": "Show the selected Tinseth model and per-addition IBU contribution rather than presenting a bitterness estimate with no named method.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-homebrew-fermentation-suite.md#Correctness:-equations,-standard-choices-and-proof",
+        "finding": "A sampled brewing-calculator review says its Brix/Plato/SG conversion is incorrect; the published Brewer's Friend fixture labels its result \"IBU (tinseth): 53.91\"."
+      },
+      "status": "deferred",
+      "deferredReason": "Tinseth calculations and alternative-model disclosure have not been implemented."
+    },
+    {
+      "id": "plan-water-additions",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "Calculate target-profile salt additions and a clearly labelled Palmer residual-alkalinity mash-pH estimate for the selected recipe.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-homebrew-fermentation-suite.md#Measured-shelf-and-ceiling-evidence",
+        "finding": "\"brewing water chemistry\" returned a mixed scan result with 21 rated listings, while title hand-classification found only 9 of 50 results on brewing-water chemistry."
+      },
+      "status": "deferred",
+      "deferredReason": "Water-ion calculations and malt/water fixtures have not been implemented or validated."
+    },
+    {
+      "id": "guide-fermentation-packaging",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "Carry the recipe through fermentation-temperature steps, yeast-pitch guidance and either priming-sugar or keg-carbonation instructions.",
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/ideation/2026-10-08-homebrew-fermentation-suite.md#Feature-areas:-one-job-from-design-to-packaged-beer",
+        "finding": "The recipe-to-packaging workflow is coherent, but the carbonation-calculator search had only 3 rated results among 12 visible, so this subfeature lacks independent demand evidence."
+      },
+      "status": "deferred",
+      "deferredReason": "Pitch, fermentation and packaging models need named references and independent test fixtures."
+    },
+    {
+      "id": "notify-live-brew-steps",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "reminder",
+      "promise": "Resume an active brew-day run and notify the brewer when its next timed step is due.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-homebrew-fermentation-suite.md#Measured-shelf-and-ceiling-evidence",
+        "finding": "\"brew day app\" returned a mixed scan result and 25 of 30 visible cards were hand-classified as brewing-related."
+      },
+      "status": "deferred",
+      "deferredReason": "The notification lifecycle, timer recovery and opt-in behavior have not been implemented."
+    },
+    {
+      "id": "export-reproducible-brew-sheet",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "Export the resolved recipe as BeerXML and as a printable, shareable PDF containing the named calculation models and timed brew-day and packaging instructions.",
+      "comparison": {
+        "incumbent": "BeerSmith 3 Mobile Homebrewing",
+        "limitation": "A sampled critical review reports \"No import of beer.xml files\" and recipe loss; this is one review, not a claim about every user's experience.",
+        "source": "docs/ideation/2026-10-08-homebrew-fermentation-suite.md#Measured-shelf-and-ceiling-evidence"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-homebrew-fermentation-suite.md#Measured-shelf-and-ceiling-evidence",
+        "finding": "BeerXML v1 states that recipe exchange is its primary purpose; the sampled BeerSmith critical review says \"No import of beer.xml files\"."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/kettlepathbeerbrewing/export/BrewSheetExporter.kt",
+        "symbol": "ACTION_CREATE_DOCUMENT",
+        "assertion": "A source review finds ACTION_CREATE_DOCUMENT and PdfDocument in the exporter; an export test reads the generated BeerXML and PDF and verifies the fixture's model-labelled recipe and schedule."
+      }
+    }
+  ]
+}

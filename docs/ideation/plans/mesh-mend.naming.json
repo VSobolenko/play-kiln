@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "slot": "mesh-mend",
+  "reconRef": "docs/ideation/2026-10-08-meshmend.md#promise-contract-and-naming",
+  "title": "MeshMend: STL Repair",
+  "slug": "mesh-mend",
+  "applicationId": "com.gexetr.meshmend",
+  "archetype": "carrier_job_noun",
+  "candidates": [
+    {
+      "name": "MeshMend: STL Repair",
+      "archetype": "carrier_job_noun",
+      "score": 84.5,
+      "why": "The ownable carrier is paired with the two-word job phrase observed in STL-repair searches; it names file repair rather than generic model viewing.",
+      "dimensions": {
+        "jobFit": 4.5,
+        "searchability": 4.5,
+        "distinctiveness": 4.0,
+        "radioTest": 4.5,
+        "uniqueness": 3.5,
+        "lengthFit": 4.5,
+        "localeSurvival": 4.0
+      }
+    },
+    {
+      "name": "STL Repair",
+      "archetype": "descriptive",
+      "score": 76,
+      "why": "It says the searched job plainly, but the generic phrase is difficult to own and does not distinguish a changed-file pipeline from simple repair."
+    },
+    {
+      "name": "MeshMend",
+      "archetype": "coined",
+      "score": 68,
+      "why": "The short coined carrier is memorable but omits the STL repair job words and depends on users already knowing the brand."
+    },
+    {
+      "name": "BedReady",
+      "archetype": "metaphorical",
+      "score": 63,
+      "why": "It hints at a printable result but does not tell a user that the app repairs an existing mesh file."
+    },
+    {
+      "name": "FileForge",
+      "archetype": "compound",
+      "score": 60,
+      "why": "It suggests file transformation but is broad enough to describe unrelated file tools and lacks the model-repair query."
+    }
+  ],
+  "rejected": [
+    {
+      "name": "STL Viewer",
+      "reason": "The broad result shelf already contains multiple STL Viewer titles, and viewing alone is the incomplete job this proposal adds repair and print-risk checks to."
+    },
+    {
+      "name": "3D Print Prep",
+      "reason": "The phrase describes a broad category rather than the distinctive changed-mesh repair action, and it risks looking interchangeable with printer companion tools."
+    }
+  ],
+  "searchPhrases": [
+    "stl file repair",
+    "3d model repair",
+    "slice stl on phone"
+  ],
+  "audience": "A 3D-print hobbyist with an existing STL or 3MF model who wants to repair its geometry and check likely print risks on a phone before sending it to a slicer.",
+  "rationale": "The title scans measured weak Android results around STL viewing and phone slicing, while sampled users complain about dark rendering, file access, and paywalls for viewing; the title therefore names a repair job rather than copying a viewer title, but the brand is not legally cleared.",
+  "collisionCheck": "The 2026-10-08 scan-titles command searched MeshMend STL Repair and MeshMend. No exact MeshMend: STL Repair title appeared in the visible cards, but the standalone MeshMend query returned 12 mostly unrelated cards with a polluted relevance guard; Google Play title search is not trademark clearance, and no USPTO, EUIPO, WIPO, or Russian register was queried.",
+  "localisationCheck": "The proposed English and Russian titles are each 20 characters, both below Play's 30-character cap; the short Latin carrier is retained while the Russian job words are localized, and the Cyrillic phrasing still needs native-speaker review.",
+  "evidence": "docs/ideation/2026-10-08-meshmend.md#what-the-play-shelf-measured",
+  "localizedTitles": {
+    "en-US": "MeshMend: STL Repair",
+    "ru-RU": "MeshMend: ремонт STL"
+  },
+  "scoringRubric": {
+    "scale": "0-5 per dimension, weighted",
+    "weights": {
+      "jobFit": 20,
+      "searchability": 15,
+      "distinctiveness": 15,
+      "radioTest": 15,
+      "uniqueness": 15,
+      "lengthFit": 10,
+      "localeSurvival": 10
+    },
+    "floor": "chosen >= 70 with no dimension below 2.5; a hard check outranks the score"
+  },
+  "assumptionsUnverified": [
+    "UNVERIFIED: no trademark register was queried, so MeshMend's availability in downloadable software class 9 is not known.",
+    "UNVERIFIED: Google Play search does not establish that the title is unique across all localized or unpublished listings.",
+    "UNVERIFIED: the Russian localized job phrase needs a native-speaker and searchability review."
+  ]
+}

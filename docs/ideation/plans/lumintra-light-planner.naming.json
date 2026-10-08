@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "slot": "lumintra-light-planner",
+  "reconRef": "docs/ideation/2026-10-08-nightvector-astro-plan.md#market-evidence",
+  "title": "Lumintra: Light Planner",
+  "archetype": "carrier_job_noun",
+  "chosen": {
+    "archetype": "carrier_job_noun",
+    "carrier": "Lumintra",
+    "jobNoun": "Light Planner",
+    "score": 81,
+    "dimensions": {
+      "jobFit": 4.5,
+      "searchability": 3.5,
+      "distinctiveness": 4.0,
+      "radioTest": 4.0,
+      "uniqueness": 3.5,
+      "lengthFit": 5.0,
+      "localeSurvival": 4.0
+    },
+    "titles": [
+      { "locale": "en-US", "title": "Lumintra: Light Planner", "length": 23 },
+      { "locale": "ru-RU", "title": "Lumintra: план съёмки", "length": 21 }
+    ]
+  },
+  "candidates": [
+    {
+      "name": "Lumintra: Light Planner",
+      "archetype": "carrier_job_noun",
+      "score": 81,
+      "why": "Chosen: a coined light-rooted carrier that reads day and night, plus the planning noun the shelf itself uses. Weighted total 18.0 + 10.5 + 12.0 + 12.0 + 10.5 + 10.0 + 8.0."
+    },
+    {
+      "name": "Lumintra: Sky Planner",
+      "archetype": "carrier_job_noun",
+      "score": 80,
+      "why": "Runner-up: the only serious candidate with no live title using its descriptor, but it names the sky rather than the light the paying photographer plans, and its query neighbourhood is planetarium and sky-map apps. 16.0 + 9.0 + 13.5 + 12.0 + 12.0 + 10.0 + 8.0."
+    },
+    {
+      "name": "Solentra: Light Planner",
+      "archetype": "carrier_job_noun",
+      "score": 77,
+      "why": "A sun-rooted carrier with no exact visible title and a clean 0 of 11 job-share reading, but the sun root repeats the defect the night-only name had in the other direction, and the spelling is heard as Soluntra or Solera. 16.0 + 10.5 + 12.0 + 10.5 + 10.5 + 10.0 + 8.0."
+    },
+    {
+      "name": "Lume: Sun & Moon Planner",
+      "archetype": "carrier_job_noun",
+      "score": 76,
+      "why": "The shortest carrier tested and it carries the measured sun and moon phrase, but Lume is a photography-lighting brand with several live listings, so the carrier cannot be owned. 18.0 + 12.0 + 9.0 + 13.5 + 6.0 + 10.0 + 8.0."
+    },
+    {
+      "name": "Skyvora: Light Planner",
+      "archetype": "carrier_job_noun",
+      "score": 75,
+      "why": "Pronounceable and short, but Skyvora VPN is a live 4.8-rated listing with the identical carrier, which eliminates it on uniqueness regardless of its arithmetic. 18.0 + 10.5 + 12.0 + 12.0 + 4.5 + 10.0 + 8.0."
+    },
+    {
+      "name": "Solstice: Light Planner",
+      "archetype": "metaphorical",
+      "score": 73,
+      "why": "A vivid astronomical image, but a solstice happens twice a year while this job is planned per session, and a live Solstice - Vacation Planner listing already spends the word. 14.0 + 9.0 + 10.5 + 13.5 + 9.0 + 10.0 + 7.0."
+    },
+    {
+      "name": "Golden Hour Planner",
+      "archetype": "descriptive",
+      "score": 64,
+      "why": "The most searched phrase of the field, and that is why it cannot be taken: Golden Hour alone is a live free listing at 500K+ installs and a second incumbent sells a paid Golden Hour+ listing. It also leaves only 2 characters of slack. 16.0 + 13.5 + 4.5 + 13.5 + 4.5 + 4.0 + 8.0."
+    },
+    {
+      "name": "SessionLight: Session Planner",
+      "archetype": "compound",
+      "score": 63,
+      "why": "Two real words fused around the session, but the title is 29 characters and so keeps 1 character of slack against the 5 the contract requires, the Russian descriptor overflows the 30-character cap outright, and the carrier repeats the noun. 16.0 + 7.5 + 10.5 + 10.5 + 10.5 + 4.0 + 4.0."
+    },
+    {
+      "name": "Sun Tracker",
+      "archetype": "descriptive",
+      "score": 53,
+      "why": "Negative control: the bare head term the free giants already own. The sun tracker query returned 10 of 10 on-topic cards led by Sun Position, Sun Seeker and Sunset & Sunrise - Sun Tracker, and the metering sibling Light Meter is held by two 1M+ free listings. It is unwinnable at the one query it is named for. 10.0 + 4.5 + 3.0 + 15.0 + 3.0 + 10.0 + 8.0."
+    }
+  ],
+  "rejected": [
+    {
+      "name": "NightVector: Astro Plan",
+      "reason": "The retired name. Two of its three words name the night and the third names astronomy, so it under-sells the daylight photographer who the repositioned plan makes the largest part of the market, and it cannot describe the golden-hour and cloud half of the job."
+    },
+    {
+      "name": "Lumintra: Sky Planner",
+      "reason": "The runner-up, and rejected on job fit only: the descriptor names the sky while the paying user buys the answer to when the light is best, and the sky planner query returns Stellarium, SkySafari, Sky Map and The Sky Pro rather than light planners."
+    },
+    {
+      "name": "SessionLight: Session Planner",
+      "reason": "Rejected on the length rule the contract states: 29 characters leaves 1 character of slack rather than 5, the Russian descriptor cannot fit under the 30-character cap, and the carrier and the noun both say session, which wastes the one field that could carry a search phrase."
+    },
+    {
+      "name": "Lume: Sun & Moon Planner",
+      "reason": "Rejected on uniqueness: Lume is the name of a photography lighting brand with several live Play listings, so a light-planning app carrying it would collide in the same category a photographer already shops in."
+    },
+    {
+      "name": "Skyvora: Light Planner",
+      "reason": "Rejected on uniqueness: Skyvora VPN is a live 4.8-rated application with the identical carrier, and a Play search for the carrier returns that VPN ahead of anything else."
+    },
+    {
+      "name": "Solentra: Light Planner",
+      "reason": "Rejected on honesty of meaning: sol is the sun, so the carrier claims the daylight half of a product that sells the dark window, the moon and deep-sky targets, and the name sits beside Solera and Soleran in both sound and listing results."
+    },
+    {
+      "name": "Golden Hour Planner",
+      "reason": "Rejected on collision: Golden Hour is a live free listing at 500K+ installs with 5,370 displayed reviews, a second developer sells Golden Hour+ and a third Golden Hour Calculator, so this is an incumbent title with a word swapped."
+    }
+  ],
+  "collisions": {
+    "playSearch": "MEASURED 2026-10-08, node scripts/scan-titles.mjs with the signed-out storefront. The carrier query returned 29 visible cards and no card is titled Lumintra, but the Lum family is dense around it (Lumira three times, Luminote, Lumiora, Lumenta, Lumetia, Lumesia) and one card is Relay by Luminultra. The descriptor query light planner returned 30 cards whose on-job guard share is 24 of 30, and two cards already use the descriptor: SunMoon Alert: Light Planner and Lumenleaf Light Planner, the second being the closest title shape to this name. The head-term query sun tracker returned 10 of 10 on-topic cards led by Sun Position, Sun Seeker and Sunset & Sunrise - Sun Tracker. Play does not enforce unique titles, a capped display of about 30 cards is not a market count, and none of this is trademark clearance.",
+    "trademarkScreen": [
+      "USPTO not queried",
+      "EUIPO eSearch plus and TMview not queried",
+      "WIPO Global Brand Database not queried",
+      "Russian national register not queried"
+    ],
+    "checkedAt": "2026-10-08"
+  },
+  "slug": "lumintra-light-planner",
+  "applicationId": "com.gexetr.lumintralightplanner",
+  "searchPhrases": [
+    "photo planner sun moon",
+    "golden hour planner",
+    "light planner"
+  ],
+  "audience": "A landscape, travel or outdoor photographer who plans one shoot around the light, and the astrophotographer who wants the same brief to reach the moon, the dark window, deep-sky targets, satellite passes and hourly cloud.",
+  "rationale": "The carrier is coined from a light root so it reads across the whole day instead of naming one half, which is exactly what the retired night-only name failed to do, and the descriptor is the planning noun this shelf already spends its own titles on rather than a head term a million-install free listing owns. It was chosen over the runner-up on job fit, the heaviest dimension, because the paying user plans the light first and the sky second, and the desk analysis that followed the two candidates through the shelf is recorded in the collisions field.",
+  "collisionCheck": "MEASURED, node scripts/scan-titles.mjs, 2026-10-08: Lumintra, Lumintra Light Planner, Solentra, sky planner, shoot planner, sun and moon planner, light planner and sun tracker were each searched and every visible card classified by hand, with the outputs at .kiln/scratch/naming-2026-10-08/verify-*.md. No visible card is titled Lumintra. The honest negatives are real and are not hidden: the Lum family is crowded on Play, the descriptor Light Planner is already used by two live listings, and no trademark register was queried, so a clean Play search is not clearance.",
+  "localisationCheck": "MEASURED by character count: Lumintra: Light Planner is 23 of the 30 characters Play allows and Lumintra: план съёмки is 21, so the slack is 7 and 9 rather than the 5 the contract requires. The carrier stays Latin in both locales because the brand has to be one name, and the Russian descriptor was authored as the phrase a Russian photographer reads instead of machine-translated. планировщик света was rejected because at 27 characters it leaves 3 of slack, and световой план because film and television use that phrase for a lighting plot, a meaning this app does not have. A native-speaker read of the Russian title is not performed.",
+  "evidence": "docs/research/2026-10-08-finalists-verification.md#b-nightvector--paid-shelf",
+  "assumptionsUnverified": [
+    "UNVERIFIED: the repositioning recon lives only in disposable scratch. The light-shelf gaps are at .kiln/scratch/positioning-2026-10-08/C-sun-moon-light-shelf.md section 3 and the 2026-10-08 title scans are under .kiln/scratch/naming-2026-10-08/, while the naming contract accepts only docs/ paths as a source, so this record cites the durable proposal document and the independent finalist verification and states the scratch original here. Those scratch files must be promoted into the slot docs before the slot-mode gate runs.",
+    "UNVERIFIED: no trademark register was screened, so the class-9 headroom of Lumintra is decided by nobody; the register list in collisions names what was skipped.",
+    "UNVERIFIED: Play search is a capped display of roughly 30 cards and relevance order is not size order, so a larger Lumintra or Light Planner listing could sit below the visible cut and was not seen.",
+    "UNVERIFIED: whether this name attracts installs is unmeasured. The 81 is arithmetic over seven judged dimensions, not a forecast, and no controlled test of a name exists.",
+    "UNVERIFIED: the Russian descriptor план съёмки was written by an agent, and no native speaker has read the localised title."
+  ]
+}

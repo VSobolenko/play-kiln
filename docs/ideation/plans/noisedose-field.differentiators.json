@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "slot": "noisedose-field",
+  "reconRef": "docs/ideation/2026-10-08-noisedose-field.md#promise-contract",
+  "jobCoverage": {
+    "before": { "claimId": "setup-placement-note" },
+    "during": { "claimId": "live-dose-and-peaks" },
+    "after": { "claimId": "shareable-peak-report" }
+  },
+  "claims": [
+    {
+      "id": "setup-placement-note",
+      "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "data_in",
+      "promise": "Before measurement, the user sets the session duration and placement note that are printed in the report, so the result is a documented observation rather than an unexplained number.",
+      "evidence": { "strength": "INFERRED", "source": "docs/ideation/2026-10-08-noisedose-field.md#promise-contract", "finding": "The measured shelf proves sound-meter demand; the placement-note requirement is inferred from the professional reporting job and awaits calibration guidance." },
+      "status": "deferred",
+      "deferredReason": "No setup flow exists yet; resolve when a test creates a session with duration and placement and proves both appear in the generated report." 
+    },
+    {
+      "id": "live-dose-and-peaks",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "A local microphone session shows A-weighted level, peak, elapsed time, and an explicitly indicative dose progression live, without claiming calibrated regulatory compliance.",
+      "evidence": { "strength": "MEASURED", "source": "docs/ideation/2026-10-08-noisedose-field.md#market-evidence", "finding": "The hand-classified noise-dosimeter shelf has 27/30 on-job cards and contains apps titled Sound meter, SPL & dB meter, and Sound Meter: SPL & Noise Dose." },
+      "status": "deferred",
+      "deferredReason": "No AudioRecord analysis exists yet; resolve when tests feed known PCM fixtures through the weighting and peak calculation and assert the displayed values." 
+    },
+    {
+      "id": "shareable-peak-report",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "Every completed session exports an Android-shareable PDF with the session summary, peak timeline, device label, and indicative-measurement disclaimer, so the observation leaves the phone as a report.",
+      "comparison": { "incumbent": "coocent.app.tools.soundmeter.noisedetector", "limitation": "A 2-star review says saved history cannot show where noise peaks occurred or skip to that portion of the recording.", "source": "docs/ideation/2026-10-08-noisedose-field.md#market-evidence" },
+      "evidence": { "strength": "MEASURED", "source": "docs/ideation/2026-10-08-noisedose-field.md#market-evidence", "finding": "The cited 2-star review says saved history cannot show where peaks occurred; this is 1 missing-feature review among 3 critical reviews for that incumbent." },
+      "status": "deferred",
+      "deferredReason": "No PDF or share flow exists yet; resolve when an instrumentation test generates a PDF and verifies ACTION_SEND with a FileProvider content URI." 
+    },
+    {
+      "id": "recover-interrupted-session",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "durability",
+      "promise": "An interrupted measurement restores the elapsed session and accumulated peak state locally so a field observation is not silently discarded.",
+      "evidence": { "strength": "INFERRED", "source": "docs/ideation/2026-10-08-noisedose-field.md#promise-contract", "finding": "Durability is inferred from a live field measurement workflow; it was not asserted by the sampled review corpus." },
+      "status": "deferred",
+      "deferredReason": "No persistence exists yet; resolve when a recreation test restores an in-progress session with its elapsed time and peak." 
+    }
+  ]
+}

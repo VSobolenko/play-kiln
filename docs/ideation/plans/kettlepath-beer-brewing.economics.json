@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "An all-grain homebrewer who wants one tool to design and run a complete brew.",
+  "paidUnit": "A one-time unlock for the full on-device recipe-to-packaging suite.",
+  "priceUsd": 14.99,
+  "momentOfPayment": "After the user tries the first recipe and requests a second full brew plan.",
+  "distinctnessSentence": "One standards-labelled recipe calculation flows into the brew-day schedule and exportable packaging sheet.",
+  "evidenceRef": "docs/ideation/2026-10-08-homebrew-fermentation-suite.md#Measured-shelf-and-ceiling-evidence",
+  "day1RevenuePath": "The first full-suite entitlement is sold through a Google Play Billing non-consumable unlock.",
+  "killCriteria": {
+    "windowDays": 90,
+    "minInstalls": 500,
+    "minRevenueUsd": 1000
+  },
+  "assumptionsUnverified": [
+    "Trial-to-paid conversion at the proposed $14.99 price is unmeasured; 79 monthly purchases are needed for the target under the stated US fee assumption.",
+    "The 500-install and $1000-in-90-days kill thresholds are management choices, not measured market forecasts.",
+    "A one-time unlock at this price can compete with a $4.99 paid listing and a $29.99/year subscription."
+  ]
+}

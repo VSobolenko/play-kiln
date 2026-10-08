@@ -56,7 +56,8 @@ checkpoint rather than a validated field; `docs/slot-economics.md` records why.
 
 `subscription` SHALL be rejected. The owner banned recurring billing on 2026-10-01 because
 re-establishing entitlement continuously requires server-side validation plus a renewal,
-refund, cancellation and grace-period lifecycle, which makes the slot a server project. The
+refund, cancellation and grace-period lifecycle the factory would have to operate permanently. This
+is the owner's product decision, not an infrastructure prohibition: a server is admissible. The
 ban is enforced by `subscription` being absent from `ARCHETYPES`, and SHALL NOT be
 overridable by any exemption file.
 

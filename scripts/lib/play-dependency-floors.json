@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "_comment": "The coordinates Google Play has told this factory are outdated, and the version each must be at or above. This file is the SINGLE source of truth for that list: `scripts/core/deps.mjs` reads it for the source-level constraint check and `scripts/lib/dependency-floors.mjs` reads it for the artifact-level check, so the two cannot drift. A coordinate is added here only from a Play notice the factory actually received, with the date and the shipped version that caused it, because an invented floor is a false positive that teaches the operator to ignore the gate. Adding a new notice means adding a row, not editing a regex.",
+  "floors": [
+    {
+      "coordinate": "androidx.fragment:fragment",
+      "floor": "1.9.1",
+      "why": "Play's 'outdated SDK' notice, received twice. Compose apps never use Fragment UI, so the coordinate arrives only as a transitive of Play Billing: com.android.billingclient:billing -> com.google.android.gms:play-services-basement -> androidx.fragment:fragment. Billing itself is already current and is never the thing to change; the fix is a dependency constraint that forces this transitive to the floor.",
+      "path": "com.android.billingclient:billing -> com.google.android.gms:play-services-basement -> androidx.fragment:fragment",
+      "notices": [
+        { "reportedAt": "2026-10-05", "slot": "2026-09-26-teacher-gradebook", "shipped": "1.1.0" },
+        { "reportedAt": "2026-10-08", "slot": "2026-10-02-laneset", "shipped": "1.1.0" }
+      ],
+      "measuredInBundles": [
+        { "slot": "2026-09-25-pipe-sizing", "artifact": "apps/2026-09-25-pipe-sizing/dist/pipe-sizing-0.2.0-2-release.aab", "shipped": "1.1.0" },
+        { "slot": "2026-09-26-teacher-gradebook", "artifact": "apps/2026-09-26-teacher-gradebook/dist/teacher-gradebook-0.1.0-1-release.aab", "shipped": "1.1.0" },
+        { "slot": "2026-09-26-teacher-gradebook", "artifact": "apps/2026-09-26-teacher-gradebook/dist/teacher-gradebook-0.1.1-2-release.aab", "shipped": "1.9.1" },
+        { "slot": "2026-10-01-lawn-round-log", "artifact": "apps/2026-10-01-lawn-round-log/dist/lawn-round-log-0.1.0-1-release.aab", "shipped": "1.5.4" },
+        { "slot": "2026-10-02-laneset", "artifact": "apps/2026-10-02-laneset/dist/laneset-0.1.0-1-release.aab", "shipped": "1.1.0" }
+      ]
+    }
+  ]
+}

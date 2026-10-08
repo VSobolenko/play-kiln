@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_only_no_ads",
+  "payingUser": "A choir, band, orchestra or piano student who photographs borrowed or marked-up paper scores and needs a clean rehearsal copy that can leave the phone.",
+  "paidUnit": "A paid, no-ad app that turns a batch of score photographs into a cropped, deskewed, ordered and shareable rehearsal PDF without a renewal.",
+  "priceUsd": 9.99,
+  "momentOfPayment": "The one-time purchase is taken when the user exports the first multi-page rehearsal PDF after reviewing the enhanced pages.",
+  "distinctnessSentence": "Scorefolio makes a print-ready rehearsal PDF from a batch of photographed music pages with manual page ordering, score-specific crop and deskew review, and Android share/export, instead of attempting error-prone note recognition or trapping one scanned page behind recurring limits.",
+  "evidenceRef": "docs/ideation/2026-10-08-scorefolio.md#the-wedge-and-transformation",
+  "day1RevenuePath": "The listing meets the measured sheet music scanner query, where the paid $19.99 Sheet Music Scanner & Reader has 50K+ installs and the 50K+ and 100K+ weak mid-tier apps draw paywall and broken-scan complaints; the first export is the single, visible value moment for the $9.99 unlock.",
+  "killCriteria": {
+    "windowDays": 90,
+    "minInstalls": 500,
+    "minRevenueUsd": 250
+  },
+  "assumptionsUnverified": [
+    "The $9.99 price is inferred from the measured $19.99 paid incumbent, not from this developer account's conversion data.",
+    "Play install buckets are rounded and the review sample contains only three reviews per app page, so neither market size nor complaint frequency is measured exactly.",
+    "No trademark-register search has tested Scorefolio in class 9, and a clean visible Play-title reading would not establish clearance.",
+    "The app must prove that Android image processing produces sufficiently legible music notation across real lighting and paper conditions; the market scan does not test image quality."
+  ]
+}

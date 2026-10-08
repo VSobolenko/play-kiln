@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "slot": "skywindow-drone",
+  "reconRef": "docs/ideation/2026-10-08-skywindow-drone.md#naming",
+  "title": "SkyWindow: Drone Windows",
+  "archetype": "carrier_job_noun",
+  "chosen": {
+    "archetype": "carrier_job_noun",
+    "carrier": "SkyWindow",
+    "jobNoun": "Drone Windows",
+    "score": 81,
+    "dimensions": {
+      "jobFit": 4.5,
+      "searchability": 4.0,
+      "distinctiveness": 4.0,
+      "radioTest": 4.5,
+      "uniqueness": 2.5,
+      "lengthFit": 5.0,
+      "localeSurvival": 4.0
+    },
+    "titles": [
+      { "locale": "en-US", "title": "SkyWindow: Drone Windows", "length": 24 },
+      { "locale": "ru-RU", "title": "SkyWindow: Drone Windows", "length": 24 }
+    ]
+  },
+  "candidates": [
+    { "name": "Drone Weather", "archetype": "descriptive", "score": 39, "why": "Negative control: it is the generic phrase used throughout the measured shelf." },
+    { "name": "SkyWindow: Drone Windows", "archetype": "carrier_job_noun", "score": 81, "why": "Chosen: it states the product output while retaining a short carrier." },
+    { "name": "FlyWindow", "archetype": "compound", "score": 68, "why": "Short and memorable, but it loses the explicit drone job noun and collision headroom is unmeasured." },
+    { "name": "Clear Launch", "archetype": "metaphorical", "score": 63, "why": "It suggests a verdict but could be confused with airspace clearance, which the product must not claim." },
+    { "name": "AeroWindow", "archetype": "coined", "score": 66, "why": "It sounds aviation-specific but does not state the drone-planning output users search for." }
+  ],
+  "rejected": [
+    { "name": "Clear Launch", "reason": "It risks promising a launch authorisation or airspace clearance when the app only provides a weather advisory." },
+    { "name": "Drone Weather", "reason": "The measured shelf already uses Drone Weather Forecast, Drone Weather and Drone Weather Map, so the bare category phrase is not distinguishable." }
+  ],
+  "collisions": {
+    "playSearch": "MEASURED: the 2026-10-08 Play title scan for drone flight conditions shows multiple generic Drone Weather titles but no SkyWindow title in its 30 visible cards; a clean result is not trademark clearance.",
+    "trademarkScreen": ["USPTO not queried", "EUIPO eSearch plus / TMview not queried", "WIPO Global Brand Database not queried", "Russian national register not queried"],
+    "checkedAt": "2026-10-08"
+  },
+  "slug": "skywindow-drone",
+  "applicationId": "com.gexetr.skywindowdrone",
+  "searchPhrases": ["drone flight conditions", "drone flight weather", "drone launch window"],
+  "audience": "A recreational drone pilot deciding whether a nearby launch location has a weather-suitable flight window before travelling there.",
+  "rationale": "SkyWindow: Drone Windows pairs the measured search language with a named product output, while avoiding names that imply legal clearance or repeat the shelf's generic Drone Weather title pattern.",
+  "collisionCheck": "MEASURED: the 2026-10-08 title scan shows no SkyWindow title in 30 visible drone-flight-condition cards; this is not trademark clearance because no register was queried.",
+  "localisationCheck": "The 24-character Latin title leaves six characters of slack below Play's 30-character cap in en-US and ru-RU; discoverability in ru-RU remains unverified.",
+  "evidence": "docs/ideation/2026-10-08-skywindow-drone.md#naming",
+  "assumptionsUnverified": [
+    "SkyWindow trademark headroom in class 9 is unverified because no trademark register was queried.",
+    "The English title's discoverability for Russian-speaking users has not been measured."
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "slot": "fretflow-guitar-studio",
+  "reconRef": "docs/ideation/2026-10-08-fretflow-guitar-studio.md#promise-contract",
+  "jobCoverage": {
+    "before": { "claimId": "chart-to-drill" },
+    "during": { "claimId": "listening-tempo-ramp" },
+    "after": { "claimId": "share-practice-take" }
+  },
+  "claims": [
+    {
+      "id": "chart-to-drill",
+      "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "data_in",
+      "promise": "A guitarist can type a chord chart or import its photo, transpose it, select bars, and turn that passage into a guitar-specific loop rather than starting a generic timer.",
+      "evidence": { "strength": "MEASURED", "source": "docs/ideation/2026-10-08-fretflow-guitar-studio.md#market-evidence", "finding": "The hand-classified chord-chart-transposer shelf has 8 of 11 on-job visible cards; 4 of 5 sampled rated apps are below 4.2 stars and a review asks to save transposed songs." },
+      "status": "deferred",
+      "deferredReason": "No chart importer or loop compiler exists; resolve when a test turns a chord sequence and bar range into the expected timed loop."
+    },
+    {
+      "id": "listening-tempo-ramp",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "The drill repeats a selected passage, raises tempo only after successful timing windows against its click, and shows an explicit confidence score rather than pretending every microphone reading is correct.",
+      "evidence": { "strength": "MEASURED", "source": "docs/ideation/2026-10-08-fretflow-guitar-studio.md#market-evidence", "finding": "A sampled Guitar Tabs X review asks for tempo switches in the same tab, while the guitar-practice shelf has 26 of 30 hand-classified on-job cards." },
+      "status": "deferred",
+      "deferredReason": "No audio onset pipeline exists; resolve when PCM fixture tests verify beat-window scoring and tempo advancement."
+    },
+    {
+      "id": "guitar-ear-link",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "fit",
+      "promise": "Each drill links its chord and scale material to adaptive guitar interval, chord, scale, and rhythm dictation so ear work rehearses the same musical vocabulary as the passage.",
+      "evidence": { "strength": "MEASURED", "source": "docs/ideation/2026-10-08-fretflow-guitar-studio.md#market-evidence", "finding": "The interval-ear-training query has 21 of 23 hand-classified on-job cards, while the enriched ear-training leaders declare in-app purchases on all 8 sampled listings." },
+      "status": "deferred",
+      "deferredReason": "No adaptive question scheduler exists; resolve when deterministic tests advance difficulty from answered interval and rhythm fixtures."
+    },
+    {
+      "id": "share-practice-take",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "The player records a take, A/B-compares it with the reference tempo, and shares the audio plus a compact timing summary through Android's share sheet rather than trapping the result in a practice diary.",
+      "comparison": { "incumbent": "com.truefire.android3", "limitation": "A sampled review says the member cannot save or print materials from the phone.", "source": "docs/ideation/2026-10-08-fretflow-guitar-studio.md#market-evidence" },
+      "evidence": { "strength": "MEASURED", "source": "docs/ideation/2026-10-08-fretflow-guitar-studio.md#market-evidence", "finding": "The TrueFire sample has a 1-star review saying materials cannot be saved or printed; the guitar-practice complaint scan found 2 missing-feature classifications among 11 critical reviews." },
+      "status": "deferred",
+      "deferredReason": "No recorder or export exists; resolve when instrumentation verifies ACTION_SEND with a FileProvider audio URI and the timing-summary attachment."
+    },
+    {
+      "id": "resume-session-progress",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "durability",
+      "promise": "The next session resumes the unfinished passage and displays tempo and accuracy improvement by passage, so practice history serves the drill instead of becoming the product.",
+      "evidence": { "strength": "MEASURED", "source": "docs/ideation/2026-10-08-fretflow-guitar-studio.md#market-evidence", "finding": "One of 3 sampled critical TrueFire reviews says it is hard to get back to content and recently watched content does not reflect the user's activity." },
+      "status": "deferred",
+      "deferredReason": "No local session persistence exists; resolve when a recreation test restores the selected passage, tempo, and completed repetitions."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "slot": "nightvector-astro-plan",
+  "reconRef": "docs/ideation/2026-10-08-nightvector-astro-plan.md#naming",
+  "title": "NightVector: Astro Plan",
+  "archetype": "carrier_job_noun",
+  "chosen": {
+    "archetype": "carrier_job_noun",
+    "carrier": "NightVector",
+    "jobNoun": "Astro Plan",
+    "score": 80,
+    "dimensions": { "jobFit": 4.5, "searchability": 4.0, "distinctiveness": 3.5, "radioTest": 4.5, "uniqueness": 2.5, "lengthFit": 5.0, "localeSurvival": 4.5 },
+    "titles": [
+      { "locale": "en-US", "title": "NightVector: Astro Plan", "length": 23 },
+      { "locale": "ru-RU", "title": "NightVector: Astro Plan", "length": 23 }
+    ]
+  },
+  "candidates": [
+    { "name": "Astro Planner", "archetype": "descriptive", "score": 41, "why": "Negative control: the measured cards already contain Astro Planner and Astrophotography Planner." },
+    { "name": "NightVector: Astro Plan", "archetype": "carrier_job_noun", "score": 80, "why": "Chosen: it carries a compact planning noun while NightVector distinguishes it from existing map and tracker titles." },
+    { "name": "SkySequence", "archetype": "compound", "score": 73, "why": "It signals ordered timing but loses the directly searchable astro-plan phrase." },
+    { "name": "Dark Compass", "archetype": "metaphorical", "score": 65, "why": "It evokes a night outing but does not honestly state planning or imaging." },
+    { "name": "Noctura", "archetype": "coined", "score": 67, "why": "Pronounceable but too abstract for a new paid listing." }
+  ],
+  "rejected": [
+    { "name": "Astro Planner", "reason": "It is a generic shelf phrase and an exact visible title, leaving inadequate distinctiveness for a paid app." }
+  ],
+  "collisions": {
+    "playSearch": "MEASURED: the 2026-10-08 astro title scans show Astro Planner and Astrophotography Planner but no NightVector title in their visible cards; this is not trademark clearance.",
+    "trademarkScreen": ["USPTO not queried", "EUIPO eSearch plus / TMview not queried", "WIPO Global Brand Database not queried", "Russian national register not queried"],
+    "checkedAt": "2026-10-08"
+  },
+  "slug": "nightvector-astro-plan",
+  "applicationId": "com.gexetr.nightvectorastroplan",
+  "searchPhrases": ["astrophotography planner", "night sky planner", "deep sky planner"],
+  "audience": "An astrophotographer or visual observer planning where, when and how to shoot or observe during a dark-sky outing.",
+  "rationale": "NightVector: Astro Plan pairs the measured planning vocabulary with a named carrier, while avoiding the already-visible generic Astro Planner title.",
+  "collisionCheck": "MEASURED: no NightVector title appears in the visible cards of the 2026-10-08 astro title scans; register searches remain unperformed and Play-title absence is not legal clearance.",
+  "localisationCheck": "MEASURED: the 23-character English title leaves seven characters of slack below Play's 30-character cap in en-US and ru-RU; Russian discoverability is unverified.",
+  "evidence": "docs/ideation/2026-10-08-nightvector-astro-plan.md#naming",
+  "assumptionsUnverified": ["NightVector's class-9 trademark headroom is unverified because no trademark registry was searched.", "The English title's discovery performance for Russian-speaking users is unverified."]
+}

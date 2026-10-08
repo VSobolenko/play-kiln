@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "slot": "skywindow-drone",
+  "reconRef": "docs/ideation/2026-10-08-skywindow-drone.md#promise-contract",
+  "jobCoverage": {
+    "before": { "claimId": "profile-the-mission" },
+    "during": { "claimId": "ranked-altitude-aware-windows" },
+    "after": { "claimId": "share-the-brief" }
+  },
+  "claims": [
+    {
+      "id": "profile-the-mission",
+      "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "durability",
+      "promise": "The pilot saves a flight profile with legal wind, gust, precipitation, temperature, visibility and daylight limits, so every later verdict is tested against their aircraft and mission rather than a generic colour score.",
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/ideation/2026-10-08-skywindow-drone.md#market-evidence",
+        "finding": "Inferred from the 1M-plus-install Drone Assist review that says its wind data at different heights is essential, and from the category's separate drone-weather titles: configurable limits are needed to turn conditions into a personal decision."
+      },
+      "status": "deferred",
+      "deferredReason": "The local profile store and threshold editor do not exist; this resolves when a SavedStateHandle-backed profile survives recreation and a test shows a changed gust limit changes a verdict."
+    },
+    {
+      "id": "ranked-altitude-aware-windows",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "The app ranks the next safe launch windows from hourly weather at launch altitude, names the exact pass and fail conditions for each hour, and labels the result advisory rather than authorising a flight.",
+      "comparison": {
+        "incumbent": "com.uavforecast",
+        "limitation": "Its sampled critical reviews say forecasts beyond the minimal horizon are put behind a subscription, while the proposed app exposes its verdict logic and sells no recurring entitlement.",
+        "source": "docs/ideation/2026-10-08-skywindow-drone.md#market-evidence"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-skywindow-drone.md#market-evidence",
+        "finding": "The drone flight conditions search returned 29 hand-classified on-job cards of 30, and the enriched shelf contains com.uavforecast at 1M-plus installs with 17,839 displayed reviews and in-app purchases."
+      },
+      "status": "deferred",
+      "deferredReason": "The Open-Meteo client, threshold evaluator and timeline renderer do not exist; this resolves when fixture forecasts produce a ranked window list with every failed threshold named."
+    },
+    {
+      "id": "share-the-brief",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "A pilot exports a plain-language launch brief with the selected window, location time, weather thresholds and safety disclaimer through Android Sharesheet, so the decision can be checked with a visual observer or retained outside the app.",
+      "comparison": {
+        "incumbent": "ai.aloft.airaware",
+        "limitation": "A sampled review asks to submit a future flight window up to 24 hours rather than only the current 60-minute window; a portable planned-window brief addresses the planning handoff without claiming airspace clearance.",
+        "source": "docs/ideation/2026-10-08-skywindow-drone.md#market-evidence"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-08-skywindow-drone.md#market-evidence",
+        "finding": "The sampled ai.aloft.airaware 3-star review asks for a flight window up to 24 hours rather than only now for 60 minutes, and the 18-review conditions sample classified missing-feature complaints 3 times."
+      },
+      "status": "deferred",
+      "deferredReason": "No launch-brief formatter or share intent exists; this resolves when a test asserts an ACTION_SEND intent carries the selected window, threshold results and advisory disclaimer."
+    },
+    {
+      "id": "remind-before-the-window",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "reminder",
+      "promise": "The pilot can schedule a local reminder before a chosen good window, with the last fetched verdict included, so a short viable period is not missed after the planning screen closes.",
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/ideation/2026-10-08-skywindow-drone.md#market-evidence",
+        "finding": "Inferred from the measured complaint requesting future flight windows and from the job's time-bounded weather result: an alert makes a chosen future window actionable without an account."
+      },
+      "status": "deferred",
+      "deferredReason": "No notification channel or scheduled work exists; this resolves when a WorkManager-backed reminder posts through NotificationManagerCompat at the chosen local time."
+    }
+  ]
+}

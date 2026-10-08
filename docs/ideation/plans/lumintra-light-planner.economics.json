@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_only_no_ads",
+  "payingUser": "A landscape or outdoor photographer planning a shoot who buys a one-time sky-and-light session planner from Play.",
+  "paidUnit": "One lifetime unlock of the complete session-brief planner: the combined Sun, Moon, twilight, dark-window, deep-sky catalogue, cloud-cover and satellite-pass brief for a location and date, with share/export and no ads.",
+  "priceUsd": 9.99,
+  "momentOfPayment": "At the Play purchase screen, before the user creates the first session brief for an upcoming shoot.",
+  "distinctnessSentence": "One location-and-date session brief joins a true darkness window, a deep-sky target catalogue, satellite passes and hourly cloud cover that no app on this shelf combines, instead of leaving the user to reconcile a light-planner, a satellite tracker and a weather app.",
+  "evidenceRef": "docs/research/2026-10-08-light-and-sky-session-planner-market.md#2-the-shelf-that-carries-the-money-paid-light-planning-incumbents",
+  "day1RevenuePath": "The first dollar arrives from the paid, ad-free Play listing when the first photographer buys the session planner before an upcoming shoot.",
+  "killCriteria": { "windowDays": 120, "minInstalls": 150, "minRevenueUsd": 1000 },
+  "assumptionsUnverified": [
+    "UNVERIFIED - modelled, not observed: no revenue API exists, so the 500 dollar per month target and the 64 sales per month it implies are modelled from the 9.99 dollar price and assumed deduction rates, and the shelf has not been shown to supply 64 paid sales per month to a new entrant against PhotoPills, Sun Surveyor and the free planetarium giants.",
+    "UNVERIFIED - that the satellite-pass and deep-sky-catalogue additions genuinely pull paying buyers rather than being features nobody asked for: no incumbent on the light-planning shelf sells either, so there is no observed willingness-to-pay, and this is the scout's own UNVERIFIED label for the light-planning buyer.",
+    "UNVERIFIED - that api.met.no, the keyless forecast source chosen after Open-Meteo's free tier was found to be non-commercial-only, is reliable enough for advisory planning: its licence is settled (CC BY 4.0 with attribution, which permits a paid app, and it gives hourly total cloud cover only with no low/mid/high split), but no SLA or rate-limit reading was taken, so its availability under load remains unmeasured.",
+    "UNVERIFIED - that a hand-compiled list of roughly 250 famous deep-sky objects is enough for the buyer this price assumes: the source question is settled - no permissive or public-domain full deep-sky catalogue exists (OpenNGC and HYG are CC-BY-SA-4.0, NGC 2000.0 and Hipparcos/Tycho are explicitly non-commercial, Stellarium's is GPL, and Wikidata, though CC0, was measured to be unenumerable as a catalogue) - so the slot compiles its own object table from facts, which removes the licence risk but narrows coverage from a full 13,000-object catalogue to roughly 250 showpieces, and no buyer evidence exists on whether 250 is enough.",
+    "UNVERIFIED - the Play fee tier: the arithmetic uses the first-1M 15 percent tier, but at a 30 percent fee the same app needs 78 sales per month and 150 installs yield about 965 dollars, below the 1000 dollar revenue floor, which is the deliberate tension the two kill floors expose."
+  ],
+  "capabilities": {
+    "required": [],
+    "deliberatelyNotEnabled": ["billing", "ads"],
+    "note": "INFERRED: purchase_only_no_ads needs no capability because the price is set in Play Console; billing is not enabled (no in-app store) and ads are not enabled (every paid row on the light-planning shelf declares no ads)."
+  },
+  "serverRequired": false,
+  "permissions": "INFERRED: INTERNET only for the keyless forecast and orbital feeds; ACCESS_COARSE_LOCATION only if the user auto-locates instead of entering a saved scout location. No server we would run, so client-secrets.mdc is satisfied by construction.",
+  "archetypesRejected": [
+    { "archetype": "purchase_led_single_unlock", "revenueReason": "UNVERIFIED: it rests entirely on an install-to-purchase conversion rate this recon did not observe, and the light shelf's paid apps are purchase-only standalone listings rather than free-plus-unlock; the shape it copies (ISS Detector Pro) rides a free 5M-plus funnel a new standalone entrant does not have." },
+    { "archetype": "ads_led_utility", "revenueReason": "ON RECORD: banner-only ads imply roughly 5,500 daily active users for 500 dollars per month, which a few-times-a-month session planner cannot hold, and the light shelf shows zero ads on all of its paid rows." },
+    { "archetype": "purchase_led_repeat_sales", "revenueReason": "INFERRED: there is nothing to re-sell - the brief is produced per trip and the forecast and passes are fetched, not sold, so a consumable would be a feature the job does not contain." },
+    { "archetype": "subscription", "revenueReason": "BANNED factory-wide by the owner's instruction and absent from ARCHETYPES; it is not a candidate to weigh." }
+  ]
+}

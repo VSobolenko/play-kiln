@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "slot": "kerfwise-cut-planner",
+  "reconRef": "docs/ideation/2026-10-08-kerfwise-cut-planner.md#naming",
+  "title": "Kerfwise: Cut Planner",
+  "slug": "kerfwise-cut-planner",
+  "applicationId": "com.gexetr.kerfwisecutplanner",
+  "archetype": "carrier_job_noun",
+  "candidates": [
+    { "name": "Cut List", "archetype": "descriptive", "score": 42, "dimensions": { "jobFit": 4.0, "searchability": 5.0, "distinctiveness": 1.0, "radioTest": 5.0, "uniqueness": 1.0, "lengthFit": 5.0, "localeSurvival": 4.0 }, "why": "Negative control: it is the repeated bare category phrase in the measured shelf and says nothing about the project-to-export workflow." },
+    { "name": "Kerfwise: Cut Planner", "archetype": "carrier_job_noun", "score": 82.5, "dimensions": { "jobFit": 4.5, "searchability": 4.0, "distinctiveness": 4.0, "radioTest": 4.5, "uniqueness": 3.0, "lengthFit": 5.0, "localeSurvival": 4.0 }, "why": "Kerf is a real cutting term and the job noun names planning rather than a generic calculator." },
+    { "name": "StockNest", "archetype": "compound", "score": 72, "dimensions": { "jobFit": 3.5, "searchability": 2.5, "distinctiveness": 4.0, "radioTest": 4.5, "uniqueness": 3.5, "lengthFit": 5.0, "localeSurvival": 4.0 }, "why": "It evokes arranging stock but loses cut-planning search language." },
+    { "name": "Cut Packet", "archetype": "metaphorical", "score": 68, "dimensions": { "jobFit": 3.5, "searchability": 3.0, "distinctiveness": 3.0, "radioTest": 5.0, "uniqueness": 3.0, "lengthFit": 5.0, "localeSurvival": 4.5 }, "why": "It names the export but not the planning and optimisation work." },
+    { "name": "Kerfory", "archetype": "coined", "score": 66, "dimensions": { "jobFit": 2.5, "searchability": 2.5, "distinctiveness": 4.0, "radioTest": 3.5, "uniqueness": 3.5, "lengthFit": 5.0, "localeSurvival": 4.0 }, "why": "It is compact but its spelling and meaning are too opaque for a new listing." }
+  ],
+  "rejected": [{ "name": "CutList Optimizer", "reason": "It closely repeats the 1M+-install incumbent title and reduces the app to the optimisation feature rather than the distinct end-to-end woodworking workflow." }],
+  "searchPhrases": ["cut list optimizer", "woodworking project planner", "miter angle calculator woodworking"],
+  "audience": "A hobby woodworker or small-shop cabinet maker converting a furniture idea into parts, cuts, angles, material needs, and a workshop packet.",
+  "rationale": "Kerfwise is a pronounceable cut-specific carrier paired with the planner job phrase, avoiding the incumbent's bare CutList title and the misleading implication that this is only a calculator.",
+  "collisionCheck": "UNVERIFIED: exact-title and close-variant Play searches were not separately run, and USPTO, EUIPO/TMview, WIPO, and Russian class-9 registers were not searched; Play titles are not legal clearance.",
+  "localisationCheck": "Kerfwise: Cut Planner is 21 characters; Kerfwise: план раскроя is 22 characters. Both are under the 30-character cap with at least five characters slack; Russian search quality requires native-speaker review.",
+  "evidence": "docs/ideation/2026-10-08-kerfwise-cut-planner.md#market-evidence",
+  "localizedTitles": { "en-US": "Kerfwise: Cut Planner", "ru-RU": "Kerfwise: план раскроя" },
+  "scoringRubric": { "scale": "0-5 per dimension, weighted", "weights": { "jobFit": 20, "searchability": 15, "distinctiveness": 15, "radioTest": 15, "uniqueness": 15, "lengthFit": 10, "localeSurvival": 10 }, "floor": "chosen >= 70 with no dimension below 2.5; a hard collision check outranks the score" },
+  "assumptionsUnverified": ["Trademark availability for downloadable software class 9 is unverified.", "The proposed Russian phrase needs native-speaker and searchability review.", "A Play title search cannot establish exclusivity."]
+}

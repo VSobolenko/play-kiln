@@ -137,4 +137,4 @@ a program — a rule that only a document asserts is a rule nobody follows.
   `jobCoverage`).
 - `.cursor/rules/differentiator-contract.mdc` — the rule that the promise list is a contract.
 - `.cursor/rules/ideation-gate.mdc` — the budget section, corrected so the surface narrows and the job
-  does not.
+  does not; build time cannot justify losing a required handoff.
