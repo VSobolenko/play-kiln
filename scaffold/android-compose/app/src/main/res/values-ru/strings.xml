@@ -30,9 +30,12 @@
     <string name="settings_language_header" translatable="true">Язык</string>
     <string name="settings_language_title" translatable="true">Язык приложения</string>
     <string name="settings_language_summary" translatable="true">Выберите язык, который использует приложение.</string>
-    <string name="settings_language_summary_legacy" translatable="true">Измените язык в настройках Android.</string>
-    <string name="settings_language_unavailable" translatable="true">На этом устройстве нет настроек языка для приложений.</string>
+    <string name="settings_language_system" translatable="true">Как в системе</string>
+    <string name="action_cancel" translatable="true">Отмена</string>
     <string name="settings_behaviour_header" translatable="true">Поведение</string>
     <string name="settings_haptics_title" translatable="true">Виброотклик</string>
     <string name="settings_haptics_summary" translatable="true">Вибрировать при выполнении основного действия.</string>
+    <string name="settings_about_header" translatable="true">О приложении</string>
+    <string name="settings_rate_title" translatable="true">Оценить приложение</string>
+    <string name="settings_rate_summary" translatable="true">Расскажите, как приложение работает для вас.</string>
 </resources>

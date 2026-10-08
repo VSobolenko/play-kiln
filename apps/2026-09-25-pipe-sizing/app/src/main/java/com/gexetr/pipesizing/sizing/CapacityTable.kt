@@ -2,7 +2,7 @@ package com.gexetr.pipesizing.sizing
 
 /**
  * User-recorded lookup data only. The app owns no capacity-table data; see
- * docs/research/2026-09-25-pipe-sizing-code-source.md.
+ * apps/2026-09-25-pipe-sizing/docs/2026-09-25-pipe-sizing-code-source.md.
  */
 const val USER_RECORDED_MARKER: String = "user-recorded"
 

@@ -144,6 +144,13 @@ dependencies {
     // resolve the same billing-ktx version, so only one billing library is compiled in.
     implementation(libs.capability.billing)
     implementation(libs.billing.ktx)
+    // Compose apps do not use Fragment; this only upgrades the transitive so Play stops flagging 1.1.0.
+    // Path: billing → play-services-basement → fragment:1.1.0 (Play notice 2026-10-05).
+    constraints {
+        api(libs.androidx.fragment) {
+            because("Play notice: Billing→GMS basement pulled fragment:1.1.0; pin latest stable")
+        }
+    }
 
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.androidx.profileinstaller)

@@ -1,0 +1,7 @@
+schema: spec-driven
+created: 2026-10-05
+goal: Ship an offline, no-account rental unit walk a self-managing landlord owns
+  outright — a room-by-room condition record with crash-safe photo drafts, a small
+  portfolio of named units, move-in versus move-out compare per unit, and a signed
+  PDF that leaves the phone without a vendor cloud — unlocked once instead of rented
+  monthly.

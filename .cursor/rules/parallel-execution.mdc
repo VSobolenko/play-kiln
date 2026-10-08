@@ -105,7 +105,7 @@ message unless the row says otherwise.
 |---|---|---|
 | **Recon** | **two or more scouts** (`explore`) over different query sets or shelves, **plus a `money-owner`** pricing what comes back | the shelves do not overlap, and the price of a niche does not depend on which query surfaced it. The scouts never wait for each other; the money owner needs only one candidate to start |
 | **Propose** | a `planner` per candidate the owner shortlists | each proposal is a separate change with its own tasks |
-| **Build** | **one `generator` or Codex worker per bounded file list**, as many as there are disjoint units — UI, domain logic, tests, resources | parallel writers on one file corrupt each other, so the orchestrator partitions the file lists *before* dispatching, never after |
+| **Build** | **one `generator`, Codex, or GitHub Copilot CLI worker per bounded file list**, as many as there are disjoint units — UI, domain logic, tests, resources | parallel writers on one file corrupt each other, so the orchestrator partitions the file lists *before* dispatching, never after |
 | **Verify** | a `verifier` and a **separate** bug hunter (`bugbot` or a `generalPurpose` critic), in contexts other than the builder's | finding defects nobody claimed and testing claims somebody made are different jobs; collapsing them loses the first |
 | **Audit** | `play-auditor` (policy, Data safety, permissions) ∥ `security-review` ∥ `android-debugger` (runtime) | three different questions over the same tree, none of which writes |
 | **Release** | the store pack, the release notes and the review copy as separate writers; `evaluator` grading in parallel | disjoint file sets, and grading must not share a context with authoring |
@@ -118,13 +118,21 @@ one process may build in a given slot directory.
 ## Codex first, not last
 
 - `AGENTS.md` makes Codex a co-lead engineer, not a reviewer. For any bounded engineering task,
-  the order is **Codex worker → Cursor `generator` subagent → orchestrator**.
+  the order is **Codex worker → GitHub Copilot CLI worker → Cursor `generator`
+  subagent → orchestrator**. Codex stays first and Copilot is the **first fallback**, because
+  Copilot is a second peer model family while `generator` is the orchestrator's own family — a less
+  independent check. The order itself is stated once in `harness/dual-agent.md`; this section cites it.
 - Long Codex tasks go through `node scripts/codex-run.mjs run --id <id> --prompt-file <path>`,
   backgrounded so several workers run at once. The MCP `codex` tool is for short dialogue only.
-- Launch several Codex workers **in the same message**, each with a bounded prompt file and a
-  disjoint file list.
-- Falling back to a Cursor subagent is correct **after** a worker reports `RATE_LIMITED`,
-  `CONTEXT_LIMIT`, `AUTH_ERROR`, or has failed twice — not before trying Codex at all.
+- Long Copilot tasks go through `node scripts/copilot-run.mjs run --id <id> --prompt-file <path>`,
+  backgrounded the same way. `node scripts/copilot-run.mjs probe` is the fresh probe that refutes a
+  `BLOCKED(...)` label before a channel is called unavailable.
+- Launch several Codex or Copilot workers **in the same message**, each with a bounded prompt file
+  and a disjoint file list.
+- Falling back is correct **after** a worker reports `RATE_LIMITED` (no retry), `CONTEXT_LIMIT`
+  (reduce to a bounded file list and resume once), `AUTH_ERROR` (record the blocker; do not paste
+  credentials), or has failed the same issue twice — not before trying Codex at all. A Copilot
+  worker's own `RATE_LIMITED` or `AUTH_ERROR` falls through to the Cursor `generator`.
 - Doing a bounded task personally is the last resort. It is acceptable only when the earlier
   owners are blocked, and the reason must be stated.
 
@@ -226,7 +234,8 @@ Four independent things, one round-trip, instead of four turns.
 ## Related
 
 - `AGENTS.md` — agent model and the Codex-first ladder.
-- `harness/dual-agent.md` — role cards, worker lifecycle, fallback ladder.
+- `harness/dual-agent.md` — role cards, worker lifecycle, and the fallback ladder, whose first rung
+  after Codex is now a GitHub Copilot CLI worker; `harness/copilot-workers.md` is the channel's runbook.
 - `.cursor/rules/release-gate.mdc` — the phase-1/phase-2 boundary and why it is a time lever.
 - `.cursor/rules/build-speed.mdc` — why Gradle is the exception.
 - `.cursor/rules/verification-discipline.mdc` — parallelism does not weaken evidence.

@@ -165,6 +165,41 @@ export function harnessFixtures() {
         placeholderHostProblems(['example.com', 'old.example'], ['example.com']).length === 1
       )
 
+      // The publication assist ladder: the three points and the one-click download protocol.
+      const synthPoints = [{ id: 'p', label: 'the synthetic point', pattern: /alpha/ }]
+      const synthExpected = [{ path: 'a.md', what: 'the synthetic doc' }]
+      const synthProtocol = [{ label: 'does the thing', pattern: /gamma/ }]
+      const synthLadder = (docs) =>
+        publishAssistProblems(docs, synthPoints, synthExpected, ['a.md'], synthProtocol)
+
+      add(
+        'a document naming the point has no problems',
+        synthLadder([{ path: 'a.md', text: 'alpha gamma' }]).length === 0
+      )
+      add(
+        'a document missing the point\u2019s token fails',
+        synthLadder([{ path: 'a.md', text: 'beta gamma' }]).length === 1
+      )
+      add(
+        'an expected document that is absent fails',
+        synthLadder([]).length === 1
+      )
+      add(
+        'a protocol document that omits the protocol token fails',
+        synthLadder([{ path: 'a.md', text: 'alpha beta' }]).length === 1
+      )
+      add(
+        'a protocol document outside the protocol list is not asked for the protocol',
+        publishAssistProblems([{ path: 'a.md', text: 'alpha beta' }], synthPoints, synthExpected, [], synthProtocol).length === 0
+      )
+
+      const realDocs = PUBLISH_ASSIST_DOCS.filter(({ path: rel }) => existsSync(path.join(ROOT, rel)))
+      const realText = () =>
+        realDocs.map(({ path: rel }) => ({ path: rel, text: readFileSync(path.join(ROOT, rel), 'utf8') }))
+      add('the real repository states the ladder somewhere', realDocs.length > 0)
+      add('every declared holder of the ladder exists on disk', realDocs.length === PUBLISH_ASSIST_DOCS.length)
+      add('the real documents carry no drift', publishAssistProblems(realText()).length === 0)
+
       // The two below are the same comparison read the other way: they exist so that a fixture set
       // which cannot fail is noticable as one. Both must be true for the inverted predicates above
       // to be meaningful.
@@ -184,7 +219,149 @@ export function harnessFixtures() {
 }
 
 export function harnessChecks() {
-  return [checkApprovalExclusions(), checkPlaceholderHosts(), checkRuleFrontmatter(), checkGroundedClaims()]
+  return [
+    checkApprovalExclusions(),
+    checkPlaceholderHosts(),
+    checkPublishAssists(),
+    checkRuleFrontmatter(),
+    checkGroundedClaims()
+  ]
+}
+
+// ---------------------------------------------------------------------------------------------
+// The publication `[assist]` ladder — the three points where the owner's hand is needed
+// ---------------------------------------------------------------------------------------------
+//
+// The defect this was written from, recorded by the owner on 2026-10-07: the *list* of human-hand
+// points existed in seven documents while the *procedure* for the third one existed in none, so the
+// agent pressed `Скачать коды` repeatedly and the owner dismissed a stack of identical save windows.
+// Two failures with one shape — a list that is a copy in seven places drifts, and a point named
+// without its protocol is a point the next session improvises. Both halves are compared here, and
+// the comparison is only possible because the canonical statement is `.cursor/rules/release-gate.mdc`
+// § "Tooling assists" and every other holder cites it.
+
+/**
+ * The three points, as the token a document must carry to count as naming each one.
+ *
+ * One pattern per point, and each is the phrase the factory actually uses for the point. A stricter
+ * pair was tried first and rejected on measurement: `release.md` and `forge.md` name the store
+ * assist as "store graphics" without the word "input", so the second pattern was testing a house
+ * style rather than the presence of the point — and a check that fails on correct prose is the
+ * false positive this repository's own fixtures exist to prevent. What carries the real weight is
+ * not this table but `PROMO_DOWNLOAD_PROTOCOL` below: naming the download was never the defect.
+ */
+export const PUBLISH_ASSIST_POINTS = [
+  {
+    id: 'aab-chooser',
+    label: 'the AAB/APK file chooser',
+    pattern: /AAB\s*\/\s*APK[^.\n]{0,20}chooser|AAB\s+chooser|bundle chooser|chooser for the (bundle|AAB)/i
+  },
+  {
+    id: 'store-graphics',
+    label: 'the store-graphic file inputs',
+    pattern: /store[-\s]graphic/i
+  },
+  {
+    id: 'promo-download',
+    label: 'the promo-code download',
+    pattern: /promo[-\s]codes?[^.\n]{0,40}download|download[^.\n]{0,40}promo[-\s]codes?/i
+  }
+]
+
+/** Every document that states the ladder. A missing one is a drift, so it is a problem, not a skip. */
+export const PUBLISH_ASSIST_DOCS = [
+  { path: 'AGENTS.md', what: 'the L1 contract' },
+  { path: '.cursor/rules/release-gate.mdc', what: 'the rule' },
+  { path: '.cursor/rules/authorization.mdc', what: 'the authorization rule' },
+  { path: '.cursor/commands/release.md', what: 'the release command' },
+  { path: '.cursor/commands/forge.md', what: 'the forge command' },
+  { path: 'docs/play-publishing-playbook.md', what: 'the runbook' },
+  { path: 'docs/play-console-checklist.md', what: 'the console checklist' }
+]
+
+/**
+ * The documents that must carry the download's full protocol rather than only its name.
+ *
+ * `release-gate.mdc` is the canonical statement and `play-publishing-playbook.md` and
+ * `play-console-checklist.md` are the two a session actually walks the console with; the commands
+ * and the L1 contract name the three points and cite the rule. Requiring the protocol in all seven
+ * would be seven copies to maintain, which is the drift this module exists to stop.
+ */
+export const PUBLISH_PROTOCOL_DOCS = [
+  '.cursor/rules/release-gate.mdc',
+  'docs/play-publishing-playbook.md',
+  'docs/play-console-checklist.md'
+]
+
+/** The one-click protocol, as the tokens each protocol document must carry. */
+export const PROMO_DOWNLOAD_PROTOCOL = [
+  { label: 'name the console control `Скачать коды`', pattern: /Скачать коды/ },
+  { label: 'name the downloaded file `promotion_codes.csv`', pattern: /promotion_codes\.csv/ },
+  {
+    label: 'say the button is pressed exactly once',
+    pattern: /exactly once|clicks? once|only once|click it \*\*once\*\*|один раз/i
+  },
+  { label: 'say to stop and ask the owner', pattern: /stop and ask|stops?, asks? and waits?|ask the owner/i },
+  { label: 'say to wait for the owner', pattern: /wait/i },
+  {
+    label: 'forbid pressing the button a second time',
+    pattern: /never press|not press again|never pressed|repeated press|never a retry|повторн/i
+  }
+]
+
+/**
+ * Problems with a set of documents, as sentences. `docs` is `[{ path, text }]`.
+ *
+ * A document that is expected and absent is a problem: deleting a holder would otherwise make the
+ * check quieter, which is the failure `.cursor/rules/verification-discipline.mdc` names when it says
+ * a rule only a document asserts is a rule nobody follows.
+ */
+export function publishAssistProblems(
+  docs,
+  points = PUBLISH_ASSIST_POINTS,
+  expected = PUBLISH_ASSIST_DOCS,
+  protocolDocs = PUBLISH_PROTOCOL_DOCS,
+  protocol = PROMO_DOWNLOAD_PROTOCOL
+) {
+  const problems = []
+  const byPath = new Map(docs.map((doc) => [doc.path, String(doc.text)]))
+
+  for (const { path: rel, what } of expected) {
+    if (!byPath.has(rel)) {
+      problems.push(`${rel} (${what}) is missing, so the ladder it states cannot be compared`)
+      continue
+    }
+    const text = byPath.get(rel)
+    for (const point of points) {
+      if (!point.pattern.test(text)) {
+        problems.push(`${rel} (${what}) does not name ${point.label}: no match for ${point.pattern.source}`)
+      }
+    }
+    if (protocolDocs.includes(rel)) {
+      for (const token of protocol) {
+        if (!token.pattern.test(text)) problems.push(`${rel} (${what}) does not ${token.label}`)
+      }
+    }
+  }
+
+  return problems
+}
+
+export function checkPublishAssists() {
+  return guard('harness.publishAssists', () => {
+    const docs = []
+    for (const { path: rel } of PUBLISH_ASSIST_DOCS) {
+      const abs = path.join(ROOT, rel)
+      if (existsSync(abs)) docs.push({ path: rel, text: readFileSync(abs, 'utf8') })
+    }
+    const problems = publishAssistProblems(docs)
+    const detail =
+      `${PUBLISH_ASSIST_POINTS.length} assist point(s) in ${PUBLISH_ASSIST_DOCS.length} document(s); ` +
+      `${PUBLISH_PROTOCOL_DOCS.length} carry the one-click download protocol`
+    return problems.length > 0
+      ? fail('harness.publishAssists', problems.join('; '))
+      : pass('harness.publishAssists', detail)
+  })
 }
 
 // ---------------------------------------------------------------------------------------------

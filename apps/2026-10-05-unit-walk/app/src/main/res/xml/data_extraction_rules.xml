@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <!-- API 31+ requires separate cloud-backup and device-transfer policies because users
+         can permit one restoration path without permitting the other. Keep both explicit. -->
+    <cloud-backup>
+        <include domain="sharedpref" path="." />
+        <include domain="file" path="." />
+        <include domain="database" path="." />
+        <exclude domain="sharedpref" path="secrets.xml" />
+        <exclude domain="sharedpref" path="auth_tokens.xml" />
+        <exclude domain="file" path="secrets/" />
+        <exclude domain="file" path="tokens/" />
+        <exclude domain="database" path="secrets.db" />
+        <exclude domain="database" path="tokens.db" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="sharedpref" path="." />
+        <include domain="file" path="." />
+        <include domain="database" path="." />
+        <exclude domain="sharedpref" path="secrets.xml" />
+        <exclude domain="sharedpref" path="auth_tokens.xml" />
+        <exclude domain="file" path="secrets/" />
+        <exclude domain="file" path="tokens/" />
+        <exclude domain="database" path="secrets.db" />
+        <exclude domain="database" path="tokens.db" />
+    </device-transfer>
+</data-extraction-rules>

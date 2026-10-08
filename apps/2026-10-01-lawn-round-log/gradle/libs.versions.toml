@@ -22,6 +22,9 @@ benchmarkMacro = "1.4.1"      # macrobenchmark and baseline-profile test APIs
 # `capabilities/` build. One version for every capability module a slot pins; a slot consumes a
 # capability instead of re-inventing the integration. See capabilities/AGENTS.md.
 playkilnCapability = "1.0.0"
+# Play notice 2026-10-05: fragment:1.1.0 via billing→play-services-basement. Constraint only —
+# Compose apps do not use Fragment UI. See .cursor/rules/dependency-freshness.mdc.
+fragment = "1.9.1"            # forces the Billing→GMS transitive off Play-flagged 1.1.0
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -58,6 +61,7 @@ androidx-profileinstaller = { module = "androidx.profileinstaller:profileinstall
 # enables it in `capabilities.json`; the alias must stay `capability-billing` so the slot gate reads
 # `libs.capability.billing` (scripts/core/manifest.mjs `declaresCapability`).
 capability-billing = { module = "com.gexetr.capability:billing", version.ref = "playkilnCapability" }
+androidx-fragment = { module = "androidx.fragment:fragment", version.ref = "fragment" }
 junit = { module = "junit:junit", version.ref = "junit" }
 androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      UnitWalk's pre-Compose surface colours: the two things the platform reads before Compose has
+      drawn its first frame. Runtime UI colour always comes from `MaterialTheme.colorScheme`
+      (`ui/theme/Color.kt`, `ui/theme/Theme.kt`); nothing in the app reads these at run time.
+
+      Every value is a role of the identity declared in `store/studio.json`, and each name is this
+      slot's own — the scaffold's `playkiln_seed*` (a green that belonged to the scaffold's default
+      seed) is gone, because a colour carries an app's identity and this app's is slate and amber.
+      `playkiln_window_background` keeps the name `res/values/themes.xml` references; its value is the
+      palette's `paper`, which is also the light scheme's `background` role, so the window never
+      flashes a colour the theme does not paint.
+    -->
+    <color name="playkiln_window_background">#F7F9FB</color>
+
+    <!-- The palette, declared for any XML consumer. Same hex as `Color.kt`'s `Brand*` constants and
+         as `store/studio.json`. -->
+    <color name="unitwalk_paper">#F7F9FB</color>
+    <color name="unitwalk_ink">#0E1A24</color>
+    <color name="unitwalk_ink_soft">#16283A</color>
+    <color name="unitwalk_ink_lift">#24425E</color>
+    <color name="unitwalk_amber">#E8A93C</color>
+    <color name="unitwalk_amber_deep">#C87A1E</color>
+    <color name="unitwalk_amber_pale">#F2D3A0</color>
+    <color name="unitwalk_accent_deep">#2E6E80</color>
+    <color name="unitwalk_muted">#A7B4C2</color>
+    <color name="unitwalk_bezel">#14100C</color>
+    <color name="unitwalk_bezel_rim">#8D8174</color>
+
+    <!-- The launcher artwork's own seeds. `unitwalk_seed` is the palette's `accent_deep`, the teal the
+         pack tints with; `unitwalk_seed_dark` is `amber`, the colour the identity reserves for a
+         completed walk. They are named as seeds rather than as roles because that is what they are:
+         inputs to icon rendering, not colours the UI paints with. -->
+    <color name="unitwalk_seed">#2E6E80</color>
+    <color name="unitwalk_seed_dark">#E8A93C</color>
+</resources>

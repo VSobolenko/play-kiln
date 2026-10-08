@@ -17,7 +17,7 @@ import org.junit.Test
  * storage is simply nothing.
  *
  * Every reading below is deliberate synthetic filler ("synthetic-size-a", 1.0, 2.0). None of it is
- * code-table data; the app owns none (`docs/research/2026-09-25-pipe-sizing-code-source.md`).
+ * code-table data; the app owns none (`apps/2026-09-25-pipe-sizing/docs/2026-09-25-pipe-sizing-code-source.md`).
  */
 class TableCodecTest {
 

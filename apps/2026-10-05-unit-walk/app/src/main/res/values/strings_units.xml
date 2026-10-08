@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copy for the portfolio (units) screen, owned by the units worker.
+
+    One file per screen area, so two workers can add copy without editing one another's
+    file. Keys are `units_*` and are mirrored in values-ru/strings_units.xml with real
+    Russian; every name here exists in both locales, because a key with no translation
+    falls back to English (slot.locales) and a placeholder is not a translation
+    (locale.placeholder). No user-facing prose is compiled into Kotlin — every label
+    reaches the screen through stringResource (locale.hardcoded).
+-->
+<resources>
+    <string name="units_title" translatable="true">Units</string>
+    <string name="units_hero_title" translatable="true">Your unit walks</string>
+    <string name="units_hero_subtitle" translatable="true">Room-by-room condition records that survive a restart.</string>
+    <string name="units_hero_stat_label" translatable="true">units</string>
+
+    <string name="units_add_action" translatable="true">Add unit</string>
+    <string name="units_new_unit_title" translatable="true">New unit</string>
+    <string name="units_rename_title" translatable="true">Rename unit</string>
+    <string name="units_name_label" translatable="true">Unit name</string>
+    <string name="units_name_hint" translatable="true">For example, Flat 3B</string>
+    <string name="units_create_action" translatable="true">Create</string>
+    <string name="units_save_action" translatable="true">Save</string>
+
+    <string name="units_empty_title" translatable="true">No units yet</string>
+    <string name="units_empty_body" translatable="true">Add your first rental unit to begin a room-by-room walk.</string>
+
+    <string name="units_walks_label" translatable="true">Walks</string>
+    <string name="units_status_prior_present" translatable="true">Move-in baseline on file</string>
+    <string name="units_status_prior_absent" translatable="true">No move-in baseline yet</string>
+    <string name="units_no_walks_body" translatable="true">No walks recorded yet. Start a move-in, a move-out or a standalone walk.</string>
+    <string name="units_prior_absent_body" translatable="true">Record a move-in walk before a move-out, so the comparison has a baseline to work from.</string>
+
+    <string name="units_continue_action" translatable="true">Continue walk</string>
+    <string name="units_compare_action" translatable="true">Compare</string>
+    <string name="units_rename_action" translatable="true">Rename</string>
+    <string name="units_delete_action" translatable="true">Delete</string>
+
+    <string name="units_delete_title" translatable="true">Delete this unit?</string>
+    <string name="units_delete_body" translatable="true">“%1$s” will be deleted, together with its recorded walks (%2$d). This cannot be undone.</string>
+    <string name="units_delete_confirm_action" translatable="true">Delete</string>
+
+    <string name="units_start_header" translatable="true">Start a walk</string>
+    <string name="units_kind_move_in" translatable="true">Move-in</string>
+    <string name="units_kind_move_out" translatable="true">Move-out</string>
+    <string name="units_kind_single" translatable="true">Standalone walk</string>
+
+    <string name="units_unlock_action" translatable="true">Unlock</string>
+    <string name="units_about_action" translatable="true">About</string>
+
+    <string name="units_created_message" translatable="true">Unit created.</string>
+    <string name="units_renamed_message" translatable="true">Unit renamed.</string>
+    <string name="units_deleted_message" translatable="true">Unit deleted.</string>
+    <string name="units_name_required_message" translatable="true">Enter a name for the unit.</string>
+    <string name="units_not_found_message" translatable="true">That unit is no longer available.</string>
+    <string name="units_walk_started_message" translatable="true">Walk started.</string>
+    <string name="units_limit_reached_message" translatable="true">Free covers one unit. Unlock to add more.</string>
+    <string name="units_not_saved_message" translatable="true">Could not save the change. Please try again.</string>
+</resources>

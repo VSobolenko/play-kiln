@@ -62,7 +62,7 @@ data class TableRowDraft(
  * The table being typed.
  *
  * No cell has a default and no row exists until the user adds one, because the app owns no table
- * content (`docs/research/2026-09-25-pipe-sizing-code-source.md`). The marker is not a field: it is
+ * content (`apps/2026-09-25-pipe-sizing/docs/2026-09-25-pipe-sizing-code-source.md`). The marker is not a field: it is
  * the shared `USER_RECORDED_MARKER` constant, so the label the result view renders cannot drift.
  */
 data class TableDraft(

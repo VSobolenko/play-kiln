@@ -221,22 +221,86 @@ def release_note_overflow(locale: str, note: str) -> str | None:
     return f"the {locale} note is {len(note)} code points, over the {limit} code point limit"
 
 
-def release_note_prompts() -> dict[str, str]:
-    """The unfinished-note prompt per supported locale, built from the measured cap.
+# --------------------------------------------------------------------------------------------
+# Finished-product store copy — ban unfinished / early-release / roadmap tone
+# --------------------------------------------------------------------------------------------
+#
+# The factory ships a finished, tested product.  Release notes and listing short/full descriptions
+# that apologise for being early, WIP or "coming soon" teach users the opposite.  Phrases live here
+# so the generator prompts and ``scripts/store/validate.py`` cannot drift; the failure sentence is
+# built from the matched phrase (verification-discipline: never a hand-written rule restated twice).
 
-    A freshly generated note is a prompt rather than text, and it has to read as unfinished -- the
-    failure being prevented is a pack that looked complete while a field Play demands had no
-    prepared text at all.
+STORE_COPY_TONE_BANS: tuple[str, ...] = (
+    "first release",
+    "initial release",
+    "первый выпуск",
+    "первый релиз",
+    "coming soon",
+    "still in development",
+    "under development",
+    "we will add",
+    "скоро добав",
+    "в разработке",
+)
+
+# Short tokens matched with word boundaries so "wip" does not fire inside unrelated words.
+STORE_COPY_TONE_BAN_TOKENS: tuple[str, ...] = ("wip",)
+
+_STORE_COPY_TOKEN_RE = re.compile(
+    r"(?<!\w)(?:" + "|".join(re.escape(token) for token in STORE_COPY_TONE_BAN_TOKENS) + r")(?!\w)",
+    re.IGNORECASE,
+)
+
+
+def banned_store_copy_tone(text: str) -> str | None:
+    """Failure sentence when ``text`` uses unfinished-product tone, or ``None``.
+
+    Applied to release-note bodies and listing ``shortDescription`` / ``fullDescription``.  The
+    remedy is named in the sentence so a FAIL row tells the author what to write instead.
+    """
+    if not text or not text.strip():
+        return None
+    lowered = text.casefold()
+    for phrase in STORE_COPY_TONE_BANS:
+        if phrase.casefold() in lowered:
+            return (
+                f"banned unfinished-product tone ({phrase!r}); describe what the user can do now "
+                "and invite Play reviews for wishes — never early/WIP/roadmap-apology language "
+                "(.cursor/rules/store-copy.mdc)"
+            )
+    token_hit = _STORE_COPY_TOKEN_RE.search(text)
+    if token_hit is not None:
+        matched = token_hit.group(0)
+        return (
+            f"banned unfinished-product tone ({matched!r}); describe what the user can do now "
+            "and invite Play reviews for wishes — never early/WIP/roadmap-apology language "
+            "(.cursor/rules/store-copy.mdc)"
+        )
+    return None
+
+
+def release_note_prompts() -> dict[str, str]:
+    """The seed prompt per supported locale (wrapped in ``TODO-HUMAN`` by the renderer).
+
+    The ``TODO-HUMAN`` marker is what makes a fresh file look unfinished as a *field*; the prompt
+    body itself must teach finished-product posture — what works now — plus a short invite for Play
+    review feedback.  The prompt must not itself contain a ``STORE_COPY_TONE_BANS`` substring, or a
+    fresh pack would fail its own tone check.
     """
     limit = release_note_limit()
     defaults = {
         "en-US": (
-            "Describe what changed for the user in this release. Play shows this text on the store "
-            f"page; the limit is {limit} characters."
+            "Describe what the user can do now in this finished, ready-to-use product — concrete "
+            "capabilities, not a roadmap or an apology for missing work. Invite users to leave "
+            "wishes and issues in Play reviews so community feedback can guide improvements. Play "
+            f"shows this on the store page; the limit is {limit} characters."
         ),
         "ru-RU": (
-            "Опишите, что изменилось для пользователя в этом выпуске. Play показывает этот текст на "
-            f"странице приложения; лимит — {limit} символов."
+            "Опишите, что пользователь может сделать сейчас в готовом продукте — конкретные "
+            "возможности, без обещаний «добавим позже» и без тона незавершённости. Пригласите "
+            "оставить пожелания и проблемы в отзывах Play, чтобы сообщество помогало планировать "
+            "улучшения. Play показывает текст на странице приложения; лимит — "
+            f"{limit} символов."
         ),
     }
     ordered: dict[str, str] = {}

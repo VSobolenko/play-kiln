@@ -69,7 +69,21 @@
       "promises": 7,
       "status": "building",
       "createdAt": "2026-10-02T18:13:07.645Z",
-      "updatedAt": "2026-10-03T12:27:14.438Z"
+      "updatedAt": "2026-10-04T19:05:00.000Z",
+      "submittedNote": "11 changes sent for Play review from Console publishing overview on 2026-10-04; page reads Изменения на проверке. Status stays building until the listing is live — published is only after Play approval."
+    },
+    {
+      "id": "unit-walk",
+      "dir": "apps/2026-10-05-unit-walk",
+      "name": "UnitWalk",
+      "applicationId": "com.gexetr.unitwalk",
+      "idea": "UnitWalk — a crash-safe, no-account rental unit walk for self-managing landlords: room-by-room photo condition records that survive a process kill, move-in versus move-out compare per unit, and a signed PDF shared from the phone.",
+      "archetype": "purchase_led_single_unlock",
+      "promises": 5,
+      "status": "building",
+      "createdAt": "2026-10-05T16:46:47.380Z",
+      "updatedAt": "2026-10-06T17:35:00.000Z",
+      "releaseNote": "Implementation, tests, on-device verification and the signed release artifacts (dist/ APK + AAB) are complete, and the owner's release approval is recorded for this revision. Status stays building until the listing is live — published is only after Play approval."
     }
   ]
 }

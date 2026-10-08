@@ -1,13 +1,12 @@
 package com.gexetr.scaffold.ui.settings
 
-import android.content.ActivityNotFoundException
+import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
-import android.provider.Settings
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,34 +16,41 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gexetr.scaffold.R
 import com.gexetr.scaffold.data.AppSettings
+import com.gexetr.scaffold.data.ReviewPromptStore
 import com.gexetr.scaffold.data.ThemeMode
+import com.gexetr.scaffold.ui.review.InAppReview
 import com.gexetr.scaffold.ui.theme.PlayKilnTheme
-import kotlinx.coroutines.launch
+import java.util.Locale
+import org.xmlpull.v1.XmlPullParser
 
 /**
  * The settings route: state wiring only, so the screen below stays a pure function of its arguments.
@@ -67,20 +73,10 @@ fun SettingsRoute(
 }
 
 /**
- * The settings surface.
+ * The settings surface: appearance, in-app language, behaviour, and Rate app (In-App Review).
  *
- * Three groups, and every row changes something the app actually reads — a control that changes
- * nothing is worse than no control, because it teaches the user that Settings is decoration.
- *
- * Accessibility decisions here are deliberate and are the reason the rows are shaped this way:
- *
- * - each row is one focus target, not two. The `Switch` and the `RadioButton` are drawn with a null
- *   handler and the *row* carries the click, so a screen reader announces one selectable item with
- *   its label, its value and its role instead of a label and an unlabelled control;
- * - every row declares `heightIn(min = 48.dp)`, so the whole row is the touch target rather than the
- *   trailing control alone;
- * - every user-visible string is a `stringResource`, so the screen is translated with the rest of the
- *   app, and the language row is the route to the picker that changes which one is used.
+ * Language stays inside the app via [LanguagePickerDialog] + [applyAppLanguage] — never
+ * `ACTION_APP_LOCALE_SETTINGS`. Rate uses Play's ReviewManager first; store listing is fallback only.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,9 +89,10 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val snackbarHostState = remember { SnackbarHostState() }
+    val activity = context.findActivity()
     val coroutineScope = rememberCoroutineScope()
-    val languageUnavailable = stringResource(R.string.settings_language_unavailable)
+    val reviewStore = remember(context) { ReviewPromptStore(context) }
+    var languagePickerOpen by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -112,7 +109,6 @@ fun SettingsScreen(
                 },
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -139,7 +135,8 @@ fun SettingsScreen(
                 )
             }
 
-            val dynamicColorAvailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+            val dynamicColorAvailable =
+                android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
             SwitchRow(
                 title = stringResource(R.string.settings_dynamic_color_title),
                 supporting = stringResource(
@@ -159,24 +156,12 @@ fun SettingsScreen(
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_language_title)) },
                 supportingContent = {
-                    Text(
-                        stringResource(
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                R.string.settings_language_summary
-                            } else {
-                                R.string.settings_language_summary_legacy
-                            },
-                        ),
-                    )
+                    Text(stringResource(R.string.settings_language_summary))
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 48.dp)
-                    .clickable {
-                        if (!context.openAppLanguageSettings()) {
-                            coroutineScope.launch { snackbarHostState.showSnackbar(languageUnavailable) }
-                        }
-                    },
+                    .clickable { languagePickerOpen = true },
             )
 
             SectionHeader(stringResource(R.string.settings_behaviour_header))
@@ -188,7 +173,103 @@ fun SettingsScreen(
                 enabled = true,
                 onCheckedChange = onHapticsChange,
             )
+
+            SectionHeader(stringResource(R.string.settings_about_header))
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.settings_rate_title)) },
+                supportingContent = {
+                    Text(stringResource(R.string.settings_rate_summary))
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp)
+                    .clickable {
+                        if (activity != null) {
+                            InAppReview.requestReviewFromSettings(
+                                activity = activity,
+                                store = reviewStore,
+                                scope = coroutineScope,
+                            )
+                        }
+                    },
+            )
         }
+    }
+
+    if (languagePickerOpen) {
+        val declaredTags = remember { declaredLanguageTags(context) }
+        val appliedTag = AppCompatDelegate.getApplicationLocales().let { locales ->
+            if (locales.isEmpty) null else locales.get(0)?.toLanguageTag()
+        }
+        LanguagePickerDialog(
+            declaredTags = declaredTags,
+            appliedTag = appliedTag,
+            onSelect = { tag ->
+                languagePickerOpen = false
+                applyAppLanguage(tag)
+            },
+            onDismiss = { languagePickerOpen = false },
+        )
+    }
+}
+
+@Composable
+private fun LanguagePickerDialog(
+    declaredTags: List<String>,
+    appliedTag: String?,
+    onSelect: (String?) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(R.string.settings_language_title)) },
+        text = {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                LanguageOptionRow(
+                    label = stringResource(R.string.settings_language_system),
+                    selected = appliedTag == null,
+                    onClick = { onSelect(null) },
+                )
+                for (tag in declaredTags) {
+                    LanguageOptionRow(
+                        label = languageDisplayName(tag),
+                        selected = appliedTag == tag,
+                        onClick = { onSelect(tag) },
+                    )
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.action_cancel))
+            }
+        },
+    )
+}
+
+@Composable
+private fun LanguageOptionRow(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .selectable(
+                selected = selected,
+                role = Role.RadioButton,
+                onClick = onClick,
+            )
+            .heightIn(min = 48.dp)
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        RadioButton(selected = selected, onClick = null)
+        Text(text = label, style = MaterialTheme.typography.bodyLarge)
     }
 }
 
@@ -202,13 +283,6 @@ private fun SectionHeader(title: String) {
     )
 }
 
-/**
- * One mutually exclusive choice.
- *
- * The radio is drawn with a null handler and the row carries `selectable` plus `Role.RadioButton`, so
- * the accessible item is the labelled row rather than an unlabelled control beside it. `onClick` is
- * required to be non-null here, which is why the role is stated explicitly instead of being inferred.
- */
 @Composable
 private fun ThemeModeRow(
     label: String,
@@ -229,13 +303,6 @@ private fun ThemeModeRow(
     )
 }
 
-/**
- * One on/off setting.
- *
- * The switch is drawn with a null handler and the row carries `toggleable`, so one tap, one focus
- * target and one announcement cover both the label and the control. A disabled row keeps its
- * supporting text, which is where the reason it is unavailable is written.
- */
 @Composable
 private fun SwitchRow(
     title: String,
@@ -273,35 +340,53 @@ private fun ThemeMode.labelResource(): Int = when (this) {
 }
 
 /**
- * Opens Android's own per-app language settings for this app.
+ * Switches the app's own language without leaving the app.
  *
- * The system picker is the right picker, and this app is in a position to use it: it declares
- * `android:localeConfig`, so Android 13 and newer already lists its languages and remembers the
- * choice in the same place the picker writes. A second picker built inside the app would be a second
- * source of truth for one value, which is how an app ends up in a language the user did not choose.
- *
- * Below Android 13 there is no per-app picker to open, so the app's own settings page is opened
- * instead and the row's supporting text says so. Pretending the two are the same screen would be the
- * honest-looking defect.
- *
- * Returns false when the platform has nothing to handle the intent, so the caller can say so rather
- * than leaving a tap with no visible effect.
+ * Null means follow the phone. AppCompat is the published backport; on Android 13+ it writes the
+ * same framework store the system would. The system settings screen is deliberately not opened.
  */
-internal fun Context.openAppLanguageSettings(): Boolean {
-    val packageUri = Uri.fromParts("package", packageName, null)
-    val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        Intent(Settings.ACTION_APP_LOCALE_SETTINGS).setData(packageUri)
+internal fun applyAppLanguage(languageTag: String?) {
+    val locales = if (languageTag == null) {
+        LocaleListCompat.getEmptyLocaleList()
     } else {
-        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(packageUri)
+        LocaleListCompat.forLanguageTags(languageTag)
     }
-    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    return try {
-        startActivity(intent)
-        true
-    } catch (_: ActivityNotFoundException) {
-        false
-    }
+    AppCompatDelegate.setApplicationLocales(locales)
 }
+
+/** Language tags from `res/xml/locales_config.xml` — the picker's data, not a system localeConfig. */
+private fun declaredLanguageTags(context: Context): List<String> {
+    return runCatching {
+        val parser = context.resources.getXml(R.xml.locales_config)
+        val tags = mutableListOf<String>()
+        while (parser.next() != XmlPullParser.END_DOCUMENT) {
+            if (parser.eventType != XmlPullParser.START_TAG) continue
+            if (parser.name != LOCALE_TAG) continue
+            val tag = parser.getAttributeValue(ANDROID_NAMESPACE, LOCALE_NAME_ATTRIBUTE)
+            if (!tag.isNullOrBlank()) tags.add(tag)
+        }
+        parser.close()
+        tags
+    }.getOrDefault(emptyList())
+}
+
+private fun languageDisplayName(tag: String): String {
+    val locale = Locale.forLanguageTag(tag)
+    return locale.getDisplayName(locale).replaceFirstChar { first -> first.titlecase(locale) }
+}
+
+private fun Context.findActivity(): Activity? {
+    var current: Context = this
+    while (current is android.content.ContextWrapper) {
+        if (current is Activity) return current
+        current = current.baseContext
+    }
+    return null
+}
+
+private const val ANDROID_NAMESPACE: String = "http://schemas.android.com/apk/res/android"
+private const val LOCALE_TAG: String = "locale"
+private const val LOCALE_NAME_ATTRIBUTE: String = "name"
 
 @Preview(name = "Settings light", showBackground = true, widthDp = 412, heightDp = 892)
 @Composable

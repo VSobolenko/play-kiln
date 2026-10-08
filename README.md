@@ -22,7 +22,7 @@ node scripts/kiln-status.mjs
 | 1 | Idea from measured demand, plus an economics plan and a promise contract | Agent, per `.cursor/rules/ideation-gate.mdc` |
 | 1 | Approve the plan and its price | Human checkpoint 1 |
 | 1 | `/ship` → `scripts/new-slot.mjs --economics <path> --differentiators <path>` | Factory |
-| 1 | Codex workers implement | Factory |
+| 1 | Codex workers implement (GitHub Copilot CLI is a second worker channel) | Factory |
 | 1 | Unit tests plus `verify.mjs --build` (debug APK, no signing) | Factory |
 | 1 | **Install the debug APK and approve the release** | Human checkpoint 1.5 |
 | 2 | `/release` → `prepare-release.mjs` → `store/render.py` → `media-capture.mjs` | Factory |

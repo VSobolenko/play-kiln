@@ -32,9 +32,12 @@
     <string name="settings_language_header" translatable="true">Language</string>
     <string name="settings_language_title" translatable="true">App language</string>
     <string name="settings_language_summary" translatable="true">Choose the language this app uses.</string>
-    <string name="settings_language_summary_legacy" translatable="true">Change the language in Android settings.</string>
-    <string name="settings_language_unavailable" translatable="true">This device has no per-app language settings.</string>
+    <string name="settings_language_system" translatable="true">System default</string>
+    <string name="action_cancel" translatable="true">Cancel</string>
     <string name="settings_behaviour_header" translatable="true">Behaviour</string>
     <string name="settings_haptics_title" translatable="true">Vibration feedback</string>
     <string name="settings_haptics_summary" translatable="true">Vibrate when you run the main action.</string>
+    <string name="settings_about_header" translatable="true">About</string>
+    <string name="settings_rate_title" translatable="true">Rate app</string>
+    <string name="settings_rate_summary" translatable="true">Tell others how this app works for you.</string>
 </resources>

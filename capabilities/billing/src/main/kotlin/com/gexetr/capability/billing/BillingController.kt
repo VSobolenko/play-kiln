@@ -48,6 +48,23 @@ interface BillingController {
      */
     suspend fun restore(): PlayKilnResult<Entitlements>
 
+    /**
+     * Play's own formatted price for [product] — e.g. `"$9.99"` or `"9,99 ₽"` — or `null` when it
+     * cannot be answered.
+     *
+     * The amount a user is charged is localized by Play to the account's country and currency, so an
+     * app that prints its own literal shows dollars to a user who will be charged rubles. This is the
+     * accessor a slot reads to display the real amount, and it is declared here with a default of
+     * `null` so every implementor — the real controller, the fake, a preview, a demo build — answers
+     * without being forced to invent a price it does not know.
+     *
+     * `null` means **unknown**: never "free", never a guessed string. The product may not be
+     * configured yet, the billing service may be disconnected, or the query may time out, and a
+     * caller's correct response to all three is the same — keep its own fallback rather than state an
+     * amount Play will not charge. It is not an error.
+     */
+    suspend fun formattedPrice(product: ProductId): String? = null
+
     /** Launches the purchase flow for [product] and grants or credits on success. */
     suspend fun purchase(product: ProductId): PlayKilnResult<Entitlements>
 

@@ -41,6 +41,12 @@ export const FACTORY_BASELINE = '2026-09-30'
 export const CONTENT_COLOUR_BASELINE = '2026-10-02'
 
 /**
+ * The date the In-App Review rule starts applying — the day the owner required soft rating prompts
+ * via Play's ReviewManager (2026-10-05). Slots created before that date carry findings as notes.
+ */
+export const IN_APP_REVIEW_BASELINE = '2026-10-05'
+
+/**
  * The date the specification rule starts applying, which is the day the defect was measured.
  *
  * The owner's rule is that every application is authored inside an OpenSpec change, and it was
@@ -92,7 +98,11 @@ export function proposalBaselineApplies(date) {
  */
 const CHECK_BASELINES = Object.freeze({
   'uiux.content-colour': CONTENT_COLOUR_BASELINE,
-  'slot.spec': SPEC_BASELINE
+  'slot.spec': SPEC_BASELINE,
+  'review.dependency': IN_APP_REVIEW_BASELINE,
+  'review.api': IN_APP_REVIEW_BASELINE,
+  'review.throttle': IN_APP_REVIEW_BASELINE,
+  'review.settings': IN_APP_REVIEW_BASELINE
 })
 
 /** The date a check id's baseline starts applying, defaulting to the factory's own. */

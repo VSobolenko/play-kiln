@@ -154,6 +154,13 @@ dependencies {
     implementation(libs.capability.core)
     implementation(libs.capability.ads)
     implementation(libs.capability.billing)
+    // Compose apps do not use Fragment; this only upgrades the transitive so Play stops flagging 1.1.0.
+    // Path: billing → play-services-basement → fragment:1.1.0 (Play notice 2026-10-05).
+    constraints {
+        api(libs.androidx.fragment) {
+            because("Play notice: Billing→GMS basement pulled fragment:1.1.0; pin latest stable")
+        }
+    }
 
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

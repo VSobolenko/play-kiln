@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Русский перевод экрана сравнения «заселение — выселение». Ключи те же, что в
+  values/strings_compare.xml, и их набор совпадает один в один.
+-->
+<resources>
+    <string name="compare_title" translatable="true">Заселение и выселение</string>
+    <string name="compare_back" translatable="true">Назад</string>
+    <string name="compare_hero_subtitle" translatable="true">Различия по комнатам</string>
+    <string name="compare_rooms_label" translatable="true">Комнаты</string>
+    <string name="compare_kind_move_in" translatable="true">Заселение</string>
+    <string name="compare_kind_move_out" translatable="true">Выселение</string>
+    <string name="compare_kind_single" translatable="true">Обычный обход</string>
+    <string name="compare_no_prior_short" translatable="true">Нет предыдущего отчёта</string>
+    <string name="compare_no_prior_notice" translatable="true">Для этого объекта нет предыдущего отчёта о заселении, поэтому показан только текущий обход. Исходное состояние не придумывается.</string>
+    <string name="compare_column_prior" translatable="true">Заселение</string>
+    <string name="compare_column_current" translatable="true">Выселение</string>
+    <string name="compare_condition_good" translatable="true">Хорошее</string>
+    <string name="compare_condition_worn" translatable="true">Изношено</string>
+    <string name="compare_condition_damaged" translatable="true">Повреждено</string>
+    <string name="compare_condition_missing" translatable="true">Отсутствует</string>
+    <string name="compare_condition_not_recorded" translatable="true">Не записано</string>
+    <string name="compare_condition_supporting" translatable="true">Каждое состояние показано словом и формой, а не только цветом.</string>
+    <string name="compare_record_label" translatable="true">Состояние комнаты</string>
+    <string name="compare_note_label" translatable="true">Заметка к комнате</string>
+    <string name="compare_note_placeholder" translatable="true">Что изменилось?</string>
+    <string name="compare_save_delta" translatable="true">Сохранить различие</string>
+    <string name="compare_delta_saved" translatable="true">Различие сохранено.</string>
+    <string name="compare_save_failed" translatable="true">Не удалось сохранить различие.</string>
+    <string name="compare_walk_not_found" translatable="true">Этот обход больше не существует.</string>
+    <string name="compare_open_report" translatable="true">Открыть отчёт</string>
+    <string name="compare_loading" translatable="true">Загрузка сравнения…</string>
+</resources>

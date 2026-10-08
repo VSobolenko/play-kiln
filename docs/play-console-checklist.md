@@ -1,15 +1,18 @@
 # Play Console submission checklist
 
 This is the runbook for taking an **approved** revision of a slot through Google Play Console to the
-terminal state `Изменения на проверке`. It is read by the builder at phase 2 and by the owner at
-checkpoint 2. It carries the exact console strings, field caps and page names recorded from the live
-RU console on **2026-09-29**, so a human who has never opened the console can follow it and an agent
-can be checked against it. Nothing here is a substitute for the owner's approval, and nothing here
-is a program: the console ladder is a recorded runbook, not code.
+terminal state `Изменения на проверке` and Publish. It is read by the agent at phase 2 after
+checkpoint 2 (publish authorization). It carries the exact console strings, field caps and page
+names recorded from the live RU console on **2026-09-29**, so the agent can walk it and be checked
+against it. Nothing here is a substitute for the owner's publish yes, and nothing here is a program:
+the console ladder is a recorded runbook, not code.
 
-**Markers.** `[human]` — an action only the owner may take. `[console]` — a console action a person
-or an agent performs. `[verify]` — a read-only check. Exactly one step is `[human]` — the
-store-graphics upload; it is listed again in §10.
+**Markers.** `[assist]` — a tooling assist where the owner's hand is required (a file chooser or a
+download the sandbox cannot set or receive). `[console]` — a console action the agent performs after
+the publish yes. `[verify]` — a read-only check. `[assist]` covers store-graphic file inputs, the
+AAB/APK file chooser when `DOM.setFileInputFiles` is denied, and the promo-code download (§5, §10);
+listed again in §10. Publish and every form are `[console]`. The three points and their protocol are
+stated once in `.cursor/rules/release-gate.mdc` § "Tooling assists".
 
 **Sources.** `docs/play-publishing-playbook.md` §5.1 (the live walk), the archived console model
 `docs/play-console-observations.json` — the frozen body of the deleted `scripts/lib/console-form.json`,
@@ -43,15 +46,16 @@ recorded 2026-10-03: «В нашем заводе есть правило, чт�
 - [ ] In the observed run both were already ticked and the dialog's primary button was disabled —
       that disabled button is the evidence that nothing remained to save there.
 
-### B. The five store-graphic fields `[human]`
+### B. The five store-graphic fields `[assist]`
 
-- [ ] `Магазин → Основная информация о магазине` (`/main-store-listing`): upload the icon, the
-      feature graphic, and the phone / 7-inch / 10-inch screenshot sets — five required image fields,
+- [ ] Agent opens `Магазин → Основная информация о магазине` (`/main-store-listing`), names absolute
+      paths, asks the owner to drop files into the open chooser / fields for the icon, the feature
+      graphic, and the phone / 7-inch / 10-inch screenshot sets — five required image fields,
       recorded in the console model as `icon`, `featureGraphic`, `phoneShots`, `tablet7Shots` and
-      `tablet10Shots`.
+      `tablet10Shots` — then continues the ladder.
 - [ ] The pack already renders every one of them and `scripts/media-capture.mjs` produces the
       screenshots; the upload itself cannot be done by the sandboxed browser the factory drives (see
-      §10).
+      §10). That is why the assist exists — not why the owner owns publication.
 - [ ] While the dashboard row `Настройте страницу приложения` is open, the submit button in §2
       stays disabled. The observed session cleared it exactly this way.
 - [ ] The same page carries the listing's text and identity fields an agent can paste:
@@ -315,6 +319,16 @@ tags have to fit:
       only move forward; the count is a final decision. Download codes promptly with
       `Скачать коды` (`promotion_codes.csv`) — after the end date the page stops showing them. The
       file is **never committed**: a code is a free unlock of what the slot sells.
+- [ ] **The download is an `[assist]`, and it is one click — never a retry loop.** `Скачать коды`
+      answers with the browser's own save window, which is outside the page and cannot be accepted by
+      the agent. So: click it **exactly once**, then **stop and ask** — «Нажмите „Скачать“ в
+      открывшемся окне и подтвердите, когда файл сохранится» — and **wait**; do not press again, do
+      not navigate away, do not reload. On the confirmation, read the downloaded
+      `promotion_codes.csv` (browser default download folder; on Windows usually
+      `%USERPROFILE%\Downloads`) and use it. If no window opened, say so and hand the owner the manual
+      path: page `.../promotions`, control `Скачать коды`, file `promotion_codes.csv` — and read the
+      path he reports. A repeated press opens repeated save windows; that is the defect this row
+      exists to prevent (owner's instruction, recorded 2026-10-07).
 - [ ] License testers are an **account-level** list (`Настройки → Тестирование лицензий`), different
       from track testers. An account that is only an internal tester on a track is charged real
       money.
@@ -396,32 +410,45 @@ it blocks nothing.
 
 ---
 
-## 10. What stays human — one step, and the declarations the agent now performs
+## 10. What stays `[assist]` — file inputs and one download; everything else is the agent's
 
-Every other step of this ladder is console-mandatory and unattended: an agent may walk it when the
-owner has directed it and is observing. What an agent may do on its own initiative — and what it may
-never do without an instruction — is stated once in `.cursor/rules/authorization.mdc`.
+Every form, declaration answer, release step, submit and Publish is console-mandatory and
+**agent-owned** once the owner has answered yes to «may I proceed to publish?» (checkpoint 2). What
+an agent may never do without that instruction is stated once in `.cursor/rules/authorization.mdc`.
+The owner does not fill Console while the agent watches (owner's decision, recorded 2026-10-04).
 
-1. **Uploading the five store-graphic fields (§1.B).** The field is a hidden `input[type=file]` that
-   only appears after `Добавить объекты`, and the sandboxed browser the factory drives denies
-   `DOM.setFileInputFiles`. This is an **unsolved tooling limitation, deliberately recorded as a
-   limitation and not as a policy.** A human — or a driver that owns the file chooser — performs this
-   step and nothing else.
-2. **The two first-publication declarations (§1.A)** — `Правила программы для разработчиков` and
+**The three `[assist]` points are not the same kind of act.** Two push a file *into* the console and
+are hidden `input[type=file]` controls (store graphics appear only after `Добавить объекты`), which
+the sandboxed browser refuses to fill; the third pulls a file *out* through a native save window.
+This is an **unsolved tooling limitation, deliberately recorded as a limitation and not as a
+policy.** The agent opens the page, names absolute paths, asks, waits, then continues — the owner
+supplies the hand; the agent still owns the release.
+
+1. **`[assist]` — store-graphic file inputs (§1.B) and the AAB/APK file chooser.** The agent opens
+   the page, names absolute paths (`store/assets/…`, or the staged AAB under `dist/`), asks, waits,
+   then continues.
+2. **`[assist]` — the promo-code download (§5).** `Скачать коды` on `.../promotions` is clicked
+   **once**; the agent then **stops, asks and waits** — «нажмите „Скачать“ в открывшемся окне и
+   подтвердите» — reads `promotion_codes.csv` from where the browser saved it, and continues. It
+   never presses the button again, and if no window opened it hands the owner the manual path
+   (page `.../promotions`, control `Скачать коды`, file `promotion_codes.csv`) and waits for the
+   location. A repeated press opens repeated save windows; that defect is why the rule is written
+   (owner's instruction, recorded 2026-10-07).
+3. **The two first-publication declarations (§1.A)** — `Правила программы для разработчиков` and
    `Экспортное законодательство США` — are performed by the **agent**, not the owner, once the slot
-   carries a recorded release approval: the approval is the human checkpoint, and the click is not.
+   carries a recorded release approval: the approval is the product checkpoint, and the click is not.
    They are accepted **once per app** rather than per release. The export declaration is a
    certification about encryption the app uses: every slot uses encryption whether or not it imports
    crypto code, and the **annual BIS self-classification question is an open obligation**, not
    settled law.
 
-The release approval itself (checkpoint 2) precedes this ladder: the agent has already installed the
-debug APK on the connected phone and exercised the app itself, the handoff carries its observed
-evidence (device serial, artifact hash, what appeared on screen), and the owner's act is the
-**product** decision — whether this is the app to ship — stated in his own words, which is recorded
-with `node scripts/approve-release.mjs --slot <slug> --note "<the owner's own words>"`. The rules for
-that record — the owner's own words only, never inferred, never recorded to unblock a step — are
-stated once in `.cursor/rules/release-gate.mdc`.
+Two authorizations precede this ladder. **Checkpoint 1.5** is the product decision — whether this
+is the app to ship — recorded with
+`node scripts/approve-release.mjs --slot <slug> --note "<the owner's own words>"` after the agent
+has already installed and exercised the debug APK (device serial, artifact hash, what appeared).
+**Checkpoint 2** is the publish yes that authorises this walk. The rules for both — the owner's own
+words only, never inferred, never recorded to unblock a step — are stated once in
+`.cursor/rules/release-gate.mdc`.
 
 ---
 

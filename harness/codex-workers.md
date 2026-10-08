@@ -41,6 +41,16 @@ Use `read-only` for Verify. Use `workspace-write` for normal Build/Store work.
 `danger-full-access` is available but should not be used unless the task explicitly
 requires and authorizes it.
 
+## Windows sandbox PATH
+
+For worker and launcher processes, the MSIX application-execution-alias directory
+is removed from `PATH`: the restricted-token sandbox cannot run its aliases. On
+this machine, `pwsh.exe` and `winget.exe` exist only through that directory, so
+those commands are unavailable to filtered children. Set
+`PLAYKILN_CODEX_KEEP_PATH=1` to preserve a worker's inherited `PATH` (use `0` or
+`false` to keep filtering). The launcher skips the filter when its Codex command
+uses `--sandbox danger-full-access`.
+
 ## Prompt contract
 
 A worker prompt must stand alone. Include these sections in this order:

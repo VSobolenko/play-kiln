@@ -17,14 +17,18 @@ text box** and separates them with a tag whose name is the language, the tags on
 
 ```text
 <en-US>
-First release. Laneset builds a paced swim set from your minutes, pool length, focus, strokes to avoid and gear on the deck.
+Laneset builds a paced swim set from your minutes, pool length, focus, strokes to avoid and gear on the deck.
 
 The 400 m and 200 m trials set your threshold pace per 100 m, so every interval has a target time. Share the set as text or print a card. Works offline; one purchase, no subscription, no ads.
+
+Have a wish or hit a snag? Leave it in a Play review — we read those and plan from them.
 </en-US>
 <ru-RU>
-Первый выпуск. Laneset собирает тренировку по минутам, бассейну, задаче дня, гребкам и инвентарю.
+Laneset собирает тренировку по минутам, бассейну, задаче дня, гребкам и инвентарю.
 
 Два заплыва на время, 400 и 200, задают пороговый темп на 100 м, и у каждого отрезка есть целевое время. Тренировку можно отправить текстом или распечатать карточкой. Работает без сети, одна покупка, без подписки и рекламы.
+
+Есть пожелание или проблема? Напишите в отзыве Play — мы читаем комментарии и планируем улучшения по ним.
 </ru-RU>
 ```
 

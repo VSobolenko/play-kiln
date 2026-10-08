@@ -77,6 +77,21 @@ check(
   diagnose('3. **Rate limits / quota model**, and whether there are hard concurrency limits an app must handle.'),
   null,
 );
+check(
+  'a tight diff-marker Copilot sign-in regression-test call is not AUTH_ERROR',
+  diagnose("+check('Copilot sign-in error is AUTH_ERROR', diagnose('ERROR: not logged in. Please sign in.'), 'AUTH_ERROR')"),
+  null,
+);
+check(
+  'an indented diff-marker quoted usage-limit assertion is not RATE_LIMITED',
+  diagnose("+  diagnose(\"check('request failed: usage limit', 'RATE_LIMITED')\"),"),
+  null,
+);
+check(
+  'a context-line quoted usage-limit assertion is not RATE_LIMITED',
+  diagnose("check('request failed: usage limit', 'RATE_LIMITED')"),
+  null,
+);
 check('empty input yields no signal', diagnose(''), null);
 check('ordinary output yields no signal', diagnose('Wrote 3 files. All tests pass.'), null);
 // The sandbox failure is the newest signal, and it has the newest failure mode to guard against: a
@@ -98,6 +113,11 @@ console.log('\n=== recall: real errors must still be caught ===');
 check(
   'the real usage-limit line is RATE_LIMITED',
   diagnose("ERROR: You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/codex/pricing) or try again later."),
+  'RATE_LIMITED',
+);
+check(
+  'a diff-added real usage-limit diagnostic is RATE_LIMITED',
+  diagnose("+ ERROR: You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/codex/pricing) or try again later."),
   'RATE_LIMITED',
 );
 check(

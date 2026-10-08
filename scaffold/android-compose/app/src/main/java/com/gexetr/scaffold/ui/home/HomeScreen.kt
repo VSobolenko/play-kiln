@@ -1,5 +1,8 @@
 package com.gexetr.scaffold.ui.home
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,8 +30,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -38,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gexetr.scaffold.R
+import com.gexetr.scaffold.data.ReviewPromptStore
+import com.gexetr.scaffold.ui.review.InAppReview
 import com.gexetr.scaffold.ui.theme.PlayKilnTheme
 
 @Composable
@@ -71,12 +78,27 @@ fun HomeScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val haptics = LocalHapticFeedback.current
+    val context = LocalContext.current
+    val activity = remember(context) { context.findActivity() }
+    val reviewStore = remember(context) { ReviewPromptStore(context) }
+    val reviewScope = rememberCoroutineScope()
     val snackbarText = when (state.snackbarMessage) {
         HomeSnackbarMessage.ActionCompleted -> stringResource(R.string.home_snackbar_completed)
         HomeSnackbarMessage.AlreadyCompleted -> {
             stringResource(R.string.home_snackbar_already_completed)
         }
         null -> null
+    }
+
+    // Soft In-App Review after the first successful primary action (see in-app-review.mdc).
+    LaunchedEffect(state.snackbarMessage) {
+        if (state.snackbarMessage == HomeSnackbarMessage.ActionCompleted && activity != null) {
+            InAppReview.maybeSoftPromptAfterSuccess(
+                activity = activity,
+                store = reviewStore,
+                scope = reviewScope,
+            )
+        }
     }
 
     LaunchedEffect(snackbarText) {
@@ -200,6 +222,15 @@ private fun HomeContent(
         }
         Spacer(Modifier.height(4.dp))
     }
+}
+
+private fun Context.findActivity(): Activity? {
+    var current: Context = this
+    while (current is ContextWrapper) {
+        if (current is Activity) return current
+        current = current.baseContext
+    }
+    return null
 }
 
 @Preview(name = "Home light", showBackground = true, widthDp = 412, heightDp = 892)

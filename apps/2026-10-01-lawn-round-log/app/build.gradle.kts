@@ -141,6 +141,13 @@ dependencies {
     // The one-time unlock's purchase path. Enabled in the slot's `capabilities.json`, so the money
     // plan (`purchase_led_single_unlock`) and the shipped build declare the same capability.
     implementation(libs.capability.billing)
+    // Compose apps do not use Fragment; this only upgrades the transitive so Play stops flagging 1.1.0.
+    // Path: billing → play-services-basement → fragment:1.1.0 (Play notice 2026-10-05).
+    constraints {
+        api(libs.androidx.fragment) {
+            because("Play notice: Billing→GMS basement pulled fragment:1.1.0; pin latest stable")
+        }
+    }
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.profileinstaller)

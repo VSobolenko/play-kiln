@@ -48,16 +48,17 @@ from stage 5, and the approval lapses by itself if the app's sources change.
 | 7 | `python scripts/store/render.py` | Factory | complete store pack |
 | 8 | `scripts/media-capture.mjs` | Factory | real-device screenshots, when a device is available |
 | 9 | `scripts/verify.mjs --build` and `/eval` | Factory + Cursor | Objective gates plus an independent verdict; repair until green |
-| 10 | Play Console submission, walked from the dashboard to `Изменения на проверке` | Cursor, driven under the owner's observation; **Human checkpoint 2** covers one step only | The ladder is `docs/play-publishing-playbook.md` §5.1 and was measured live 2026-09-29. Every declaration answer, the release form, the save, the submit and the pre-review check are performed by the agent, and the two first-publication legal declarations are ticked by the agent too, once the recorded approval exists — the approval is the human checkpoint, not the click (owner's decision, recorded 2026-10-03). Exactly one step stays human: **uploading the five store-graphic fields** (the sandboxed browser cannot set a `file` input — an unsolved tooling limitation, deliberately recorded as such and not as a policy). Submitting at all still requires the stage-5 approval record, and the ladder is a recorded runbook, **not yet code** — no script performs those clicks today |
+| 10 | Play Console submission through Publish | Cursor, after **Human checkpoint 2** (publish authorization) | After phase-2 artifacts are ready, the agent asks «may I proceed to publish?»; on the owner's yes, the agent walks `docs/play-publishing-playbook.md` §5.1 end to end — every declaration answer, Data safety / content rating, the release form, save, submit, pre-review check, and Publish. Checkpoint 1.5 (stage 5) authorised the release pipeline; checkpoint 2 authorises the console submission. The owner is yes/no and corrections, not the person who fills Console while the agent watches (owner's decision, recorded 2026-10-04). Tooling assists only, and there are exactly three: store-graphic file inputs, the AAB/APK file chooser, and the **promo-code download** (`Скачать коды` on `.../promotions`) — the agent opens the page, names absolute paths, asks, waits, then continues; at the download it clicks the button **once**, then asks the owner to confirm the browser's save window and waits, never pressing repeatedly. The two first-publication declarations are ticked under the stage-5 approval (owner's decision, recorded 2026-10-03). The protocol is `.cursor/rules/release-gate.mdc` § "Tooling assists". The ladder is a recorded runbook, **not yet code** — no script performs those clicks today |
 | 11 | Earn | Human + the **money owner** role | `node scripts/check-outcomes.mjs --slot <slug>` verdicts the plan's own `killCriteria` against a recorded reading from `apps/<slot>/store/outcomes.json`; `NO-DATA` and `TOO-EARLY` are honest states, `MISSED` names the kill command, and `node scripts/kiln-status.mjs --kill <slug> --reason "<why>"` records the decision. A slot that misses its own thresholds is archived, and the archive is a decision with the numbers in it rather than an abandoned directory |
 
 One idea must take one command through this pipeline. Never silently upload, commit
-an edit, or act in the console without the owner's direction and his ability to watch. An
+an edit, or act in the console without the owner's explicit publish yes (checkpoint 2). An
 approval is recorded only from the owner's own
 words, never inferred from an agent's confidence, and never recorded to unblock a step. The
-distinction the first real submission measured on 2026-09-29: an agent **may** walk the console ladder
-when the owner has directed it and is observing, and it may not do any of it silently, on its own
-initiative, or in place of the approval stage.
+distinction measured on 2026-09-29 and corrected on 2026-10-04: an agent **must** walk the console
+ladder and publish once the owner has said yes — it may not do any of it silently, on its own
+initiative, or instead of asking; and it may not hand the console labour back to the owner after
+that yes.
 
 **The factory's product is revenue, not green gates.** Both phases measure form: that the
 APK builds, that the store pack is complete and truthfully described, that the assets exist and
@@ -209,7 +210,12 @@ by `new-slot.mjs`, `verify.mjs`, and `kiln-status.mjs`; do not restate it.
 ## Agent model
 
 Cursor is the orchestrator and verifier. Codex is a co-lead engineer with its own
-worker channel and writes production code; it is not merely a reviewer.
+worker channel and writes production code; it is not merely a reviewer. **GitHub Copilot CLI is a
+second worker channel beside it** — a peer model family, driven by `node scripts/copilot-run.mjs`,
+whose command surface mirrors `scripts/codex-run.mjs` (`run`/`status`/`list`/`last`/`log`/`resume`/`probe`).
+It is an **additional** channel, not a replacement: Codex stays the co-lead, and Copilot exists so a
+bounded task has a second peer family to be handed to when Codex is limited. Both channels run the
+same channel-agnostic five role cards under `harness/roles/`.
 
 **The chat orchestrates; the work runs in subagents.** The chat window is a control plane: it
 decomposes, dispatches, adjudicates and reports. Its own writing is limited to answering, reading in
@@ -229,18 +235,23 @@ frontmatter, no `description`, or neither `alwaysApply: true` nor `globs`.
 
 - Run long Codex tasks with `node scripts/codex-run.mjs`; the MCP `codex` tool is
   only for short dialogue because long MCP requests time out.
+- Run long Copilot tasks with `node scripts/copilot-run.mjs run --id <id> --prompt-file <path>`,
+  backgrounded the same way. Its state lives under `.kiln/copilot/`, and it is a **subagent-like peer**
+  that must be told so in its prompt.
 - Give each worker a bounded role and file list. Parallel code writers must have
   disjoint files or separate worktrees.
-- If a worker reports `RATE_LIMITED`, hand the task to the Cursor `generator`
-  subagent. Follow `harness/dual-agent.md` for other failure signals.
+- If a worker reports `RATE_LIMITED`, hand the task to the next owner on the fallback ladder in
+  `harness/dual-agent.md` — a GitHub Copilot CLI worker is the first fallback for the Codex-class
+  failures — rather than to the orchestrator's own family first.
 - A ledger `BLOCKED(...)` label, including a wall of historical labels, is not evidence
   that Codex is unavailable. Before assigning a Cursor `generator`, run a fresh
   read-only, trivial `tier-smoke`-shaped Codex probe in this session at the tier the
   task will use; record its observed exit in the handoff.
 - Apply fallback per failed worker task, not to the channel globally: `RATE_LIMITED`
-  does not retry and goes to `generator`; `CONTEXT_LIMIT` reduces scope and resumes
-  once, then goes to `generator`; `AUTH_ERROR` records the blocker and goes to
-  `generator`. A blocked worker does not disable Codex while the fresh probe answers.
+  does not retry; `CONTEXT_LIMIT` reduces scope and resumes once; `AUTH_ERROR` records the blocker.
+  Each hands the task to the next rung of the ladder in `harness/dual-agent.md` — a GitHub Copilot
+  CLI worker first, then the Cursor `generator` subagent. A blocked worker does not disable Codex
+  while the fresh probe answers.
 - Historical exit records predate the current classifier and may preserve a classifier
   bug rather than the worker's fate. Check the deliverable on disk before trusting a
   label; see “2026-09-23 - the failure classifier reported finished work as blocked,
@@ -253,7 +264,8 @@ frontmatter, no `description`, or neither `alwaysApply: true` nor `globs`.
   (`docs/grounded-claims.md`).
 - Adjudicate disagreements against OpenSpec, this file, and observable evidence.
 
-Worker ledger verdicts from `node scripts/codex-run.mjs list`:
+Worker ledger verdicts from `node scripts/codex-run.mjs list` — the Copilot channel's
+`node scripts/copilot-run.mjs list` reports the same four, because both import `scripts/lib/codex-ledger.mjs`:
 
 | Verdict | Written when |
 |---|---|
@@ -267,7 +279,8 @@ files on disk and never assume the task landed. Liveness is a heuristic — a re
 pid can leave a dead worker reported `running` — so `running` alone is not proof of
 life.
 
-Operator details: [`harness/codex-workers.md`](harness/codex-workers.md).
+Operator details: [`harness/codex-workers.md`](harness/codex-workers.md) for the Codex channel and
+[`harness/copilot-workers.md`](harness/copilot-workers.md) for the GitHub Copilot CLI channel.
 
 ### The worker loop is the default, not an optimisation
 
@@ -530,6 +543,8 @@ DESIGN.md                         L1 visual guidance
 .kiln/                            gitignored worker state, prompts, logs, and ledgers
 openspec/                         factory specs and per-slot changes
 harness/                          protocols, ambition, surface map, and lessons
+harness/codex-workers.md          the Codex worker channel runbook
+harness/copilot-workers.md        the GitHub Copilot CLI worker channel runbook
 apps/<date>-<slug>/               isolated Android projects
 scaffold/android-compose/         new-slot template
 registry/apps.json                slot registry
@@ -559,8 +574,9 @@ scripts/check-16k.py              measures 16 KB page-size readiness from the bu
 docs/slot-economics.md            the economics.json contract and its archetype/capability pairing
 docs/slot-differentiators.md      the differentiators.json contract: promises, proofs, owner decisions
 docs/signing.md                   signing runbook: where the upload key lives, how it is made, the backup, rotation (rule: .cursor/rules/signing-keys.mdc)
-docs/ideation/                    idea proposals awaiting the owner's decision
+docs/ideation/                    open proposal queue (after scaffold, proposal + plans/<slug>.* move to apps/<slot>/docs/)
 scripts/codex-run.mjs             durable Codex worker runner
+scripts/copilot-run.mjs           durable GitHub Copilot CLI worker runner (a second worker channel)
 scripts/lib/release-approval.mjs  source digest + owner approval: the two-phase gate
 scripts/approve-release.mjs       record, check, or revoke the owner's release approval
 scripts/core/                     the checks, as importable functions with inline fixtures
@@ -573,6 +589,7 @@ scripts/core/device.mjs           the on-device run as a record: serial, artifac
 scripts/core/icons.mjs            the iconography split as a sensor: the mark a slot owns, and the licence-cleared UI icon sets it borrows
 scripts/core/palette.mjs          the palette as a measurement: WCAG contrast, and the accent's hue and chroma against Material 3's own derivation
 scripts/core/index.mjs            the check registry: every check the one entry point runs
+scripts/core/budget.mjs            the size baselines' one maintenance command: --check reads, --record records a measurement
 scripts/verify.mjs                the single verification entry point: one process, one report
 scripts/store/model.py            the pack's data model and every numeric limit, resolved once
 scripts/store/render.py           the pack's write path; requires the recorded approval
@@ -614,6 +631,12 @@ node scripts/verify.mjs --slot <slug> --build            # phase-1 evidence: sou
 node scripts/verify.mjs --only invariants,assets         # a subset, for a fast inner loop
 node scripts/verify.mjs --json                           # the same report as JSON
 node scripts/kiln-status.mjs                             # factory health + each slot's phase
+
+# `core.size` compares the measured tree against recorded baselines inside a band, so an ordinary edit
+# does not fail it. `--check` reads and writes nothing; `--record` is the remedy a failure names: it
+# sets each baseline past its band to the measurement and appends a machine-written revision entry.
+node scripts/core/budget.mjs --check                     # the measurement, the band, and the verdict
+node scripts/core/budget.mjs --record                    # re-baseline a row that is past its band
 
 # the money stages, also in-process as core checks but still runnable on their own
 node scripts/check-economics.mjs --slot <slug>           # money stage: plan vs enabled capabilities
@@ -669,6 +692,12 @@ node scripts/test-play-reviews.mjs
 node scripts/test-client-secrets.mjs
 python scripts/test-store-studio-completeness.py          # needs local store/captures (gitignored)
 node scripts/verify-reviews-sensor.mjs                    # review sensor vs live Play pages
+
+# the worker channels — not checks; the probe is what refutes a BLOCKED(...) label
+node scripts/copilot-run.mjs probe                        # fresh probe: observed exit code + answer
+node scripts/copilot-run.mjs status [--id <id>]           # running / done / failed / classified blocked
+node scripts/copilot-run.mjs last --id <id> --chars 4000  # the worker's final answer
+node scripts/copilot-run.mjs list                         # every Copilot worker's verdict
 ```
 
 `docs/factory-checks.md` is the inventory: every check that exists, the exact command that runs it,
@@ -786,17 +815,21 @@ fail is not a check: the manner of its failure is part of the change record in
  paid for it and the one limitation (a reused Gradle daemon keeps its original temp until it is
  stopped) are `.cursor/rules/workspace-hygiene.mdc`.
 - Archive or kill failed attempts; do not turn PlayKiln into one product repo.
-- Human approval is mandatory for releasing at all: the stage-5
- approval record is the owner's own words and is never inferred. What is **not** human any more is
- pressing the console's controls — `docs/play-publishing-playbook.md` §5.1 records the submission
- ladder as walked by the agent on 2026-09-29, and only the graphics upload stays with the owner. The
- two first-publication attestations are ticked by the agent once the approval is recorded, because
- the approval is the human checkpoint and not the click — the owner's decision, recorded 2026-10-03:
- «В нашем заводе есть правило, что перед публикацией необходимо одобрение владельца. Собственно
- говоря, в то время и я проверяю проверку всех вот этих политик, и только после моего одобрения я
- говорю разрешить публикацию. Поэтому, если я разрешил публикацию, значит эти галочки можно уже
- автоматически нажимать. Потому что все проверки необходимые для публикации проводятся до начальной
- публикации всего приложения.»
+- Human approval is mandatory for releasing and for publishing: the stage-5
+ approval record is the owner's own words and is never inferred, and checkpoint 2 is a separate
+ publish yes («may I proceed to publish?»). What is **not** the owner's labour is pressing the
+ console's controls — `docs/play-publishing-playbook.md` §5.1 is walked by the agent end to end,
+ including Publish, once that yes exists. Tooling assists only, and there are exactly three:
+ store-graphic file inputs, the AAB/APK file chooser, and the promo-code download when the sandbox
+ cannot set `input[type=file]` or receive a native save window (owner's decision, recorded 2026-10-04).
+ The download is clicked **once** before the ask — the agent then waits for the owner to confirm the
+ file saved — never pressed repeatedly (owner's instruction, recorded 2026-10-07). The two first-publication attestations are ticked by the agent once
+ the stage-5 approval is recorded, because the approval is the product checkpoint and not the click —
+ the owner's decision, recorded 2026-10-03: «В нашем заводе есть правило, что перед публикацией
+ необходимо одобрение владельца. Собственно говоря, в то время и я проверяю проверку всех вот этих
+ политик, и только после моего одобрения я говорю разрешить публикацию. Поэтому, если я разрешил
+ публикацию, значит эти галочки можно уже автоматически нажимать. Потому что все проверки
+ необходимые для публикации проводятся до начальной публикации всего приложения.»
 - A slot is never scaffolded without a validated `economics.json`; the money stage is not optional.
 - A slot is never scaffolded without a validated `differentiators.json` either, and it is authored
   from recon **before** the UI. Every promise starts `deferred`, and `verify.mjs` fails while

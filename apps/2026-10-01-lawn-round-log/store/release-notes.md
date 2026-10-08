@@ -20,6 +20,6 @@ its listing.
 
 ```text
 <en-US>
-First release of Lawn Round Log. The round, one-tap visits (mowed, skipped or rained off), the rained-off day push, per-customer owed balances and CSV export all work offline with no account. Free for up to eight customers; one purchase unlocks the whole round for good, with no subscription.
+Lawn Round Log is ready to use. Run the round with one-tap visits (mowed, skipped or rained off), get the rained-off day push, track per-customer owed balances and export CSV — all offline, no account. Free for up to eight customers; one purchase unlocks the whole round for good, with no subscription. Have a wish or hit a snag? Leave it in a Play review — we read those and plan from them.
 </en-US>
 ```

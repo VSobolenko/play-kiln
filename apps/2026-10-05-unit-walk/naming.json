@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "slot": "unit-walk",
+  "reconRef": "apps/2026-10-05-unit-walk/docs/2026-10-05-rental-unit-walk.md#name",
+  "title": "UnitWalk",
+  "slug": "unit-walk",
+  "applicationId": "com.gexetr.unitwalk",
+  "archetype": "coined",
+  "candidates": [
+    {
+      "name": "UnitWalk",
+      "archetype": "coined",
+      "score": 81,
+      "dimensions": {
+        "jobFit": 4.5,
+        "searchability": 3.5,
+        "distinctiveness": 4.5,
+        "radioTest": 5,
+        "uniqueness": 4.5,
+        "lengthFit": 5,
+        "localeSurvival": 4.5
+      },
+      "why": "Eight letters that name the exact act: walk the unit. One spelling, easy to say once on a radio test, survives ru as a Latin brand with 22 characters of slack under Play's 30-character cap, and is not the bare category noun every incumbent already bids on. Gives up some head-term searchability on purpose so the listing is not Rental Inspection."
+    },
+    {
+      "name": "LeaseWalk",
+      "archetype": "compound",
+      "score": 76,
+      "dimensions": {
+        "jobFit": 4,
+        "searchability": 3.5,
+        "distinctiveness": 4,
+        "radioTest": 4.5,
+        "uniqueness": 4,
+        "lengthFit": 5,
+        "localeSurvival": 3.5
+      },
+      "why": "Compound of lease plus walk; pronounceable and on-job. Loses to UnitWalk because lease is a legal noun that drifts toward contract apps, and in ru lease does not help a landlord searching for an inspection walk."
+    },
+    {
+      "name": "RoomWalk Report",
+      "archetype": "carrier_job_noun",
+      "score": 74,
+      "dimensions": {
+        "jobFit": 4,
+        "searchability": 4,
+        "distinctiveness": 3.5,
+        "radioTest": 4,
+        "uniqueness": 3.5,
+        "lengthFit": 4.5,
+        "localeSurvival": 3
+      },
+      "why": "Carrier plus job noun keeps Report as a typed token. Loses length slack in longer locales and reads generic next to every checklist card on the SERP."
+    },
+    {
+      "name": "Deposit Walk",
+      "archetype": "evocative",
+      "score": 71,
+      "dimensions": {
+        "jobFit": 3.5,
+        "searchability": 3.5,
+        "distinctiveness": 4,
+        "radioTest": 4.5,
+        "uniqueness": 3.5,
+        "lengthFit": 5,
+        "localeSurvival": 3.5
+      },
+      "why": "Names why the landlord cares — the deposit — which is evocative and honest. Loses because the app's job is the condition walk, not deposit accounting, and deposit apps already crowd adjacent SERPs."
+    },
+    {
+      "name": "Condition Book",
+      "archetype": "descriptive",
+      "score": 68,
+      "dimensions": {
+        "jobFit": 3.5,
+        "searchability": 3,
+        "distinctiveness": 3,
+        "radioTest": 4.5,
+        "uniqueness": 3,
+        "lengthFit": 5,
+        "localeSurvival": 3.5
+      },
+      "why": "Descriptive of the artifact. Below the 70 floor on distinctiveness and uniqueness once scored honestly against the field of inspection checklist titles."
+    },
+    {
+      "name": "Rental Inspection",
+      "archetype": "descriptive",
+      "score": 42,
+      "dimensions": {
+        "jobFit": 2,
+        "searchability": 4,
+        "distinctiveness": 1,
+        "radioTest": 5,
+        "uniqueness": 1,
+        "lengthFit": 4.5,
+        "localeSurvival": 2.5
+      },
+      "why": "Negative control: the bare category phrase on the SERP. Every serious incumbent already bids on these two words; a new listing with no reviews cannot own them."
+    }
+  ],
+  "rejected": [
+    {
+      "name": "Rental Inspection",
+      "reason": "Negative control and hard reject: bare category noun pair that spends Play's strongest ranking field on the head term RentCheck and Property Inspect already own."
+    },
+    {
+      "name": "Inspection Checklist",
+      "reason": "Generic checklist wording that collides conceptually with Checkbuster and every HSE audit card on the same SERP; fails distinctiveness and uniqueness."
+    },
+    {
+      "name": "Condition Book",
+      "reason": "Scored 68, below the 70 floor; descriptive but not ownable enough against the inspection title field."
+    }
+  ],
+  "searchPhrases": [
+    "landlord inspection app",
+    "move in move out inspection",
+    "rental property inspection checklist"
+  ],
+  "audience": "A self-managing landlord with a few units who walks move-in and move-out themselves and needs photo-backed condition evidence that survives the report without an enterprise login.",
+  "rationale": "UnitWalk wins as a short coined carrier that names the act without bidding on the category head term. LeaseWalk and RoomWalk Report were serious runners; Rental Inspection is kept as the negative control that must lose.",
+  "collisionCheck": "Play search for UnitWalk and LeaseWalk was not exhaustively trademark-cleared. Search phrases used in recon returned no live title exactly UnitWalk among the measured cards on 2026-10-05. A clean Play search is not trademark clearance.",
+  "localisationCheck": "en-US title UnitWalk is 8 characters (22 slack). ru-RU keeps UnitWalk as the Latin brand (8 characters, 22 slack). No emoji, no ALL CAPS, one spelling.",
+  "evidence": "apps/2026-10-05-unit-walk/docs/2026-10-05-rental-unit-walk.md#name",
+  "localizedTitles": {
+    "en-US": "UnitWalk",
+    "ru-RU": "UnitWalk"
+  },
+  "scoringRubric": {
+    "scale": "0-5 per dimension, weighted",
+    "weights": {
+      "jobFit": 20,
+      "searchability": 15,
+      "distinctiveness": 15,
+      "radioTest": 15,
+      "uniqueness": 15,
+      "lengthFit": 10,
+      "localeSurvival": 10
+    },
+    "floor": "chosen 81 out of 100 with no dimension below 2.5; negative control Rental Inspection loses on distinctiveness and uniqueness"
+  },
+  "assumptionsUnverified": [
+    "Trademark clearance for UnitWalk in class 9 is UNVERIFIED — no register was queried.",
+    "Whether com.gexetr.unitwalk is free on Play is UNVERIFIED.",
+    "Scoring is a judgement, not a measurement."
+  ]
+}

@@ -53,10 +53,63 @@
 //
 // And a missing input is never a pass: `docs/ideation/` holding no proposal document is `UNVERIFIED`,
 // not a green line about declarations for nothing, following `scripts/core/spec.mjs`.
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
+//
+// ORPHAN PLANS. Successful apps may later leave the factory (`Ctrl+X`) with their own tree, so a
+// plan that still sits under `docs/ideation/plans/<slug>.*` after `apps/<date>-<slug>/` exists is
+// trash the cut-out developer never sees. `ideas.orphanPlans` fails that leftover. The open queue
+// under `docs/ideation/` keeps only proposals that have not been scaffolded yet.
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
+import { SCRATCH_DIR } from '../lib/scratch.mjs'
 import { PROPOSAL_CAPABILITY_BASELINE, proposalBaselineApplies } from './baseline.mjs'
 import { expectEqual, expectTrue, fail, guard, pass, ROOT, runFixtures, unverified, VERDICT } from './lib.mjs'
+
+/** A plan leftover filename: `<slug>.{economics|differentiators|naming}.json`. */
+const PLAN_FILE = /^([a-z0-9]+(?:-[a-z0-9]+)*)\.(economics|differentiators|naming)\.json$/
+
+/** A living product slot directory: `apps/<YYYY-MM-DD>-<slug>/`. */
+const SLOT_DIR = /^(\d{4}-\d{2}-\d{2})-(.+)$/
+
+/**
+ * Slugs that already have a slot directory under `apps/`, so their ideation plans must have moved.
+ *
+ * Driven over an arbitrary root so the fixture can inject a leftover without touching the real tree.
+ */
+export function livingSlotSlugs(root = ROOT) {
+  const appsDir = path.join(root, 'apps')
+  const slugs = new Set()
+  if (!existsSync(appsDir)) return slugs
+  for (const entry of readdirSync(appsDir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue
+    const match = entry.name.match(SLOT_DIR)
+    if (match) slugs.add(match[2])
+  }
+  return slugs
+}
+
+/**
+ * Plan files still under `docs/ideation/plans/` for a slug that already has `apps/<date>-<slug>/`.
+ *
+ * Each problem names the leftover path and the remedy, so a FAIL is an instruction rather than a
+ * label. An absent plans directory is not a problem — there is nothing left to orphan.
+ */
+export function orphanPlanProblems(root = ROOT) {
+  const plansDir = path.join(root, 'docs', 'ideation', 'plans')
+  if (!existsSync(plansDir)) return []
+  const slugs = livingSlotSlugs(root)
+  if (slugs.size === 0) return []
+  const problems = []
+  for (const name of readdirSync(plansDir)) {
+    const match = name.match(PLAN_FILE)
+    if (!match) continue
+    const slug = match[1]
+    if (!slugs.has(slug)) continue
+    problems.push(
+      `docs/ideation/plans/${name} remains after apps/*-${slug}/ was scaffolded — move it to apps/<slot>/docs/`
+    )
+  }
+  return problems.sort()
+}
 
 /**
  * The twelve capabilities every proposal answers, with the API/permission facts a declaration is
@@ -154,7 +207,9 @@ export const NON_PROPOSAL_DOCUMENTS = Object.freeze({
   '2026-10-02-leader-head-to-head-tap-to-say.md': 'a head-to-head comparison of one recipe proposed elsewhere; it proposes no recipe',
   '2026-10-02-target-vs-kill-floor.md': "an analysis of the plans' kill floors; it proposes no recipe",
   '2026-10-02-verification-lane-b.md': 'a verification report on another lane; it proposes no recipe',
-  '2026-10-02-verification-lane-c.md': 'a verification report on another lane; it proposes no recipe'
+  '2026-10-02-verification-lane-c.md': 'a verification report on another lane; it proposes no recipe',
+  '2026-10-05-scout-b-hobby-health-refusal.md': 'a measured refusal of the hobby/narrow-health shelf; it proposes no recipe of its own',
+  '2026-10-05-scout-b-money.md': "a money reading of another document's refused candidates; it proposes no recipe"
 })
 
 /** Escapes a literal for a `RegExp`, so a capability noun can never be read as a pattern. */
@@ -398,6 +453,20 @@ export function ideasChecks() {
       if (problems.length > 0) return fail('ideas.capabilities', `${problems.join('; ')} — ${summary}`)
       if (gated.length > 0) return fail('ideas.capabilities', gated.join('; '))
       return pass('ideas.capabilities', summary)
+    }),
+    guard('ideas.orphanPlans', () => {
+      const problems = orphanPlanProblems(ROOT)
+      if (problems.length > 0) {
+        return fail(
+          'ideas.orphanPlans',
+          `${problems.length} leftover plan file(s) for scaffolded slot(s): ${problems.join('; ')}`
+        )
+      }
+      const slugs = livingSlotSlugs(ROOT)
+      return pass(
+        'ideas.orphanPlans',
+        `${slugs.size} living slot slug(s) checked; docs/ideation/plans/ holds no leftover for any of them`
+      )
     })
   ]
 }
@@ -546,6 +615,50 @@ export function ideasFixtures() {
         expectEqual(verdict.verdict, VERDICT.PASS, `verdict (${verdict.detail})`)
         expectTrue(verdict.detail.includes('proposal document(s) read'), verdict.detail)
         expectTrue(verdict.detail.includes(`${PROPOSAL_CAPABILITY_BASELINE} baseline`), verdict.detail)
+      }
+    ])
+
+    cases.push([
+      'MUST FAIL — a leftover docs/ideation/plans/<slug>.economics.json beside apps/<date>-<slug>/ is reported',
+      () => {
+        mkdirSync(SCRATCH_DIR, { recursive: true })
+        const root = mkdtempSync(path.join(SCRATCH_DIR, 'orphan-plans-'))
+        try {
+          mkdirSync(path.join(root, 'apps', '2026-10-04-demo-slug'), { recursive: true })
+          mkdirSync(path.join(root, 'docs', 'ideation', 'plans'), { recursive: true })
+          writeFileSync(path.join(root, 'docs', 'ideation', 'plans', 'demo-slug.economics.json'), '{}\n')
+          const problems = orphanPlanProblems(root)
+          expectEqual(problems.length, 1, 'problems')
+          expectTrue(problems[0].includes('docs/ideation/plans/demo-slug.economics.json'), problems[0])
+          expectTrue(problems[0].includes('apps/*-demo-slug/'), problems[0])
+        } finally {
+          rmSync(root, { recursive: true, force: true })
+        }
+      }
+    ])
+
+    cases.push([
+      'NEGATIVE CONTROL — a plan for a slug with no apps/<date>-<slug>/ directory is not an orphan',
+      () => {
+        mkdirSync(SCRATCH_DIR, { recursive: true })
+        const root = mkdtempSync(path.join(SCRATCH_DIR, 'orphan-plans-clean-'))
+        try {
+          mkdirSync(path.join(root, 'apps', '2026-10-04-other'), { recursive: true })
+          mkdirSync(path.join(root, 'docs', 'ideation', 'plans'), { recursive: true })
+          writeFileSync(path.join(root, 'docs', 'ideation', 'plans', 'unchosen-recipe.economics.json'), '{}\n')
+          expectEqual(orphanPlanProblems(root), [], 'problems')
+        } finally {
+          rmSync(root, { recursive: true, force: true })
+        }
+      }
+    ])
+
+    cases.push([
+      'the real tree has no leftover plans for any living slot slug',
+      () => {
+        const verdict = ideasChecks().find((row) => row.id === 'ideas.orphanPlans')
+        expectTrue(Boolean(verdict), 'ideas.orphanPlans present')
+        expectEqual(verdict.verdict, VERDICT.PASS, `verdict (${verdict.detail})`)
       }
     ])
 

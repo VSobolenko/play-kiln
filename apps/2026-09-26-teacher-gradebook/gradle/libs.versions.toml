@@ -7,6 +7,9 @@ lifecycle = "2.11.0"          # Compose-aware lifecycle and ViewModel integratio
 activityCompose = "1.13.0"    # Compose activity host integration
 navigation3 = "1.1.7"         # aligned Navigation 3 runtime and UI artifacts
 datastore = "1.2.1"           # preferences persistence without a database
+# Play notice 2026-10-05: fragment:1.1.0 via billing→play-services-basement. Constraint only —
+# Compose apps do not use Fragment UI. See .cursor/rules/dependency-freshness.mdc.
+fragment = "1.9.1"            # forces the Billing→GMS transitive off Play-flagged 1.1.0
 profileInstaller = "1.4.1"    # installs bundled baseline profiles on devices
 baselineProfilePlugin = "1.5.0" # generates and packages baseline profiles
 junit = "4.13.2"              # local JVM unit-test runner
@@ -42,6 +45,7 @@ androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+androidx-fragment = { module = "androidx.fragment:fragment", version.ref = "fragment" }
 androidx-profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version.ref = "profileInstaller" }
 junit = { module = "junit:junit", version.ref = "junit" }
 androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }

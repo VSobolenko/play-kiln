@@ -22,9 +22,11 @@ The measured starting position, re-measured in this tree:
   `implementation(libs.androidx.datastore.preferences)`, while **nothing in the repository used it** —
   a declared dependency with zero consumers, which is the shape of a decision that was made and never
   carried out.
-- `android:localeConfig` was already declared and `res/xml/locales_config.xml` already shipped, so
-  Android 13+ already offers a **system** per-app language picker for every slot — and no app offered
-  a route to it.
+- `android:localeConfig` was declared and `res/xml/locales_config.xml` shipped, so Android 13+ offered
+  a **system** per-app language picker — and the scaffold's language row opened that system screen
+  (`Settings.ACTION_APP_LOCALE_SETTINGS` / app-details). The owner rejected that jump on 2026-10-05:
+  language must be chosen **inside the app**. The factory standard is now the AndroidX AppCompat
+  in-app picker (reference: `apps/2026-10-01-lawn-round-log/`).
 - `scripts/core/` had no settings check at all, so every gate stayed green while the app shipped with
   nowhere to change anything. A defect no program reads is a defect that ships.
 
@@ -39,18 +41,16 @@ The measured starting position, re-measured in this tree:
   / `NavEntry`) references it **and** something outside the settings files offers a way in — a
   settings-named route, destination or callback. A route key with no affordance is a screen that
   exists on disk and nowhere in the app. Check id: **`settings.reachable`**.
-- **The language row opens the picker the platform already has.** When `android:localeConfig` is
-  declared — it is, from the scaffold — the honest entry point is a route to Android's own per-app
-  language settings: `Settings.ACTION_APP_LOCALE_SETTINGS` with a `package:` data URI on API 33+, and
-  `Settings.ACTION_APPLICATION_DETAILS_SETTINGS` below it, because below API 33 there is no per-app
-  picker to open and the row must not pretend there is. An in-app picker is accepted only when it is
-  built on the published APIs *and* there is no declared `localeConfig`: `LocaleManager.applicationLocales`
-  guarded by `Build.VERSION.SDK_INT >= TIRAMISU` (an unguarded write is a silent no-op on API 26–32,
-  which is the worst shape of failure), or `AppCompatDelegate.setApplicationLocales` hosted in an
-  `AppCompatActivity` — which the scaffold's `ComponentActivity` is not. Never reimplement the locale
-  plumbing (`createConfigurationContext` / `applyOverrideConfiguration`) beside a declared
-  `localeConfig`: two writers for one language is how an app ends up in a language nobody chose.
-  Check id: **`settings.language`**.
+- **The language row opens an in-app picker via AppCompat.** The factory standard is
+  `AppCompatDelegate.setApplicationLocales` hosted in an `AppCompatActivity`, with language tags read
+  from `res/xml/locales_config.xml` (kept as the picker's data, not as a promise to the system). Prefer
+  **not** declaring `android:localeConfig` on `<application>`: declaring it makes Android 13+ offer a
+  second, system-side control for the same value, and the settings Language row must stay inside the
+  app. The primary language row must **not** `startActivity` to `Settings.ACTION_APP_LOCALE_SETTINGS`
+  or `ACTION_APPLICATION_DETAILS_SETTINGS` — that jump is the defect the owner named on 2026-10-05.
+  Never reimplement the locale plumbing (`createConfigurationContext` / `applyOverrideConfiguration`):
+  two writers for one language is how an app ends up in a language nobody chose. Reference slot:
+  `apps/2026-10-01-lawn-round-log/`. Check id: **`settings.language`**.
 - **A theme choice, wired into the theme host.** The settings model declares a light/dark/system
   preference and it reaches a host that declares or calls a `*Theme(…)` (or `isSystemInDarkTheme(…)`),
   so choosing it changes something. Following the system is the default and one of the options, not
@@ -86,24 +86,30 @@ The measured starting position, re-measured in this tree:
 ## What is required, and what is refused as padding
 
 Three categories are required, because each is a question the user actually asks and each is
-verifiable: **which language** (the system picker that already exists), **light or dark** (the two
-palettes the app already owns and can currently only reach by following the system), and **at least one
-behaviour preference** that a real code path reads. Anything beyond that has to earn its row.
+verifiable: **which language** (the in-app AppCompat picker), **light or dark** (the two palettes the
+app already owns), and **at least one behaviour preference** that a real code path reads. Anything
+beyond that has to earn its row.
 
 Refused, with the reason this line is drawn:
 
-- **A second in-app language picker while `android:localeConfig` is declared.** It would be a second
-  source of truth for one value, and the system picker is the one the platform, the launcher and the
-  app all agree on
-  (<https://developer.android.com/guide/topics/resources/app-languages>).
-- **A stored language tag in DataStore when the system already stores it.** Same defect, one layer down.
+- **`android:localeConfig` on `<application>` when the Language row is an in-app AppCompat picker.**
+  Declaring it invites a second, system-side control for one value. Keep `res/xml/locales_config.xml`
+  as the picker's language list; do not advertise it to the framework via `localeConfig`
+  (<https://developer.android.com/guide/topics/resources/app-languages>; reference:
+  `apps/2026-10-01-lawn-round-log/`).
+- **A language row that opens `ACTION_APP_LOCALE_SETTINGS` / app-details.** That leaves the app for a
+  device settings screen; the owner requires the picker to stay inside the app.
+- **A stored language tag in DataStore when AppCompat / the framework already stores it.** AppCompat's
+  `autoStoreLocales` (and on API 33+ the framework store) already persist the choice.
 - **"Clear cache"**, when the slot has no cache. A control with no observable effect teaches the user
   that Settings is decoration.
 - **A notifications toggle**, when the slot posts no notification and declares no `POST_NOTIFICATIONS`.
   A switch for a permission the app does not need is padding in the shape of a feature, and it
   contradicts the permission-minimisation baseline.
-- **"Rate this app" / "Share"**, which are actions that leave the app rather than preferences that
-  change it. Nothing about the app's behaviour changes, so the sensor can never judge them.
+- **"Share"** as padding, and **"Rate this app" judged as a settings preference.** Rate is an action,
+  not a preference this sensor owns — the In-App Review contract is `.cursor/rules/in-app-review.mdc`
+  (`scripts/core/review.mjs`). This settings rule neither requires nor forbids the Rate row; it
+  refuses treating Share/Rate as substitutes for a real behaviour preference.
 - **Animation speed, developer options, or any debug switch**, which are not user preferences.
 - **A settings search field for four groups.** Search earns its place in a long list; in a list of
   four rows it is noise that has to be translated forever.
@@ -119,10 +125,10 @@ Refused, with the reason this line is drawn:
 
 - A settings surface that is a screen of switches nothing reads.
 - A route to settings that no affordance opens, or a `NavEntry` key with nothing pointing at it.
-- An in-app language picker beside a declared `localeConfig`, an unguarded
-  `LocaleManager.applicationLocales` write, `AppCompatDelegate.setApplicationLocales` in a host that
-  is not an `AppCompatActivity`, or `createConfigurationContext` / `applyOverrideConfiguration`
-  rebuilding the locale beside the framework's own machinery.
+- A language row whose primary action is `Settings.ACTION_APP_LOCALE_SETTINGS` /
+  `ACTION_APPLICATION_DETAILS_SETTINGS`, `AppCompatDelegate.setApplicationLocales` in a host that is
+  not an `AppCompatActivity`, an unguarded `LocaleManager.applicationLocales` write, or
+  `createConfigurationContext` / `applyOverrideConfiguration` rebuilding the locale beside AppCompat.
 - `preferencesDataStore(…)` declared inside the settings surface, a composable naming `DataStore`, or
   a store with no writer (which can only ever return its defaults).
 - An `R.string.<name>` in a settings screen that no default resource file declares.

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The one-time unlock surface. Owned by the unlock screen worker; the keys are scope-prefixed
+  `unlock_*` and are mirrored key-for-key in values-ru/strings_unlock.xml.
+
+  `economics.json` describes a single non-consumable purchase, so there is no trial wording, no
+  renewal text and nothing consumable here — one price, one purchase, one restore.
+-->
+<resources>
+    <string name="unlock_title" translatable="true">Unlock</string>
+    <string name="unlock_back" translatable="true">Back</string>
+    <string name="unlock_hero_title" translatable="true">UnitWalk unlock</string>
+    <string name="unlock_hero_subtitle" translatable="true">One payment, yours for good</string>
+    <string name="unlock_price" translatable="true">$9.99</string>
+    <string name="unlock_price_caption" translatable="true">One-time purchase</string>
+    <string name="unlock_pitch" translatable="true">Unlimited units, and PDF reports with no watermark.</string>
+    <string name="unlock_owned_status" translatable="true">Owned</string>
+    <string name="unlock_not_owned_status" translatable="true">Not owned</string>
+    <string name="unlock_owned_detail" translatable="true">Unlimited units, and PDF reports with no watermark.</string>
+    <string name="unlock_not_owned_detail" translatable="true">Free covers one unit, and exported PDFs carry a watermark. Exporting is never blocked.</string>
+    <string name="unlock_buy_action" translatable="true">Unlock for %1$s</string>
+    <string name="unlock_restore_action" translatable="true">Restore purchase</string>
+    <string name="unlock_working" translatable="true">Contacting Google Play…</string>
+    <string name="unlock_availability_label" translatable="true">Google Play status</string>
+    <string name="unlock_availability_uninitialized" translatable="true">Checking Google Play…</string>
+    <string name="unlock_availability_unsupported" translatable="true">Purchases are not supported on this device.</string>
+    <string name="unlock_availability_needs_consent" translatable="true">Waiting for consent.</string>
+    <string name="unlock_availability_ready" translatable="true">Ready to purchase.</string>
+    <string name="unlock_availability_failed" translatable="true">Google Play Billing is unavailable.</string>
+    <string name="unlock_message_purchase_success" translatable="true">Thank you — the unlock is yours.</string>
+    <string name="unlock_message_purchase_failed" translatable="true">The purchase did not complete.</string>
+    <string name="unlock_message_already_owned" translatable="true">You already own the unlock.</string>
+    <string name="unlock_message_restore_success" translatable="true">Your purchase was restored.</string>
+    <string name="unlock_message_restore_failed" translatable="true">No purchase could be restored.</string>
+    <string name="unlock_message_unavailable" translatable="true">Google Play Billing is unavailable.</string>
+    <string name="unlock_failure_label" translatable="true">Reason</string>
+    <string name="unlock_reason_not_available" translatable="true">Not available</string>
+    <string name="unlock_reason_not_configured" translatable="true">Not configured</string>
+    <string name="unlock_reason_no_consent" translatable="true">Consent required</string>
+    <string name="unlock_reason_network" translatable="true">Network problem</string>
+    <string name="unlock_reason_policy_blocked" translatable="true">Blocked by policy</string>
+    <string name="unlock_reason_unknown" translatable="true">Unknown error</string>
+</resources>

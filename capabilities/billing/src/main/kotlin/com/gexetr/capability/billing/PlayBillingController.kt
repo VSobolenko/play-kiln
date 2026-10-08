@@ -215,6 +215,21 @@ class PlayBillingController(
     }
 
     /**
+     * Play's own formatted price for [product], or `null` when it cannot be answered.
+     *
+     * The purchase flow already resolves the product before it can sell it, so this reuses the same
+     * query path rather than adding a second one. Every failure direction is `null` — a disconnected
+     * client, an unknown product, a timed-out query — because the caller's correct response to all
+     * three is identical: keep its own fallback price rather than state an amount Play will not
+     * charge.
+     */
+    override suspend fun formattedPrice(product: ProductId): String? {
+        if (!client.isReady) return null
+        val details = queryProductDetails(product) ?: return null
+        return details.oneTimePurchaseOfferDetailsList?.firstOrNull()?.formattedPrice
+    }
+
+    /**
      * Spends from the local wallet, after asking the authority first when the unit costs money
      * to serve.
      *

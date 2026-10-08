@@ -1,0 +1,63 @@
+---
+description: Soft In-App Review prompts via Play ReviewManager — settings Rate and after meaningful use, never a fake star quiz
+globs: apps/**,scaffold/**
+alwaysApply: false
+---
+
+# Softly ask for a rating — Play In-App Review, not a store jump alone
+
+The owner asked on 2026-10-05 that every product app be able to softly request a rating, using
+Google Play's In-App Review API (`com.google.android.play:review-ktx`), not only by opening the Play
+Store listing. A settings "Rate app" row and a prompt after meaningful use are both legitimate entry
+points; neither may fake a star rating UI before the API, and neither may spam.
+
+`scripts/core/review.mjs` is the sensor. Applicability starts **2026-10-05** via
+`scripts/core/baseline.mjs` (`IN_APP_REVIEW_BASELINE`), so older slots carry findings as notes.
+
+## Rules
+
+- **Declare the Play Review KTX dependency.** Pin a current stable of
+  `com.google.android.play:review-ktx` (2.0.2 is acceptable as of 2026-10-05 Maven metadata). Check id:
+  **`review.dependency`**.
+- **Call the ReviewManager flow.** `ReviewManagerFactory.create` → `requestReviewFlow` →
+  `launchReviewFlow(activity, reviewInfo)`. Check id: **`review.api`**.
+- **Throttle with DataStore.** Persist at least a "last prompted" timestamp and a "completed / already
+  asked" flag so soft prompts stay moderate. Check id: **`review.throttle`**.
+- **Settings "Rate app" uses the Review API first.** Only fall back to `market://details?id=` / the
+  Play Store HTTPS URL when the flow fails to start (quota, unavailable, ActivityNotFound). Check id:
+  **`review.settings`**.
+
+## Soft-prompt policy (scaffold default)
+
+Documented here so slots copy one policy rather than inventing spam:
+
+1. **Meaningful success** — after the **first successful completion** of the app's primary / core
+   action (scaffold: Home "Try the starter action"), attempt one soft In-App Review prompt if the
+   store says the user has not completed a review flow and was not soft-prompted in the last **90
+   days**.
+2. **Settings Rate** — always attempts `requestReviewFlow` / `launchReviewFlow` on tap; records the
+   prompt; falls back to the Play Store listing only when the API path fails to start.
+3. **Never** show a custom star rating dialog before the Play UI. **Never** prompt on every launch or
+   every action.
+
+Slots may raise the success threshold (e.g. N=3 core actions) for a denser product, but must keep a
+DataStore throttle and must not remove the settings Rate → Review API path.
+
+## What is banned
+
+- A Rate row that only opens the Play Store without attempting In-App Review first.
+- A pre-prompt star quiz or custom rating UI that collects stars before `launchReviewFlow`.
+- Soft prompts with no persisted throttle (every launch / every action).
+- Shipping without `review-ktx` while claiming a rating prompt exists.
+
+## How it is verified
+
+```bash
+node scripts/verify.mjs                 # invariants: reviewFixtures()
+node scripts/verify.mjs --slot <slug>   # ui group: review.* via baselineVerdict
+```
+
+- Sensor: `scripts/core/review.mjs`. Findings are `file:line`.
+- Baseline date: **2026-10-05** (`IN_APP_REVIEW_BASELINE` in `scripts/core/baseline.mjs`).
+- Honest limit: a static scan proves the API and throttle wiring exist; it cannot prove Play showed
+  the dialog (quota is server-side) or that the user rated.

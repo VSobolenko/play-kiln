@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "slot": "unit-walk",
+  "reconRef": "apps/2026-10-05-unit-walk/docs/2026-10-05-rental-unit-walk.md#promises",
+  "claims": [
+    {
+      "id": "crash-safe-photo-draft",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "durability",
+      "promise": "Every photo and room note taken on a walk is written to durable local draft storage before the next room opens, so a crash, a Next tap, or a process kill cannot delete a finished hour of work the way Property360 and Yardi reviews describe.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-05-solo-field-trade-recon.md#5-shared-complaints-measured-sample",
+        "finding": "Property360 1-star: after spending 2hours on detailed report, upon clicking next, the app deleted everything. Yardi Inspection 1-star: finalizing an inspection with photos, the app LOST THE PHOTOS. Property Inspect critical sample includes crash mid-report."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "test",
+        "ref": "app/src/test/java/com/gexetr/unitwalk/ui/walk/WalkViewModelTest.kt",
+        "symbol": "aResumedDraftRestoresTheSamePositionNoteAndPhotosFromDisk",
+        "assertion": "Run aResumedDraftRestoresTheSamePositionNoteAndPhotosFromDisk on the JVM: it records two rooms, a note and a photo through one WalkViewModel, then builds a brand-new WalkStore and WalkViewModel over the same directory as a process kill and asserts the same rooms, the saved note and the photo file name reload from disk with the bytes intact; the same file contains the durability token SavedStateHandle used to restore the interrupted position."
+      }
+    },
+    {
+      "id": "no-account-walk",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "trust",
+      "promise": "The walk opens and finishes with no account, no email and no employer login, so a landlord who does not have a Yardi or Property Inspect seat can still complete a move-in report on the phone they already own.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-05-solo-field-trade-recon.md#5-shared-complaints-measured-sample",
+        "finding": "Property Inspect 1-star: installed the app, opened it, asked for email and password, incorrect details. Yardi Inspection is an employer Voyager plugin; enrichment shows free with no consumer IAP — the buyer is not choosing it."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/unitwalk/ui/walk/WalkScreen.kt",
+        "symbol": "WalkScreen",
+        "assertion": "Read WalkScreen.kt: the walk surface builds its state from WalkViewModel over the local WalkStore and offers rooms, notes, conditions, camera and gallery photo capture, and Finish with no account, email, login or session gate anywhere on the path; a case-insensitive search for login, signin, account, auth, session, password, credential or token across app/src/main returns no auth surface, only the no-account copy and the scaffold generic backup exclusions."
+      }
+    },
+    {
+      "id": "move-in-vs-move-out",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "For each unit the landlord can open the prior move-in report beside the new move-out walk and mark differences room by room, so deposit disputes rest on the same checklist rather than on memory.",
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/research/2026-10-05-solo-field-trade-recon.md#7-pocket-that-clears-the-bar",
+        "finding": "The job is move-in and move-out condition evidence; cloud leaders (RentCheck) sell resident-driven inspections, while unrated offline cards claim PDF reports. The compare-per-unit handoff is the functional gap a self-managing landlord needs that a single disposable checklist does not give."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "test",
+        "ref": "app/src/test/java/com/gexetr/unitwalk/domain/CompareTest.kt",
+        "symbol": "aMoveOutComparesRoomByRoomAgainstTheLinkedMoveIn",
+        "assertion": "Run aMoveOutComparesRoomByRoomAgainstTheLinkedMoveIn: it resolves the unit prior finished move-in with priorMoveInFor, builds one row per room with compareRooms, and asserts both prior conditions (GOOD/GOOD) and the current walk per-room notes (Worktop chipped, Hole in the wall), so a move-out is measured against the linked move-in room by room rather than from memory."
+      }
+    },
+    {
+      "id": "signed-pdf-share",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "The finished report leaves the phone as a signed PDF the landlord can share or save with the system share sheet or a SAF create-document action, without uploading to a vendor cloud first.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-05-solo-field-trade-recon.md#4-enrichment-money-on-the-shelf-measured-2026-10-05",
+        "finding": "Property Inspect at 2.1 stars over 42 exact reviews and 10K-plus installs draws a critical review that report upload failed due to validation error with no hint — the handoff is blocked by a server. PropertyLog at 1-plus installs declares IAP for an offline PDF shape; RentCheck at 4.7 stars over 7,200 reviews and 100K-plus installs is cloud with no Play IAP badge."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/unitwalk/ui/report/ReportViewModel.kt",
+        "symbol": "ACTION_SEND",
+        "assertion": "Read ReportViewModel.kt: it renders the report with renderReportPdf, writes the bytes under the app private filesDir/reports and exposes a real Intent(Intent.ACTION_SEND) carrying EXTRA_STREAM with FLAG_GRANT_READ_URI_PERMISSION plus an Intent(Intent.ACTION_CREATE_DOCUMENT) save path, both over a FileProvider content URI, so the finished PDF leaves the phone through the system share sheet or SAF without any vendor cloud upload first."
+      }
+    },
+    {
+      "id": "multi-unit-portfolio",
+      "weight": "supporting",
+      "jobStage": "before",
+      "depthFamily": "fit",
+      "promise": "The landlord keeps a small portfolio of units on the phone and starts a walk from a named unit, so a second property does not require a second app install or a cloud seat.",
+      "evidence": {
+        "strength": "ON RECORD",
+        "source": "docs/research/2026-09-24-market-decision.md",
+        "finding": "Candidate 2 names the reachable user as the landlord who manages a few units themselves — a different job from the enterprise Yardi seat, and the reason multi-unit local portfolio is in scope while team sync is not."
+      },
+      "status": "shipped",
+      "proof": {
+        "type": "test",
+        "ref": "app/src/test/java/com/gexetr/unitwalk/ui/units/UnitsViewModelTest.kt",
+        "symbol": "twoUnitsKeepIndependentWalksAndEachStartsItsOwn",
+        "assertion": "Run twoUnitsKeepIndependentWalksAndEachStartsItsOwn: it creates two units, starts a MOVE_IN walk from the first and a MOVE_OUT walk from the second, and asserts both walks are durable on disk and each stays attached to its own unit with its own resumable draft, so a second property needs no second app install and no cloud seat."
+      }
+    }
+  ],
+  "jobCoverage": {
+    "before": {
+      "claimId": "multi-unit-portfolio"
+    },
+    "during": {
+      "claimId": "crash-safe-photo-draft"
+    },
+    "after": {
+      "claimId": "signed-pdf-share"
+    }
+  }
+}

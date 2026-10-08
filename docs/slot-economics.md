@@ -50,7 +50,7 @@ exactly:
 | `priceUsd` | The price in US dollars. A finite number `> 0` for every paid archetype; `ads_led_utility` may be `0`. |
 | `momentOfPayment` | When in the journey the money is taken. At least 12 characters. |
 | `distinctnessSentence` | The §1.2 distinct angle: what a user gets here that the existing apps in the category do not give them. At least 12 characters. |
-| `evidenceRef` | `docs/research/<file>.md`, optionally with `#section`. The file must exist for `check-economics.mjs --slot`; the anchor is not verified. |
+| `evidenceRef` | `docs/research/<file>.md`, `docs/ideation/<file>.md`, or `apps/<date>-<slug>/docs/<file>.md`, optionally with `#section`. The file must exist for `check-economics.mjs --slot`; the anchor is not verified. |
 | `day1RevenuePath` | How the first dollar actually arrives. At least 12 characters. |
 | `killCriteria` | Object with three finite integers: `windowDays` in `7..180`, `minInstalls >= 1`, `minRevenueUsd >= 1`. A kill criterion of `0` can never be missed, so it is rejected. |
 | `assumptionsUnverified` | At least one non-empty string that is not a placeholder. An empty array claims a plan has no unknowns, which is not a plan. |

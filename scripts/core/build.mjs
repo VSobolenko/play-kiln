@@ -12,7 +12,7 @@
 // this repository's most-recorded failure mode.
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
-import { fail, guard, pass, ROOT, runFixtures, skip, unverified, expectEqual, expectTrue } from './lib.mjs'
+import { fail, guard, pass, ROOT, runFixtures, skip, unverified, expectEqual, expectTrue, VERDICT } from './lib.mjs'
 import { applicationIdPattern, packagePrefix } from '../lib/namespaces.mjs'
 import { parseEconomics, validateEconomicsAgainstCapabilities } from '../lib/slot-economics.mjs'
 import { IDENTITY_FROZEN_STATES, readRegistry } from './project.mjs'
@@ -262,11 +262,19 @@ export function checkToolchainPins() {
 // that appears nowhere, the token fused with the word after it, which is a finding no author can act
 // on. The plain form counts as an identity under `apps/` and `scaffold/`; under `scripts/` only an
 // escaped or path spelling does, because there a plain token is a sensor's own data.
+//
+// `apps/<slot>/docs/` is excluded: those files are the slot's cut-out archive (proposals, domain
+// memos) and cite competitor `com.*` packages by design. They lived under root `docs/` before the
+// 2026-10-04 cut-out rule moved them, and root `docs/` is outside `SWEEP_ROOTS` — sweeping them
+// after the move would punish the archive for the same prose the factory already accepted.
 const SWEEP_ROOTS = [
   { root: 'apps', plainEscapedOnly: false },
   { root: 'scaffold', plainEscapedOnly: false },
   { root: 'scripts', plainEscapedOnly: true }
 ]
+
+/** Slot docs are product archives, not shipping identity — see the comment on `SWEEP_ROOTS`. */
+const isSlotDocsPath = (file) => /^apps\/[^/]+\/docs\//.test(relPath(file))
 
 // Files whose package-shaped tokens are sensor data rather than a declaration. A suite's synthetic
 // path (the reserved example domain, reverse-DNS'd) and its banned-vendor coordinate name no package
@@ -310,7 +318,9 @@ export function namespaceTokenProblems(text, { plainEscapedOnly = false } = {}) 
 export function checkNamespaceSweep() {
   return guard('build.namespaceSweep', () => {
     const files = SWEEP_ROOTS.flatMap(({ root, plainEscapedOnly }) =>
-      walkSourceFiles(path.join(ROOT, root), SWEEP_EXTENSIONS).map((file) => ({ file, plainEscapedOnly }))
+      walkSourceFiles(path.join(ROOT, root), SWEEP_EXTENSIONS)
+        .filter((file) => !isSlotDocsPath(file))
+        .map((file) => ({ file, plainEscapedOnly }))
     )
     if (files.length === 0) {
       return unverified('build.namespaceSweep', 'no source file was found to sweep for a foreign package token')
@@ -837,6 +847,17 @@ export function buildFixtures() {
         for (const form of forms) {
           expectTrue(namespaceTokenProblems(form).some((p) => p.startsWith(foreign)), `the token was not found in: ${form}`)
         }
+      }
+    ])
+
+    cases.push([
+      'apps/<slot>/docs/ is outside the namespace sweep — competitor packages in a cut-out archive are not leftovers',
+      () => {
+        expectTrue(isSlotDocsPath(path.join(ROOT, 'apps', '2026-10-01-lawn-round-log', 'docs', 'x.md')), 'slot docs path')
+        expectTrue(!isSlotDocsPath(path.join(ROOT, 'apps', '2026-10-01-lawn-round-log', 'app', 'x.kt')), 'app source path')
+        const verdict = checkNamespaceSweep()
+        expectEqual(verdict.verdict, VERDICT.PASS, `verdict (${verdict.detail})`)
+        expectTrue(!String(verdict.detail).includes('/docs/'), `detail must not cite slot docs: ${verdict.detail}`)
       }
     ])
 

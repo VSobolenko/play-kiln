@@ -74,6 +74,21 @@ const DIAGNOSTIC_LINE = new RegExp(
 );
 
 /**
+ * Source excerpts that may contain a copied diagnostic as a quoted argument.
+ *
+ * The input is first stripped of a unified-diff marker, including its indentation: diff additions
+ * may be `+check(...)` or `+  check(...)`, while context lines have no marker. The identifier and
+ * member chain distinguish a call expression from a runtime message, and the immediate quote is
+ * the copied fixture/message.
+ */
+const SOURCE_CALL_WITH_QUOTED_ARGUMENT = /^\s*[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*\s*\(\s*['"`]/;
+
+/** Removes only a leading unified-diff marker, so a real `+ ERROR: ...` remains diagnostic-shaped. */
+function withoutUnifiedDiffMarker(line) {
+  return line.replace(/^\s*[+-]\s*/, '');
+}
+
+/**
  * Signal patterns, applied only to diagnostic lines.
  *
  * Each is anchored on wording a real error uses. `compact` was removed from the context test: it is
@@ -89,8 +104,9 @@ const SIGNALS = [
     // real file, so SpawnChild fails with `CreateProcessAsUserW failed: 1920` before the command
     // starts. A worker in that state has read nothing and written nothing, so its zero exit code is
     // not delivery — and the classifier previously called it `DONE`, because the failure line is
-    // timestamped and therefore never reached the signal scan. `danger-full-access` is the only
-    // working mode on a machine in this state; it is a diagnostic to report, not a mode to default to.
+    // timestamped and therefore never reached the signal scan. The factory now removes that alias
+    // directory from the Codex child's `PATH`, so ordinary `workspace-write` works and
+    // `danger-full-access` is not required; it remains a diagnostic escape hatch, not a default.
     //
     // This is the most specific wording of the failure, which is why it is first: the pattern names
     // the sandbox runner and the Win32 call, so prose *about* the Windows sandbox cannot match it.
@@ -120,7 +136,9 @@ const SIGNALS = [
  */
 export function diagnose(text) {
   const lines = String(text || '').split(/\r?\n/);
-  const diagnosticLines = lines.filter((line) => DIAGNOSTIC_LINE.test(line));
+  const diagnosticLines = lines
+    .map(withoutUnifiedDiffMarker)
+    .filter((line) => !SOURCE_CALL_WITH_QUOTED_ARGUMENT.test(line) && DIAGNOSTIC_LINE.test(line));
   if (diagnosticLines.length === 0) return null;
 
   const haystack = diagnosticLines.join('\n').toLowerCase();

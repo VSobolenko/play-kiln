@@ -299,10 +299,11 @@ RELEASE_NOTES_MARKER = "<!-- kiln:generated release notes - delete this line to 
 
 
 
-# A freshly generated release note is a prompt, not text, and the prompt has to be visible as
-# unfinished rather than reading like a finished sentence: the failure being fixed is a pack that
-# looked complete while a field Play demands had no prepared text at all.  The prompts and the
-# per-language cap come from the model.
+# A freshly generated release note is a prompt wrapped in ``TODO-HUMAN`` so the *field* reads as
+# unfinished until a human (or builder) replaces it.  The prompt body itself teaches finished-product
+# posture — what the user can do now — and invites Play review feedback; see
+# ``pack_model.release_note_prompts`` and `.cursor/rules/store-copy.mdc`.  The per-language cap comes
+# from the model.
 RELEASE_NOTE_PROMPTS: dict[str, str] = pack_model.release_note_prompts()
 
 
@@ -1144,6 +1145,19 @@ def console_runbook(
             "paste the code into the App-access declaration (§2 `Учетные данные`). The promo count and type "
             "are final once saved; the `promotion_codes.csv` file is never committed."
         )
+        add(
+            "- [ ] `[assist]` **Download the codes — press `Скачать коды` exactly once, then stop and ask.** "
+            "The button answers with the browser's own save window, which lives outside the page and cannot "
+            "be accepted by the agent, so it presses once, asks the owner to confirm the save («нажмите "
+            "„Скачать“ в открывшемся окне и подтвердите»), and **waits** — it never presses again and does "
+            "not reload the page. Read `promotion_codes.csv` from the browser's default download folder "
+            "(on Windows usually the user's `Downloads` folder) and never commit it."
+        )
+        add(
+            "- [ ] `[assist]` **If no window opened, hand the owner the manual path and wait.** The page is "
+            "`.../promotions`, the control is `Скачать коды`, the file is `promotion_codes.csv`; when the "
+            "owner reports where it landed, read that path and continue."
+        )
     else:
         add(
             f"This slot enables no selling capability ({enabled_text} in `capabilities.json`), so there is "
@@ -1530,6 +1544,7 @@ Privacy questions: {listing['contactEmail']}
 {privacy_todo}
 - TODO-HUMAN: Confirm the data-safety answers and permission list against the release AAB and all bundled SDKs.
 - TODO-HUMAN: {'Replace synthetic screenshots with real captures and regenerate the pack.' if synthetic else 'Inspect every captured screen for personal or test data.'}
+- TODO-HUMAN: Confirm release notes and listing short/full descriptions use finished-product tone (what works now) and invite Play reviews for wishes — never early/WIP/roadmap-apology language (`.cursor/rules/store-copy.mdc`).
 - TODO-HUMAN: Complete the Play Console legal declarations and first-app setup.
 
 Version reviewed: `{meta['version_name']}` (code `{meta['version_code'] or 'not declared'}`)
@@ -1570,10 +1585,12 @@ text box** and separates them with a tag whose name is the language, the tags on
 Select everything inside the block above and paste it into Play's release-notes box as one piece —
 this is Play's own format, not a representation of it, so there is nothing to reassemble. Play caps
 each language at {MAX_RELEASE_NOTE_CHARS} characters and truncates silently, so every note in the
-block is measured when the pack is validated. Replace each `{RELEASE_NOTE_UNFINISHED}` line with the
-real note, keeping its `{pack_model.release_note_locale_tag(locales[0])}` and `</{locales[0]}>` lines
-exactly where they are; a language with no real note yet can simply keep a short one or be left out of
-the block.
+block is measured when the pack is validated. Replace each `{RELEASE_NOTE_UNFINISHED}` line with a
+finished-product note — what the user can do now, plus a short invite to leave wishes in Play
+reviews — keeping its `{pack_model.release_note_locale_tag(locales[0])}` and `</{locales[0]}>` lines
+exactly where they are. Never use early/WIP/roadmap-apology language
+(`.cursor/rules/store-copy.mdc`); a language with no real note yet can keep a short one or be left
+out of the block.
 
 {RELEASE_NOTES_MARKER}
 """

@@ -11,7 +11,7 @@ import path from 'node:path'
 import { evaluateInAppPolicy } from '../lib/in-app-policy.mjs'
 import { scanClientImports, scanClientText, scanGoogleServices, scanSlot } from '../lib/client-secrets.mjs'
 import { evaluateOutcomes, parseOutcomes } from '../lib/outcomes.mjs'
-import { expectEqual, expectTrue, fail, guard, pass, ROOT, skip, unverified } from './lib.mjs'
+import { expectEqual, expectTrue, fail, guard, pass, ROOT, runFixtures, skip, unverified } from './lib.mjs'
 
 /** The registry's lifecycle vocabulary. Adding a state is a product decision, not a convenience. */
 export const LIFECYCLE = Object.freeze([
@@ -273,10 +273,17 @@ const SKIP_DIRS = new Set(['node_modules', '.git', '__pycache__'])
 export function walkFiles(dir, acc = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name)
+    // A directory is descended into and a **regular file** is measured; every other entry kind is
+    // skipped rather than collected. This clause is the whole of a 2026-10-07 hardening: the walk
+    // used to push anything that was not a directory, so a symlink or a junction was handed to
+    // `readFileSync` and the measurement died with `EISDIR: illegal operation on a directory, read`
+    // — observed, not imagined, from a symlink-to-directory under the gitignored `.kiln/` scratch
+    // tree. A walker that throws on an entry it cannot classify turns a measurement into a crash,
+    // which is the opposite of what a size row is for.
     if (entry.isDirectory()) {
       if (SKIP_DIRS.has(entry.name)) continue
       walkFiles(full, acc)
-    } else acc.push(full)
+    } else if (entry.isFile()) acc.push(full)
   }
   return acc
 }
@@ -297,16 +304,126 @@ export function measureSources(dir) {
   return { rows, totals }
 }
 
-/** The budgets. A number a command prints is the ceiling; see budget.json for the measured baseline. */
-export function budgets() {
-  return JSON.parse(readFileSync(path.join(ROOT, 'scripts', 'core', 'budget.json'), 'utf8'))
+/** Where the recorded baselines, the band and the revision history live. */
+export const BUDGET_PATH = path.join('scripts', 'core', 'budget.json')
+
+/**
+ * The budget file: recorded baselines, the band, and the revision history.
+ *
+ * `budget` may be handed in for one reason only — so a fixture can drive `checkSize` against a
+ * synthetic file, which is how the band is proved able to fail without editing the real one.
+ */
+export function budgets(budget) {
+  if (budget) return budget
+  return JSON.parse(readFileSync(path.join(ROOT, BUDGET_PATH), 'utf8'))
 }
 
-export function checkSize() {
+/**
+ * The band a recorded baseline may move before `core.size` fails.
+ *
+ * A recorded number is a **baseline**, not an exact ceiling, and that distinction is the whole of
+ * this check's 2026-10-07 redesign. The ceilings used to be set to the exact measurement of the
+ * moment, so *every* edit under `scripts/` turned the row red and the remedy was a hand-written
+ * justification in `budget.json`: nine consecutive raises are recorded there, and on 2026-10-07 a
+ * correct change ended red because a **parallel session** had written 172 lines minutes earlier. A
+ * number that fires on every edit — including edits someone else made — is not a measurement, it is
+ * a toll, and the row it prints in every chat is noise the operator learns to read past.
+ *
+ * The band is 25%, and the number is measured rather than felt: the largest single change in the
+ * file's own history moved the new surface by 1973 lines (8% of it) and the legacy half by 935 (3%),
+ * so 25% clears every real change on record with room to spare while still catching what this
+ * number exists for — bulk, unrecorded growth. `tolerancePercent` lives in `budget.json`, so this
+ * module states no limit of its own.
+ */
+export function tolerancePercent(budget) {
+  const percent = budget?.tolerancePercent
+  return typeof percent === 'number' && Number.isFinite(percent) && percent > 0 ? percent : null
+}
+
+/** The limit a recorded baseline implies at a given band. */
+export function sizeLimit(recorded, percent) {
+  return Math.ceil(recorded * (1 + percent / 100))
+}
+
+/**
+ * The size verdict, as problems. Pure, so the fixtures drive every edge of the band — including the
+ * single line over it — and it names the command that records a measurement, because a refusal a
+ * reader cannot act on is a refusal that gets worked around.
+ */
+export function sizeProblems({ surface, legacy, budget }) {
+  const problems = []
+  const percent = tolerancePercent(budget)
+  if (percent === null) {
+    problems.push(`\`tolerancePercent\` is missing from ${BUDGET_PATH}, so the recorded baselines have no band`)
+    return problems
+  }
+  const rows = [
+    { what: 'the core', measured: surface, recorded: budget?.coreBaseline, field: 'coreBaseline' },
+    { what: 'the legacy harness', measured: legacy, recorded: budget?.legacyBaseline, field: 'legacyBaseline' }
+  ]
+  for (const row of rows) {
+    if (typeof row.recorded !== 'number') {
+      problems.push(`\`${row.field}\` is missing from ${BUDGET_PATH}`)
+      continue
+    }
+    const limit = sizeLimit(row.recorded, percent)
+    if (row.measured > limit) {
+      problems.push(
+        `${row.what} is ${row.measured} lines, past the ${percent}% band over its ` +
+          `${row.recorded}-line recorded baseline (limit ${limit}) — record the measurement with ` +
+          '`node scripts/core/budget.mjs --record`'
+      )
+    }
+  }
+  return problems
+}
+
+/**
+ * How the legacy number has moved across the recorded revisions.
+ *
+ * The budget file's own point is deletion — "the core replaced the harness, not sat beside it" — and
+ * the count is what keeps that claim honest: a green row that says the number moved up nine times
+ * and down once tells a reader more than the number itself does. Entries that carry no move (an
+ * entry may record only the core half) are counted in neither direction.
+ */
+export function legacyMoves(budget) {
+  const revisions = Array.isArray(budget?._revisions) ? budget._revisions : []
+  let up = 0
+  let down = 0
+  for (const revision of revisions) {
+    const raw = String(revision?.legacyBaseline ?? revision?.legacyCeiling ?? '')
+    const move = raw.match(/(\d+)\D+(\d+)/)
+    if (!move) continue
+    if (Number(move[2]) > Number(move[1])) up += 1
+    else if (Number(move[2]) < Number(move[1])) down += 1
+  }
+  return { up, down, revisions: revisions.length }
+}
+
+/** The one line every run prints, so growth is visible inside a green row rather than only in a red one. */
+export function sizeReport({ surface, legacy, total, budget }) {
+  const percent = tolerancePercent(budget) ?? 0
+  const part = (what, measured, recorded) => {
+    const delta = measured - (typeof recorded === 'number' ? recorded : 0)
+    const movement =
+      delta === 0
+        ? 'at the recorded baseline'
+        : `${delta > 0 ? '+' : ''}${delta}${delta > 0 ? ` within the ${percent}% band` : ' under the recorded baseline'}`
+    return `${what} ${measured}/${sizeLimit(typeof recorded === 'number' ? recorded : 0, percent)} (recorded ${recorded}, ${movement})`
+  }
+  const moves = legacyMoves(budget)
+  return (
+    `${part('core', surface, budget?.coreBaseline)}; ${part('legacy', legacy, budget?.legacyBaseline)}; ` +
+    `scripts total ${total} (target ${budget?._targets?.['scripts total'] ?? 'unrecorded'}); ` +
+    `${moves.revisions} recorded revision(s), the legacy number moved up ${moves.up}x and down ${moves.down}x`
+  )
+}
+
+export function checkSize(budget) {
   return guard('core.size', () => {
     const scripts = path.join(ROOT, 'scripts')
     if (!existsSync(scripts)) return unverified('core.size', 'no scripts/ directory')
-    const budget = budgets()
+    const file = budgets(budget)
     const total = measureSources(scripts).totals.lines
 
     // The new surface: what the refactor ADDED, which is what its budget governs.
@@ -318,25 +435,85 @@ export function checkSize() {
       .reduce((a, b) => a + b, 0)
     const legacy = total - surface
 
-    const problems = []
-    if (surface > budget.coreLines) {
-      problems.push(
-        `the core is ${surface} lines, over its ${budget.coreLines}-line ceiling`
-      )
-    }
-    // The legacy ceiling may only move down. It is the number that turns "the harness was replaced"
-    // into a measurement: deleting a file lowers it, and nothing else is allowed to raise it.
-    if (legacy > budget.legacyCeiling) {
-      problems.push(
-        `the legacy harness is ${legacy} lines, over its recorded ceiling ${budget.legacyCeiling} — ` +
-          `the core is meant to replace it, not sit beside it`
-      )
-    }
-    const detail =
-      `core ${surface}/${budget.coreLines}; legacy ${legacy}/${budget.legacyCeiling}; ` +
-      `scripts total ${total} (target ${budget._targets['scripts total']})`
+    const problems = sizeProblems({ surface, legacy, budget: file })
+    const detail = sizeReport({ surface, legacy, total, budget: file })
     return problems.length === 0 ? pass('core.size', detail) : fail('core.size', problems.join('; ') + ` — ${detail}`)
   })
+}
+
+/**
+ * The band's own controls, against the real tree and a synthetic budget.
+ *
+ * A band is the one thing in this file that could quietly become "no check at all", so the fixtures
+ * drive it from both sides: the exact limit is green and one line past it is red, the missing
+ * `tolerancePercent` is a problem rather than an infinite band, and the real check is driven against
+ * a one-line budget whose band is zero — which must turn `core.size` FAIL on the tree it is reading,
+ * proving the sensor can fail **in place** rather than only in arithmetic.
+ */
+export function checkSizeFixtures() {
+  return guard('size.fixtures', () =>
+    runFixtures('size.fixtures', [
+      [
+        'a measurement at its recorded baseline is green',
+        () =>
+          expectEqual(
+            sizeProblems({ surface: 1000, legacy: 2000, budget: { tolerancePercent: 25, coreBaseline: 1000, legacyBaseline: 2000 } }),
+            [],
+            'problems'
+          )
+      ],
+      [
+        'the last line inside the band is green, and the next one is not',
+        () => {
+          const budget = { tolerancePercent: 10, coreBaseline: 1000, legacyBaseline: 1000 }
+          expectEqual(sizeProblems({ surface: 1100, legacy: 1100, budget }), [], 'problems at the limit')
+          expectEqual(sizeProblems({ surface: 1101, legacy: 1101, budget }).length, 2, 'problems past the limit')
+        }
+      ],
+      [
+        'a missing band is a problem, not an infinite band',
+        () =>
+          expectTrue(
+            sizeProblems({ surface: 10, legacy: 10, budget: { coreBaseline: 1, legacyBaseline: 1 } }).some((p) =>
+              p.includes('tolerancePercent')
+            ),
+            'the missing band was not reported'
+          )
+      ],
+      [
+        'a missing recorded baseline is a problem rather than a free pass',
+        () =>
+          expectTrue(
+            sizeProblems({ surface: 10, legacy: 10, budget: { tolerancePercent: 25, legacyBaseline: 1 } }).some((p) =>
+              p.includes('coreBaseline')
+            ),
+            'the missing baseline was not reported'
+          )
+      ],
+      [
+        'a deletion is reported as a direction, never as a problem',
+        () => {
+          const budget = {
+            tolerancePercent: 25,
+            coreBaseline: 1000,
+            legacyBaseline: 2000,
+            _revisions: [{ legacyCeiling: '1800 -> 2000' }, { legacyCeiling: '2000 -> 1800' }, { coreLines: '1 -> 2' }]
+          }
+          expectEqual(sizeProblems({ surface: 500, legacy: 500, budget }), [], 'problems after a deletion')
+          expectEqual(legacyMoves(budget), { up: 1, down: 1, revisions: 3 }, 'moves')
+          expectTrue(sizeReport({ surface: 500, legacy: 500, total: 1000, budget }).includes('target'), 'the target line')
+        }
+      ],
+      [
+        'the real check fails in place when its band is zero',
+        () => {
+          const verdict = checkSize({ tolerancePercent: 1, coreBaseline: 1, legacyBaseline: 1 })
+          expectEqual(verdict.verdict, 'FAIL', 'a one-line budget must turn the real row red')
+          expectTrue(verdict.detail.includes('budget.mjs --record'), 'the remedy is named')
+        }
+      ]
+    ])
+  )
 }
 
 // ---------------------------------------------------------------------------------------------

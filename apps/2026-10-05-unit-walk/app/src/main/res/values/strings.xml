@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">UnitWalk</string>
+    <string name="app_idea" translatable="true">UnitWalk — a crash-safe, no-account rental unit walk for self-managing landlords: room-by-room photo condition records that survive a process kill, move-in versus move-out compare per unit, and a signed PDF shared from the phone.</string>
+    <string name="about_title" translatable="true">About this app</string>
+    <string name="about_back" translatable="true">Back</string>
+    <string name="about_body" translatable="true">%1$s keeps the condition record of every rental unit on this phone: a photo and a note per room, written as the walk goes on, so an inspection that finished is an inspection that survived. No account, no upload, no server.</string>
+    <string name="about_privacy_note" translatable="true">Your units, walks, photos and notes stay in this app on the device; nothing is sent anywhere. The privacy policy below is the complete description of what the app does with your data.</string>
+    <string name="about_privacy_action" translatable="true">Open the privacy policy</string>
+    <!-- The policy address is data, not prose: `translatable="false"` keeps it out of the translation
+         round-trip (and out of `values-ru/`, where a second copy could only drift), and Play requires
+         the policy to be reachable from inside the app as well as from the listing
+         (store/listing.json). AboutScreen opens it through LocalUriHandler. -->
+    <string name="about_privacy_url" translatable="false">https://telegra.ph/UnitWalk--privacy-policy-10-05</string>
+
+    <!-- Settings. Every preference here is read by code outside the settings screen, because a
+         control that changes nothing teaches the user that Settings is decoration. -->
+    <string name="settings_title" translatable="true">Settings</string>
+    <string name="settings_back" translatable="true">Back</string>
+    <string name="settings_appearance_header" translatable="true">Appearance</string>
+    <string name="settings_theme_supporting" translatable="true">Choose how the app looks.</string>
+    <string name="settings_theme_system" translatable="true">Follow system</string>
+    <string name="settings_theme_light" translatable="true">Light</string>
+    <string name="settings_theme_dark" translatable="true">Dark</string>
+    <string name="settings_dynamic_color_title" translatable="true">Use wallpaper colours</string>
+    <string name="settings_dynamic_color_supported" translatable="true">Build the palette from the device wallpaper.</string>
+    <string name="settings_dynamic_color_unsupported" translatable="true">Not available on this version of Android.</string>
+    <string name="settings_language_header" translatable="true">Language</string>
+    <string name="settings_language_title" translatable="true">App language</string>
+    <string name="settings_language_summary" translatable="true">Choose the language this app uses.</string>
+    <string name="settings_language_system" translatable="true">System default</string>
+    <string name="action_cancel" translatable="true">Cancel</string>
+    <string name="settings_behaviour_header" translatable="true">Behaviour</string>
+    <string name="settings_haptics_title" translatable="true">Vibration feedback</string>
+    <string name="settings_haptics_summary" translatable="true">Vibrate when you move between screens.</string>
+    <string name="settings_about_header" translatable="true">About</string>
+    <string name="settings_rate_title" translatable="true">Rate app</string>
+    <string name="settings_rate_summary" translatable="true">Tell others how this app works for you.</string>
+
+    <!-- The destination host. Shown only in the leading pane of a wide window, before anything is
+         opened; on a phone the portfolio fills the window and this is never read. -->
+    <string name="nav_detail_placeholder" translatable="true">Select a unit to see its walks.</string>
+</resources>

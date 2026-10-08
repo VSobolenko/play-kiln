@@ -73,14 +73,16 @@ Rules for the recording step:
 - **`--note` is required and must be the owner's own words.** A record with no words is a
   boolean an agent could set by itself; the note is what makes it a decision a later reader
   can audit. Never paraphrase a vague "ok" into an approval — ask what he approved.
-- Approval authorises **the release pipeline**, and it is what lets the agent tick the two
-  first-publication legal declarations during console submission: the approval is the human
-  checkpoint, and the click is not. Uploading and publishing stay with the owner
-  (`authorization.mdc`). The owner's decision, recorded 2026-10-03: «В нашем заводе есть правило,
-  что перед публикацией необходимо одобрение владельца. Собственно говоря, в то время и я проверяю
-  проверку всех вот этих политик, и только после моего одобрения я говорю разрешить публикацию.
-  Поэтому, если я разрешил публикацию, значит эти галочки можно уже автоматически нажимать. Потому
-  что все проверки необходимые для публикации проводятся до начальной публикации всего приложения.»
+- Approval authorises **the release pipeline** (signed build, store pack, captures), and it is what
+  lets the agent tick the two first-publication legal declarations during console submission: the
+  approval is the product checkpoint, and the click is not. **Console submission and Publish are the
+  agent's job** after a separate publish yes (checkpoint 2 below) — the owner does not perform the
+  console labour (`authorization.mdc`). The owner's decision, recorded 2026-10-03: «В нашем заводе
+  есть правило, что перед публикацией необходимо одобрение владельца. Собственно говоря, в то время
+  и я проверяю проверку всех вот этих политик, и только после моего одобрения я говорю разрешить
+  публикацию. Поэтому, если я разрешил публикацию, значит эти галочки можно уже автоматически
+  нажимать. Потому что все проверки необходимые для публикации проводятся до начальной публикации
+  всего приложения.»
 
 The record is `apps/<slot>/release-approval.json`, gitignored, and the check is one module:
 `scripts/lib/release-approval.mjs`. Six entry points call it and refuse without it:
@@ -128,45 +130,88 @@ Runs only after the gate passes:
    beat synthetic ones, and any synthetic capture must be labelled as such.
 4. `node scripts/verify.mjs --slot <slug> --build`, then `/eval` and
    `play-auditor`.
-5. Update `registry/apps.json`, then **human checkpoint 2**: the owner uploads and publishes.
+5. Update `registry/apps.json`, then **human checkpoint 2 — publish authorization**: the agent asks
+   whether it may proceed to publish; on the owner's yes, the agent walks
+   `docs/play-publishing-playbook.md` §5.1 end to end, including forms, declarations, the release
+   form, submit, and Publish. Checkpoint 1.5 authorised the release pipeline; checkpoint 2
+   authorises the console submission. The owner is yes/no and corrections — not the person who
+   fills the console while the agent watches. The owner's decision, recorded 2026-10-04: after the
+   app is developed and confirmed ready, the agent must not propose that the owner publish while
+   the agent watches; the agent asks «may I proceed to publish?», and on yes the agent itself opens
+   Google Play Console, fills every form, uploads what tooling allows, fixes what needs fixing, and
+   publishes — the owner helps only where a tooling limit requires a human (store-graphic file
+   inputs, AAB file chooser, promo-code files).
 
 Report the release phase's own elapsed wall clock. The one-hour target is a direction and the
 release half is where the unavoidable build and capture time sits; do not present development
 time as if it covered the release.
 
-## The store graphics are the owner's upload, and the agent must ask for them
+## Tooling assists — the three points where the owner's hand is needed
 
-One console act cannot be automated and must not be attempted: **uploading the store-graphic
-fields** — the app icon, the feature graphic and the phone / 7-inch / 10-inch screenshot sets. They
-are hidden `input[type=file]` controls that appear only after `Добавить объекты`, and the sandboxed
-browser the factory drives denies `DOM.setFileInputFiles`. That is an unsolved tooling limitation,
-recorded as a limitation and not as a policy (`docs/play-console-checklist.md` §1.B and §10); no
-route around it exists, so a session that needs these assets neither leaves the release half-done in
-silence nor invents a workaround.
+A few console acts cannot be automated and must not be faked: hidden `input[type=file]` controls
+(store graphics appear only after `Добавить объекты`), a bundle chooser the sandboxed browser
+denies, and **a file download** the agent can trigger but cannot receive — the browser answers it
+with a native save window that is outside the page. That is an unsolved tooling limitation, recorded
+as a limitation and not as a policy (`docs/play-console-checklist.md` §1.B and §10) — it is why the
+agent asks for a human hand at those points, **not** why the owner owns publication.
 
-The owner's instruction, recorded 2026-10-03, is that at this point the agent **opens the page, gives
-the instruction, and asks — and the asking is the checkpoint**:
+There are **exactly three**, and they are not the same kind of act. Two push a file *into* the
+console; the third pulls a file *out*.
 
-1. **Open the page for the owner** in the browser the factory drives
-   (`…/store-listings/default/edit`), scrolled to `Значок приложения`.
+| # | Point | Where | What the agent does | What the owner does |
+|---|---|---|---|---|
+| 1 | **AAB / APK chooser** | the release form's bundle upload | opens the page, names the absolute path under `dist/` | drops the file |
+| 2 | **Store-graphic inputs** | `…/store-listings/default/edit`, the five image fields | opens the page, names the paths under `store/assets/` | drops the files |
+| 3 | **Promo-code download** | `Монетизация с помощью Play → Promotions` (`.../promotions`) | clicks **`Скачать коды` once** | confirms the browser's save window |
+
+**For 1 and 2 — uploads.** The owner's instruction, recorded 2026-10-03 and reframed 2026-10-04, is
+that the agent **drives the session, opens the page, names the paths, asks for the assist, waits,
+then continues and publishes**:
+
+1. **Open the page** in the browser the factory drives, scrolled to the field in question
+   (`…/store-listings/default/edit` at `Значок приложения`, or the release upload page for the
+   bundle chooser).
 2. **Give the exact instruction**: which file goes into which field, as absolute paths — the icon
    from `store/assets/icon-512.png`, the feature graphic from
    `store/assets/feature-graphic-1024x500.png`, the phone set from `store/assets/<locale>/phone-*.png`
-   and the tablet sets from `store/assets/<locale>/tablet-*.png`.
-3. **Ask, and wait.** The question is a checkpoint, not a notification: the owner uploads and
-   confirms, and the agent does not proceed, does not re-save over his upload, and does not report the
-   release as finished until he answers. **While he is uploading, the agent touches the page as little
-   as possible** — it must not navigate away or reload it, because the chosen files live in the form
-   and not on the server until the step-2 save, so a reload silently discards his work and leaves the
-   agent checking an empty form it reloaded itself.
-4. **Only then continue, and check without discarding** — `Далее` → the `Отзыв` tab → save, reading
-   the validation messages the `Далее` click produces. That is what says whether the listing is
-   finally complete; a reload is not a check.
+   and the tablet sets from `store/assets/<locale>/tablet-*.png` (or the staged AAB under `dist/`).
+3. **Ask, and wait.** The owner drops files into the open chooser / fields and confirms; the agent
+   does not proceed, does not re-save over that upload, and does not leave the release half-done.
+   **While files are being chosen, the agent touches the page as little as possible** — it must not
+   navigate away or reload it, because the chosen files live in the form and not on the server until
+   the next save, so a reload silently discards the work and leaves the agent checking an empty form
+   it reloaded itself.
+4. **Only then continue** — save / `Далее` / the rest of §5.1, including Publish — reading the
+   validation messages the console produces. A reload is not a check.
 
-The ask is mandatory because the upload is invisible to every gate: the pack validates,
-`media-capture.mjs` has already photographed the build, and the release review is the only place that
-reports the field as missing — so a session that skips the ask reports a finished release whose store
-page has no icon.
+**For 3 — the promo-code download.** This is the point the list was already naming and the procedure
+was not, and the defect is recorded: the agent pressed `Скачать коды` repeatedly, and each press
+opened another save window the owner had to dismiss. The protocol is one click and a wait, never a
+retry loop:
+
+1. **Navigate** to `Монетизация с помощью Play → Promotions` (`.../promotions`) and click
+   **`Скачать коды` exactly once**.
+2. **Stop and ask** — in the owner's own language, e.g. «Нажмите „Скачать“ в открывшемся окне и
+   подтвердите, когда файл сохранится» — then **wait**. The agent does not click again, does not
+   browse away from the page, and does not reload it while the window is open.
+3. **On the owner's confirmation**, continue: read the downloaded CSV and use it for what §5 of the
+   checklist needs (the reviewer credentials' `Другие данные, которые требуются для входа`). **The
+   file is never committed** — a code is a free unlock of what the slot sells.
+4. **If no window opened**, say so, and hand the owner the manual path so he can do it himself:
+   the page is `.../promotions`, the control is `Скачать коды`, Play names the file
+   **`promotion_codes.csv`**, and a browser saves it to its default download folder (on Windows
+   usually `%USERPROFILE%\Downloads`). When he tells the agent where it landed, the agent reads that
+   path and finishes the step.
+
+**Never press `Скачать коды` a second time.** A second press opens a second save window and leaves
+the owner dismissing duplicates; the button is idempotent from the agent's side and the waiting is
+not optional. `docs/play-console-checklist.md` §5 and §10 and `docs/play-publishing-playbook.md`
+carry the same three points and the same one-click rule — `harness.publishAssists` compares all the
+holders, so a fourth document cannot drift or a point cannot go missing quietly.
+
+The assist ask is mandatory because those acts are invisible to every gate: the pack validates,
+`media-capture.mjs` has already photographed the build, and skipping the ask reports a finished
+release whose store page has no icon (or no bundle, or a reviewer with no way into paid content).
 
 ## What never changes
 
@@ -174,5 +219,7 @@ page has no icon.
   work may run, not whether the app is good.
 - Never record an approval to unblock yourself. If the release scripts refuse, the answer is
   to ask the owner, not to delete or edit `release-approval.json`.
-- Never upload artifacts or the store graphics, and never publish (`authorization.mdc`). The two
-  first-publication declarations are ticked by the agent only under the recorded approval above.
+- Never upload to Play or press Publish without an explicit publish yes in the current conversation
+  (`authorization.mdc`). On that yes, the agent drives the console and publishes; it does not hand
+  the labour back to the owner. The two first-publication declarations are ticked by the agent under
+  the recorded release approval (checkpoint 1.5).

@@ -1,8 +1,10 @@
-# Codex co-lead protocol
+# Codex co-lead protocol and the Copilot worker channel
 
-Cursor owns orchestration and final verification. Codex is a co-lead engineer with
-a durable worker channel and may implement any bounded factory task. A worker result
-is input to verification, never proof of completion.
+Cursor owns orchestration and final verification. Codex is the co-lead engineer with a durable
+worker channel, and it stays the co-lead. Beside it, the GitHub Copilot CLI is a **second durable
+worker channel** and a peer model family — an additional channel, not a replacement for Codex and
+not a new role. Either channel may implement any bounded factory task by running the existing role
+cards from a prompt file. A worker result is input to verification, never proof of completion.
 
 ## Role cards
 
@@ -44,6 +46,11 @@ node scripts/codex-run.mjs list
 5. `resume` continues the exact recorded Codex session with a new prompt.
 6. Verify the result with a diff and the relevant factory commands.
 
+The **GitHub Copilot CLI** is the second worker channel and follows the same shape through
+`scripts/copilot-run.mjs run|status|list|last|log|resume|probe`; its state lives in
+`.kiln/copilot/`, its ledger verdicts are the same four as Codex's because the classifier is shared,
+and its operator runbook is `harness/copilot-workers.md`.
+
 Every worker report carries the **claim ledger** `.cursor/rules/grounded-claims.mdc` defines: one
 `CLAIM / LABEL / EVIDENCE` row per factual claim, each `MEASURED` row naming the command that produced
 it or the `path:line` it was read from, and `UNVERIFIED` used as the honest answer to a question the
@@ -76,15 +83,22 @@ OpenSpec or the appropriate tracked harness document.
 
 | Signal or failure | Immediate response | Next owner |
 |---|---|---|
-| `RATE_LIMITED` | Stop retrying Codex; preserve prompt and evidence | Cursor `generator` subagent |
-| `CONTEXT_LIMIT` | Reduce the task to a bounded file list and resume once with the exact session ID | Cursor `generator` if still blocked |
-| `AUTH_ERROR` | Do not paste credentials or create an API key; record the auth blocker | Cursor `generator` |
-| Same issue fails twice | Stop repeating the same worker path; record both failures | Cursor `generator`, then orchestrator |
+| `RATE_LIMITED` | Stop retrying the channel; preserve prompt and evidence | GitHub Copilot CLI worker |
+| `CONTEXT_LIMIT` | Reduce the task to a bounded file list and resume once with the exact session ID | GitHub Copilot CLI worker if still blocked |
+| `AUTH_ERROR` | Do not paste credentials or create an API key; record the auth blocker | GitHub Copilot CLI worker |
+| Same issue fails twice | Stop repeating the same worker path; record both failures | Next rung, then orchestrator |
 
-The full ladder is **Codex worker → Cursor `generator` subagent → orchestrator**.
-The orchestrator may finish the bounded task directly only after the earlier owner is
-blocked or has failed twice. If completing it would require new authority, external
-credentials, or a changed product decision, stop and ask the human.
+The triggers are unchanged — `RATE_LIMITED` does not retry, `CONTEXT_LIMIT` shrinks scope and
+resumes once, `AUTH_ERROR` never handles credentials, and the same issue failing twice ends the
+path.
+
+The full ladder is **Codex worker → GitHub Copilot CLI worker → Cursor `generator` subagent →
+orchestrator**. Copilot is the first fallback rung because it is a second peer model family, while
+`generator` is the orchestrator's own family and therefore a less independent check. Copilot's own
+`RATE_LIMITED` or `AUTH_ERROR` falls through to `generator`; it is the first rung, not the last. The
+orchestrator may finish the bounded task directly only after the earlier owner is blocked or has
+failed twice. If completing it would require new authority, external credentials, or a changed
+product decision, stop and ask the human.
 
 ## Acceptance and adjudication
 

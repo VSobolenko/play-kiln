@@ -7,6 +7,7 @@
 import { checkAssetFixtures, checkLimitsAgreement, checkReleaseNoteFixtures, packChecks } from './assets.mjs'
 import { apkChecks, sixteenKbFixtures } from './apk.mjs'
 import { buildChecks, buildFixtures, checkCopyFilter, checkNamespaceSweep, checkScratchHygiene, checkToolchainPins } from './build.mjs'
+import { depsChecks, depsFixtures } from './deps.mjs'
 import { checkConfig } from './config.mjs'
 import { checkFactLedger, factFixtures } from './facts.mjs'
 import { checkAdaptiveIcon, iconFixtures } from './icon.mjs'
@@ -20,10 +21,12 @@ import { PALETTE_IDS, paletteChecks, paletteFixtures } from './palette.mjs'
 import { policyChecks, policyFixtures } from './policy.mjs'
 import { checkSpec, specFixtures } from './spec.mjs'
 import { checkSigningExample, checkSigningFixtures } from './signing.mjs'
-import { checkHarnessRefFixtures, checkHarnessRefs, checkSecretFixtures, checkSize, slotChecks } from './project.mjs'
+import { checkHarnessRefFixtures, checkHarnessRefs, checkSecretFixtures, checkSize, checkSizeFixtures, slotChecks } from './project.mjs'
+import { recordFixtures } from './budget.mjs'
 
 import { localizationChecks, localizationFixtures, localizationProjectChecks } from './localization.mjs'
 import { settingsChecks, settingsFixtures, settingsProjectChecks } from './settings.mjs'
+import { REVIEW_IDS, reviewChecks, reviewFixtures, reviewProjectChecks } from './review.mjs'
 import { uiuxChecks, uiuxFixtures, uiuxProjectChecks } from './uiux.mjs'
 
 /**
@@ -76,6 +79,20 @@ if (PALETTE_REPORTS.map((report) => report.id).join() !== PALETTE_IDS.join()) {
 }
 
 /**
+ * In-App Review legs — literal for the same reason ICON_REPORTS is: the ledger may only name an id
+ * that appears in this file as text.
+ */
+const REVIEW_REPORTS = [
+  { id: 'review.dependency' },
+  { id: 'review.api' },
+  { id: 'review.throttle' },
+  { id: 'review.settings' }
+]
+if (REVIEW_REPORTS.map((report) => report.id).join() !== REVIEW_IDS.join()) {
+  throw new Error('the review group reports list has drifted from REVIEW_IDS in scripts/core/review.mjs')
+}
+
+/**
  * Every check, in report order.
  *
  * `needsSlot` marks a check that requires a slot to inspect. A run without `--slot` still evaluates
@@ -95,6 +112,7 @@ export const CHECKS = Object.freeze([
       ...asVerdicts(paletteFixtures()),
       sixteenKbFixtures(),
       buildFixtures(),
+      ...asVerdicts(depsFixtures()),
       factFixtures(),
       harnessFixtures(),
       manifestFixtures(),
@@ -121,9 +139,13 @@ export const CHECKS = Object.freeze([
       ...uiuxProjectChecks(),
       ...asVerdicts(settingsFixtures()),
       ...settingsProjectChecks(),
+      ...asVerdicts(reviewFixtures()),
+      ...reviewProjectChecks(),
       ...asVerdicts(localizationFixtures()),
       ...localizationProjectChecks(),
       checkSize(),
+      checkSizeFixtures(),
+      recordFixtures(),
       ...checkConfig()
     ]
   },
@@ -154,7 +176,7 @@ export const CHECKS = Object.freeze([
     run: (slotDir) => paletteChecks(slotDir)
   },
   { id: 'apk', needsSlot: true, run: (slotDir) => apkChecks(slotDir) },
-  { id: 'build', needsSlot: true, run: (slotDir) => buildChecks(slotDir) },
+  { id: 'build', needsSlot: true, run: (slotDir) => [...buildChecks(slotDir), ...depsChecks(slotDir)] },
   { id: 'manifest', needsSlot: true, run: (slotDir) => manifestChecks(slotDir) },
   // `slot.naming` sits with `slot.differentiators`: both are decisions the slot recorded before it
   // was built, and both are read the same way — the contract on disk against the pack it produced.
@@ -188,8 +210,21 @@ export const CHECKS = Object.freeze([
     // declared here for the same reason the group's own id is: the ledger may name a function that
     // really runs, and it is this entry that runs it. `uiux.platform` joined on 2026-10-02, and
     // `uiux.content-colour` on 2026-10-02 with it.
-    reports: [{ id: 'uiux.insets' }, { id: 'uiux.platform' }, { id: 'uiux.content-colour' }],
-    run: (slotDir) => [...uiuxChecks(slotDir), ...settingsChecks(slotDir), ...localizationChecks(slotDir)]
+    reports: [
+      { id: 'uiux.insets' },
+      { id: 'uiux.platform' },
+      { id: 'uiux.content-colour' },
+      { id: 'review.dependency' },
+      { id: 'review.api' },
+      { id: 'review.throttle' },
+      { id: 'review.settings' }
+    ],
+    run: (slotDir) => [
+      ...uiuxChecks(slotDir),
+      ...settingsChecks(slotDir),
+      ...localizationChecks(slotDir),
+      ...reviewChecks(slotDir)
+    ]
   }
 ])
 

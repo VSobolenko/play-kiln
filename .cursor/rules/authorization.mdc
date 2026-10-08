@@ -6,9 +6,11 @@ alwaysApply: true
 # Git, signing, and publishing require explicit authorization
 
 The owner decides what enters history and what leaves the machine. An agent that commits, pushes,
-signs, or uploads on its own initiative takes a decision that is not its to take, and it does so
-irreversibly: a pushed commit is public, a signed artifact binds an app's identity, an upload is a
-release.
+signs, or publishes on its own initiative takes a decision that is not its to take, and it does so
+irreversibly: a pushed commit is public, a signed artifact binds an app's identity, a Play submit is
+a release. **Permission to publish is not permission for the owner to do the console work** — on an
+explicit yes, the agent drives Google Play Console and presses submit/Publish
+(`.cursor/rules/release-gate.mdc` checkpoint 2; owner's decision, recorded 2026-10-04).
 
 This rule exists because it was violated. During one session the factory committed repeatedly
 (`57663a9`, `1f95ea8`, `33aa492`, `5779a33`, `1681fbb`, `59f8e6a`, `e275134`) and generated a release
@@ -25,7 +27,14 @@ and neither was announced as a decision that needed permission.
   anything else that publishes.
 - Generating, rotating, or overwriting signing credentials — `scripts/sign-release.mjs --generate`,
   `keytool -genkeypair`, or writing a `keystore.properties`.
-- Uploading to Play — `scripts/play-upload.mjs` in any mode that is not `--dry-run`.
+- Uploading or publishing to Play — `scripts/play-upload.mjs` in any mode that is not `--dry-run`,
+  walking the Console ladder, submitting a release, or pressing Publish — without an explicit
+  publish yes in the current conversation. That yes **authorises the agent to execute** the console
+  work end to end; it does not mean the owner fills the forms while the agent watches. Tooling
+  assists — store-graphic file inputs, the AAB/APK file chooser, and the promo-code download
+  — stay assists: the agent opens the page, names absolute paths, asks, waits, then continues.
+  The download is the one that is clicked **once** before the ask, never repeatedly; the three
+  points and the protocol are `.cursor/rules/release-gate.mdc` § "Tooling assists".
 - Editing `.git/config`, remotes, or hooks.
 
 ## Reading git is always allowed

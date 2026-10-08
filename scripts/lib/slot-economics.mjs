@@ -70,17 +70,19 @@ export const PLACEHOLDER_PATTERNS = Object.freeze([
 
 /**
  * Where a plan may point for evidence. `docs/research/` holds factory-wide measured
- * facts; `docs/ideation/` holds the proposal a plan came from, which is where the
- * per-niche measurement actually lives. Both are accepted because a plan that cites
- * only the *method* record — as all five plans in `docs/ideation/2026-09-26-five-recipes.md`
- * first did — points at a file that documents how the market was measured rather than
- * what was measured for that niche, and that is a weaker link than this gate implies.
+ * facts; `docs/ideation/` holds an open proposal still in the queue; and after scaffold
+ * the proposal moves into `apps/<date>-<slug>/docs/`, so that path is accepted too.
+ * A plan that cites only a *method* record — as all five plans in
+ * `docs/ideation/2026-09-26-five-recipes.md` first did — points at a file that documents
+ * how the market was measured rather than what was measured for that niche, and that is
+ * a weaker link than this gate implies.
  *
- * Accepting `docs/ideation/` cannot create a dangling reference: `check-economics.mjs`
+ * Accepting these prefixes cannot create a dangling reference: `check-economics.mjs`
  * resolves the cited file on disk and BLOCKS when it is gone, so deleting the proposal
  * that justifies a slot breaks that slot's money gate.
  */
-const EVIDENCE_REF_PATTERN = /^docs\/(?:research|ideation)\/[a-z0-9._-]+\.md(#.+)?$/
+const EVIDENCE_REF_PATTERN =
+  /^(?:docs\/(?:research|ideation)|apps\/\d{4}-\d{2}-\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*\/docs)\/[a-z0-9._-]+\.md(#.+)?$/
 
 function isPlainObject(value) {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
@@ -154,7 +156,7 @@ function validateEvidenceRef(value, errors) {
   const trimmed = raw.trim()
   if (!EVIDENCE_REF_PATTERN.test(trimmed)) {
     errors.push(
-      `evidenceRef must be docs/research/<file>.md or docs/ideation/<file>.md with an optional #section (found "${trimmed}")`
+      `evidenceRef must be docs/research/<file>.md, docs/ideation/<file>.md, or apps/<date>-<slug>/docs/<file>.md with an optional #section (found "${trimmed}")`
     )
     return
   }

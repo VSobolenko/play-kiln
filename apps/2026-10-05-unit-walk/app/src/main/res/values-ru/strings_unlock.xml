@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Русский перевод экрана разовой разблокировки. Ключи те же, что в
+  values/strings_unlock.xml, и их набор совпадает один в один.
+-->
+<resources>
+    <string name="unlock_title" translatable="true">Разблокировка</string>
+    <string name="unlock_back" translatable="true">Назад</string>
+    <string name="unlock_hero_title" translatable="true">Разблокировка UnitWalk</string>
+    <string name="unlock_hero_subtitle" translatable="true">Один платёж — навсегда</string>
+    <string name="unlock_price" translatable="true">9,99 $</string>
+    <string name="unlock_price_caption" translatable="true">Разовая покупка</string>
+    <string name="unlock_pitch" translatable="true">Объектов без ограничений и PDF-отчёты без водяного знака.</string>
+    <string name="unlock_owned_status" translatable="true">Куплено</string>
+    <string name="unlock_not_owned_status" translatable="true">Не куплено</string>
+    <string name="unlock_owned_detail" translatable="true">Объектов без ограничений и PDF-отчёты без водяного знака.</string>
+    <string name="unlock_not_owned_detail" translatable="true">Бесплатно — один объект, а в экспортируемых PDF остаётся водяной знак. Экспорт при этом доступен всегда.</string>
+    <string name="unlock_buy_action" translatable="true">Разблокировать за %1$s</string>
+    <string name="unlock_restore_action" translatable="true">Восстановить покупку</string>
+    <string name="unlock_working" translatable="true">Связь с Google Play…</string>
+    <string name="unlock_availability_label" translatable="true">Состояние Google Play</string>
+    <string name="unlock_availability_uninitialized" translatable="true">Проверка Google Play…</string>
+    <string name="unlock_availability_unsupported" translatable="true">Покупки не поддерживаются на этом устройстве.</string>
+    <string name="unlock_availability_needs_consent" translatable="true">Ожидание согласия.</string>
+    <string name="unlock_availability_ready" translatable="true">Готово к покупке.</string>
+    <string name="unlock_availability_failed" translatable="true">Google Play Billing недоступен.</string>
+    <string name="unlock_message_purchase_success" translatable="true">Спасибо — разблокировка ваша.</string>
+    <string name="unlock_message_purchase_failed" translatable="true">Покупка не завершена.</string>
+    <string name="unlock_message_already_owned" translatable="true">У вас уже есть разблокировка.</string>
+    <string name="unlock_message_restore_success" translatable="true">Покупка восстановлена.</string>
+    <string name="unlock_message_restore_failed" translatable="true">Не удалось восстановить покупку.</string>
+    <string name="unlock_message_unavailable" translatable="true">Google Play Billing недоступен.</string>
+    <string name="unlock_failure_label" translatable="true">Причина</string>
+    <string name="unlock_reason_not_available" translatable="true">Недоступно</string>
+    <string name="unlock_reason_not_configured" translatable="true">Не настроено</string>
+    <string name="unlock_reason_no_consent" translatable="true">Нужно согласие</string>
+    <string name="unlock_reason_network" translatable="true">Проблема сети</string>
+    <string name="unlock_reason_policy_blocked" translatable="true">Заблокировано политикой</string>
+    <string name="unlock_reason_unknown" translatable="true">Неизвестная ошибка</string>
+</resources>

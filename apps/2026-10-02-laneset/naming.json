@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "slot": "laneset",
-  "reconRef": "docs/ideation/2026-10-02-planners-and-optimisers.md#5-the-naming-decision",
+  "reconRef": "apps/2026-10-02-laneset/docs/2026-10-02-planners-and-optimisers.md#5-the-naming-decision",
   "title": "Laneset: Swim Set Builder",
   "slug": "laneset",
   "applicationId": "com.gexetr.laneset",
@@ -163,7 +163,7 @@
   "rationale": "The field was generated before it was judged: eight candidates spanning four archetypes, with the carrier space screened on Play first and three auditions eliminated by a live collision (Setline, BlockSmith) or by a genre (the forge token space). The winner is a compound rather than a bare descriptive phrase because the shelf is already saturated with descriptive titles that share the head term, and Play's strongest ranking field is spent better on a carrier that can compound plus one job noun no incumbent's title uses; the swim token is kept in the title because the shelf's own leaders hold it in theirs. The job half was deliberately narrowed from the fuller phrase Swim Workout Builder to Swim Set Builder to buy back the characters of slack the locale rule requires, accepting a small ASO cost against the query swim workout generator in exchange for a title that survives every declared locale inside Play's cap.",
   "collisionCheck": "Screened on Play from this machine on 2026-10-02, one query per candidate token, and the reading is recorded in the evidence file section 5. For laneset the 29-card result page carried no app with that token in its title, the nearest being Allsets: Gym Workout Planner (com.strongomatic.android), LiveSet (com.cognitechs.liveset) and Everyset (com.castifi). The carrier auditions were then screened the same way: blocksmith returned the live app com.jerus.blocksmith, setline returned the live app com.setline.app, and laneforge returned an idle RPG genre page. This is a storefront search reading only, not a register: no trademark database was queried, Play does not enforce unique titles, and a clean search is not clearance, so the exact string Laneset is UNVERIFIED in class 9.",
   "localisationCheck": "The title was measured in both declared locales against Play's 30 character cap. The en-US string Laneset: Swim Set Builder is 25 characters, 5 of slack, and the ru-RU string Laneset: план тренировок is 24 characters, 6 of slack, so neither locale overflows and both keep the slack the contract asks for. Both use only letters, one colon and single spaces, with no emoji, no ALL CAPS and no repeated symbols, and each has exactly one canonical spelling, so a listener who heard it once can type it. The carrier stays a Latin brand token in both locales rather than a machine translation, because a brand that differs per language is not one brand, and the job half is a human-authored Russian phrase rather than machine output. The residual gap is that the Russian phrase's discoverability for a Russian-speaking swimmer was not measured, and the ru title uses a shorter job noun than the en title, so the two locales do not state the job in the same words.",
-  "evidence": "docs/ideation/2026-10-02-planners-and-optimisers.md#5-the-naming-decision",
+  "evidence": "apps/2026-10-02-laneset/docs/2026-10-02-planners-and-optimisers.md#5-the-naming-decision",
   "localizedTitles": {
     "en-US": "Laneset: Swim Set Builder",
     "ru-RU": "Laneset: план тренировок"

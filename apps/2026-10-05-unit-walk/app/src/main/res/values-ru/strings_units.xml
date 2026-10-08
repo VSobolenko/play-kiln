@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Russian translation of res/values/strings_units.xml. Every key exists in both
+    locales and carries a real translation rather than a copy of the English, so
+    locale.placeholder stays green. Written as Russian, not machine output.
+-->
+<resources>
+    <string name="units_title" translatable="true">Объекты</string>
+    <string name="units_hero_title" translatable="true">Осмотры ваших объектов</string>
+    <string name="units_hero_subtitle" translatable="true">Фотофиксация состояния по комнатам, которая переживает перезапуск.</string>
+    <string name="units_hero_stat_label" translatable="true">объектов</string>
+
+    <string name="units_add_action" translatable="true">Добавить объект</string>
+    <string name="units_new_unit_title" translatable="true">Новый объект</string>
+    <string name="units_rename_title" translatable="true">Переименовать объект</string>
+    <string name="units_name_label" translatable="true">Название объекта</string>
+    <string name="units_name_hint" translatable="true">Например, квартира 3Б</string>
+    <string name="units_create_action" translatable="true">Создать</string>
+    <string name="units_save_action" translatable="true">Сохранить</string>
+
+    <string name="units_empty_title" translatable="true">Пока нет объектов</string>
+    <string name="units_empty_body" translatable="true">Добавьте первый объект аренды, чтобы начать покомнатный осмотр.</string>
+
+    <string name="units_walks_label" translatable="true">Осмотры</string>
+    <string name="units_status_prior_present" translatable="true">Есть базовый осмотр при заселении</string>
+    <string name="units_status_prior_absent" translatable="true">Нет базового осмотра при заселении</string>
+    <string name="units_no_walks_body" translatable="true">Осмотров пока нет. Начните заселение, выселение или отдельный осмотр.</string>
+    <string name="units_prior_absent_body" translatable="true">Запишите осмотр при заселении до выселения, чтобы сравнению было с чем сравнивать.</string>
+
+    <string name="units_continue_action" translatable="true">Продолжить осмотр</string>
+    <string name="units_compare_action" translatable="true">Сравнить</string>
+    <string name="units_rename_action" translatable="true">Переименовать</string>
+    <string name="units_delete_action" translatable="true">Удалить</string>
+
+    <string name="units_delete_title" translatable="true">Удалить этот объект?</string>
+    <string name="units_delete_body" translatable="true">«%1$s» будет удалён вместе с записанными осмотрами (%2$d). Это действие необратимо.</string>
+    <string name="units_delete_confirm_action" translatable="true">Удалить</string>
+
+    <string name="units_start_header" translatable="true">Начать осмотр</string>
+    <string name="units_kind_move_in" translatable="true">Заселение</string>
+    <string name="units_kind_move_out" translatable="true">Выселение</string>
+    <string name="units_kind_single" translatable="true">Отдельный осмотр</string>
+
+    <string name="units_unlock_action" translatable="true">Разблокировать</string>
+    <string name="units_about_action" translatable="true">О приложении</string>
+
+    <string name="units_created_message" translatable="true">Объект создан.</string>
+    <string name="units_renamed_message" translatable="true">Объект переименован.</string>
+    <string name="units_deleted_message" translatable="true">Объект удалён.</string>
+    <string name="units_name_required_message" translatable="true">Введите название объекта.</string>
+    <string name="units_not_found_message" translatable="true">Этот объект больше недоступен.</string>
+    <string name="units_walk_started_message" translatable="true">Осмотр начат.</string>
+    <string name="units_limit_reached_message" translatable="true">Бесплатно доступен один объект. Разблокируйте, чтобы добавить ещё.</string>
+    <string name="units_not_saved_message" translatable="true">Не удалось сохранить изменение. Попробуйте ещё раз.</string>
+</resources>

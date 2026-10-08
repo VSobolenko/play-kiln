@@ -107,19 +107,36 @@ node scripts/kiln-status.mjs
 Then `/eval` with the `evaluator` subagent and `play-auditor`. The generator never grades its
 own work. On FIX → generator → re-eval. `UNVERIFIED` is not PASS — read the diff by hand.
 
-## 5. Register and hand off
+## 5. Register, then CHECKPOINT 2 — publish authorization
 
-Update `registry/apps.json`. **CHECKPOINT 2 — the human uploads and publishes.**
+Update `registry/apps.json`. Artifacts are ready. **Stop and ask** in the owner's own words:
+«may I proceed to publish?» Checkpoint 1.5 authorised the release pipeline; this yes authorises
+Console submission. Do not propose that the owner publish while you watch.
+
+On yes, the agent walks `docs/play-publishing-playbook.md` §5.1 end to end: declarations, forms,
+Data safety / content-rating answers, the release form, submit, and Publish. Three points are tooling
+assists where the sandbox cannot act — they are not ownership of the release
+(`.cursor/rules/release-gate.mdc` § "Tooling assists"; owner's decision, recorded 2026-10-04):
+
+1. **Store graphics and the AAB/APK chooser** (hidden `input[type=file]`): open the page, name
+   absolute paths, ask, wait, then continue.
+2. **The promo-code download** (`Монетизация с помощью Play → Promotions` → `Скачать коды`): click
+   the button **exactly once**, then **stop and ask** — «нажмите „Скачать“ в открывшемся окне и
+   подтвердите, когда файл сохранится» — and **wait**. Do not press again, do not reload. On the
+   confirmation, read `promotion_codes.csv` from where the browser saved it (on Windows usually
+   `%USERPROFILE%\Downloads`) and continue. If no window opened, give the manual path (page
+   `.../promotions`, control `Скачать коды`, file `promotion_codes.csv`) and wait for the owner to
+   report the location. The file is never committed.
 
 ```bash
-node scripts/play-upload.mjs --slot <slug>   # only after the first manual upload
+node scripts/play-upload.mjs --slot <slug>   # updates after the first Console upload exists
 ```
 
 ## Guardrails
 
 - The gate is not a formality: if it refuses, ask the owner instead of working around it.
 - Never commit, never push, never upload, never publish without an explicit instruction in
-  the current conversation.
+  the current conversation. A publish yes means **you** drive the console and press submit/Publish.
 - Never generate or rotate a signing key on your own initiative.
 - Evidence before "done": `verify.mjs` output plus a read diff, never a self-report.
 - Report the release phase's elapsed wall clock separately from development time.
@@ -135,5 +152,5 @@ node scripts/play-upload.mjs --slot <slug>   # only after the first manual uploa
 **Store pack:** apps/<dir>/store/
 **Verification:** <stdout evidence + /eval verdict>
 **Release time:** <elapsed wall clock>
-**Next:** human checkpoint 2 — upload and publish
+**Next:** human checkpoint 2 — ask «may I proceed to publish?»; on yes, agent walks §5.1 and publishes
 ```

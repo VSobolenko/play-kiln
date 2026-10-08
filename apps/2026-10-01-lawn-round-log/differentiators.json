@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "slot": "lawn-round-log",
-  "reconRef": "docs/ideation/2026-10-01-solo-trade-rounds.md#3-recipe--lawn-round-log-lawn-round-log",
+  "reconRef": "apps/2026-10-01-lawn-round-log/docs/2026-10-01-solo-trade-rounds.md#3-recipe--lawn-round-log-lawn-round-log",
   "claims": [
     {
       "id": "offline-round-no-account",
@@ -11,7 +11,7 @@
       "promise": "The round, its visit history and the balances open and save with the phone in airplane mode and with no account, so nothing in the daily path waits on a login or on someone else's server being up.",
       "evidence": {
         "strength": "MEASURED",
-        "source": "docs/ideation/2026-10-01-solo-trade-rounds.md#25-what-the-incumbents-users-actually-complain-about-measured",
+        "source": "apps/2026-10-01-lawn-round-log/docs/2026-10-01-solo-trade-rounds.md#25-what-the-incumbents-users-actually-complain-about-measured",
         "finding": "Yardbook, 4.6 stars over 100K+ installs, draws a 3-star review reading \"Login hasn't worked in over a month. Always says incorrect password or Email, even when the exact same credentials work on browser\", and LawnPro, 3.5 stars over 10K+ installs, draws a 1-star review reading \"They did a server upgrade and it wasn't done correctly, took everything down without warning for about 3 days\" plus another reading \"They deleted all my clients payment information\"; the account and offline classes together appear in 3 of the 8 critical operator-side reviews read."
       },
       "status": "shipped",
@@ -30,7 +30,7 @@
       "promise": "It is a recurring seasonal round rather than an appointment book: the day's customers are an ordered list he can reorder, one tap marks a visit mowed, skipped or rained-off, and a rained-off morning pushes the whole round by a day in one action.",
       "evidence": {
         "strength": "MEASURED",
-        "source": "docs/ideation/2026-10-01-solo-trade-rounds.md#25-what-the-incumbents-users-actually-complain-about-measured",
+        "source": "apps/2026-10-01-lawn-round-log/docs/2026-10-01-solo-trade-rounds.md#25-what-the-incumbents-users-actually-complain-about-measured",
         "finding": "Missing-feature is 3 of the 8 critical operator-side reviews read (38 percent) and arises on a shelf whose operator apps are job and booking shaped, while 29 of 30 visible titles on the lawn care client tracker query are on the job and 13 of the 22 rated ones sit below 4.2 stars; the single-action rain push itself is not directly measured on this shelf."
       },
       "status": "shipped",
@@ -49,7 +49,7 @@
       "promise": "A per-customer running balance shows who still owes and for what, marked off in one tap when cash or a transfer arrives, without an accounting suite and without generating an invoice document.",
       "evidence": {
         "strength": "INFERRED",
-        "source": "docs/ideation/2026-10-01-solo-trade-rounds.md#25-what-the-incumbents-users-actually-complain-about-measured",
+        "source": "apps/2026-10-01-lawn-round-log/docs/2026-10-01-solo-trade-rounds.md#25-what-the-incumbents-users-actually-complain-about-measured",
         "finding": "The paywall class is 3 of the 8 critical operator-side reviews read and the accuracy class 1 of 8, on operator tools whose money handling its users openly distrust, and LawnPro's 1-star review reports that clients payment information was deleted; what is owed is the fourth clause of this lane's own definition and no incumbent complaint measures the balance feature directly, which is why this claim is inferred rather than measured."
       },
       "status": "shipped",
@@ -68,7 +68,7 @@
       "promise": "One price, no subscription, no advertising and no renewal prompt, so the operator is not renting access to his own round.",
       "evidence": {
         "strength": "MEASURED",
-        "source": "docs/ideation/2026-10-01-solo-trade-rounds.md#25-what-the-incumbents-users-actually-complain-about-measured",
+        "source": "apps/2026-10-01-lawn-round-log/docs/2026-10-01-solo-trade-rounds.md#25-what-the-incumbents-users-actually-complain-about-measured",
         "finding": "LawnBook, 4.4 stars over 500+ installs, draws a 3-star review reading \"80 dollars for a pretty-new app, for premium? that's kinda insane\", and all 8 enriched lawn incumbents declare no advertising while only 3 declare any in-app purchase, so the shelf's money is rent rather than a one-time price."
       },
       "status": "shipped",
@@ -87,7 +87,7 @@
       "promise": "Every control on the day list is reachable one-handed with a 48 dp target and stays legible in direct sunlight, because it is used standing at a curb with the mower running.",
       "evidence": {
         "strength": "INFERRED",
-        "source": "docs/ideation/2026-10-01-solo-trade-rounds.md#34-visual-direction",
+        "source": "apps/2026-10-01-lawn-round-log/docs/2026-10-01-solo-trade-rounds.md#34-visual-direction",
         "finding": "The shelf's paying users are operators working outdoors rather than desk users, and no incumbent complaint on this shelf measures tap-target size or outdoor contrast, so the requirement is inferred from the job and stated here rather than presented as a measured finding."
       },
       "status": "shipped",

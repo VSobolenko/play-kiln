@@ -1,0 +1,33 @@
+---
+description: Slot-specific durable docs live under apps/<slot>/docs/; factory docs stay at root docs/
+alwaysApply: true
+---
+
+# Slot documents leave with the app
+
+Successful apps may later be cut out of the factory and handed to another developer. Therefore every
+`apps/<slot>/` must carry what that app needs. App-specific documents left under root `docs/` become
+trash when the app is removed. The owner's instruction, recorded 2026-10-04.
+
+## The rule
+
+- **Slot-specific durable documents live under `apps/<slot>/docs/`.** After scaffold, the proposal
+  markdown and `docs/ideation/plans/<slug>.*` move into that directory. Research that is *about* one
+  app's domain data (useless without that app) lives there too.
+- **Factory documents stay under root `docs/`.** Contracts (`slot-economics.md`,
+  `slot-differentiators.md`, `app-naming.md`, `app-depth.md`, `factory-checks.md`, playbooks,
+  standards), general research/methodology that only *mentions* a slot as an example, and the open
+  ideation proposal queue stay at the root.
+- **`docs/ideation/` is only the open proposal queue.** Once a recipe has a living slot under
+  `apps/`, its proposal and plan files are not allowed to remain under `docs/ideation/` or
+  `docs/ideation/plans/`. The check is `ideas.orphanPlans` in `scripts/core/ideas.mjs`.
+- **Factory learning that cites a slot as a postmortem stays at root** when other rules and
+  `AGENTS.md` treat it as factory history — moving it would orphan those citations. Leave those
+  files and say so rather than breaking the learning trail.
+
+## What is banned
+
+- Leaving `docs/ideation/plans/<slug>.*` in place after `apps/<date>-<slug>/` exists.
+- Parking an app's proposal, domain memo or product archive only under root `docs/` so a later cut-out
+  loses it.
+- Moving factory contracts or general methodology into a slot to "clean up" `docs/`.

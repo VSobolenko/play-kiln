@@ -1,0 +1,33 @@
+---
+description: Store listing and release-note copy ships finished-product tone and invites Play review feedback — never early/WIP/roadmap-apology language
+globs: "{apps/**/store/**,scripts/store/**}"
+alwaysApply: false
+---
+
+# Store copy ships a finished product
+
+The owner's instruction, recorded 2026-10-04: the factory ships a finished, tested, ready-to-use
+product. Users must read that it works now. Successful apps may later leave the factory for a
+dedicated developer, so store copy must never look like a factory demo or an early drop.
+
+## Rules
+
+- **No early / unfinished tone** in release-note bodies or listing `shortDescription` /
+  `fullDescription`: no "First release", "initial release", "первый выпуск", "первый релиз",
+  "coming soon", "still in development", "under development", "WIP", "we will add", "скоро добав",
+  "в разработке". Describe what the user can do **now**.
+- **Invite community feedback** in Play reviews (wishes and issues), in natural EN+RU wording when
+  the pack has both locales — typically in release notes (and prompts for new packs). Do not spam
+  every marketing paragraph; do not rewrite owner-approved listing copy solely to insert the invite.
+- **Generator prompts teach the posture.** `scripts/store/model.py` → `release_note_prompts()` is the
+  seed; the prompt itself must not contain a banned substring.
+
+## How it is verified
+
+```bash
+python scripts/test-store-release-tone.py
+python scripts/store/validate.py --slot <slug>   # listing:tone + release-notes:tone rows
+```
+
+`banned_store_copy_tone` in `scripts/store/model.py` is the sensor; `scripts/store/validate.py`
+emits the FAIL rows. A check that cannot fail is not a check — the suite carries a bad-fixture leg.

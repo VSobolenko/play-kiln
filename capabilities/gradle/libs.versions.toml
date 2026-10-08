@@ -5,6 +5,9 @@ coroutines = "1.11.0"          # Flow/StateFlow used by every capability API
 playServicesAds = "25.5.0"     # Google Mobile Ads SDK wrapper
 userMessagingPlatform = "4.0.0" # Google UMP consent SDK (required before ad requests in the EEA/UK)
 billing = "9.1.0"              # Google Play Billing Library (Play policy: keep current)
+# Play notice 2026-10-05: Mark Book shipped fragment:1.1.0 via billing→play-services-basement.
+# Billing is already latest; constrain Fragment up. Compose apps do not use Fragment UI.
+fragment = "1.9.1"             # forces the Billing→GMS transitive off Play-flagged 1.1.0
 firebaseBom = "34.19.0"        # Firebase Android BoM; pins Remote Config and Firebase Installations
 junit = "4.13.2"
 androidxTestJunit = "1.3.0"
@@ -19,6 +22,7 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
 user-messaging-platform = { module = "com.google.android.ump:user-messaging-platform", version.ref = "userMessagingPlatform" }
 billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = "billing" }
+androidx-fragment = { module = "androidx.fragment:fragment", version.ref = "fragment" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-remote-config = { module = "com.google.firebase:firebase-config" }
 junit = { module = "junit:junit", version.ref = "junit" }

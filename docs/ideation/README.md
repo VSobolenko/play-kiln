@@ -1,17 +1,23 @@
-# `docs/ideation/` — proposals the owner chooses between
+# `docs/ideation/` — the open proposal queue
 
 This directory is where an idea exists **before** it is allowed to become a slot. It is not
-documentation for an existing app. A file here is a proposal, and the owner is the reader.
+documentation for an existing app. A file here is a proposal awaiting the owner's decision, and the
+owner is the reader.
+
+**After scaffold, the proposal leaves this directory.** The proposal markdown and
+`plans/<slug>.*` move into `apps/<slot>/docs/` so a later cut-out of the app takes its own history
+with it. Root `docs/ideation/` holds only the open queue. Leaving a plan behind for a living slot
+fails `ideas.orphanPlans` (`.cursor/rules/slot-docs.mdc`).
 
 ## What lives here
 
 | Path | What it is |
 |---|---|
 | `README.md` | This file: the rules for proposing an idea. |
-| `<date>-<topic>.md` | A human-readable proposal set: what was measured, one or more recipes in full, a comparison, a recommendation, and the refusals. |
-| `plans/<slug>.economics.json` | One gate-ready economics plan per recipe, in the exact schema of `docs/slot-economics.md`. |
-| `plans/<slug>.differentiators.json` | One gate-ready promise contract per recipe, in the exact schema of `docs/slot-differentiators.md`: the measured reasons this app can win, each weighted `core` or `supporting`. |
-| `plans/<slug>.naming.json` | One gate-ready naming contract per recipe, in the exact schema of `docs/app-naming.md`: the scored candidates the name was chosen from, the chosen name, and the alternatives that were rejected with their reasons. |
+| `<date>-<topic>.md` | A human-readable proposal set still awaiting a decision: what was measured, one or more recipes in full, a comparison, a recommendation, and the refusals. Once scaffolded, it moves to `apps/<slot>/docs/`. |
+| `plans/<slug>.economics.json` | One gate-ready economics plan per **unchosen** recipe, in the exact schema of `docs/slot-economics.md`. After scaffold: `apps/<slot>/docs/`. |
+| `plans/<slug>.differentiators.json` | One gate-ready promise contract per **unchosen** recipe, in the exact schema of `docs/slot-differentiators.md`. After scaffold: `apps/<slot>/docs/`. |
+| `plans/<slug>.naming.json` | One gate-ready naming contract per **unchosen** recipe, in the exact schema of `docs/app-naming.md`. After scaffold: `apps/<slot>/docs/`. |
 
 ## The rule: a proposal must pass the economics gate before a slot exists
 
@@ -35,11 +41,15 @@ So the order is fixed and is not negotiable:
    what the archetype needs (`billing` for the `purchase_led_*` archetypes, `ads` for
    `ads_led_utility`). It also writes `differentiators.json` from the promise contract, with every
    promise `deferred` — see the next section.
-5. **Promote the evidence.** The gate's `evidenceRef` pattern accepts only
-   `docs/research/<file>.md`. Before a slot is scaffolded from a plan whose measured evidence lives
-   here, that evidence must be promoted into `docs/research/`, or the `evidenceRef` must be
-   re-pointed at a research file that genuinely supports the claim. See the factory-improvement
-   section of `2026-09-26-five-recipes.md` for why this is a defect rather than a nuisance.
+5. **Move the proposal into the slot.** Copy or `git mv` the proposal markdown and
+   `plans/<slug>.*` into `apps/<slot>/docs/`, and re-point any `evidenceRef` / `reconRef` /
+   `evidence.source` fields in the slot contracts at the new path (or at factory-wide
+   `docs/research/` evidence that remains at root). The queue under this directory must not keep a
+   leftover for a living slug — `ideas.orphanPlans` fails it.
+6. **Promote factory-wide evidence.** Market methodology that other slots may reuse stays under
+   `docs/research/`. Domain memos that are useless without this app move into `apps/<slot>/docs/`
+   with the proposal. See the factory-improvement section of `2026-09-26-five-recipes.md` for why a
+   plan that cites only a method record is a weaker link.
 
 ## The rule: a proposal must also state why the app can win
 

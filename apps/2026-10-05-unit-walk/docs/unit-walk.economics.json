@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A self-managing landlord who owns a handful of rental units and walks them themselves at move-in and move-out, not an enterprise property manager whose employer chose Yardi.",
+  "paidUnit": "One non-consumable unlock of unlimited units and PDF export without a watermark, bought once with no renewal.",
+  "priceUsd": 9.99,
+  "momentOfPayment": "After the landlord finishes one free unit walk with photos and taps Share or Export on the report; the free unit is fully usable, and the unlock is offered for a second unit or for PDF export without watermark.",
+  "distinctnessSentence": "A crash-safe, no-account unit walk that keeps every photo through the report, compares move-in to move-out per unit, and shares a signed PDF from the phone — without RentCheck cloud camera failures or Yardi and Property Inspect employer logins.",
+  "evidenceRef": "docs/research/2026-10-05-solo-field-trade-recon.md#7-pocket-that-clears-the-bar",
+  "day1RevenuePath": "A landlord searching landlord inspection app or move in move out inspection installs the free one-unit walk, survives a full photo walk offline, taps export, and buys the 9.99 dollar unlock through Play Billing.",
+  "killCriteria": {
+    "windowDays": 60,
+    "minInstalls": 800,
+    "minRevenueUsd": 80
+  },
+  "capabilities": {
+    "required": ["billing"],
+    "deliberatelyNotEnabled": ["ads"],
+    "note": "billing collects the one-time unlock. ads stays off: a banner mid-walk over deposit evidence is hostile, and the enriched top ten on landlord inspection app declared zero ads."
+  },
+  "serverRequired": false,
+  "permissions": "CAMERA for TakePicture / ACTION_IMAGE_CAPTURE on the walk; POST_NOTIFICATIONS only if a reminder surface ships later (not required for the core walk). Photo Picker backfill needs no runtime permission. Share/export uses FileProvider and ACTION_SEND / ACTION_CREATE_DOCUMENT with no storage permission on modern Android.",
+  "buildEstimateAgentHours": 5,
+  "archetypesRejected": [
+    {
+      "archetype": "ads_led_utility",
+      "revenueReason": "Zero of the enriched top ten on landlord inspection app declared ads; money on the shelf is SaaS accounts and IAP unlocks. An interstitial over a deposit walk is hostile and would earn nothing at this session shape."
+    },
+    {
+      "archetype": "purchase_led_repeat_sales",
+      "revenueReason": "There is no consumable to re-sell: the landlord needs the same walk forever. Charging per PDF export is rent by another name and recreates the subscription anger this factory bans."
+    },
+    {
+      "archetype": "purchase_only_no_ads",
+      "revenueReason": "Shelf leaders that reach 10K–100K installs are free to download (RentCheck, myInspections, Property Inspect). A paid-upfront listing spends the free-walk funnel PropertyLog and RentProof already use."
+    },
+    {
+      "archetype": "subscription",
+      "revenueReason": "Banned outright by the owner on 2026-10-01 and absent from ARCHETYPES. Named only because enterprise incumbents make it the natural B2B shape — which is exactly why this recipe targets the self-managing landlord with a one-time unlock instead."
+    }
+  ],
+  "assumptionsUnverified": [
+    "That a self-managing landlord pays 9.99 once instead of Notes plus the Camera roll; no priced IAP amount was MEASURED on this shelf (myInspections / Property360 / PropertyLog declare IAP true with no dollar figure in enrich-market).",
+    "That unrated PropertyLog (1+ installs, IAP) and RentProof have not already absorbed the offline one-time buyers; PropertyLog's install floor is the discovery risk for this shape, not proof the job is empty.",
+    "Play fee arithmetic used by this plan (list 9.99): at ASSUMPTION 15 percent fee (first-$1M / new-install default in docs/monetization-strategy.md §2.2) net ≈ 8.49 per sale; at stress 30 percent fee net ≈ 6.99. Sales/month for ~100 dollars net: ≈12 at 15 percent, ≈15 at 30 percent. Sales/month for the factory illustrative 1000 dollars net: ≈118 at 15 percent, ≈144 at 30 percent. Kill floor 80 dollars / 60 days needs ≈9.4 unlocks at 15 percent (~11.4 at 30 percent).",
+    "Install-to-unlock conversion assumed near 2 percent (docs/monetization-strategy.md §4 band 1–3 percent, itself UNVERIFIED). At 800 installs and 2 percent ≈16 unlocks ≈136 dollars gross-of-refunds at 15 percent net, which clears the 80 dollar kill; at 1 percent ≈8 unlocks ≈68 dollars, which MISSES it.",
+    "The loudest pain on Yardi is enterprise users who cannot switch; whether the self-managing landlord feels the same photo-loss pain hard enough to pay is UNVERIFIED."
+  ]
+}

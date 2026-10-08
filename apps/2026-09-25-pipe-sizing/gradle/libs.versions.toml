@@ -15,6 +15,9 @@ espresso = "3.7.0"            # Android UI test APIs
 benchmarkMacro = "1.4.1"      # macrobenchmark and baseline-profile test APIs
 # Shared capability artifacts, published to mavenLocal from capabilities/ at this version.
 capability = "1.0.0"
+# Play notice 2026-10-05: fragment:1.1.0 via billing→play-services-basement. Constraint only —
+# Compose apps do not use Fragment UI. See .cursor/rules/dependency-freshness.mdc.
+fragment = "1.9.1"            # forces the Billing→GMS transitive off Play-flagged 1.1.0
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -48,6 +51,7 @@ androidx-benchmark-macro-junit4 = { module = "androidx.benchmark:benchmark-macro
 capability-core = { module = "com.gexetr.capability:core", version.ref = "capability" }
 capability-ads = { module = "com.gexetr.capability:ads", version.ref = "capability" }
 capability-billing = { module = "com.gexetr.capability:billing", version.ref = "capability" }
+androidx-fragment = { module = "androidx.fragment:fragment", version.ref = "fragment" }
 
 # How to extend a slot later
 # Room: androidx.room:room-runtime, androidx.room:room-ktx, and androidx.room:room-compiler; plugin com.google.devtools.ksp.

@@ -1,0 +1,17 @@
+{
+  "slug": "unit-walk",
+  "applicationId": "com.gexetr.unitwalk",
+  "appName": "UnitWalk",
+  "idea": "UnitWalk — a crash-safe, no-account rental unit walk for self-managing landlords: room-by-room photo condition records that survive a process kill, move-in versus move-out compare per unit, and a signed PDF shared from the phone.",
+  "createdAt": "2026-10-05T16:46:47.380Z",
+  "scaffoldVersion": "android-compose-v1",
+  "status": "scaffolded",
+  "economics": {
+    "archetype": "purchase_led_single_unlock",
+    "priceUsd": 9.99
+  },
+  "differentiators": {
+    "promises": 5,
+    "core": 3
+  }
+}

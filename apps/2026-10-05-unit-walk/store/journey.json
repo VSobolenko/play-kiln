@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "locale": "en-US",
+  "_comment": "Six-shot journey for the UnitWalk store screenshots, replayed by scripts/media-capture.mjs and composed by scripts/store-studio.py. Every tap and swipe coordinate below was measured from the live view hierarchy (`adb -s R58MB3SGZVL exec-out uiautomator dump /dev/tty`) on a physical Samsung Galaxy A40 (SM-A405FM), 1080x2340 / 480dpi, Android 11, device language en-US. The first pass was measured on the debug install and its dumps are kept under .kiln/scratch/unit-walk-pass2/. RE-MEASURED on 2026-10-06 against the SIGNED RELEASE install (com.gexetr.unitwalk, versionName 0.1.0, versionCode 1): the replay's own dumps are written to store/captures/staging/ while it runs, and the live release-build drive that settled the remaining coordinates is kept under .kiln/scratch/unit-walk-release/live/. Each shot's `_evidence` names the dump its readings and coordinates came from, and three coordinates plus one reading were corrected by that re-measure - see _why_one_room_is_still_two_distinct_frames and _unverified. No coordinate was estimated from a screenshot, and none was carried over from another slot.",
+  "_why_locale_is_declared": "Every expectation below is the literal text of a node, and Android resolves those strings against the *device's* language rather than the listing's. scripts/media-capture.mjs compares this value against `am get-config` before it takes the capture lock, so a phone in another language is refused in seconds instead of failing every reading in every shot. The A40 reported `en-rUS` when these dumps were taken.",
+  "_why_body_is_short": "`body` is not a note to a reader: scripts/store-studio.py draws it under the headline with `wrap(...)[:2]` at 32px (store-studio.py:697-700), so only the first two wrapped lines reach the composed frame - roughly 110 characters at the phone canvas. Every `body` below is a complete sentence pair that fits those two lines, and nothing that should not be printed on a store asset lives in it. The measured facts about each shot live in `_evidence`, which the composer does not draw.",
+  "_why_title_and_caption_are_two_keys": "`title` is the text the composer burns into the frame: store-studio.py reads studio.json's `headlines`/`kickers` by POSITION (store-studio.py:1016-1023, `headlines[index] if index < len(headlines) else shot.get('title', '')`), so each `title` below is character-identical to store/studio.json `headlines[index]` - the journey's title is the fallback the studio only uses when studio.json declares no headline for that position. `caption` is the Play Console caption for the same frame, character-identical to store/listing.json `locales['en-US'].screenshotCaptions[index]`. The two sets are deliberately different strings for the same shot, so both are declared rather than one being derived from the other.",
+  "_inventory": {
+    "note": "The store-pack contract in AGENTS.md ('Store-pack contract'). The journey drives SIX phone frames; scripts/store-studio.py composes every target from those six captures (store-studio.py:260), so the 7-inch and 10-inch sets are the same frames on other canvases rather than separate device runs.",
+    "phone": { "count": 6, "canvas": [1080, 1920], "ratio": "9:16" },
+    "tablet7": { "count": 4, "canvas": [1080, 1920], "ratio": "9:16" },
+    "tablet10": { "count": 4, "canvas": [1440, 2560], "ratio": "9:16" }
+  },
+  "_why_the_setup_lives_in_shot_01": "media-capture.mjs runs `pm clear` before the first shot (media-capture.mjs:498), so a capture cannot inherit a scene: the unit the screenshots show has to be built by the run itself. The unit is created in shot-01 through the app's own New-unit dialog, and the walk that shot-02 opens is that same unit.",
+  "_why_only_one_unit_and_one_room": "The decided purchase boundary (owner, this conversation) is: free is ONE unit, fully usable - unlimited walks on it, photos, the room-by-room move-in vs move-out comparison, and PDF export that carries a watermark; the one-time $9.99 unlock adds unlimited units and watermark-free PDF export. A free first run therefore holds exactly one unit, and this journey creates exactly one and attempts no second. It names ONE room, because that is the state every dump below actually shows (e6-room-added.xml: 'Rooms', 'Kitchen', 'No note yet', 'Add room'); a second room was never observed on this device, so no reading for one is asserted.",
+  "_why_one_room_is_still_two_distinct_frames": "The walk screen is one scroll column. With a single room and an empty note its content is taller than the 1080x2340 viewport, so the column has a real bottom: measured on the release build on 2026-10-06, store/captures/staging/shot-03-before.xml IS that bottom ('Finish walk' at y=2046 with the ScrollView's own bottom edge at y=2110, 'Rooms' off-screen) while shot-02's own dump is the top. shot-02 is the top extreme and shot-03 the bottom extreme, so the two captions photograph two different screens; both offsets are extremes reached by extra swipes, so an extra swipe is a no-op and neither frame depends on a fling's velocity. CORRECTION, 2026-10-06: this note used to cite e13-note-kbd-down.xml as the bottom, naming 'Finish room' at y=2064. That dump was about 200px SHORT of the bottom - 'Finish walk' is absent from it altogether - and reading it as the bottom is exactly what put 'Current room' in shot-03's expect and the note-field tap at y=930, both of which the release-build replay refused.",
+  "_why_the_photo_strip_is_empty_and_that_is_honest": "MEASURED LIMIT, stated rather than hidden. Attaching a photo goes through `ActivityResultContracts.TakePicture` (the system camera) or `ActivityResultContracts.PickVisualMedia` (the system Photo Picker). The picker is a different app whose contents are the DEVICE's gallery, not UnitWalk's, so a capture that tapped through it would depend on whatever happened to be in the phone's photos that day; a photo WAS attached that way during the manual exploration (e26-photo-row.xml carries `content-desc=\"photo-c4505a38-...\"`, and e27-after-finish-room.xml reads '1 photos'), and precisely because that is device state rather than app state, this journey does not drive it. shot-03 therefore photographs the strip in its real empty state ('No photos for this room yet.'), with the two controls that add one. The caption ('Photograph as you walk' / 'Photograph each room as you walk') is supported by the frame: it shows where a photo is taken and what it is recorded against. The frame is NOT a photograph of a photo and no step pretends otherwise.",
+  "_why_the_watermark_is_not_an_assertion": "The decided boundary says the free tier's PDF export carries a watermark. The watermark is a property of the produced file, and the report screen of the observed build shows the export controls ('Share the PDF', 'Save a copy') without printing any string that names the watermark - so no on-screen reading for it exists in the dumps, and none is asserted: an invented reading is worse than a missing one. shot-06 is the free tier's own export screen, which is the honest frame for the free half of the boundary; asserting the watermark itself would need a dump of the watermark-bearing build, which does not exist yet (see _unverified).",
+  "_why_the_comparison_frame_shows_the_no_baseline_state": "DISCLOSED LIMIT, stated rather than hidden. shot-05 photographs the comparison surface for the walk this journey records, and that walk has no earlier move-in report to compare against, so the room card's prior side reads `compare_no_prior_short` ('No prior report') and the surface prints `compare_no_prior_notice` ('There is no prior move-in report for this unit, so only the current walk is shown. No baseline has been invented.'). That is the state a brand-new user sees on their first finished walk, and it is photographed as it is rather than staged: the app refuses to draw a baseline it did not record. A frame showing two recorded conditions would need a second, finished walk for the same unit, and this journey creates exactly one walk - the units screen's own layout changes with the walk count (measured 2026-10-06: one draft walk renders 'Continue walk' at [397,1835][683,1895], while a finished baseline plus a second walk renders 'Continue walk' / 'Compare' / 'Start a walk' / 'Move-in' / 'Move-out' / 'Standalone walk' at a different offset), so every coordinate after the second walk would have to be re-measured against that other layout. The pixel-level reading of the state this frame does show is in the slot's device record (device-verification.json, OBSERVATION 7), and the same limit is restated in store/review-notes.md and store/graphics.md. CORRECTION, 2026-10-06: this frame's title, caption and body used to claim a side-by-side comparison ('Move-in beside move-out', 'The move-in and move-out condition of the same room, side by side'). They were changed to state exactly what the frame shows after an independent evaluation found the claim overstated the frame.",
+  "_why_no_step_completes_a_purchase": "No purchase is made anywhere in this journey and none is needed for shots 01-06. shot-07 opens the unlock surface only - it renders its price and its 'Not owned' status from the app's resources and the locally configured product, and opening it starts no billing flow. There is no license-tester account on this device, so a journey that clicked 'Unlock for $9.99' could not show a purchased state; it would only open a Play purchase dialog this run must not touch.",
+  "_why_shot_07_is_not_composed": "MEASURED CONSTRAINT, stated rather than worked around. media-capture.mjs captures `journey.shots.slice(0, 6)` (media-capture.mjs:505) and scripts/store-studio.py reads `journey.get('shots', [])[:6]` (store-studio.py:879) and burns studio.json's `headlines[index]` onto capture `index`. The unlock surface is therefore not one of the six composed captions, and putting it in a frame would burn a headline that describes a different screen onto it - a false claim, not a marketing choice. shot-07 is authored, asserted and purchase-free, and is kept in the file as the ready-made frame for the day store/studio.json declares a matching seventh headline/kicker. store/studio.json is outside this worker's file ownership, so that is a decision for its owner, not a silent edit here.",
+  "_why_every_reading_is_self_identifying": "Every expectation names a field, and for a reading that a node carries as its own text the field is that same text anchored with ^...$ - the strongest form available for a label, a status or a list row. media-capture.mjs refuses a value shorter than two characters (media-capture.mjs 'validateExpectations'), so a bare '1' or '0' is never asserted. Regex metacharacters in values are escaped (`$9.99` is asserted as `^\\$9\\.99$`).",
+  "_why_the_waits_are_what_they_are": "media-capture.mjs waits one second after launching the app and then executes steps back to back. Compose needs longer than that to draw the unit list on a cold start, so shot-01 opens with a 9000 ms wait; every screen change below is followed by 1.4-2.5 s, which is the observed draw time for the unit list, the walk surface, the comparison and the report on this device. The waits are load-bearing, not padding.",
+  "_why_there_are_no_clear_steps": "A `clear` step is one adb invocation per key press. Every field this journey types into arrives empty - the New-unit dialog's name field and the walk's room-name field are both blank on a first run, and media-capture's `pm clear` is what guarantees it - so there is no pre-filled value to delete and no clear step in the file.",
+  "_step_vocabulary": "media-capture.mjs:191-224 implements exactly tap, swipe, wait, text, clear and back. There is no step that presses a system dialog button, and no step that relaunches the app, which is why shot-07's route back to the units list (and any picker route) is stated as a limit rather than solved here.",
+  "_unverified": [
+    "The four corrections of 2026-10-06 were measured on the release build but have NOT yet been replayed end to end themselves: 'Current room' moved from shot-03's expect to shot-02's, shot-04's note tap became [540,631], and shot-05's 'Finish room' tap became [540,1836]. The one command that decides them is `node scripts/media-capture.mjs --slot unit-walk`, and its result is what the next reader should trust rather than this sentence.",
+    "REPLAYED TWICE on 2026-10-06 against the signed release build, and it failed at shot-03 - which is how the corrections above were found. The authoring dumps (e6, e13, e27, e29, 04-unit-created) had been taken on the build BEFORE the free-tier and watermark change and, more importantly, at scroll offsets this journey's own steps do not reach: e13 sat about 200px short of the column's bottom, so 'Current room' was still visible and the note field still sat under y=930. Every reading and tap above is now measured from the replay's own dumps under store/captures/staging/ and from a live drive of the release build under .kiln/scratch/unit-walk-release/live/.",
+    "No on-screen watermark string exists on the report screen, measured on the release build (.kiln/scratch/unit-walk-release/live/live-05.xml reads 'Flat 3B', 'Signed condition report', 'Report written', 'File', the report's file name and byte count, 'Share the PDF', 'Save a copy', 'Signatures'). Nothing is asserted for it in shot-06, and the watermark stays a property of the produced file.",
+    "shot-07's tap that opens the unlock surface is measured (04-unit-created.xml, the 'Unlock' action at [816,146,888,218]), but the route back to the units list is not: returning there was done by RELAUNCHING the app in the manual exploration (only e34-relaunch.xml carries 'Your unit walks'; e31-back1.xml is the comparison, e32-back2.xml the walk, and e33-units.xml is the Android Settings storage screen), and media-capture.mjs has no relaunch step. The `back` steps below are the closest available approximation and are stated as unverified. shot-07 is not composed into the pack either - see _why_shot_07_is_not_composed.",
+    "Pixels were not checked: no capture exists, so nothing here can say the composed frames look right. `python scripts/visual-qa.py --slot unit-walk` is the report that reads them once they exist."
+  ],
+  "_preconditions": [
+    "Target the release build. media-capture.mjs refuses a DEBUGGABLE install itself, and the debug variant also carries a `.debug` applicationId suffix: node scripts/prepare-release.mjs --slot unit-walk, then adb -s R58MB3SGZVL install -r dist/unit-walk-<version>-<code>-release.apk",
+    "A physical device at 1080x2340 / 480dpi with the system language set to English (en-US), because every reading below is English copy and the tool refuses a device whose language disagrees with `locale` before it captures. The device must not be asleep: a locked screen swallows the taps and the first shot then fails with an empty hierarchy.",
+    "The app must be a first run. media-capture.mjs enforces this itself with `pm clear`, so the empty unit list the setup builds on cannot be inherited from an earlier run, and it retries `ime disable` until the enabled list is empty. With every IME disabled the New-unit dialog does not rise on a soft keyboard, so its controls stay at the positions measured in 02-new-unit-dialog.xml.",
+    "No purchase is made by this journey and none is needed for shots 01-06. The single unit the run creates is the free tier's full allowance, and shot-06 is the free tier's own export screen.",
+    "The tablet sets are composed from these same phone captures rather than captured on a tablet device, because no tablet device is attached; that phone-framed status is disclosed in store/graphics.md and store/review-notes.md instead of being passed off as a tablet capture."
+  ],
+  "supportedStepTypes": {
+    "tap": { "x": 540, "y": 1200 },
+    "swipe": { "x1": 540, "y1": 1900, "x2": 540, "y2": 700, "durationMs": 400 },
+    "wait": { "ms": 750 },
+    "text": { "value": "example text" },
+    "clear": { "count": 4 },
+    "back": {}
+  },
+  "shots": [
+    {
+      "name": "shot-01",
+      "title": "The whole unit, on your phone",
+      "caption": "Keep your units on the phone",
+      "body": "One unit on the phone, created in the app with no account and no purchase.",
+      "_evidence": "Every reading is present in 04-unit-created.xml. Taps: 'Add unit' at [588,961] (04-unit-created.xml), the dialog's name field at [540,1105] and 'Create' at [845,1347] (02-new-unit-dialog.xml).",
+      "expect": [
+        { "value": "Your unit walks", "field": { "label": "^Your unit walks$" } },
+        { "value": "Flat 3B", "field": { "label": "^Flat 3B$" } },
+        { "value": "Add unit", "field": { "label": "^Add unit$" } },
+        { "value": "Start a walk", "field": { "label": "^Start a walk$" } }
+      ],
+      "steps": [
+        { "type": "wait", "ms": 9000 },
+        { "type": "tap", "x": 588, "y": 961 },
+        { "type": "wait", "ms": 1500 },
+        { "type": "tap", "x": 540, "y": 1105 },
+        { "type": "wait", "ms": 700 },
+        { "type": "text", "value": "Flat 3B" },
+        { "type": "wait", "ms": 700 },
+        { "type": "tap", "x": 845, "y": 1347 },
+        { "type": "wait", "ms": 2500 }
+      ]
+    },
+    {
+      "name": "shot-02",
+      "title": "Rooms, one at a time",
+      "caption": "Add each room as you walk",
+      "body": "Add a room and name it as you walk; then its photo, note and condition stay with it.",
+      "_evidence": "Every reading is present in e6-room-added.xml. Taps: 'Move-in' at [540,1944] (04-unit-created.xml), the room-name field at [540,1773] and 'Add room' at [540,1991] (05-walk-screen.xml). 'Not recorded' is the room's condition chip before anything is recorded. 'Current room' is read HERE rather than in shot-03 because this shot photographs the walk column at its top, where the label is visible at [108,1783][376,1832] - measured present both before and after the shutter in store/captures/staging/shot-02-before.xml and shot-02-after.xml of the release-build replay, 2026-10-06. At shot-03's bottom extreme the same label is clipped above the scroll viewport and no node carries it.",
+      "expect": [
+        { "value": "Rooms", "field": { "label": "^Rooms$" } },
+        { "value": "Kitchen", "field": { "label": "^Kitchen$" } },
+        { "value": "No note yet", "field": { "label": "^No note yet$" } },
+        { "value": "Not recorded", "field": { "label": "^Not recorded$" } },
+        { "value": "Add room", "field": { "label": "^Add room$" } },
+        { "value": "Current room", "field": { "label": "^Current room$" } }
+      ],
+      "steps": [
+        { "type": "tap", "x": 540, "y": 1944 },
+        { "type": "wait", "ms": 2500 },
+        { "type": "tap", "x": 540, "y": 1773 },
+        { "type": "wait", "ms": 700 },
+        { "type": "text", "value": "Kitchen" },
+        { "type": "wait", "ms": 700 },
+        { "type": "tap", "x": 540, "y": 1991 },
+        { "type": "wait", "ms": 1800 }
+      ]
+    },
+    {
+      "name": "shot-03",
+      "title": "Photograph as you walk",
+      "caption": "Photograph each room as you walk",
+      "body": "Add a photo from the camera or the gallery, on the room it belongs to.",
+      "_evidence": "Measured against the release-build replay of 2026-10-06, not only against the authoring dumps: store/captures/staging/shot-03-before.xml is the state these two swipes actually reach, and every reading below is present in it - 'Kitchen' at [108,278][402,327], 'Note' at [108,363][220,422] (the field's label), 'Photos' at [108,1116][273,1175], 'No photos for this room yet.' at [108,1211][652,1260], 'Add photo' at [145,1445][324,1484], 'Add from gallery' at [419,1626][758,1686]. Both swipes start at [540,1900] and end at [540,700], inside the walk column's scroll area. 'Current room' is deliberately NOT asserted here: at this bottom extreme it sits above the ScrollView's top edge (278) and no node on screen carries it - it is read in shot-02 instead, which photographs the same column at its top. An earlier revision of this file asserted it here because e13-note-kbd-down.xml had been scrolled about 200px less far, which was a property of that exploration rather than of these two swipes. The strip is photographed empty: see _why_the_photo_strip_is_empty_and_that_is_honest.",
+      "expect": [
+        { "value": "Kitchen", "field": { "label": "^Kitchen$" } },
+        { "value": "Photos", "field": { "label": "^Photos$" } },
+        { "value": "No photos for this room yet.", "field": { "label": "^No photos for this room yet\\.$" } },
+        { "value": "Add photo", "field": { "label": "^Add photo$" } },
+        { "value": "Add from gallery", "field": { "label": "^Add from gallery$" } }
+      ],
+      "steps": [
+        { "type": "swipe", "x1": 540, "y1": 1900, "x2": 540, "y2": 700, "durationMs": 400 },
+        { "type": "wait", "ms": 400 },
+        { "type": "swipe", "x1": 540, "y1": 1900, "x2": 540, "y2": 700, "durationMs": 400 },
+        { "type": "wait", "ms": 1000 }
+      ]
+    },
+    {
+      "name": "shot-04",
+      "title": "A note in one tap",
+      "caption": "Add a note in a tap",
+      "body": "The note is written into the walk as it is typed, with the condition one tap away.",
+      "_evidence": "[540,631] is the centre of the note field's measured box in the state this shot runs in, read on the release build twice on 2026-10-06: store/captures/staging/shot-03-before.xml (the replay) measures the EditText at [108,458][972,805], and .kiln/scratch/unit-walk-release/live/live-01.xml measures the same box after the text was typed - identical, because it is a fixed-height box that does not grow. The previous value [540,930] was carried over from e13-note-kbd-down.xml, where the column sat about 200px lower and the same fixed-height box measured [108,686,972,1033]; at the scroll position these steps actually reach, 930 falls past the field's bottom edge and lands on the condition-chip row.",
+      "expect": [
+        { "value": "Cracked tile by the door", "field": { "label": "^Cracked tile by the door$" } },
+        { "value": "Note", "field": { "label": "^Note$" } },
+        { "value": "Condition", "field": { "label": "^Condition$" } },
+        { "value": "Worn", "field": { "label": "^Worn$" } },
+        { "value": "Missing", "field": { "label": "^Missing$" } }
+      ],
+      "steps": [
+        { "type": "tap", "x": 540, "y": 631 },
+        { "type": "wait", "ms": 800 },
+        { "type": "text", "value": "Cracked tile by the door" },
+        { "type": "wait", "ms": 1000 }
+      ]
+    },
+    {
+      "name": "shot-05",
+      "title": "Move-in vs move-out",
+      "caption": "Compare move-in with move-out",
+      "body": "Move-in and move-out room by room; a walk with no earlier report says so instead of inventing one.",
+      "_evidence": "Every reading is present in the comparison scrolled to its bottom, measured on the release build on 2026-10-06 (.kiln/scratch/unit-walk-release/live/live-04.xml): 'Move-in vs move-out' at [198,137][886,227], 'Room condition' at [96,1266][415,1315], 'Save difference' at [168,1806][487,1866], 'Open the report' at [381,2046][700,2106]. Taps: 'Finish room' at [540,1836], the centre of the button measured at [108,1764][972,1908] in the state shot-04 leaves behind (live-01.xml); the previous value [540,2064] came from e13's lower scroll and lands on 'Finish walk' the moment shot-03 reaches the bottom of the column. 'Finish walk' at [540,1943], which is inside the button measured at [60,1832][1020,1976] on the walk overview that follows the room being finished (live-02.xml); the two swipes then move the comparison from its top to its bottom.",
+      "expect": [
+        { "value": "Move-in vs move-out", "field": { "label": "^Move-in vs move-out$" } },
+        { "value": "Room condition", "field": { "label": "^Room condition$" } },
+        { "value": "Save difference", "field": { "label": "^Save difference$" } },
+        { "value": "Open the report", "field": { "label": "^Open the report$" } }
+      ],
+      "steps": [
+        { "type": "tap", "x": 540, "y": 1836 },
+        { "type": "wait", "ms": 1800 },
+        { "type": "tap", "x": 540, "y": 1943 },
+        { "type": "wait", "ms": 2500 },
+        { "type": "swipe", "x1": 540, "y1": 1900, "x2": 540, "y2": 700, "durationMs": 400 },
+        { "type": "wait", "ms": 400 },
+        { "type": "swipe", "x1": 540, "y1": 1900, "x2": 540, "y2": 700, "durationMs": 400 },
+        { "type": "wait", "ms": 1000 }
+      ]
+    },
+    {
+      "name": "shot-06",
+      "title": "Sign it, then send the PDF",
+      "caption": "Share the signed PDF",
+      "body": "The free walk's own PDF, watermarked, shared or saved to your files in one tap.",
+      "_evidence": "Every reading is present in e30-report.xml. The tap at [540,2057] is 'Open the report' on the comparison, measured on the release build inside the button at [48,2004][1032,2110] (.kiln/scratch/unit-walk-release/live/live-04.xml). This is the free tier's export screen; the watermark is a property of the file the screen produces and is not asserted here - see _why_the_watermark_is_not_an_assertion.",
+      "expect": [
+        { "value": "Report", "field": { "label": "^Report$" } },
+        { "value": "Flat 3B", "field": { "label": "^Flat 3B$" } },
+        { "value": "Share the PDF", "field": { "label": "^Share the PDF$" } },
+        { "value": "Save a copy", "field": { "label": "^Save a copy$" } }
+      ],
+      "steps": [
+        { "type": "tap", "x": 540, "y": 2057 },
+        { "type": "wait", "ms": 2500 }
+      ]
+    },
+    {
+      "name": "shot-07-unlock",
+      "title": "Free is one unit, unlocked once",
+      "caption": null,
+      "body": "Free is one unit with a watermarked PDF; $9.99 once adds unlimited units, no watermark.",
+      "_composed": false,
+      "_why_not_composed": "See _why_shot_07_is_not_composed: the composer reads exactly six shots and burns studio.json's six headlines onto them by position, so an unlock frame has no caption position to occupy today.",
+      "_evidence": "Every reading is present in e35-unlock.xml, taken on the free install with no purchase made. The tap that opens this surface is the 'Unlock' action on the units screen, [816,146,888,218] in 04-unit-created.xml.",
+      "_unverified_steps": "The route back to the units list is NOT verified: in the manual exploration the units list was reached by relaunching the app (only e34-relaunch.xml carries 'Your unit walks'; e31-back1.xml is the comparison, e32-back2.xml the walk, and e33-units.xml is the Android Settings storage screen), and media-capture.mjs has no relaunch step. The `back` steps below are the closest available approximation.",
+      "_copy_deliberately_not_asserted": "Nothing on this screen is deliberately withheld: the correction noted here has landed, and the unlock sheet's copy now matches the decided boundary (res/values/strings_unlock.xml). The one reading this journey does not assert anywhere is the watermark on a produced PDF, because it is a property of the file rather than an on-screen string - see _why_the_watermark_is_not_an_assertion.",
+      "expect": [
+        { "value": "UnitWalk unlock", "field": { "label": "^UnitWalk unlock$" } },
+        { "value": "$9.99", "field": { "label": "^\\$9\\.99$" } },
+        { "value": "One-time purchase", "field": { "label": "^One-time purchase$" } },
+        { "value": "One payment, yours for good", "field": { "label": "^One payment, yours for good$" } },
+        { "value": "Not owned", "field": { "label": "^Not owned$" } },
+        { "value": "Restore purchase", "field": { "label": "^Restore purchase$" } }
+      ],
+      "steps": [
+        { "type": "back" },
+        { "type": "wait", "ms": 1500 },
+        { "type": "back" },
+        { "type": "wait", "ms": 1500 },
+        { "type": "back" },
+        { "type": "wait", "ms": 2000 },
+        { "type": "tap", "x": 852, "y": 182 },
+        { "type": "wait", "ms": 2500 }
+      ]
+    }
+  ]
+}

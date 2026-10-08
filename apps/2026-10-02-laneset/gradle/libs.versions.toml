@@ -20,6 +20,9 @@ benchmarkMacro = "1.4.1"      # macrobenchmark and baseline-profile test APIs
 # the compile classpath.
 billing = "9.1.0"             # Google Play Billing Library (billing-ktx)
 capabilityVersion = "1.0.0"   # com.gexetr.capability:* artifacts the factory publishes to mavenLocal
+# Play notice 2026-10-05: fragment:1.1.0 via billing→play-services-basement. Constraint only —
+# Compose apps do not use Fragment UI. See .cursor/rules/dependency-freshness.mdc.
+fragment = "1.9.1"            # forces the Billing→GMS transitive off Play-flagged 1.1.0
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -53,6 +56,7 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 # billing-ktx version, so one billing library enters the APK.
 capability-billing = { module = "com.gexetr.capability:billing", version.ref = "capabilityVersion" }
 billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = "billing" }
+androidx-fragment = { module = "androidx.fragment:fragment", version.ref = "fragment" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "serialization" }
 androidx-profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version.ref = "profileInstaller" }
 junit = { module = "junit:junit", version.ref = "junit" }

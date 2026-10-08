@@ -8,7 +8,7 @@ Play Console → *Release name* is an internal label. It is never shown to a use
 Play Console's own release list, so it exists to tell one build from another. Play prefills it from
 the bundle's `versionName`.
 
-**Use:** `0.1.0 (1)`
+**Use:** `0.1.1 (2)`
 
 The source of truth is `dist/release-manifest.json` (`versionName` + `versionCode`). Read it from
 there rather than from memory — a release name that disagrees with the bundle makes the console list
@@ -30,22 +30,14 @@ reassembling:
 
 ```text
 <en-US>
-First release. A private offline grade book: classes and rosters, marks per assignment with weights and dropped lowest, attendance, notes, parent contacts and seating — on your device, no account.
+Private offline grade book: classes, weighted marks with dropped lowest, attendance, notes, parent contacts and seating — on your device, no account. Every average shows its working. Export CSV or PDF; back up the whole record.
 
-Every average shows its working: the rounding rule, whether missing work counted as zero, and each excluded category.
-
-Export CSV or a printable PDF, and back up the whole record to a file you keep.
-
-Free for one class up to 20 students; one purchase unlocks the rest.
+Free for one class up to 20 students; one purchase unlocks the rest. Want it better? Leave wishes and issues in the Play reviews — we read them and plan updates from what you write.
 </en-US>
 <ru-RU>
-Первый выпуск. Приватный офлайн-журнал оценок: классы и списки, оценки за работы с весами и отбрасыванием низшей, посещаемость, заметки, контакты с родителями и рассадка — на вашем устройстве, без аккаунта.
+Приватный офлайн-журнал: классы, оценки с весами и отбрасыванием низшей, посещаемость, заметки, контакты родителей и рассадка — на устройстве, без аккаунта. Каждое среднее показывает расчёт. Экспорт CSV/PDF и резервная копия.
 
-Каждое среднее показывает расчёт: правило округления, считалась ли пропущенная работа нулём и какие категории исключены.
-
-Экспорт в CSV и PDF, резервная копия всей записи в файл у вас.
-
-Бесплатно: один класс до 20 учеников; одна покупка открывает остальное.
+Бесплатно: один класс до 20 учеников; одна покупка открывает остальное. Хотите ещё круче? Напишите пожелания в отзывах Play — мы читаем их и планируем обновления.
 </ru-RU>
 ```
 

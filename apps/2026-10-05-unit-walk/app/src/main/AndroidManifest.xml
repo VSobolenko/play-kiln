@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Factory policy: request the fewest permissions possible, never export a component
+         without a reason, and never enable cleartext traffic.
+
+         The app does NOT declare android:localeConfig, and this is deliberate. The Language row
+         must open an in-app picker (AppCompatDelegate.setApplicationLocales hosted in
+         AppCompatActivity), not jump to system settings. Declaring localeConfig would invite a
+         second, system-side control for the same value. res/xml/locales_config.xml is kept as the
+         picker's language list only — see .cursor/rules/app-settings.mdc. -->
+
+    <!-- The camera is the app's only own runtime permission: a walk photo can be taken on the spot.
+         Gallery/picker imports need no permission (Photo Picker), and sharing or saving the report
+         goes through SAF / a content:// URI, so neither needs a storage permission on modern Android.
+         `camera.any` is required=false so the app is still offered to tablets without a camera —
+         those devices can still import from the gallery. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="false" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.PlayKilnSlot">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- AndroidX per-app language backport: on API 26-32 AppCompat stores the chosen languages
+             and re-applies them before the first composition. disabled because the service is a
+             metadata holder the library reads, never a component that runs. -->
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
+
+        <!-- The signed report PDF leaves the app as a content:// URI, so the walk never needs a
+             storage permission and no file path outside `reports/` is exposed. The paths live in
+             res/xml/file_paths.xml; `grantUriPermissions` lets ACTION_SEND / ACTION_CREATE_DOCUMENT
+             hand the URI to the target app for the one operation, and `exported=false` keeps the
+             provider private to this app's own grants. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+
+</manifest>

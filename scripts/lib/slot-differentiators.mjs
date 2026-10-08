@@ -277,7 +277,8 @@ export function crudReport(value, { file = 'differentiators.json', raw = '' } = 
  * the same reason — the per-niche measurement lives in the proposal, and the method
  * record alone is a weaker link than a plan implies.
  */
-const EVIDENCE_SOURCE_PATTERN = /^docs\/(?:research|ideation)\/[a-z0-9._-]+\.md(#.+)?$/
+const EVIDENCE_SOURCE_PATTERN =
+  /^(?:docs\/(?:research|ideation)|apps\/\d{4}-\d{2}-\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*\/docs)\/[a-z0-9._-]+\.md(#.+)?$/
 
 /** Claim ids are named in gate output, so they must be stable and greppable. */
 const CLAIM_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
@@ -332,7 +333,7 @@ function validateEvidence(value, what, errors) {
   }
   if (typeof source !== 'string' || !EVIDENCE_SOURCE_PATTERN.test(source.trim())) {
     errors.push(
-      `${what}.evidence.source must be docs/research/<file>.md or docs/ideation/<file>.md with an optional #section (found ${describe(source)})`
+      `${what}.evidence.source must be docs/research/<file>.md, docs/ideation/<file>.md, or apps/<date>-<slug>/docs/<file>.md with an optional #section (found ${describe(source)})`
     )
   } else if (matchesPlaceholder(source.trim())) {
     errors.push(`${what}.evidence.source must point at real recon, not a placeholder (found "${source.trim()}")`)
@@ -628,7 +629,7 @@ export function parseDifferentiators(json) {
     typeof value.reconRef === 'string' && EVIDENCE_SOURCE_PATTERN.test(value.reconRef.trim())
   if (!reconOk) {
     errors.push(
-      `reconRef must be docs/research/<file>.md or docs/ideation/<file>.md with an optional #section (found ${describe(value.reconRef)})`
+      `reconRef must be docs/research/<file>.md, docs/ideation/<file>.md, or apps/<date>-<slug>/docs/<file>.md with an optional #section (found ${describe(value.reconRef)})`
     )
   }
 

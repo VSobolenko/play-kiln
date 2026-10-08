@@ -257,6 +257,49 @@ def authored_reason(prior: Any, generated: str) -> str:
     return generated
 
 
+# The fields that identify a capability-declared row, so an authored row that already declares the
+# same requirement is kept rather than replaced.  `dataTypes` matches the dedupe key
+# `scripts/lib/capabilities.mjs` builds; the other two identify their row by name.
+DATA_TYPE_FIELDS = ("type", "purpose", "shared", "optional")
+SDK_FIELDS = ("name", "version")
+PERMISSION_FIELDS = ("name",)
+
+
+def _row_key(item: Any, fields: tuple[str, ...]) -> tuple[Any, ...] | None:
+    """The identity of a capability-declared row, or ``None`` when the item is not that shape."""
+    if isinstance(item, dict) and all(field in item for field in fields):
+        return tuple(item.get(field) for field in fields)
+    return None
+
+
+def merge_required_rows(prior: Any, required: Any, fields: tuple[str, ...]) -> list[Any]:
+    """Keep an authored row that already satisfies a required one, and add only the missing ones.
+
+    ``store/listing.json`` is an authored pack input the owner's release approval is bound to, so
+    replacing a row a human wrote (or one an earlier render wrote from the same capability) with the
+    capability's canonical copy rewrites digest-covered bytes and voids the approval the renderer has
+    just validated -- the defect measured on 2026-10-05 in ``apps/2026-10-05-unit-walk``, where the
+    canonical ``notes`` wording overwrote the authored one.  Preserving is safe because the identity
+    IS the requirement: a row whose ``fields`` all match is declared, so the required row is not
+    missing.  A genuinely absent row is still appended, which is the Data safety obligation this
+    keeps.  A required row whose shape cannot be keyed is added unless an equal row is already
+    present, because an unidentifiable requirement cannot be shown to be satisfied.
+    """
+    required = required if isinstance(required, list) else []
+    merged = list(prior) if isinstance(prior, list) else []
+    present = {key for item in merged if (key := _row_key(item, fields)) is not None}
+    for item in required:
+        key = _row_key(item, fields)
+        if key is not None:
+            if key in present:
+                continue
+            present.add(key)
+        elif any(item == existing for existing in merged):
+            continue
+        merged.append(item)
+    return merged
+
+
 def apply_capability_compliance(listing: dict[str, Any], compliance: dict[str, Any]) -> None:
     data_types = compliance.get("dataCollected", [])
     sdks = compliance.get("sdkDependencies", [])
@@ -266,7 +309,12 @@ def apply_capability_compliance(listing: dict[str, Any], compliance: dict[str, A
     prior_data_safety = (
         listing.get("dataSafety") if isinstance(listing.get("dataSafety"), dict) else {}
     )
-    listing["permissions"] = compliance.get("permissions", [])
+    # Each list is merged rather than replaced: an authored row is one the owner approved, and a
+    # render that has just validated that approval must not rewrite it.  A missing required row is
+    # still added, so a bundled SDK that transmits data is never left undeclared.
+    listing["permissions"] = merge_required_rows(
+        listing.get("permissions"), compliance.get("permissions", []), PERMISSION_FIELDS
+    )
     listing["ads"] = {
         "containsAds": bool(compliance.get("adsPresent")),
         "reason": authored_reason(
@@ -284,8 +332,12 @@ def apply_capability_compliance(listing: dict[str, Any], compliance: dict[str, A
             if data_types
             else "Enabled capabilities declare no collected data.",
         ),
-        "dataTypes": data_types,
-        "thirdPartySdks": sdks,
+        "dataTypes": merge_required_rows(
+            prior_data_safety.get("dataTypes"), data_types, DATA_TYPE_FIELDS
+        ),
+        "thirdPartySdks": merge_required_rows(
+            prior_data_safety.get("thirdPartySdks"), sdks, SDK_FIELDS
+        ),
         # Only claimable when there is something to transmit. Asserting "encrypted in transit" for an
         # app that collects nothing describes a transmission that does not exist, and the Data safety
         # doc renders this verbatim as "Is collected data encrypted in transit? Yes".

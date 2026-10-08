@@ -228,17 +228,24 @@ it, and never edit the record to get past a refusing script.
 ## E. Release — hand off to `/release`
 
 After the recorded approval, follow **`.cursor/commands/release.md`**: signed APK and AAB, the store
-pack, the captured screenshots, `verify.mjs --build`, and the `/eval` verdict. Then hand the Play
-Console ladder back to the owner's observation
-(`docs/play-publishing-playbook.md` §5.1). `/forge` ends when the slot is ready for Play — it does
-not publish and it does not upload the store graphics; the two first-publication declarations are
-ticked by the agent during `/release`, once the recorded approval exists, because the approval is the
-human checkpoint and not the click. The owner's decision, recorded 2026-10-03: «В нашем заводе есть
-правило, что перед публикацией необходимо одобрение владельца. Собственно говоря, в то время и я
-проверяю проверку всех вот этих политик, и только после моего одобрения я говорю разрешить
-публикацию. Поэтому, если я разрешил публикацию, значит эти галочки можно уже автоматически
-нажимать. Потому что все проверки необходимые для публикации проводятся до начальной публикации
-всего приложения.»
+pack, the captured screenshots, `verify.mjs --build`, and the `/eval` verdict. Then **checkpoint 2**
+— ask «may I proceed to publish?»; on yes, the agent walks
+`docs/play-publishing-playbook.md` §5.1 end to end and publishes. `/forge` does not skip that ask,
+and it does not hand the console labour to the owner: tooling assists (store graphics, the AAB
+chooser, and the promo-code download) are the only places the owner's hand is needed. The first two
+take a file the owner drops into an open chooser the agent prepared; the third is `Скачать коды` on
+`.../promotions`, which the agent clicks **once** and then asks the owner to confirm the save window —
+never repeatedly (`.cursor/rules/release-gate.mdc` § "Tooling assists"; owner's instruction, recorded
+2026-10-07).
+The two first-publication declarations are ticked by the agent once the recorded approval exists,
+because the approval is the product checkpoint and not the click. The owner's decision, recorded
+2026-10-03: «В нашем заводе есть правило, что перед публикацией необходимо одобрение владельца.
+Собственно говоря, в то время и я проверяю проверку всех вот этих политик, и только после моего
+одобрения я говорю разрешить публикацию. Поэтому, если я разрешил публикацию, значит эти галочки
+можно уже автоматически нажимать. Потому что все проверки необходимые для публикации проводятся до
+начальной публикации всего приложения.» And recorded 2026-10-04: the agent asks whether it may
+proceed to publish; on yes, the agent itself opens Console, fills every form, uploads what tooling
+allows, fixes what needs fixing, and publishes.
 
 ## Guardrails
 

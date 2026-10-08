@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "appName": "UnitWalk",
+  "slug": "unit-walk",
+  "applicationId": "com.gexetr.unitwalk",
+  "idea": "UnitWalk — a crash-safe, no-account rental unit walk for self-managing landlords: room-by-room photo condition records that survive a process kill, move-in versus move-out compare per unit, and a signed PDF shared from the phone.",
+  "defaultLocale": "en-US",
+  "category": "PRODUCTIVITY",
+  "tags": [
+    "landlord",
+    "rental inspection",
+    "offline"
+  ],
+  "contactEmail": "v.sobolenko.vs@gmail.com",
+  "privacyPolicyUrl": "https://telegra.ph/UnitWalk--privacy-policy-10-05",
+  "locales": {
+    "en-US": {
+      "title": "UnitWalk",
+      "shortDescription": "Offline unit walks: room photos, move-in vs move-out, signed PDF.",
+      "fullDescription": "UnitWalk is a rental unit walk for the landlord who manages a few properties themselves. It keeps the whole condition record on your phone: the rooms, the photos and notes, a move-in walk and a move-out walk side by side, and a PDF report you can share or save when the walk is done.\n\nHow a walk works\n• Set up a unit once, then open a move-in walk or a move-out walk on it.\n• Walk room by room: add each room by name, take a photo with the camera or pick one from your gallery, then add a short note about what you see.\n• Every photo and note is written to storage as you go, so closing the app or losing the process does not erase the rooms you already finished.\n• Open the move-in walk beside the move-out walk for the same unit and mark what changed, room by room.\n• Turn the finished walk into a signed PDF and send it with the system share sheet or save it with Android's own file picker.\n\nPrivate by design\n• No account, no sign-in and no vendor cloud: nothing is ever sent to us or to any service we run.\n• It works offline, including the photo capture and the report.\n• Your units, photos, notes and PDFs stay in the app's private storage on this device, and nothing is sent to us or to any service we run. If you have Android's own backup switched on, your phone may include the app's data in your personal Google backup — that copy is yours, and we never see it. The camera permission is used only while you take a walk photo, and only the gallery items you pick are copied into the app.\n\nPricing\n• Free: one unit, fully usable — unlimited walks on it, photos, the room-by-room move-in vs move-out comparison, and PDF export, which carries a watermark.\n• One-time $9.99 unlock: unlimited units, and PDF export with no watermark.\n• Nothing is a subscription and nothing renews.\n\nFound a room you cannot record, or something that got in your way? Leave a note in a Play review — the store page is where that conversation happens.",
+      "screenshotCaptions": [
+        "Keep your units on the phone",
+        "Add each room as you walk",
+        "Photograph each room as you walk",
+        "Add a note in a tap",
+        "Compare move-in with move-out",
+        "Share the signed PDF"
+      ],
+      "featureBullets": [
+        "Room-by-room photos, taken with the camera or picked from your gallery",
+        "Every photo saved as you go, so a crash cannot erase the walk",
+        "Move-in and move-out compared room by room",
+        "A signed PDF report you share or save, exported straight from the phone",
+        "No account, no sign-in, and it works offline"
+      ]
+    }
+  },
+  "dataSafety": {
+    "collectsData": true,
+    "reason": "The app's own code collects nothing and never reads or writes the network: the walk stays in the app's private storage on the device. The one bundled SDK is Google Play Billing, which handles the one-time unlock; it may add INTERNET / ACCESS_NETWORK_STATE and an internal datatransport service to the merged manifest and is why the Play form carries a Financial info → Purchase history row. That is measured from the merged manifest of the built artifact, not asserted here.",
+    "dataTypes": [
+      {
+        "type": "Financial info",
+        "purpose": "App functionality",
+        "shared": false,
+        "optional": false,
+        "notes": "Purchase history: product IDs the user bought and their entitlement state. Payment instruments are handled entirely by Google Play and never reach the app."
+      }
+    ],
+    "thirdPartySdks": [
+      {
+        "name": "Google Play Billing Library",
+        "version": "9.1.0",
+        "policyUrl": "https://developer.android.com/google/play/billing"
+      }
+    ],
+    "encryptedInTransit": true,
+    "hasAccountDeletion": false
+  },
+  "permissions": [],
+  "ads": {
+    "containsAds": false,
+    "reason": "Enabled capabilities declare no advertising SDKs. A banner over deposit evidence would be hostile, and the enriched leaders on the landlord-inspection shelf declared no ads."
+  },
+  "contentRating": {
+    "questionnaire": "notes",
+    "targetAudience": ""
+  },
+  "graphicsSource": {
+    "iconGlyph": "focus",
+    "brandColor": "#02adca",
+    "accentColor": "#751636"
+  },
+  "capabilityCompliance": {
+    "enabled": [
+      "billing"
+    ],
+    "requiresConsent": false,
+    "requiresPurchaseAuthority": false,
+    "purchaseAuthority": null
+  }
+}

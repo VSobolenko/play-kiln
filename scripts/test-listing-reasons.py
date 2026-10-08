@@ -21,6 +21,7 @@ renderer's wording changes, which a value imported from the module under test co
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -73,6 +74,37 @@ BILLING_DATA_COLLECTED = {
     "requiresConsent": False,
     "requiresPurchaseAuthority": True,
     "purchaseAuthority": "https://playkiln.example/authority",
+}
+
+# The real shapes the capability aggregator returns and the authored pack carries, used by the
+# 2026-10-05 legs below.  The canonical `notes` is `capabilities/billing/capability.json`, and the
+# authored notes are the wording measured in `apps/2026-10-05-unit-walk`.
+BILLING_CANONICAL_TYPE = {
+    "type": "Financial info",
+    "purpose": "App functionality",
+    "shared": False,
+    "optional": False,
+    "notes": "Purchase history: product IDs the user bought and their entitlement state. "
+    "Payment instruments are handled entirely by Google Play and never reach the app.",
+}
+AUTHORED_TYPE_NOTES = (
+    "Purchase history: the product ID the user bought and its entitlement state."
+)
+BILLING_DATA_ROWS = {
+    "enabled": ["billing"],
+    "permissions": [],
+    "dataCollected": [BILLING_CANONICAL_TYPE],
+    "sdkDependencies": [
+        {
+            "name": "Google Play Billing Library",
+            "version": "9.1.0",
+            "policyUrl": "https://developer.android.com/google/play/billing",
+        }
+    ],
+    "adsPresent": False,
+    "requiresConsent": False,
+    "requiresPurchaseAuthority": False,
+    "purchaseAuthority": None,
 }
 
 failures: list[str] = []
@@ -229,6 +261,82 @@ def main() -> int:
     check(
         (listing["ads"]["reason"], listing["dataSafety"]["reason"]) == before,
         "a second apply preserves the reasons it just kept",
+    )
+
+    # --- The 2026-10-05 defect: an authored dataTypes row was replaced by the canonical wording ---
+    # `apps/2026-10-05-unit-walk` validated its approval, had the authored `notes` overwritten with
+    # the capability's canonical sentence, then refused itself because the pack digest had moved.
+    # The requirement is the identity (type, purpose, shared, optional), so a row already carrying
+    # it must be kept byte-for-byte.
+    authored_type = {**BILLING_CANONICAL_TYPE, "notes": AUTHORED_TYPE_NOTES}
+    listing = {"dataSafety": {"dataTypes": [authored_type]}}
+    kit.apply_capability_compliance(listing, BILLING_DATA_ROWS)
+    check(
+        listing["dataSafety"]["dataTypes"] == [authored_type],
+        "an authored dataTypes row survives a render that would otherwise replace its wording",
+    )
+    check(
+        any(
+            row.get("type") == "Financial info"
+            and row.get("purpose") == "App functionality"
+            and row.get("shared") is False
+            and row.get("optional") is False
+            for row in listing["dataSafety"]["dataTypes"]
+        ),
+        "the surviving authored row still satisfies the capability's collected-data requirement",
+    )
+
+    # Preservation must not weaken the obligation it exists to keep: a genuinely absent required row
+    # is still added, so a bundled SDK that transmits data is never left undeclared.
+    extra_type = {
+        **BILLING_CANONICAL_TYPE,
+        "type": "Device or other IDs",
+        "purpose": "Analytics",
+        "shared": True,
+        "notes": "canonical copy of a third-party identifier row",
+    }
+    listing = {"dataSafety": {"dataTypes": [authored_type]}}
+    kit.apply_capability_compliance(
+        listing, {**BILLING_DATA_ROWS, "dataCollected": [BILLING_CANONICAL_TYPE, extra_type]}
+    )
+    check(
+        listing["dataSafety"]["dataTypes"] == [authored_type, extra_type],
+        "a missing required data type is appended while the authored row is kept",
+    )
+
+    # Idempotence is the property the approval depends on: a second render over its own output must
+    # change nothing, so the pack digest cannot move on a re-run of the renderer it just validated.
+    listing = {"dataSafety": {"dataTypes": [authored_type]}, "permissions": []}
+    kit.apply_capability_compliance(listing, BILLING_DATA_ROWS)
+    after_first = json.dumps(listing, sort_keys=True)
+    kit.apply_capability_compliance(listing, BILLING_DATA_ROWS)
+    check(
+        json.dumps(listing, sort_keys=True) == after_first,
+        "a second compliance apply leaves the listing byte-identical (the renderer is idempotent)",
+    )
+
+    # The permission list follows the same rule, keyed by name, so an authored `why` survives.
+    authored_permission = {
+        "name": "com.google.android.gms.permission.AD_ID",
+        "why": "authored reason for the advertising identifier",
+    }
+    listing = {"permissions": [authored_permission]}
+    kit.apply_capability_compliance(
+        listing,
+        {
+            **BILLING_DATA_ROWS,
+            "permissions": [
+                {
+                    "name": "com.google.android.gms.permission.AD_ID",
+                    "why": "canonical reason from the ads capability",
+                    "dangerous": False,
+                }
+            ],
+        },
+    )
+    check(
+        listing["permissions"] == [authored_permission],
+        "an authored permission row survives when the requirement is already declared",
     )
 
     # --- `default_listing` still yields generator sentences, never its own seeds ----------------

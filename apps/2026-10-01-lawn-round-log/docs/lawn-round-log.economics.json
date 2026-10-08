@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A solo mower, or the owner of a two-to-three-person mow crew, running 20 to 150 recurring residential or small-commercial customers on a weekly or fortnightly round, who keeps the round in his head, in a paper notebook, or in a free cloud CRM he half-uses.",
+  "paidUnit": "One permanent unlock of the full round: unlimited customers, the complete visit history, the per-customer owed balance and the CSV export, with no account, no sync and no renewal.",
+  "priceUsd": 9.99,
+  "momentOfPayment": "When the free tier fills up at eight customers, or the first time he needs the visit history or the export, behind one clearly priced unlock sheet with no trial clock and no subscription prompt.",
+  "distinctnessSentence": "The round is the operator's own offline record rather than a cloud account: the day's customers are an ordered worklist he can reorder and push a day when it rains, one tap records mowed, skipped or rained-off, a per-customer balance shows who still owes, and all of it opens and saves in airplane mode with no login, unlike the measured incumbents whose mobile apps are login-gated thin clients of a web account.",
+  "evidenceRef": "apps/2026-10-01-lawn-round-log/docs/2026-10-01-solo-trade-rounds.md#3-recipe--lawn-round-log-lawn-round-log",
+  "day1RevenuePath": "The slot is listed against the lawn round tracker query, where demand is proven on the operator side by com.lawnlove.pros at 4.6 stars with 1230 exact reviews and com.app.yardbook at 100K+ installs, the mower installs it after a login or a server outage costs him a round, and the first unlock arrives through the billing capability this plan requires.",
+  "killCriteria": {
+    "windowDays": 90,
+    "minInstalls": 2000,
+    "minRevenueUsd": 300
+  },
+  "assumptionsUnverified": [
+    "Install-to-unlock conversion is assumed at 2 percent of installs; no slot in this repository has ever measured a conversion rate, so every revenue and installs figure derived from it is an assumption and not a reading.",
+    "Six operator-shaped apps in the same shelf are unrated (com.lawnsapp, io.lawn.app, app.mowmoney.com, lawn.care1, the Mow Quote CRM package and com.orangeforge.lawncarelog), and whether that is a shelf that does not sustain a solo operator tool or merely weak amateur supply is not resolved by any measurement taken here.",
+    "Willingness to pay is assumed: the measured complaints come from operators paying a marketplace or a cloud CRM rather than a one-time price for an offline notebook, and no reading shows a solo mower buying software outright.",
+    "Google Play's 15 percent service fee, a 2 percent refund allowance and a 2 percent currency-conversion allowance are plan assumptions carried from docs/monetization-strategy.md section 2.2, not measurements of this developer account, and the fee rises above the first-million tier.",
+    "Search ranking is assumed rather than planned: the measured shelf is led by free marketplace apps in the 50K+ and 100K+ install buckets, and nothing here shows a new listing can reach 2450 installs per month against them."
+  ]
+}

@@ -385,6 +385,41 @@ CLOCK: tuple[dict, ...] = (
     stroke("paper", (OPTICAL_CENTER, _clock_point(200.0, _CLOCK_HOUR_R)), "bold"),
 )
 
+# mark-unit-plan
+# UnitWalk's mark: a rental unit read in plan - the walls as one closed bold stroke, and the walk's
+# tick inside them. The room is wider than it is deep, because a unit in plan is a rectangle and not
+# a page; the round join of the stroke is the corner radius, so the plan sits on the same 24px bold
+# weight as every other mark here rather than on a hand-chosen curve.
+#
+# The tick is interior detail and is therefore derived from the room rectangle rather than from the
+# canvas, exactly as `mark-book` derives its check from the page: a room that moves takes its tick
+# with it. The wall's centreline stops half a bold stroke inside the circle keyline, which is what
+# puts the outermost ink on the keyline rather than past it - the reach gate reads 30.71dp of the
+# 31dp bound, the same construction `pipe` and `mark-clock` use.
+_UNIT_HALF_W = 0.205  # half the wall centreline's width: 0.41 of the canvas
+_UNIT_HALF_H = 0.160  # half its depth: the room is wider than it is deep
+_UNIT_LEFT = OPTICAL_CENTER[0] - _UNIT_HALF_W
+_UNIT_TOP = OPTICAL_CENTER[1] - _UNIT_HALF_H
+# The tick, in room-relative fractions (x, y) of the wall rectangle. It sits clear of every wall:
+# the paper between the tick's outer edge and the nearest wall is more than one regular stroke, so
+# the negative space inside the room stays a feature rather than a smear at 48dp.
+_UNIT_TICK_FRACTIONS = ((0.30, 0.494), (0.427, 0.675), (0.70, 0.281))
+
+
+def _unit_point(x_fraction: float, y_fraction: float) -> tuple[float, float]:
+    return (_UNIT_LEFT + x_fraction * 2 * _UNIT_HALF_W,
+            _UNIT_TOP + y_fraction * 2 * _UNIT_HALF_H)
+
+
+UNIT_PLAN: tuple[dict, ...] = (
+    stroke("paper", ((_UNIT_LEFT, _UNIT_TOP),
+                     (_UNIT_LEFT + 2 * _UNIT_HALF_W, _UNIT_TOP),
+                     (_UNIT_LEFT + 2 * _UNIT_HALF_W, _UNIT_TOP + 2 * _UNIT_HALF_H),
+                     (_UNIT_LEFT, _UNIT_TOP + 2 * _UNIT_HALF_H),
+                     (_UNIT_LEFT, _UNIT_TOP)), "bold"),
+    stroke("amber", [_unit_point(x, y) for x, y in _UNIT_TICK_FRACTIONS], "bold"),
+)
+
 MARK_REGISTRY: dict[str, dict] = {
     "pipe": {"primitives": PIPE, "keyline": "circle",
              "note": "a pipe cross-section measured across its bore"},
@@ -394,6 +429,9 @@ MARK_REGISTRY: dict[str, dict] = {
                      "note": "four mown stripes converging toward a vanishing point above them"},
     "mark-clock": {"primitives": CLOCK, "keyline": "circle",
                    "note": "a deck pace clock: a bold ring with a minute hand and an hour hand"},
+    "mark-unit-plan": {"primitives": UNIT_PLAN, "keyline": "circle",
+                       "note": "a rental unit in plan: the walls as one closed bold stroke with "
+                               "the walk's tick inside them"},
 }
 DEFAULT_MARK = "pipe"
 

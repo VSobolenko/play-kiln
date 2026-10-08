@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Russian translation of res/values/strings_walk.xml. Real translations, not copies of
+    the English, so locale.placeholder and slot.locales both stay green.
+-->
+<resources>
+    <string name="walk_title" translatable="true">Осмотр</string>
+    <string name="walk_back" translatable="true">Назад</string>
+    <string name="walk_hero_room_position" translatable="true">%1$d из %2$d</string>
+    <string name="walk_hero_photos_label" translatable="true">фото в этом осмотре</string>
+
+    <string name="walk_kind_move_in" translatable="true">Заселение</string>
+    <string name="walk_kind_move_out" translatable="true">Выселение</string>
+    <string name="walk_kind_single" translatable="true">Отдельный</string>
+    <string name="walk_status_draft" translatable="true">Черновик</string>
+    <string name="walk_status_finished" translatable="true">Завершён</string>
+
+    <string name="walk_rooms_header" translatable="true">Комнаты</string>
+    <string name="walk_room_note_absent" translatable="true">Заметки пока нет</string>
+    <string name="walk_room_photos_label" translatable="true">фото</string>
+
+    <string name="walk_add_room_label" translatable="true">Название комнаты</string>
+    <string name="walk_add_room_hint" translatable="true">Например, кухня</string>
+    <string name="walk_add_room_action" translatable="true">Добавить комнату</string>
+
+    <string name="walk_no_walk_title" translatable="true">Осмотр не открыт</string>
+    <string name="walk_no_rooms_title" translatable="true">Пока нет комнат</string>
+    <string name="walk_no_rooms_body" translatable="true">Добавьте первую комнату, чтобы записать её состояние.</string>
+    <string name="walk_current_room_label" translatable="true">Текущая комната</string>
+    <string name="walk_current_room_none" translatable="true">Выберите комнату, чтобы записать её состояние.</string>
+
+    <string name="walk_note_label" translatable="true">Заметка</string>
+    <string name="walk_note_hint" translatable="true">Что вы увидели в этой комнате?</string>
+
+    <string name="walk_condition_header" translatable="true">Состояние</string>
+    <string name="walk_condition_good" translatable="true">Хорошее</string>
+    <string name="walk_condition_worn" translatable="true">Изношенное</string>
+    <string name="walk_condition_damaged" translatable="true">Повреждённое</string>
+    <string name="walk_condition_missing" translatable="true">Отсутствует</string>
+    <string name="walk_condition_not_recorded" translatable="true">Не записано</string>
+
+    <string name="walk_photos_header" translatable="true">Фотографии</string>
+    <string name="walk_photos_empty" translatable="true">Для этой комнаты пока нет фотографий.</string>
+    <string name="walk_photo_add_camera" translatable="true">Добавить фото</string>
+    <string name="walk_photo_add_gallery" translatable="true">Добавить из галереи</string>
+
+    <string name="walk_finish_room_action" translatable="true">Завершить комнату</string>
+    <string name="walk_finish_room_and_next_action" translatable="true">Завершить комнату и продолжить</string>
+    <string name="walk_finish_walk_action" translatable="true">Завершить осмотр</string>
+
+    <string name="walk_room_added_message" translatable="true">Комната добавлена.</string>
+    <string name="walk_room_finished_message" translatable="true">Комната завершена.</string>
+    <string name="walk_room_name_required_message" translatable="true">Введите название комнаты.</string>
+    <string name="walk_room_not_found_message" translatable="true">Эта комната больше недоступна.</string>
+    <string name="walk_nothing_to_resume_message" translatable="true">Нет осмотра, который можно открыть.</string>
+    <string name="walk_not_saved_message" translatable="true">Не удалось сохранить изменение. Попробуйте ещё раз.</string>
+</resources>

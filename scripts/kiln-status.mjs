@@ -26,6 +26,7 @@ import { spawnSync } from 'node:child_process'
 import { applicationIdPattern, scaffoldPackage } from './lib/namespaces.mjs'
 import { resolveJavaHome } from './lib/java.mjs'
 import { checkReleaseApproval, slotSlug } from './lib/release-approval.mjs'
+import { scratchEnv } from './lib/scratch.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 let hasFailure = false
@@ -50,6 +51,32 @@ function run(command, args) {
   return {
     ok: result.status === 0,
     status: result.status,
+    output: `${result.stdout || ''}${result.stderr || ''}`.trim(),
+    error: result.error
+  }
+}
+
+/**
+ * Probe the GitHub Copilot CLI — an ADDITIONAL worker channel beside Codex, never a required one.
+ *
+ * Two Windows facts decide the shape of this probe, and both were measured rather than assumed.
+ * The npm shim is a `.cmd`, which `spawnSync` cannot launch with `shell: false` (it raises ENOENT),
+ * so the command goes through a shell as a single string — never an argv array, which would
+ * concatenate unescaped arguments. And success is the exit code alone: the PowerShell shim writes a
+ * `NativeCommandError` block to stderr even on a successful run, so "stderr is non-empty" is not a
+ * failure signal. The child inherits `scratchEnv` so anything it writes stays under `.kiln/scratch`.
+ */
+function probeCopilot() {
+  const result = spawnSync('copilot --version', {
+    cwd: root,
+    encoding: 'utf8',
+    shell: true,
+    timeout: 30_000,
+    windowsHide: true,
+    env: scratchEnv(process.env, 'copilot-status')
+  })
+  return {
+    ok: result.status === 0,
     output: `${result.stdout || ''}${result.stderr || ''}`.trim(),
     error: result.error
   }
@@ -432,6 +459,30 @@ if (existsSync(workerDirectory)) {
   }
 }
 line('INFO', `Codex worker records: ${workerCount}`)
+
+section('Copilot channel')
+// GitHub Copilot CLI is an additional worker channel beside Codex (`harness/copilot-workers.md`,
+// `scripts/copilot-run.mjs`), so its absence is reported honestly and never fails this summary: an
+// optional channel that is missing is not a factory defect, and it is not a pass either. The probe
+// mirrors the Codex channel above and the optional-SDK rows below.
+const copilotResult = probeCopilot()
+line(
+  copilotResult.ok ? 'PASS' : 'WARN',
+  copilotResult.ok
+    ? `Copilot CLI ${firstLine(copilotResult.output)}`
+    : `Copilot CLI not resolved (optional channel): ${firstLine(copilotResult.output) || copilotResult.error?.message || 'not found'}`
+)
+
+const copilotWorkerDirectory = join(root, '.kiln', 'copilot')
+let copilotWorkerCount = 0
+if (existsSync(copilotWorkerDirectory)) {
+  try {
+    copilotWorkerCount = readdirSync(copilotWorkerDirectory).filter((name) => name.endsWith('.meta.json')).length
+  } catch (error) {
+    line('WARN', `cannot count Copilot worker records: ${error.message}`)
+  }
+}
+line('INFO', `Copilot worker records: ${copilotWorkerCount}`)
 
 section('MCP config')
 let mcp = null

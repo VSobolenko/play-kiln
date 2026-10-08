@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copy for the room-by-room walk screen, owned by the walk worker.
+
+    Keys are `walk_*` and are mirrored in values-ru/strings_walk.xml with real Russian.
+    Every label, hint, status and message the walk screen renders lives here, so no
+    user-facing prose is compiled into Kotlin (locale.hardcoded) and every key has a
+    translation in both declared languages (locale.multilingual / slot.locales).
+-->
+<resources>
+    <string name="walk_title" translatable="true">Walk</string>
+    <string name="walk_back" translatable="true">Back</string>
+    <string name="walk_hero_room_position" translatable="true">%1$d of %2$d</string>
+    <string name="walk_hero_photos_label" translatable="true">photos in this walk</string>
+
+    <string name="walk_kind_move_in" translatable="true">Move-in</string>
+    <string name="walk_kind_move_out" translatable="true">Move-out</string>
+    <string name="walk_kind_single" translatable="true">Standalone</string>
+    <string name="walk_status_draft" translatable="true">Draft</string>
+    <string name="walk_status_finished" translatable="true">Finished</string>
+
+    <string name="walk_rooms_header" translatable="true">Rooms</string>
+    <string name="walk_room_note_absent" translatable="true">No note yet</string>
+    <string name="walk_room_photos_label" translatable="true">photos</string>
+
+    <string name="walk_add_room_label" translatable="true">Room name</string>
+    <string name="walk_add_room_hint" translatable="true">For example, Kitchen</string>
+    <string name="walk_add_room_action" translatable="true">Add room</string>
+
+    <string name="walk_no_walk_title" translatable="true">No walk open</string>
+    <string name="walk_no_rooms_title" translatable="true">No rooms yet</string>
+    <string name="walk_no_rooms_body" translatable="true">Add the first room to start recording its condition.</string>
+    <string name="walk_current_room_label" translatable="true">Current room</string>
+    <string name="walk_current_room_none" translatable="true">Select a room to record its condition.</string>
+
+    <string name="walk_note_label" translatable="true">Note</string>
+    <string name="walk_note_hint" translatable="true">What did you see in this room?</string>
+
+    <string name="walk_condition_header" translatable="true">Condition</string>
+    <string name="walk_condition_good" translatable="true">Good</string>
+    <string name="walk_condition_worn" translatable="true">Worn</string>
+    <string name="walk_condition_damaged" translatable="true">Damaged</string>
+    <string name="walk_condition_missing" translatable="true">Missing</string>
+    <string name="walk_condition_not_recorded" translatable="true">Not recorded</string>
+
+    <string name="walk_photos_header" translatable="true">Photos</string>
+    <string name="walk_photos_empty" translatable="true">No photos for this room yet.</string>
+    <string name="walk_photo_add_camera" translatable="true">Add photo</string>
+    <string name="walk_photo_add_gallery" translatable="true">Add from gallery</string>
+
+    <string name="walk_finish_room_action" translatable="true">Finish room</string>
+    <string name="walk_finish_room_and_next_action" translatable="true">Finish room and continue</string>
+    <string name="walk_finish_walk_action" translatable="true">Finish walk</string>
+
+    <string name="walk_room_added_message" translatable="true">Room added.</string>
+    <string name="walk_room_finished_message" translatable="true">Room finished.</string>
+    <string name="walk_room_name_required_message" translatable="true">Enter a room name.</string>
+    <string name="walk_room_not_found_message" translatable="true">That room is no longer available.</string>
+    <string name="walk_nothing_to_resume_message" translatable="true">There is no walk in progress to open.</string>
+    <string name="walk_not_saved_message" translatable="true">Could not save the change. Please try again.</string>
+</resources>

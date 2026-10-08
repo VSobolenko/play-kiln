@@ -171,40 +171,54 @@ function resolveCodex() {
   return null
 }
 
-const bin = resolveCodex()
+async function main() {
+  const bin = resolveCodex()
 
-if (!bin) {
-  console.error(
-    'codex-launcher: could not locate the Codex binary.\n' +
-      'Install the Codex / ChatGPT extension in VS Code or Cursor, or set CODEX_BIN\n' +
-      'to the full path of the codex executable.\n\n' +
-      'Searched extension roots:\n  ' +
-      editorInstallDirs().join('\n  ')
+  if (!bin) {
+    console.error(
+      'codex-launcher: could not locate the Codex binary.\n' +
+        'Install the Codex / ChatGPT extension in VS Code or Cursor, or set CODEX_BIN\n' +
+        'to the full path of the codex executable.\n\n' +
+        'Searched extension roots:\n  ' +
+        editorInstallDirs().join('\n  ')
+    )
+    process.exit(1)
+  }
+
+  const args = process.argv.slice(2)
+  const { sandboxSafePath } = await import('../../scripts/lib/win-sandbox-path.mjs')
+  const dangerFullAccess = args.some(
+    (arg, index) =>
+      arg === '--sandbox=danger-full-access' ||
+      (arg === '--sandbox' && args[index + 1] === 'danger-full-access')
   )
-  process.exit(1)
+  const safePath = dangerFullAccess ? { path: process.env.PATH, dropped: [] } : sandboxSafePath(process.env.PATH)
+  const childEnv = { ...process.env, PATH: safePath.path }
+
+  // Diagnostics: set CODEX_LAUNCHER_DEBUG=1 to log the resolved binary to stderr.
+  // Useful when the MCP server fails to start and the reason is not obvious.
+  if (process.env.CODEX_LAUNCHER_DEBUG) {
+    console.error('codex-launcher: resolved binary = ' + bin)
+    console.error('codex-launcher: argv = ' + JSON.stringify(args))
+    console.error('codex-launcher: cwd = ' + process.cwd())
+    console.error('codex-launcher: PATH aliases dropped = ' + JSON.stringify(safePath.dropped))
+  }
+
+  const child = spawn(bin, args.length > 0 ? args : ['mcp-server'], {
+    stdio: 'inherit',
+    windowsHide: true,
+    env: childEnv
+  })
+
+  child.on('error', (err) => {
+    console.error('codex-launcher: failed to start ' + bin + ': ' + err.message)
+    process.exit(1)
+  })
+
+  child.on('exit', (code, signal) => {
+    if (signal) process.exit(1)
+    process.exit(code === null ? 1 : code)
+  })
 }
 
-const args = process.argv.slice(2)
-
-// Diagnostics: set CODEX_LAUNCHER_DEBUG=1 to log the resolved binary to stderr.
-// Useful when the MCP server fails to start and the reason is not obvious.
-if (process.env.CODEX_LAUNCHER_DEBUG) {
-  console.error('codex-launcher: resolved binary = ' + bin)
-  console.error('codex-launcher: argv = ' + JSON.stringify(args))
-  console.error('codex-launcher: cwd = ' + process.cwd())
-}
-
-const child = spawn(bin, args.length > 0 ? args : ['mcp-server'], {
-  stdio: 'inherit',
-  windowsHide: true
-})
-
-child.on('error', (err) => {
-  console.error('codex-launcher: failed to start ' + bin + ': ' + err.message)
-  process.exit(1)
-})
-
-child.on('exit', (code, signal) => {
-  if (signal) process.exit(1)
-  process.exit(code === null ? 1 : code)
-})
+main()

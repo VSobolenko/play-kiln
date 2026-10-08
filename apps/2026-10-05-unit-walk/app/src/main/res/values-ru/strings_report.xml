@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Русский перевод экрана отчёта и его выгрузки. Ключи те же, что в
+  values/strings_report.xml, и их набор совпадает один в один.
+-->
+<resources>
+    <string name="report_title" translatable="true">Отчёт</string>
+    <string name="report_back" translatable="true">Назад</string>
+    <string name="report_hero_subtitle" translatable="true">Подписанный отчёт о состоянии</string>
+    <string name="report_status_loading" translatable="true">Формирование отчёта…</string>
+    <string name="report_status_ready" translatable="true">Отчёт создан</string>
+    <string name="report_status_empty" translatable="true">Нет обхода для отчёта</string>
+    <string name="report_status_failed" translatable="true">Не удалось создать отчёт</string>
+    <string name="report_stat_rooms" translatable="true">Комнаты</string>
+    <string name="report_stat_photos" translatable="true">Фотографии</string>
+    <string name="report_stat_differences" translatable="true">Различия</string>
+    <string name="report_stat_signatures" translatable="true">Подписи</string>
+    <string name="report_file_label" translatable="true">Файл</string>
+    <string name="report_file_missing" translatable="true">Ещё не создан</string>
+    <string name="report_bytes_format" translatable="true">%1$d байт</string>
+    <string name="report_share_action" translatable="true">Поделиться PDF</string>
+    <string name="report_save_action" translatable="true">Сохранить копию</string>
+    <string name="report_share_chooser_title" translatable="true">Поделиться отчётом об обходе</string>
+    <string name="report_default_file_name" translatable="true">unit-walk-report.pdf</string>
+    <string name="report_section_signatures" translatable="true">Подписи</string>
+    <string name="report_signature_count_format" translatable="true">Подписи: %1$d</string>
+    <string name="report_signature_landlord_label" translatable="true">Имя арендодателя</string>
+    <string name="report_signature_tenant_label" translatable="true">Имя арендатора</string>
+    <string name="report_signature_landlord_save" translatable="true">Сохранить подпись арендодателя</string>
+    <string name="report_signature_tenant_save" translatable="true">Сохранить подпись арендатора</string>
+    <string name="report_signature_name_required" translatable="true">Введите имя перед сохранением подписи.</string>
+    <string name="report_section_manage" translatable="true">Управление обходом</string>
+    <string name="report_delete_walk_action" translatable="true">Удалить этот обход</string>
+    <string name="report_delete_walk_title" translatable="true">Удалить этот обход?</string>
+    <string name="report_delete_walk_message" translatable="true">Обход для «%1$s» будет удалён. Это действие нельзя отменить.</string>
+    <string name="report_delete_confirm" translatable="true">Удалить</string>
+    <string name="report_delete_cancel" translatable="true">Отмена</string>
+    <string name="report_locked_title" translatable="true">В бесплатных отчётах есть водяной знак. Разовая разблокировка убирает его и снимает ограничение на число объектов.</string>
+    <string name="report_locked_action" translatable="true">Разблокировать</string>
+    <string name="report_message_pdf_written" translatable="true">Отчёт готов.</string>
+    <string name="report_message_pdf_failed" translatable="true">Не удалось создать отчёт.</string>
+    <string name="report_message_signature_saved" translatable="true">Подпись сохранена.</string>
+    <string name="report_message_saved_to_location" translatable="true">Копия сохранена.</string>
+    <string name="report_message_save_failed" translatable="true">Не удалось сохранить копию.</string>
+    <string name="report_message_nothing_to_save" translatable="true">Пока нечего сохранять.</string>
+</resources>

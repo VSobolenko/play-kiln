@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The finished report and its handoff out of the app. Owned by the report screen worker; the keys
+  are scope-prefixed `report_*` and are mirrored key-for-key in values-ru/strings_report.xml.
+
+  `report_bytes_format` is a format string, and both locales carry the same argument so the
+  locale gate can check argument parity.
+-->
+<resources>
+    <string name="report_title" translatable="true">Report</string>
+    <string name="report_back" translatable="true">Back</string>
+    <string name="report_hero_subtitle" translatable="true">Signed condition report</string>
+    <string name="report_status_loading" translatable="true">Writing the report…</string>
+    <string name="report_status_ready" translatable="true">Report written</string>
+    <string name="report_status_empty" translatable="true">No walk to report</string>
+    <string name="report_status_failed" translatable="true">Report could not be written</string>
+    <string name="report_stat_rooms" translatable="true">Rooms</string>
+    <string name="report_stat_photos" translatable="true">Photos</string>
+    <string name="report_stat_differences" translatable="true">Differences</string>
+    <string name="report_stat_signatures" translatable="true">Signatures</string>
+    <string name="report_file_label" translatable="true">File</string>
+    <string name="report_file_missing" translatable="true">Not written yet</string>
+    <string name="report_bytes_format" translatable="true">%1$d bytes</string>
+    <string name="report_share_action" translatable="true">Share the PDF</string>
+    <string name="report_save_action" translatable="true">Save a copy</string>
+    <string name="report_share_chooser_title" translatable="true">Share the unit walk report</string>
+    <string name="report_default_file_name" translatable="true">unit-walk-report.pdf</string>
+    <string name="report_section_signatures" translatable="true">Signatures</string>
+    <string name="report_signature_count_format" translatable="true">Signatures: %1$d</string>
+    <string name="report_signature_landlord_label" translatable="true">Landlord name</string>
+    <string name="report_signature_tenant_label" translatable="true">Tenant name</string>
+    <string name="report_signature_landlord_save" translatable="true">Save landlord signature</string>
+    <string name="report_signature_tenant_save" translatable="true">Save tenant signature</string>
+    <string name="report_signature_name_required" translatable="true">Enter a name before saving the signature.</string>
+    <string name="report_section_manage" translatable="true">Manage this walk</string>
+    <string name="report_delete_walk_action" translatable="true">Delete this walk</string>
+    <string name="report_delete_walk_title" translatable="true">Delete this walk?</string>
+    <string name="report_delete_walk_message" translatable="true">This deletes the walk for %1$s. This cannot be undone.</string>
+    <string name="report_delete_confirm" translatable="true">Delete</string>
+    <string name="report_delete_cancel" translatable="true">Cancel</string>
+    <string name="report_locked_title" translatable="true">Free reports carry a watermark. The one-time unlock removes it and adds unlimited units.</string>
+    <string name="report_locked_action" translatable="true">Unlock</string>
+    <string name="report_message_pdf_written" translatable="true">The report is ready.</string>
+    <string name="report_message_pdf_failed" translatable="true">The report could not be written.</string>
+    <string name="report_message_signature_saved" translatable="true">Signature saved.</string>
+    <string name="report_message_saved_to_location" translatable="true">A copy was saved.</string>
+    <string name="report_message_save_failed" translatable="true">The copy could not be saved.</string>
+    <string name="report_message_nothing_to_save" translatable="true">There is nothing to save yet.</string>
+</resources>

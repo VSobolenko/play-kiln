@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Move-in versus move-out comparison. Owned by the compare screen worker; the keys are
+  scope-prefixed `compare_*` and are mirrored key-for-key in values-ru/strings_compare.xml.
+
+  `compare_no_prior_notice` and `compare_no_prior_short` are the words the screen uses when the
+  ViewModel reports `CompareOutcome.NoPriorReport`: the surface says "no prior report" plainly and
+  never draws a baseline that was not recorded.
+-->
+<resources>
+    <string name="compare_title" translatable="true">Move-in vs move-out</string>
+    <string name="compare_back" translatable="true">Back</string>
+    <string name="compare_hero_subtitle" translatable="true">Room-by-room differences</string>
+    <string name="compare_rooms_label" translatable="true">Rooms</string>
+    <string name="compare_kind_move_in" translatable="true">Move-in</string>
+    <string name="compare_kind_move_out" translatable="true">Move-out</string>
+    <string name="compare_kind_single" translatable="true">Single walk</string>
+    <string name="compare_no_prior_short" translatable="true">No prior report</string>
+    <string name="compare_no_prior_notice" translatable="true">There is no prior move-in report for this unit, so only the current walk is shown. No baseline has been invented.</string>
+    <string name="compare_column_prior" translatable="true">Move-in</string>
+    <string name="compare_column_current" translatable="true">Move-out</string>
+    <string name="compare_condition_good" translatable="true">Good</string>
+    <string name="compare_condition_worn" translatable="true">Worn</string>
+    <string name="compare_condition_damaged" translatable="true">Damaged</string>
+    <string name="compare_condition_missing" translatable="true">Missing</string>
+    <string name="compare_condition_not_recorded" translatable="true">Not recorded</string>
+    <string name="compare_condition_supporting" translatable="true">Each condition is shown as a word and a shape, never by colour alone.</string>
+    <string name="compare_record_label" translatable="true">Room condition</string>
+    <string name="compare_note_label" translatable="true">Note for this room</string>
+    <string name="compare_note_placeholder" translatable="true">What changed?</string>
+    <string name="compare_save_delta" translatable="true">Save difference</string>
+    <string name="compare_delta_saved" translatable="true">Difference saved.</string>
+    <string name="compare_save_failed" translatable="true">The difference could not be saved.</string>
+    <string name="compare_walk_not_found" translatable="true">This walk no longer exists.</string>
+    <string name="compare_open_report" translatable="true">Open the report</string>
+    <string name="compare_loading" translatable="true">Loading the comparison…</string>
+</resources>

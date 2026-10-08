@@ -9,7 +9,7 @@ import org.junit.Test
  * readings the method requires — gas specific gravity, pressure drop and inside diameter — are
  * deliberately absurd (21.5, 35.5, 88.5) so a reader cannot mistake them for a code table's
  * figures; no code or standard reads that way. The app supplies no capacity data of its own
- * (`docs/research/2026-09-25-pipe-sizing-code-source.md`). The unit identities asserted in
+ * (`apps/2026-09-25-pipe-sizing/docs/2026-09-25-pipe-sizing-code-source.md`). The unit identities asserted in
  * `convertsImperialToMetricAndBackWithoutChangingPhysicalValue` are the SI/imperial definitions
  * themselves, not slot data, and are the subject of that test rather than a fixture standing in
  * for one.

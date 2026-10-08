@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "slot": "laneset",
-  "reconRef": "docs/ideation/2026-10-02-planners-and-optimisers.md#2-the-shelf-and-the-leader-first-screen",
+  "reconRef": "apps/2026-10-02-laneset/docs/2026-10-02-planners-and-optimisers.md#2-the-shelf-and-the-leader-first-screen",
   "claims": [
     {
       "id": "computes-the-session",

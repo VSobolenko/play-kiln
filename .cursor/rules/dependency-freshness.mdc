@@ -1,0 +1,62 @@
+---
+description: Third-party deps stay on latest stable; constrain Play-flagged antiques (Fragment via Billing)
+alwaysApply: true
+---
+
+# Third-party libraries are latest stable only
+
+The factory ships to Google Play. Play flags outdated SDKs in the bundle, and an antique
+transitive is still a shipped SDK even when the app never imports it. The owner's canon:
+use only the modern stack; third-party libraries must be the **latest stable**; do not leave
+an APK on what a Google Maven POM asked for years ago when a constraint can raise it.
+
+## Measured instance
+
+On 2026-10-05 Play notified that Mark Book for Teachers (`teacher-gradebook`) shipped
+`androidx.fragment:fragment:1.1.0`. Gradle showed the path:
+
+```text
+androidx.fragment:fragment:1.1.0
+\--- com.google.android.gms:play-services-basement:18.9.0
+     \--- com.android.billingclient:billing:9.1.0
+          \--- billing-ktx → com.gexetr.capability:billing → app
+```
+
+Billing **9.1.0 was already the latest** stable. The app is Compose-only and does not use
+Fragment UI. GMS basement still requested Fragment 1.1.0. The fix is a dependency
+**constraint** to Fragment **1.9.1** (latest stable measured that day), not a Billing
+downgrade and not excluding GMS (Billing needs it).
+
+## Rules
+
+- **Third-party coordinates on the classpath are latest stable.** Prefer mainstream libraries.
+  When a transitive is antique and Play-flagged, **constrain it up** — do not ship the 2019
+  request GMS encoded in its POM.
+- **Known Play-outdated coordinates must not ship.** The measured instance is
+  `androidx.fragment:fragment:1.1.0`. A slot that resolves Fragment below the factory floor
+  (`1.9.1`, `FRAGMENT_FLOOR` in `scripts/core/deps.mjs`) fails the gate.
+- **Billing stays on current Play Billing.** Do not downgrade `com.android.billingclient`
+  to escape the Fragment notice. Pin Fragment instead.
+- **When Billing is present, constrain Fragment.** Every living path that puts Billing on the
+  classpath — `capabilities/billing`, and every slot `app/build.gradle.kts` that
+  `implementation`s `capability.billing` / `billing-ktx` — carries:
+  `constraints { api("androidx.fragment:fragment:<floor>") { because("…") } }`
+  (catalog version ref is fine). Document in a one-line comment that Compose apps do not use
+  Fragment; the constraint only upgrades the transitive so Play stops flagging 1.1.0.
+- **Do not add Fragment as an app feature.** No `implementation(libs.androidx.fragment)` for
+  UI, no Fragment navigation, no Fragment-hosted screens. Constraint only. Compose owns the UI.
+
+## How it is verified
+
+- `build.fragmentConstraint` / `deps.fixtures` in `scripts/core/deps.mjs`, registered in
+  `scripts/core/index.mjs`: a billing-enabled slot (or a build that depends on billing) without
+  a Fragment constraint at or above the floor FAILs; fixtures prove the check can fail.
+- Observed resolution: `./gradlew :app:dependencyInsight --dependency androidx.fragment:fragment
+  --configuration releaseRuntimeClasspath` must select the floor, not 1.1.0.
+
+## The honest limit
+
+The gate reads **source** (`app/build.gradle.kts` and the version catalog). It cannot prove the
+resolved APK graph without Gradle. After changing the constraint, republish
+`capabilities/` to mavenLocal and re-run `dependencyInsight` on a billing slot before calling
+the Play notice closed.

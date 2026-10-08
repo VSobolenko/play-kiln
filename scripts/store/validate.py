@@ -623,6 +623,16 @@ def check_listing_text(report: Report, listing: model.Listing) -> None:
                 if length <= limit
                 else f"{length} code points exceeds the {limit} code point limit",
             )
+            # Titles are names; unfinished-product tone is judged on the descriptions users read.
+            if field in ("shortDescription", "fullDescription"):
+                tone = model.banned_store_copy_tone(value)
+                report.add(
+                    "listing:tone",
+                    f"{locale}.{field}",
+                    FAIL if tone else PASS,
+                    tone
+                    or "finished-product tone (no early/WIP/roadmap-apology language)",
+                )
     if not listing.declared_locales():
         report.add(
             "listing:text",
@@ -684,6 +694,14 @@ def check_release_notes(report: Report, slot: Path) -> None:
             f"{length}/{limit} code points"
             if length <= limit
             else f"the {locale} note is {length} code points, over the {limit} code point limit",
+        )
+        tone = model.banned_store_copy_tone(note)
+        report.add(
+            "release-notes:tone",
+            locale,
+            FAIL if tone else PASS,
+            tone
+            or "finished-product tone (no early/WIP/roadmap-apology language)",
         )
 
 

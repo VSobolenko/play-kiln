@@ -1,9 +1,9 @@
 package com.gexetr.scaffold
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -15,13 +15,17 @@ import com.gexetr.scaffold.ui.theme.PlayKilnTheme
 /**
  * The single activity, and the one place the persisted settings are read for the whole app.
  *
+ * Extends [AppCompatActivity] rather than a bare `ComponentActivity` so the in-app language picker
+ * can call `AppCompatDelegate.setApplicationLocales` — the published caution is that the call only
+ * takes effect when its host is an `AppCompatActivity`. `AppCompatActivity` is a `ComponentActivity`,
+ * so `enableEdgeToEdge()` and `setContent` are unaffected.
+ *
  * The settings are hoisted here rather than inside the theme or the shell, because the theme is
  * applied *outside* the navigation host and cannot read a destination's state. `themeMode` and
  * `dynamicColor` decide which palette composes; `hapticsEnabled` is handed to the shell, which gives
- * it to the screen whose action it changes. Every one of them is a preference the user chose in
- * Settings, which is what makes that screen more than decoration.
+ * it to the screen whose action it changes.
  */
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

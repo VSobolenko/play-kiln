@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "slot": "teacher-gradebook",
-  "reconRef": "docs/ideation/2026-09-26-teacher-gradebook.md#4",
+  "reconRef": "apps/2026-09-26-teacher-gradebook/docs/2026-09-26-teacher-gradebook.md#4",
   "claims": [
     {
       "id": "edit-every-record",

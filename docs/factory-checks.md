@@ -319,7 +319,7 @@ proves the sensor can fail.
 
 | Command | What it decides | Observed 2026-10-02 |
 |---|---|---|
-| `node scripts/verify.mjs`, row `harness.groundedClaims` (the `invariants` group) | the rule loads, every `harness/roles/*.md` card names it, and every agent card names it or delegates to a role card | `FAIL` in this working tree — the five role cards name the rule; the agent mirror cards (`android-debugger`, `evaluator`, `generator`, `money-owner`, `planner`, `play-auditor`) do not yet, and that pass is still in flight |
+| `node scripts/verify.mjs`, row `harness.groundedClaims` (the `invariants` group) | the rule loads, every `harness/roles/*.md` card names it, and every agent card names it or delegates to a role card | `PASS` — `26 card(s) across 4 directory(ies) bind grounded-claims` (measured 2026-10-07 by `node scripts/verify.mjs --only invariants`). The `FAIL` this row used to record — the agent mirror cards had not yet named the rule — is **stale**: that pass landed, and the check is green in this working tree |
 | `node scripts/verify.mjs --only invariants`, row `harness.groundedClaimsFixtures` | the sensor can still fail — 9 inline fixtures over synthetic card sets | `PASS  harness.groundedClaimsFixtures  9 fixtures` |
 
 Its honest limit, stated rather than implied: it proves the duty is **declared**, never that a
@@ -427,6 +427,7 @@ Every command below was run on 2026-09-30 and passed.
 | `node scripts/test-kill-path.mjs` | `kiln-status --kill`: refuses without a reason, records the decision | exit 0 — 19/19 |
 | `node scripts/test-stop-gate.mjs` | the `stop-gate` hook's quiet-turn behaviour | exit 0 — 13/13 legs, `VERDICT: PASS` |
 | `node scripts/test-codex-signals.mjs` | the worker failure classifier | exit 0 — all checks passed |
+| `node scripts/test-win-sandbox-path.mjs` | MSIX execution aliases follow `LOCALAPPDATA`, are removed for restricted-sandbox Codex run/resume launches and direct launcher routes, and are preserved for `danger-full-access`; the data-driven launch sensor checks every runner and launcher spawn site supplies `env`, ignores comments, requires the launcher to import `scripts/lib/win-sandbox-path.mjs`, and injects a missing-`env` defect into each leg to prove rejection | exit 0 — all checks passed |
 | `node scripts/test-play-reviews.mjs` | the review-text sensor and its taxonomy | exit 0 — 39 checks, `SENSOR UNIT TESTS PASSED` |
 | `node scripts/test-play-scan.mjs` | the Play search screen and its relevance guard | exit 0 — `PLAY-SCAN REGRESSION: all checks passed` |
 | `node scripts/test-capture-assertions.mjs` | the capture journey's asserted readings | exit 0 — 26/26 |
@@ -436,6 +437,7 @@ Every command below was run on 2026-09-30 and passed.
 | `python scripts/test-icon-design.py` | the two icon renderers agree | exit 0 — `VERDICT: PASS (0 failing legs)` |
 | `python scripts/test-checklist-products.py` | the generated console checklist against a billing slot's own Kotlin | exit 0 — 21/21 |
 | `python scripts/test-release-notes.py` | the release-note format and its 500-character cap | exit 0 — 26/26 |
+| `python scripts/test-store-release-tone.py` | finished-product store copy: ban early/WIP tone in release notes and listing descriptions; prompts invite Play review feedback | run after editing `scripts/store/model.py` tone helpers or `validate.py` tone rows |
 | `python scripts/test-console-answers.py` | the generated console answer sheet against the pack | **retired by the console port**: the file and its generator are gone; see §9 |
 
 ### Suites the 2026-09-30 deletion group did NOT retire, and the cases that stop them
@@ -499,6 +501,7 @@ uses, and nothing fails when they are not run.
 | `node scripts/verify-reviews-sensor.mjs` | exit 0 — 15 checks, `SENSOR VERIFIED` |
 | `node scripts/scan-market.mjs`, `enrich-market.mjs`, `scan-titles.mjs`, `scan-complaints.mjs`, `scan-ai-niches.mjs`, `scan-plant-vertical.mjs` | not run — instruments, not gates |
 | `node scripts/codex-run.mjs list` | not run — the Codex worker channel, not a check |
+| `node scripts/copilot-run.mjs list` / `probe` | not run — the GitHub Copilot CLI worker channel (a **second** worker channel beside Codex, not a check): `list` reports each worker's verdict and `probe` is the fresh probe that refutes a `BLOCKED(...)` label. Runbook: `harness/copilot-workers.md` |
 
 ## 8. The observed outputs §1, §2 and §5 point at
 
@@ -660,5 +663,114 @@ already had the correct form, which is the precedent the fix follows. All five n
 
 That is the whole argument for running a suite rather than listing one: `test-icon-design.py` now
 reports `VERDICT: PASS (0 failing legs)` — and it never could have before — while
-`test-store-studio-completeness.py` immediately reported the non-determinism in residual 3, which no
+`test-store-completeness.py` immediately reported the non-determinism in residual 3, which no
 amount of reading would have surfaced.
+
+## 12. `harness.publishAssists` — added 2026-10-07, and why it is in the `invariants` group
+
+The third place where publishing needs the owner's hand had no procedure behind it. Seven documents
+named the promo-code point as an `[assist]` and none said what the agent should do at it, so —
+unlike the AAB chooser and the store graphics, where "open the page, name absolute paths, ask, wait"
+applies — the agent pressed `Скачать коды` repeatedly and the owner dismissed a stack of save
+windows. The lesson is recorded in `harness/lessons.md` (2026-10-07); the durable rule is
+`.cursor/rules/release-gate.mdc` § "Tooling assists".
+
+The check compares one table of the three points (`PUBLISH_ASSIST_POINTS`) and one list of the seven
+holders (`PUBLISH_ASSIST_DOCS`) against the files on disk, and fails when a holder does not name a
+point, when a declared holder is missing, and when any of the three protocol documents
+(`release-gate.mdc`, `docs/play-publishing-playbook.md`, `docs/play-console-checklist.md`) stops
+carrying the download's own tokens — `Скачать коды`, `promotion_codes.csv`, the exactly-once press,
+the ask, the wait, and the ban on pressing again. It is the same shape as `harness.approvalExclusions`
+and `harness.placeholderHosts`: **one list held by several documents, compared, so a holder cannot
+silently drop a point or drift from the rule.**
+
+Because it reads documents rather than a slot, and because it is a document-shaped defect, it lives
+in the `invariants` group via `...harnessChecks()` in `scripts/core/index.mjs` and runs on every
+`node scripts/verify.mjs`. `scripts/store/render_documents.py` writes the same two `[assist]` rows
+into a slot's `store/console-runbook.md`, which is the document a session actually walks.
+
+| Command | What it decides | Observed 2026-10-07 |
+|---|---|---|
+| `node scripts/verify.mjs --only invariants`, row `harness.publishAssists` | the three points are named by every holder, and the three protocol documents carry the one-click download rule | `PASS  harness.publishAssists  3 assist point(s) in 7 document(s); 3 carry the one-click download protocol` |
+| the same run, row `harness.fixtures` | the sensor can still fail — 18 inline fixtures, including the absent-holder leg and the protocol-token leg | `PASS  harness.fixtures  18 fixtures` |
+
+**Falsified before it was trusted**, against the real files rather than only synthetic ones, by
+mutating the loaded *text in memory* and restoring nothing because nothing on disk is written. Four
+legs, each read back with the sentence it produced:
+
+| Mutation (in memory) | Observed |
+|---|---|
+| (none — the tree as it stands) | `problems=0` |
+| `release-gate.mdc` loses `exactly once` | fails naming `.cursor/rules/release-gate.mdc (the rule) does not say the button is pressed exactly once` |
+| `AGENTS.md` loses the promo-code point | fails naming `AGENTS.md (the L1 contract) does not name the promo-code download` |
+| `.cursor/commands/forge.md` dropped from the set | fails naming `.cursor/commands/forge.md (the forge command) is missing, so the ladder it states cannot be compared` |
+| `play-console-checklist.md` loses `promotion_codes.csv` | fails naming `docs/play-console-checklist.md (the console checklist) does not name the downloaded file` |
+
+The generator half was **run, not read**: on a filtered copy of `apps/2026-10-01-lawn-round-log`
+made through the shared `isExcludedScaffoldPath` predicate (129 files copied, 2123 excluded) under
+`.kiln/scratch/runbook-verify/`, `python scripts/store/render_documents.py --slot-dir …` printed
+`RENDER: OK` and the generated `store/console-runbook.md` carries both `[assist]` rows at lines
+169-170 — inside the monetization section, so the rows exist only for a slot that enables billing,
+which is the only slot that has a promo code to download.
+
+One limit stated rather than implied: this check proves the documents **agree and are complete** — it
+cannot prove the agent obeys them, because a click is not a file. The confirmation that the download
+finished is the owner's, and the protocol names it as such; what the gate removes is the *unnoticed*
+holder that dropped the point or the sentence, which is exactly how this defect reached a live
+release.
+
+## 13. `core.size` redesigned — 2026-10-07, and why the row was the defect
+
+`core.size` compared the measured tree against an **exact** ceiling set to the measurement of the
+moment, so every edit anywhere under `scripts/` turned it red and the remedy was a hand-written
+justification in `scripts/core/budget.json`. Ten consecutive raises are recorded there. The tenth is
+the one that forced the redesign, and it is worth reading because it is not about size at all: a
+correct change ended red because a **parallel session** had written 172 lines into a shared module
+minutes earlier. The owner's instruction, recorded 2026-10-07: the row "climbs out in every chat, in
+every one, and we always get stuck on it" — the measured shape of a gate whose remedy is prose its
+author must invent, which fires on work the author did not do and which the operator learns to read
+past rather than act on.
+
+The fix has two halves and neither loosens the rule it was written for.
+
+- **The number became a baseline with a band.** `coreBaseline` / `legacyBaseline` record the last
+measurement and `tolerancePercent` (25) is how far each may move before the row fails; the fields
+were renamed from `coreLines` / `legacyCeiling`, and the `_comment` states which vocabulary an older
+entry is speaking. The band is measured, not felt: the largest single movement in the file's own
+history took the surface up 1973 lines (8% of it) and the legacy half up 935 (3%).
+- **The remedy became a command.** `node scripts/core/budget.mjs --record` measures the tree exactly
+as the check does, sets each baseline past its band to the measurement, and appends a machine-written
+entry naming every directory that moved, measured against `_measured`. `--check` prints the same
+measurement and writes nothing.
+
+| Command | What it does | Observed 2026-10-07 |
+|---|---|---|
+| `node scripts/core/budget.mjs --check` | prints the measurement and the band, writes nothing | `core 25600/31448 (recorded 25158); legacy 32701/40845 (recorded 32676); scripts total 58301` then `within the band: nothing to record` |
+| `node scripts/core/budget.mjs --record --budget <copy>` | re-baselines a file past its band and appends the entry | on a scratch copy with both baselines set to 1: `recorded: scripts/core +358, scripts/lib +10` |
+| `node scripts/verify.mjs --only invariants`, row `core.size` | the band verdict, one line, growth visible inside a green row | `PASS  core.size  core 25607/31448 (recorded 25158, +449 within the 25% band); legacy 32713/40845 (recorded 32676, +37 within the 25% band); scripts total 58320 (target 9000); 29 recorded revision(s), the legacy number moved up 17x and down 1x` |
+| the same run, row `size.fixtures` | the band's arithmetic can still fail — 6 inline fixtures | `PASS  size.fixtures  6 fixtures` |
+| the same run, row `budget.record` | the write path can still fail — 6 inline fixtures | `PASS  budget.record  6 fixtures` |
+
+**Falsified before it was trusted, on both halves.** `size.fixtures` drives the arithmetic from both
+sides — the exact limit green, one line past it red, a missing `tolerancePercent` a problem rather
+than an infinite band, a missing baseline a problem rather than a free pass, a deletion a direction
+rather than a failure — and turns the **real** row FAIL in place against a one-line budget, so the
+sensor is proved able to fail on the tree it is reading and not only on synthetic numbers. The write
+path is the one command here that mutates a committed file, so two defects were injected into
+`recordBudget` and observed before being reverted:
+
+| Injected defect | Observed |
+|---|---|
+| the recorder writes while inside the band | `FAIL  budget.record  a measurement inside the band writes nothing: wrote: expected false, got true` |
+| the recorder mutates the input instead of a copy | `FAIL  budget.record  the recorded file is a copy, so the budget handed in is never mutated in place: the input is untouched: expected undefined, got [...]` |
+
+The recorder was also driven end to end against a scratch copy under `.kiln/scratch/budget-probe/` —
+never the committed file — where it wrote an entry carrying `_auto: true` and the measured `_moved`.
+
+Two limits stated rather than implied. It **cannot tell a shared library from a new gate**: a raise
+that added a legacy gate would need a reader to catch it, which is why the entry it writes records
+*where* the lines went, in directories, instead of asserting a reason, and why `_comment` keeps the
+rule a machine cannot check — a baseline may follow the measurement, a new legacy **gate** belongs in
+the core. And the band is a **tolerance, not a target**: the row still prints `scripts total` against
+the 9000-line design target on every run, so the deletion this number exists for stays visible inside
+a green line rather than only in a red one.

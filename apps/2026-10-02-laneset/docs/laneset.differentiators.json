@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "slot": "laneset",
+  "reconRef": "apps/2026-10-02-laneset/docs/2026-10-02-planners-and-optimisers.md#2-the-shelf-and-the-leader-first-screen",
+  "claims": [
+    {
+      "id": "computes-the-session",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "Every session is computed from the swimmer's own constraints against the programming rules this app ships, so the main set is a new arrangement of distances, strokes and send-offs each time rather than a slice of a fixed rotating library: reading the pool length, the minutes on offer, the day's focus, the strokes to avoid and the gear actually on the deck, and deriving the session from those.",
+      "comparison": {
+        "incumbent": "com.gizmodus.myswimcoach",
+        "limitation": "Its own 2 star reviewer says the sets it generates are very repetitive, which is the signature of sets sliced out of a fixed rotating library rather than derived from the swimmer's constraints.",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote",
+        "finding": "com.gizmodus.myswimcoach, 4.6 stars over 2,771 exact reviews and 100K or more installs with an in-app purchase, carries the 2 star review \"in terms of the sets that the app generates are very repetitive and not very good for\", classified missing-feature, and com.SwimTrainer.SwimTrainer at 2.7 stars over 10K or more installs carries a 1 star review from a swimmer who wanted custom workouts ready to go without planning them himself."
+      },
+      "status": "deferred",
+      "deferredReason": "No generator exists yet; the promise is resolved when the shipped generator derives every session from the declared constraints and a test proves that two invocations with different pool lengths, minute budgets or gear sets never produce the same main set."
+    },
+    {
+      "id": "pace-test-drives-every-target",
+      "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "fit",
+      "promise": "The app walks the swimmer through a 400 and a 200 time trial, computes their threshold pace per 100 from those two swims, and prints that target on every interval of every session, so no set is ever a bare distance with no time to swim it in and the pacing survives into the next session without asking again.",
+      "comparison": {
+        "incumbent": "com.myswimpro.android.app",
+        "limitation": "Its own 1 star reviewer reports that the test workouts that set up the dynamic pacing have no real guidance, so the pacing half is either unguided or sold as a separate analysis product.",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#23-what-the-leaders-own-users-wrote"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#23-what-the-leaders-own-users-wrote",
+        "finding": "MySwimPro, the on-job leader at 3.8 stars over 3,102 exact reviews and 100K or more installs with an in-app purchase, carries the 1 star review \"Swim workouts seem legit, however no real guidance to do the test workouts to get the dynamic pacing in place. Analysis is extra, 50, 100 or 150 bucks\", and paywall is 2 of the 3 critical reviews sampled on that app."
+      },
+      "status": "deferred",
+      "deferredReason": "No pace model exists yet; the promise is resolved when a test drives the two time trials and asserts that a computed threshold pace is rendered as the target time on every interval of a session generated afterwards."
+    },
+    {
+      "id": "takes-it-to-the-pool",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "The finished session leaves the phone in a form the swimmer can use at the pool: one share action that sends the whole set list as text and one printable workout card, so the session can be swum off paper or a message instead of a wet screen, and without owning or wearing a supported watch.",
+      "comparison": {
+        "incumbent": "com.SwimTrainer.SwimTrainer",
+        "limitation": "Its own praise is for pushing workouts to a Garmin watch, which is the handoff this whole shelf assumes; nothing measured on the shelf produces a printable or shareable set list for a swimmer who trains without one.",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote",
+        "finding": "The shelf's handoff is a watch: com.SwimTrainer.SwimTrainer at 2.7 stars over 10K or more installs draws the 2 star review \"as well as the ease of sending workouts to my Garmin Forerunner 955\", while of the 10 enriched cards on the swim workout generator shelf 7 declare an in-app purchase and 0 declare a price, and no reviewed incumbent described printing or sharing a set list."
+      },
+      "status": "deferred",
+      "deferredReason": "No session output exists yet; the promise is resolved when the slot ships an ACTION_SEND share path and an ACTION_CREATE_DOCUMENT or print path whose proof artifact contains those tokens and a test asserts the shared payload carries the whole set list with its interval targets."
+    },
+    {
+      "id": "no-subscription-one-unlock",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "trust",
+      "promise": "One purchase and then everything: no renewal, no trial clock, no expiry and no advertising anywhere in the app, against a shelf whose leader sells the useful half as a recurring plan and whose weakest app sells nothing but subscriptions.",
+      "comparison": {
+        "incumbent": "com.myswimpro.android.app",
+        "limitation": "The useful half is a recurring plan behind a short trial, which is the charge its own critical reviewers make and the rent this recipe replaces with one price.",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#23-what-the-leaders-own-users-wrote"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote",
+        "finding": "Paywall is 2 of the 3 critical reviews sampled on MySwimPro, the on-job leader at 3.8 stars over 3,102 exact reviews and 100K or more installs, including the 1 star review \"I was under the impression there was at least some stuff that was part of the free app usage (not the 7 day\", and paywall is 4 of the 14 critical reviews in the shelf pocket, 29 percent."
+      },
+      "status": "deferred",
+      "deferredReason": "No billing surface exists yet; the promise is resolved when the shipped app declares no advertising SDK, has no renewal, expiry or trial clock path, and a test asserts the session and output screens render with no ad slot and no subscription prompt."
+    },
+    {
+      "id": "open-a-coach-workout",
+      "weight": "supporting",
+      "jobStage": "before",
+      "depthFamily": "data_in",
+      "promise": "A workout already written by a coach can be pasted in and is parsed into the same structured, paced session as a generated one, so the club sets a swimmer already has become part of the app instead of a separate photograph or a re-typed list.",
+      "comparison": {
+        "incumbent": "com.myswimpro.android.app",
+        "limitation": "The shelf's own model is that the app supplies the workout, so a set a coach wrote arrives as text the swimmer retypes or ignores; no enriched incumbent advertises reading a written practice in.",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#3-the-swim-shelf-and-its-leaders"
+      },
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#7-claim-ledger",
+        "finding": "No incumbent's reviewers were recorded asking to import a coach's written workout, so this is inferred from the job itself rather than read off the shelf; it is the payload that satisfies the contract's before stage and the data_in family, and it is stated as an inference rather than as a reading of this shelf."
+      },
+      "status": "deferred",
+      "deferredReason": "No parser exists yet; the promise is resolved when the slot ships a paste capture path for a written practice and a test parses a coach's set list with distances, repetitions and strokes into the same session model the generator produces."
+    },
+    {
+      "id": "offline-by-construction",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "trust",
+      "promise": "The programming rules, the pace arithmetic and every generated session live in the APK: the app opens, computes a full session and shares it with the phone in airplane mode and with no account, so a swimmer standing on a deck with no signal still gets a workout.",
+      "comparison": {
+        "incumbent": "com.tenklakessoftware.swimmetry",
+        "limitation": "Its own 1 star reviewer lost access after a phone upgrade because the account and its subscription could not be transferred, which is what an account-backed shelf costs a user on a pool deck.",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote",
+        "finding": "Account is 1 of the 14 critical reviews in the shelf pocket, and it is on com.tenklakessoftware.swimmetry at 2.3 stars over 10K or more installs, which carries the 1 star review \"I upgraded my phone and couldn't transfer my Swimmetry account, so I canceled my subscription\"; the same shelf's leaders ship account-backed platforms rather than an offline generator."
+      },
+      "status": "deferred",
+      "deferredReason": "No network policy exists yet; the promise is resolved when a test runs the generator, the pace model and the output path with no network available and no account created, and asserts that no internet permission is declared and the only network path in the manifest is the billing flow."
+    },
+    {
+      "id": "session-survives-interruption",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "durability",
+      "promise": "A generated session survives the interruptions a pool visit actually has, a phone call, a rotation or a trip back to the locker, and comes back with the same set, the same interval targets and the same position in it rather than regenerating something else.",
+      "comparison": {
+        "incumbent": "com.SwimTrainer.SwimTrainer",
+        "limitation": "Its own reviewers report the app working and then failing at the moment a session ends, so the session a swimmer was in the middle of is exactly what the shelf loses.",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-02-planners-and-optimisers-evidence.md#34-what-the-shelfs-own-users-wrote",
+        "finding": "Crash is 2 of the 14 critical reviews in the shelf pocket, 14 percent, and broken is 3 of the 14, 21 percent, including com.SwimTrainer.SwimTrainer at 2.7 stars over 10K or more installs, whose 2 star review reports that the app worked great at first and now crashes every time the swimmer tries to end a workout."
+      },
+      "status": "deferred",
+      "deferredReason": "The session holder does not exist yet; the promise is resolved when a test advances a session part way, recreates the holder from a saved state and asserts the same set, the same targets and the same position are restored."
+    }
+  ],
+  "jobCoverage": {
+    "before": {
+      "claimId": "pace-test-drives-every-target"
+    },
+    "during": {
+      "claimId": "computes-the-session"
+    },
+    "after": {
+      "claimId": "takes-it-to-the-pool"
+    }
+  }
+}

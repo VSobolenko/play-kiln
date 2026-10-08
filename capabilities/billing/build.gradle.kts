@@ -46,6 +46,14 @@ dependencies {
 
     implementation(libs.billing.ktx)
 
+    // Compose apps do not use Fragment; this only upgrades the transitive so Play stops flagging 1.1.0.
+    // Path measured 2026-10-05: billing:9.1.0 → play-services-basement → fragment:1.1.0.
+    constraints {
+        api(libs.androidx.fragment) {
+            because("Play notice: Billing→GMS basement pulled androidx.fragment:fragment:1.1.0; pin latest stable")
+        }
+    }
+
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
 }

@@ -1,0 +1,157 @@
+{
+    "schemaVersion":  1,
+    "sets":  [
+                 {
+                     "library":  "Material Symbols",
+                     "version":  "737e3324305806514d7909874fa1818ae1808232",
+                     "spdx":  "Apache-2.0",
+                     "sourceUrl":  "https://github.com/google/material-design-icons",
+                     "licenceFile":  "icons/LICENSES/Apache-2.0.txt",
+                     "attribution":  null,
+                     "fetchedAt":  "2026-10-05",
+                     "fetchedBy":  "agent",
+                     "icons":  [
+                                   {
+                                       "name":  "arrow_back",
+                                       "file":  "app/src/main/res/drawable/ic_back.xml",
+                                       "sha256":  "cd1f5a1109c07c79ac3e52a9a1ae8ab14be7a3bff7f7bc3559f7088d60eca3aa",
+                                       "sourcePath":  "symbols/android/arrow_back/materialsymbolsoutlined/arrow_back_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "add",
+                                       "file":  "app/src/main/res/drawable/ic_add.xml",
+                                       "sha256":  "784176dc9c204f9d2724d41e1b6fc10020780424364d246de2237875467c6980",
+                                       "sourcePath":  "symbols/android/add/materialsymbolsoutlined/add_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "delete",
+                                       "file":  "app/src/main/res/drawable/ic_delete.xml",
+                                       "sha256":  "8589dfd0ab9c15182ba5698bd38c4502ad8f476dbd983e840a709a24281211fa",
+                                       "sourcePath":  "symbols/android/delete/materialsymbolsoutlined/delete_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "settings",
+                                       "file":  "app/src/main/res/drawable/ic_settings.xml",
+                                       "sha256":  "7f350bff4766520d4011185658a0c05e517aa2729e7b8113b8b28d2a8a5d45fb",
+                                       "sourcePath":  "symbols/android/settings/materialsymbolsoutlined/settings_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "photo_camera",
+                                       "file":  "app/src/main/res/drawable/ic_camera.xml",
+                                       "sha256":  "c2a80326bfce4a216977de506fca0bd8c4ee644473a540e0d0ecfcb7d6789723",
+                                       "sourcePath":  "symbols/android/photo_camera/materialsymbolsoutlined/photo_camera_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "image",
+                                       "file":  "app/src/main/res/drawable/ic_gallery.xml",
+                                       "sha256":  "17313b4cd878f62bd13e21e2c96cc6d1023f23295349a3d33d94e67ecb862254",
+                                       "sourcePath":  "symbols/android/image/materialsymbolsoutlined/image_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "share",
+                                       "file":  "app/src/main/res/drawable/ic_share.xml",
+                                       "sha256":  "e68cc51976886c8395e3317d8bea0b8324e98d365ed8a15fc8c67767c2241931",
+                                       "sourcePath":  "symbols/android/share/materialsymbolsoutlined/share_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "save",
+                                       "file":  "app/src/main/res/drawable/ic_save.xml",
+                                       "sha256":  "6c7371f6a90e8753c711b1029dfb7114b25622444ce7db7beebf39ca70e57984",
+                                       "sourcePath":  "symbols/android/save/materialsymbolsoutlined/save_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "check",
+                                       "file":  "app/src/main/res/drawable/ic_check.xml",
+                                       "sha256":  "b38c518aa15e88cb9f2eda91aa5617427530ae9359a1b2c8ab96f7d16bffabe7",
+                                       "sourcePath":  "symbols/android/check/materialsymbolsoutlined/check_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "close",
+                                       "file":  "app/src/main/res/drawable/ic_close.xml",
+                                       "sha256":  "31644025d94b5a5637d75660ebdcb93c398f2620bfc12f7a7a9362965e271288",
+                                       "sourcePath":  "symbols/android/close/materialsymbolsoutlined/close_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "edit",
+                                       "file":  "app/src/main/res/drawable/ic_edit.xml",
+                                       "sha256":  "935389edf0589ea1228e1b4a21ed80f8760f5aaa81675a58d627fb4e2ab60b7a",
+                                       "sourcePath":  "symbols/android/edit/materialsymbolsoutlined/edit_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "more_vert",
+                                       "file":  "app/src/main/res/drawable/ic_more.xml",
+                                       "sha256":  "c7f362f9dd94e2e06f056ffa11badba9246b60ccd796a7ee6df3fbaa4668347f",
+                                       "sourcePath":  "symbols/android/more_vert/materialsymbolsoutlined/more_vert_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "chevron_right",
+                                       "file":  "app/src/main/res/drawable/ic_chevron_right.xml",
+                                       "sha256":  "d3f53b271fdb2150775b4252bf46139c3ab5ca872802372a1089e6e1dd6f2a35",
+                                       "sourcePath":  "symbols/android/chevron_right/materialsymbolsoutlined/chevron_right_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "lock",
+                                       "file":  "app/src/main/res/drawable/ic_lock.xml",
+                                       "sha256":  "2153d1ce0851e9b9eff5e55efca2dc5d10343988bc14c3d96c958ca2e9d287fe",
+                                       "sourcePath":  "symbols/android/lock/materialsymbolsoutlined/lock_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "history",
+                                       "file":  "app/src/main/res/drawable/ic_history.xml",
+                                       "sha256":  "810cd1d657367d5f33c56bde96d6b3cb0e714528b8d60fb548a96cd4a63d257e",
+                                       "sourcePath":  "symbols/android/history/materialsymbolsoutlined/history_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "door_front",
+                                       "file":  "app/src/main/res/drawable/ic_room.xml",
+                                       "sha256":  "849df0fe7498ce98141ec2bfa765367941c31f68e0429df8c16db74763424f6c",
+                                       "sourcePath":  "symbols/android/door_front/materialsymbolsoutlined/door_front_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "compare",
+                                       "file":  "app/src/main/res/drawable/ic_compare.xml",
+                                       "sha256":  "6481e1d1c5c78f62f01f9690481ffc6b6ff57d034d1014d2c09982ca67f3db27",
+                                       "sourcePath":  "symbols/android/compare/materialsymbolsoutlined/compare_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "signature",
+                                       "file":  "app/src/main/res/drawable/ic_signature.xml",
+                                       "sha256":  "f978cb2340cd2676aed20eb2ca84dff6f725f6eb251e49d879d9d7f74fa335d9",
+                                       "sourcePath":  "symbols/android/signature/materialsymbolsoutlined/signature_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "picture_as_pdf",
+                                       "file":  "app/src/main/res/drawable/ic_pdf.xml",
+                                       "sha256":  "ea537b1967f4e619167bbcadd7592679dd2a6790864a6798207c2996a3e20e85",
+                                       "sourcePath":  "symbols/android/picture_as_pdf/materialsymbolsoutlined/picture_as_pdf_24px.xml",
+                                       "attribution":  null
+                                   },
+                                   {
+                                       "name":  "undo",
+                                       "file":  "app/src/main/res/drawable/ic_undo.xml",
+                                       "sha256":  "640246df692878d51ba94ab4da16f144376ae64014bc79fbcba17d2ae690629f",
+                                       "sourcePath":  "symbols/android/undo/materialsymbolsoutlined/undo_24px.xml",
+                                       "attribution":  null
+                                   }
+                               ]
+                 }
+             ]
+}

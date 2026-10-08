@@ -1,8 +1,9 @@
 # Play publishing playbook
 
 This is the ordered handoff for taking a verified PlayKiln slot live. **Factory**
-means automated by the harness; **Human** means a Play Console or legal action that
-the factory must not perform silently.
+means automated by the harness; **Agent** means a Play Console action the agent performs
+after an explicit publish yes (checkpoint 2); **Human** means an owner decision (plan,
+product approval, publish authorization) or a tooling assist the sandbox cannot do.
 
 ## 1. Confirm account prerequisites — Human
 
@@ -110,18 +111,23 @@ Sources: **NEEDS-VERIFICATION** — no official Play App Signing or key-rotation
 The factory's own half of this section is measured in `docs/signing.md`; `FACTS.md` remains the reason
 the external distinction stays labelled rather than stated.
 
-## 5. Perform the first upload — Human
+## 5. Perform the first upload — Agent (`[assist]` for the file chooser)
 
-Upload the signed AAB manually in Play Console. Complete any first-upload setup the
-Console requires and confirm that the package name and upload certificate are
-accepted. The factory must not attempt `play-upload.mjs` before this succeeds.
+After checkpoint 2 (publish yes), the agent opens Play Console and performs the first AAB
+upload. When the sandboxed browser denies `DOM.setFileInputFiles` on the bundle chooser, that
+step is an **`[assist]`**: the agent opens the page, names the absolute path under `dist/`,
+asks the owner to drop the file, waits, then continues. Complete any first-upload setup the
+Console requires and confirm that the package name and upload certificate are accepted. The
+factory must not attempt `play-upload.mjs` before this first Console upload succeeds.
 
 Uploading a bundle is not creating a release, and a draft release is not a submission. The
 measured ladder that carries a draft release from this upload to `Изменения на проверке` is
 **§5.1** below; it supersedes any instruction that names a dashboard label as the control that
 submits anything.
 
-Sources: **NEEDS-VERIFICATION** — `FACTS.md` states the first AAB must be uploaded manually but provides no official URL.
+Sources: **NEEDS-VERIFICATION** — `FACTS.md` states the first AAB must be uploaded in Console but
+provides no official URL; role assignment corrected 2026-10-04 (agent executes; owner assists only
+on the file chooser).
 
 ### 5.1 The release-submission ladder — recorded 2026-09-29
 
@@ -132,13 +138,17 @@ are not controls. Everything below was read off the live RU console on 2026-09-2
 end. It is written to be followed by a human who has never opened the console and to be parsed as a
 procedure by a bot.
 
-**Markers.** `[console]` — a console action a bot performs. `[verify]` — a read-only check.
-`[human]` — an action only the owner may take; today this family is **uploading the store
-graphics**, named in precondition B below. The first-publication legal declarations are no longer in
-it: the agent performs them once the slot carries a recorded release approval, because the approval
-is the human checkpoint and not the click (owner's decision, recorded 2026-10-03). Everything else in
-this ladder is console-mandatory and unattended. `NEEDS-VERIFICATION` marks a claim nobody has
-measured.
+**Markers.** `[console]` — a console action the agent performs after the publish yes. `[verify]` —
+a read-only check. `[assist]` — a tooling assist where the owner's hand is required: **store-graphic
+file inputs**, the **AAB/APK file chooser** when the sandbox denies `DOM.setFileInputFiles`, and the
+**promo-code download**. These are not ownership of the release — the agent opens the page, names
+absolute paths, asks, waits, then continues and publishes (owner's decision, recorded 2026-10-04).
+The three points and their exact protocol are stated once in `.cursor/rules/release-gate.mdc` §
+"Tooling assists"; the download's one-click rule is repeated in the checklist's §5 and §10. The
+first-publication legal declarations are `[console]`: the agent performs them once the slot carries a
+recorded release approval, because the approval is the product checkpoint and not the click (owner's
+decision, recorded 2026-10-03). Everything else in this ladder is console-mandatory and agent-owned.
+`NEEDS-VERIFICATION` marks a claim nobody has measured.
 
 **Field-level detail is deliberately not restated here.** Page paths, field names, character caps,
 asset dimensions, the exact string to paste, and which slot value feeds which field are owned by the
@@ -167,17 +177,18 @@ sequences those screens; it does not duplicate them. Numbers quoted here (`Вы�
 - *What is already automated:* nothing about the two marks themselves beyond this rule; do not infer
   them from a slot's capabilities or from its store pack.
 
-**Precondition B — the store graphics. [human]**
+**Precondition B — the store graphics. `[assist]`**
 
 - *Where:* `Магазин → Основная информация о магазине` (`/main-store-listing`), the five required
   image fields (icon, feature graphic, and the phone / 7-inch / 10-inch screenshot sets). Their
   names, dimensions, counts and caps are the checklist's *Магазин — тексты и контакт* section.
-- *What the human does:* uploads the files. The pack already **renders** every one of them
-  (`scripts/store/render.py`) and `scripts/media-capture.mjs` already **produces** the screenshots, but
-  the upload itself cannot be done by the sandboxed browser the factory drives: the field is a
-  hidden `input[type=file]` that only appears after `Добавить объекты`, and
-  `DOM.setFileInputFiles` is denied by the browser sandbox. A human — or a driver that owns the
-  file chooser — performs this step and nothing else.
+- *What the agent does:* opens the page, names absolute paths from `store/assets/`, asks the owner
+  to drop files into the open chooser / fields, waits, then continues the ladder. The pack already
+  **renders** every asset (`scripts/store/render.py`) and `scripts/media-capture.mjs` already
+  **produces** the screenshots, but the upload itself cannot be done by the sandboxed browser the
+  factory drives: the field is a hidden `input[type=file]` that only appears after `Добавить
+  объекты`, and `DOM.setFileInputFiles` is denied by the browser sandbox. That limitation is why
+  the assist exists — not why the owner owns publication.
 - *Why it is a precondition:* while the dashboard row `Настройте страницу приложения` is open,
   nothing in the submission flow is reachable, and the submit button in step 6 stays disabled. The
   observed session cleared it exactly this way.
@@ -329,7 +340,7 @@ sequences those screens; it does not duplicate them. Numbers quoted here (`Вы�
 | Step | What it is | Marker |
 |---|---|---|
 | A | First-publication declarations (`Правила программы…`, `Экспортное законодательство США`) | `[console]` (after the approval) |
-| B | Upload the store graphics (five image fields) | `[human]` |
+| B | Upload the store graphics (five image fields) | `[assist]` |
 | C | Privacy policy URL in the listing **and** inside the app | `[verify]` (+ open defect) |
 | 1 | Dashboard goal `Создайте и опубликуйте выпуск` — read only | `[verify]` |
 | 2 | `.../tracks/production?tab=releases` → `Черновик` row | `[console]` |
@@ -362,22 +373,24 @@ screens of `.../tracks/4699531965830041024/releases/1/`; the
 compliance floor (the privacy policy in both places) and §Store-pack contract; `DESIGN.md`; the
 generated [`docs/play-console-walkthrough.md`](play-console-walkthrough.md) for field-level detail.
 
-## 6. Complete the store listing — Factory prepares, Human confirms
+## 6. Complete the store listing — Factory prepares, Agent pastes after checkpoint 2
 
 **Factory:** generates listing text within 30/80/4000-character limits, a 512×512
 icon, a 1024×500 feature graphic, 6 phone screenshots, 4 seven-inch screenshots,
 and 4 ten-inch screenshots per locale. It validates format, dimensions, alpha, byte
 size, and count.
 
-**Human:** confirm every claim and screenshot matches the uploaded build; review every
-asset explicitly marked synthetic for truthful representation of shipped behavior;
-provide demo credentials and review instructions when the app is gated.
+**Agent:** after the publish yes, pastes listing fields and continues the ladder. Store
+graphics use `[assist]` (file chooser). The owner may correct copy that is wrong; the
+product decision that the pack matches the app was checkpoint 1.5. Provide demo
+credentials in `store/review-notes.md` when the app is gated.
 
 Sources: **NEEDS-VERIFICATION** — `FACTS.md` names Play Console Help article 9866151 but provides no official URL.
 
-## 7. Complete legal and audience declarations — Human, Data safety may be automated
+## 7. Complete legal and audience declarations — Agent after checkpoint 2
 
-Use the generated files as evidence, not as authorization to guess:
+Use the generated files as evidence, not as authorization to guess. After the publish
+yes, the **agent** fills these Console forms from the pack:
 
 - Submit Data safety even if no data is collected; reconcile every SDK and the
   public privacy-policy URL.
@@ -388,8 +401,9 @@ Use the generated files as evidence, not as authorization to guess:
 - Complete target-audience declarations.
 - Confirm permissions, foreground-service types, exact-alarm use, and reviewer access.
 
-The human owns the truth and legal effect of these declarations. If code, policy,
-and form disagree, stop and fix the app or the draft before submission.
+The owner owns the truth via checkpoint 1.5 / checkpoint 2 and may correct answers; the
+agent performs the clicks. If code, policy, and form disagree, stop and fix the app or
+the draft before submission.
 
 ### Capability-derived Data safety surface
 
@@ -419,15 +433,15 @@ Before submission, run `node scripts/verify.mjs --slot <slug>
 --build`. The strict gate compares the derived permissions with the build's merged
 manifest, rejects ads or collected-data omissions in the store pack, and rejects a
 `SERVER_COST` catalog without documented authority. Unknown capability IDs fail with
-the valid ID list. The human still reviews the derived answers and owns their legal
-submission; editing the generated prose to contradict the declarations cannot make the
-gate pass.
+the valid ID list. The agent submits the derived answers after the publish yes; the
+owner corrects if they are wrong. Editing the generated prose to contradict the
+declarations cannot make the gate pass.
 
 Data safety is the one form with a documented write endpoint, so the factory may
 upload it from a reviewed CSV instead of typing it by hand:
 `POST /androidpublisher/v3/applications/{packageName}/dataSafety` with body
 `{"safetyLabels": "<CSV contents>"}`. The CSV is still authored from the slot's real
-SDK surface and approved by the human before it is sent; automatic upload of an
+SDK surface and covered by the publish yes before it is sent; automatic upload of an
 unreviewed CSV is a truthfulness risk and must not happen.
 
 The privacy-policy URL is **not** settable through `edits.details` (which exposes
@@ -439,13 +453,13 @@ Sources: <https://developers.google.com/android-publisher/api-ref/rest/v3/applic
 <https://developers.google.com/android-publisher/api-ref/rest/v3/edits.details>.
 Full surface: [`docs/research/2026-09-23-google-play-automation-surface.md`](research/2026-09-23-google-play-automation-surface.md).
 
-## 8. Complete AI-content declarations when relevant — Factory + Human
+## 8. Complete AI-content declarations when relevant — Factory + Agent
 
 **Factory:** verify that generative-AI features include in-app reporting or flagging,
 do not produce prohibited content, and are more than a thin API wrapper.
 
-**Human:** complete the applicable Console declarations and review the shipped safety
-behavior. Do not publish if the reporting path cannot be demonstrated.
+**Agent:** after the publish yes, complete the applicable Console declarations from the
+pack; the owner may correct. Do not publish if the reporting path cannot be demonstrated.
 
 Sources: **NEEDS-VERIFICATION** — no official AI-generated-content policy URL is present in `FACTS.md`.
 
@@ -547,28 +561,54 @@ for purchase as long as it's active, even if its app is unpublished"*
 the app is uploaded and signed, the purchase option is active, the buyer is a license tester, and the
 app is available in their region.
 
-## 10. Roll out — Human approval, Factory may automate updates
+### 9.3 Downloading the promo codes — `[assist]`, one click and a wait — recorded 2026-10-07
+
+A selling slot hands the reviewer into paid content with a **promo code** (the checklist's §5), and
+the codes are read from `Монетизация с помощью Play → Promotions` (`.../promotions`) with
+**`Скачать коды`**. The button answers with the browser's own save window, which lives outside the
+page and cannot be accepted by the agent — so this is the third `[assist]` point, and the protocol is
+deliberately not a retry loop:
+
+1. **Click `Скачать коды` exactly once.**
+2. **Stop and ask** — «Нажмите „Скачать“ в открывшемся окне и подтвердите, когда файл сохранится» —
+   then **wait**. Do not press again, do not navigate away, do not reload.
+3. **On the confirmation**, read the CSV (Play names it **`promotion_codes.csv`**, saved to the
+   browser's default download folder — on Windows usually `%USERPROFILE%\Downloads`) and use it for
+   what the checklist's §5 needs. The file is **never committed**: a code is a free unlock of what the
+   slot sells.
+4. **If no window opened**, say so and hand the owner the manual path: the page is `.../promotions`,
+   the control is `Скачать коды`, the file is `promotion_codes.csv`; when he reports where it landed,
+   the agent reads that path and finishes.
+
+A repeated press opens repeated save windows and leaves the owner dismissing duplicates — the defect
+this section was written from. Sources: `.cursor/rules/release-gate.mdc` § "Tooling assists";
+`docs/play-console-checklist.md` §5 and §10; owner's instruction, recorded 2026-10-07.
+
+## 10. Roll out — Agent after checkpoint 2; Factory may automate later updates
 
 A release reaches review through the ladder in **§5.1**; nothing can be rolled out before it has
-been submitted there and approved. After approval, choose the production release in Play Console and
-use a staged rollout when desired. The exact staged-rollout controls and percentages are
-**NEEDS-VERIFICATION** because they are absent from `FACTS.md`.
+been submitted there and approved. After Google's approval, the agent chooses the production release
+in Play Console and uses a staged rollout when desired. The exact staged-rollout controls and
+percentages are **NEEDS-VERIFICATION** because they are absent from `FACTS.md`.
 
-After the first manual upload, `scripts/play-upload.mjs` may automate an approved
+After the first Console upload, `scripts/play-upload.mjs` may automate an approved
 update through Android Publisher v3: create edit, upload bundle, patch listings,
 upload images, update track, and commit. It uses service-account credentials from an
 environment-provided local path. Never commit the JSON; never commit an edit without
-explicit human approval.
+an explicit publish yes in the current conversation.
 
 Sources: **NEEDS-VERIFICATION** — no official edits/tracks/staged-rollout URL is present in `FACTS.md`.
 
-## 11. Publish — Human
+## 11. Publish — Agent (after checkpoint 2)
 
 Review Console warnings, legal declarations, countries, price, and rollout choice.
-Press **Publish** only when they match the approved release. This is the second human
-checkpoint: the human presses Publish, and the action is never delegated to an agent.
+Press **Publish** only when they match the approved release and the owner has answered yes to
+«may I proceed to publish?». Checkpoint 2 is that authorization — not labour for the owner.
+The agent presses Publish; the owner is yes/no and corrections, plus `[assist]` file drops where
+tooling requires them (owner's decision, recorded 2026-10-04). Supersedes any earlier text that
+assigned the Publish click exclusively to the owner.
 
-Sources: human-control rule in `MISSION.md`; no external citation required.
+Sources: owner's decision 2026-10-04 in `.cursor/rules/release-gate.mdc`; `MISSION.md`.
 
 ## 12. Monitor after launch — Human + Factory
 

@@ -12,10 +12,10 @@
 //
 //   * A *surface* (`.` a `@Composable` `*Screen`/`*Route` under a settings/preferences package).
 //   * A *route* (`.` navigation code references it, and something in the app opens it).
-//   * A *language entry point* (`.` a route to the **system** per-app language picker, or an in-app
-//     picker built on the published APIs). `android:localeConfig` is already shipped by the scaffold,
-//     so the honest requirement is a route to the picker the system already offers, not a second
-//     picker that can disagree with it.
+//   * A *language entry point* (`.` an in-app AppCompat picker:
+//     `AppCompatDelegate.setApplicationLocales` hosted in an `AppCompatActivity`). Opening
+//     `ACTION_APP_LOCALE_SETTINGS` is a FAIL — the owner requires the picker to stay inside the app.
+//     Prefer not declaring `android:localeConfig`; keep `res/xml/locales_config.xml` as picker data.
 //   * A *theme preference* wired into the theme host, an *app-behaviour preference* read by app logic,
 //     and *persistence* through the DataStore dependency the scaffold already declares but never used.
 //   * The strings the surface names actually exist.
@@ -88,17 +88,16 @@ const KOTLIN_FILE = /\.kt$/i
 const LANGUAGE_TOKENS = /lang|locale/i
 const THEME_TOKENS = /theme|dark|light|appearance|night|contrast/i
 
-// The published entry points for the *system* per-app language picker. `ACTION_APP_LOCALE_SETTINGS`
-// was added in API 33 with the feature (verified against the API-33 diff of `android.provider.Settings`);
-// `ACTION_APPLICATION_DETAILS_SETTINGS` is older and lands on the app page that hosts the language row.
+// The *banned* system routes for the settings Language row. Opening these leaves the app for a
+// device settings screen; the factory standard is an in-app AppCompat picker instead.
 const SYSTEM_LANGUAGE_ROUTE = /(?:\bSettings\s*\.\s*)?ACTION_(?:APP_LOCALE_SETTINGS|APPLICATION_DETAILS_SETTINGS|LOCALE_SETTINGS)\b/
-// The framework picker, API 33+ only: `LocaleManager.applicationLocales = ...`.
+// The framework picker, API 33+ only: `LocaleManager.applicationLocales = ...` — not the factory path.
 const FRAMEWORK_LOCALE_SETTER = /\bapplicationLocales\s*=/
-// The AndroidX picker: `AppCompatDelegate.setApplicationLocales(...)`, which the published caution
-// says only works when the hosting Activity extends `AppCompatActivity`.
+// The required AndroidX in-app picker: `AppCompatDelegate.setApplicationLocales(...)`.
 const APPCOMPAT_LOCALE_SETTER = /\bAppCompatDelegate\s*\.\s*setApplicationLocales\b/
-// Reimplementing the locale plumbing instead of using the published APIs.
+// Reimplementing the locale plumbing instead of using AppCompat.
 const CUSTOM_LOCALE_PLUMBING = /\bcreateConfigurationContext\s*\(|\bapplyOverrideConfiguration\s*\(/
+const APPCOMPAT_ACTIVITY_HOST = /\bclass\s+[A-Za-z0-9_]+\s*:\s*AppCompatActivity\s*\(/
 
 const NAV_MARKERS = /\bNavDisplay\s*\(|\bNavHost\s*\(|\bNavEntry\s*\(/
 // An affordance that opens settings, distinct from the settings screen's own name: a callback, a
@@ -340,42 +339,46 @@ function reachableCheck(sources) {
 
 function languageCheck(dir, sources) {
   const findings = []
-  const localeConfig = localeConfigSite(dir)
   const systemRoute = matchSites(sources, SYSTEM_LANGUAGE_ROUTE)
   const framework = matchSites(sources, FRAMEWORK_LOCALE_SETTER)
   const appcompat = matchSites(sources, APPCOMPAT_LOCALE_SETTER)
+  const appCompatActivityHosts = matchSites(sources, APPCOMPAT_ACTIVITY_HOST)
 
-  if (systemRoute.length === 0 && framework.length === 0 && appcompat.length === 0) {
-    findings.push(
-      localeConfig
-        ? `${localeConfig.rel}:${localeConfig.line}: declares android:localeConfig="${localeConfig.value}" ` +
-          '(so Android 13+ already offers a per-app language picker for this app), but nothing in the app ' +
-          'routes to it: expected Settings.ACTION_APP_LOCALE_SETTINGS (API 33+), or ' +
-          'Settings.ACTION_APPLICATION_DETAILS_SETTINGS below it. Declaring the languages and hiding the ' +
-          'picker is the defect'
-        : 'no language entry point at all: neither a route to the system per-app language settings ' +
-          '(Settings.ACTION_APP_LOCALE_SETTINGS / ACTION_APPLICATION_DETAILS_SETTINGS) nor an in-app ' +
-          'picker built on the published APIs (AppCompatDelegate.setApplicationLocales / ' +
-          'LocaleManager.applicationLocales) exists anywhere in the app'
-    )
-  }
-
-  // The published caution: on Compose, `setApplicationLocales` only works when the hosting Activity
-  // extends AppCompatActivity, and the scaffold's MainActivity extends ComponentActivity.
-  if (appcompat.length > 0) {
-    const appCompatActivityHosts = matchSites(sources, /\bclass\s+[A-Za-z0-9_]+\s*:\s*AppCompatActivity\s*\(/)
+  // Required path: in-app AppCompat picker. A system-settings jump is the defect the owner named.
+  if (appcompat.length === 0) {
+    if (systemRoute.length > 0) {
+      findings.push(
+        `${systemRoute[0].rel}:${systemRoute[0].line}: language row opens the system settings ` +
+          '(ACTION_APP_LOCALE_SETTINGS / ACTION_APPLICATION_DETAILS_SETTINGS) instead of an in-app ' +
+          'picker; the factory standard is AppCompatDelegate.setApplicationLocales hosted in an ' +
+          'AppCompatActivity (reference: apps/2026-10-01-lawn-round-log)'
+      )
+    } else {
+      findings.push(
+        'no in-app language picker: expected AppCompatDelegate.setApplicationLocales hosted in an ' +
+          'AppCompatActivity, reading language tags from res/xml/locales_config.xml'
+      )
+    }
+  } else {
     if (appCompatActivityHosts.length === 0) {
       findings.push(
         `${appcompat[0].rel}:${appcompat[0].line}: AppCompatDelegate.setApplicationLocales is used, and ` +
           'the published caution is that a Compose app must host it in an AppCompatActivity (the ' +
-          'startApplicationLocales call otherwise does not apply); no activity in this app extends ' +
-          'AppCompatActivity, and androidx.appcompat is not a declared dependency'
+          'call otherwise does not apply); no activity in this app extends AppCompatActivity'
+      )
+    }
+    if (systemRoute.length > 0) {
+      findings.push(
+        `${systemRoute[0].rel}:${systemRoute[0].line}: language settings must not startActivity to ` +
+          'ACTION_APP_LOCALE_SETTINGS / ACTION_APPLICATION_DETAILS_SETTINGS; keep the in-app ' +
+          'AppCompat picker as the only Language-row action'
       )
     }
   }
 
-  // The framework picker exists only on API 33+. minSdk 26 means an unguarded write silently does
-  // nothing on API 26-32 — no crash, no effect, which is the worst shape of failure.
+  // LocaleManager exists only on API 33+. minSdk 26 means an unguarded write silently does nothing
+  // on API 26-32 — no crash, no effect, which is the worst shape of failure. Not the factory path
+  // either; AppCompat is required above, and this remains an extra defect when present.
   for (const site of framework) {
     const file = sources.find((candidate) => candidate.rel === site.rel)
     if (file && !/TIRAMISU|SDK_INT\s*>=\s*33/.test(file.code)) {
@@ -387,29 +390,25 @@ function languageCheck(dir, sources) {
     }
   }
 
-  // Two sources of truth for the app's language is the failure the public APIs exist to prevent.
-  if (localeConfig) {
-    for (const file of sources) {
-      if (!/locale/i.test(file.code)) continue
-      const plumbing = matchSites([file], CUSTOM_LOCALE_PLUMBING)
-      if (plumbing.length > 0) {
-        findings.push(
-          `${plumbing[0].rel}:${plumbing[0].line}: reimplements the locale plumbing ` +
-            `(createConfigurationContext/applyOverrideConfiguration) while android:localeConfig declares ` +
-            'per-app language support, so the system picker and the app can disagree about the language'
-        )
-      }
+  // Two sources of truth for the app's language is the failure AppCompat exists to prevent.
+  for (const file of sources) {
+    if (!/locale/i.test(file.code)) continue
+    const plumbing = matchSites([file], CUSTOM_LOCALE_PLUMBING)
+    if (plumbing.length > 0) {
+      findings.push(
+        `${plumbing[0].rel}:${plumbing[0].line}: reimplements the locale plumbing ` +
+          '(createConfigurationContext/applyOverrideConfiguration) beside the AppCompat language ' +
+          'path, so two writers can disagree about the language'
+      )
     }
   }
 
-  const routes = systemRoute.length + framework.length + appcompat.length
   return {
     findings,
     summary:
-      routes > 0
-        ? `the language entry point exists (${systemRoute.length} system-picker route(s), ` +
-          `${framework.length} framework call(s), ${appcompat.length} AndroidX call(s)); ` +
-          `android:localeConfig ${localeConfig ? 'is' : 'is not'} declared`
+      appcompat.length > 0 && appCompatActivityHosts.length > 0 && systemRoute.length === 0
+        ? `in-app AppCompat language picker (${appcompat.length} setApplicationLocales call(s), ` +
+          `${appCompatActivityHosts.length} AppCompatActivity host(s))`
         : ''
   }
 }
@@ -790,9 +789,14 @@ const GOOD_MANIFEST = [
   '<manifest xmlns:android="http://schemas.android.com/apk/res/android">',
   '    <application',
   '        android:allowBackup="true"',
-  '        android:localeConfig="@xml/locales_config"',
   '        android:label="@string/app_name">',
   '        <activity android:name=".MainActivity" android:exported="true" />',
+  '        <service',
+  '            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"',
+  '            android:enabled="false"',
+  '            android:exported="false">',
+  '            <meta-data android:name="autoStoreLocales" android:value="true" />',
+  '        </service>',
   '    </application>',
   '</manifest>',
   ''
@@ -846,6 +850,7 @@ const GOOD_STORE = [
 const GOOD_SCREEN = [
   'package com.gexetr.demo.ui.settings',
   '',
+  'import androidx.appcompat.app.AppCompatDelegate',
   'import androidx.compose.foundation.clickable',
   'import androidx.compose.material3.ListItem',
   'import androidx.compose.material3.Switch',
@@ -853,6 +858,7 @@ const GOOD_SCREEN = [
   'import androidx.compose.runtime.Composable',
   'import androidx.compose.ui.Modifier',
   'import androidx.compose.ui.res.stringResource',
+  'import androidx.core.os.LocaleListCompat',
   'import com.gexetr.demo.R',
   'import com.gexetr.demo.data.ThemeMode',
   '',
@@ -862,11 +868,11 @@ const GOOD_SCREEN = [
   '    onBack: () -> Unit,',
   '    onThemeModeChange: (ThemeMode) -> Unit,',
   '    onHapticsChange: (Boolean) -> Unit,',
-  '    onOpenLanguageSettings: () -> Unit,',
+  '    onOpenLanguagePicker: () -> Unit,',
   ') {',
   '    ListItem(',
   '        headlineContent = { Text(stringResource(R.string.settings_language_title)) },',
-  '        modifier = Modifier.clickable(onClick = onOpenLanguageSettings),',
+  '        modifier = Modifier.clickable(onClick = onOpenLanguagePicker),',
   '    )',
   '    ListItem(',
   '        headlineContent = { Text(stringResource(R.string.settings_theme_title)) },',
@@ -882,14 +888,13 @@ const GOOD_SCREEN = [
   '    )',
   '}',
   '',
-  'internal fun openAppLanguageSettings(context: Context) {',
-  '    val packageUri = Uri.fromParts("package", context.packageName, null)',
-  '    val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {',
-  '        Intent(Settings.ACTION_APP_LOCALE_SETTINGS).setData(packageUri)',
+  'internal fun applyAppLanguage(languageTag: String?) {',
+  '    val locales = if (languageTag == null) {',
+  '        LocaleListCompat.getEmptyLocaleList()',
   '    } else {',
-  '        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(packageUri)',
+  '        LocaleListCompat.forLanguageTags(languageTag)',
   '    }',
-  '    runCatching { context.startActivity(intent) }',
+  '    AppCompatDelegate.setApplicationLocales(locales)',
   '}',
   ''
 ].join('\n')
@@ -974,13 +979,13 @@ const GOOD_NAV = [
 const GOOD_ACTIVITY = [
   'package com.gexetr.demo',
   '',
-  'import androidx.activity.ComponentActivity',
+  'import androidx.appcompat.app.AppCompatActivity',
   'import androidx.compose.foundation.isSystemInDarkTheme',
   'import com.gexetr.demo.data.AppSettings',
   'import com.gexetr.demo.ui.PlayKilnApp',
   'import com.gexetr.demo.ui.theme.PlayKilnTheme',
   '',
-  'class MainActivity : ComponentActivity() {',
+  'class MainActivity : AppCompatActivity() {',
   '    private fun render(settings: AppSettings) {',
   '        setContent {',
   '            PlayKilnTheme(darkTheme = settings.themeMode.resolve(isSystemInDarkTheme())) {',
@@ -1161,13 +1166,32 @@ export function settingsFixtures() {
 
       // ---- settings.language ----
       cases.push([
-        'an app that declares android:localeConfig with no route to the system picker fails',
+        'an app with no AppCompat in-app language picker fails',
         () => {
           expectFinding(
             'settings.language',
-            { [SCREEN_REL]: GOOD_SCREEN.replace(/openAppLanguageSettings[\s\S]*$/, '') },
-            'android:localeConfig'
+            { [SCREEN_REL]: GOOD_SCREEN.replace(/internal fun applyAppLanguage[\s\S]*$/, '') },
+            'no in-app language picker'
           )
+        }
+      ])
+
+      cases.push([
+        'a language row that only opens ACTION_APP_LOCALE_SETTINGS fails',
+        () => {
+          const systemOnly = GOOD_SCREEN
+            .replace(/internal fun applyAppLanguage[\s\S]*$/, '')
+            .concat(
+              [
+                'internal fun openAppLanguageSettings(context: Context) {',
+                '    val packageUri = Uri.fromParts("package", context.packageName, null)',
+                '    val intent = Intent(Settings.ACTION_APP_LOCALE_SETTINGS).setData(packageUri)',
+                '    runCatching { context.startActivity(intent) }',
+                '}',
+                ''
+              ].join('\n')
+            )
+          expectFinding('settings.language', { [SCREEN_REL]: systemOnly }, 'ACTION_APP_LOCALE_SETTINGS')
         }
       ])
 
@@ -1185,16 +1209,32 @@ export function settingsFixtures() {
       cases.push([
         'AppCompatDelegate.setApplicationLocales in a non-AppCompatActivity host fails',
         () => {
-          const appcompat = GOOD_ACTIVITY.replace(
+          const bare = [
+            'package com.gexetr.demo',
+            '',
+            'import androidx.activity.ComponentActivity',
+            'import androidx.compose.foundation.isSystemInDarkTheme',
+            'import com.gexetr.demo.data.AppSettings',
+            'import com.gexetr.demo.ui.PlayKilnApp',
+            'import com.gexetr.demo.ui.theme.PlayKilnTheme',
+            '',
+            'class MainActivity : ComponentActivity() {',
+            '    private fun render(settings: AppSettings) {',
+            '        setContent {',
+            '            PlayKilnTheme(darkTheme = settings.themeMode.resolve(isSystemInDarkTheme())) {',
+            '                PlayKilnApp(settings = settings)',
+            '            }',
+            '        }',
             '    }',
-            '    }\n\n    private fun pick() {\n        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("ru"))\n    }'
-          )
-          expectFinding('settings.language', { [ACTIVITY_REL]: appcompat }, 'AppCompatActivity')
+            '}',
+            ''
+          ].join('\n')
+          expectFinding('settings.language', { [ACTIVITY_REL]: bare }, 'AppCompatActivity')
         }
       ])
 
       cases.push([
-        'reimplementing the locale plumbing beside android:localeConfig fails',
+        'reimplementing the locale plumbing beside the AppCompat path fails',
         () => {
           const plumbing = GOOD_ACTIVITY.replace(
             '    }',

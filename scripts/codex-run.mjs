@@ -140,6 +140,7 @@ function readMeta(id) {
  * Importing this CLI would execute its dispatch, which is why the classifier is not defined here.
  */
 import { DIAGNOSIS_WINDOW_LINES, classifyRun, diagnose } from './lib/codex-signals.mjs'
+import { codexChildEnv } from './lib/win-sandbox-path.mjs'
 
 /**
  * Ledger state resolution lives in `scripts/lib/codex-ledger.mjs` for the same reason, and adds the
@@ -151,6 +152,18 @@ import { LOST_NOTE, LOST_STATE, classifyWorkerFromDisk, readJsonSafe } from './l
 function tail(file, lines) {
   if (!existsSync(file)) return ''
   return readFileSync(file, 'utf8').split(/\r?\n/).slice(-lines).join('\n')
+}
+
+function logChildPathDecision(log, sandbox, { dropped, rewrote, skipped, reason }) {
+  if (reason === 'danger-full-access') {
+    appendFileSync(log, `PATH decision: preserved for sandbox=${sandbox}; no restricted-token sandbox is active.\n`)
+  } else if (skipped) {
+    appendFileSync(log, `PATH decision: preserved for sandbox=${sandbox}; PLAYKILN_CODEX_KEEP_PATH is set.\n`)
+  } else if (rewrote && dropped.length > 0) {
+    appendFileSync(log, `PATH decision: filtered for sandbox=${sandbox}; removed MSIX application-execution alias directories ${dropped.map((entry) => JSON.stringify(entry)).join(', ')}.\n`)
+  } else {
+    appendFileSync(log, `PATH decision: filtered for sandbox=${sandbox}; no MSIX application-execution alias directory was present.\n`)
+  }
 }
 
 function run() {
@@ -206,10 +219,14 @@ function run() {
   if (meta.model) args.push('-m', meta.model)
   args.push('-')
 
+  const childEnvironment = codexChildEnv({ baseEnv: process.env, sandbox: meta.sandbox })
+  logChildPathDecision(meta.log, meta.sandbox, childEnvironment)
+
   const child = spawn(process.execPath, args, {
     cwd: meta.cwd,
     stdio: ['pipe', 'pipe', 'pipe'],
-    windowsHide: true
+    windowsHide: true,
+    env: childEnvironment.env
   })
 
   const out = []
@@ -382,11 +399,15 @@ function resume() {
   if (meta.model) resumeArgs.push('-m', meta.model)
   resumeArgs.push('-')
 
+  const childEnvironment = codexChildEnv({ baseEnv: process.env, sandbox: meta.sandbox })
+  logChildPathDecision(meta.log, meta.sandbox, childEnvironment)
+
   const child = spawnSync(process.execPath, resumeArgs, {
     cwd: meta.cwd,
     input: readFileSync(pf, 'utf8'),
     encoding: 'utf8',
-    windowsHide: true
+    windowsHide: true,
+    env: childEnvironment.env
   })
   appendFileSync(meta.log, child.stdout || '')
   appendFileSync(meta.err, child.stderr || '')

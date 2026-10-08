@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "mark": "mark-unit-plan",
+  "palette": {
+    "ink": "#0E1A24",
+    "ink_soft": "#16283A",
+    "ink_lift": "#24425E",
+    "amber": "#E8A93C",
+    "amber_deep": "#C87A1E",
+    "amber_pale": "#F2D3A0",
+    "accent_deep": "#2E6E80",
+    "paper": "#F7F9FB",
+    "muted": "#A7B4C2",
+    "bezel": "#14100C",
+    "bezel_rim": "#8D8174"
+  },
+  "headlines": [
+    "The whole unit, on your phone",
+    "Rooms, one at a time",
+    "Photograph as you walk",
+    "A note in one tap",
+    "Move-in vs move-out",
+    "Sign it, then send the PDF"
+  ],
+  "kickers": [
+    "PORTFOLIO",
+    "ROOM LIST",
+    "THE WALK",
+    "THE RECORD",
+    "COMPARE",
+    "SIGNED PDF"
+  ],
+  "featureTagline": "The unit walk on your phone: room photos, a move-out compare, a signed PDF.",
+  "featurePill": "OFFLINE  ·  NO ACCOUNT"
+}

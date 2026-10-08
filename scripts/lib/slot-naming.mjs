@@ -114,10 +114,12 @@ export const REQUIRED_STRING_FIELDS = Object.freeze([
 
 /**
  * Where a name may point for its evidence, mirroring `slot-economics.mjs`'s `EVIDENCE_REF_PATTERN`:
- * the methodology in `docs/research/` or the proposal it came from in `docs/ideation/`. Kept in the
- * same shape so a reviewer reads one pattern, not two.
+ * factory methodology in `docs/research/`, an open proposal in `docs/ideation/`, or the proposal
+ * after scaffold under `apps/<date>-<slug>/docs/`. Kept in the same shape so a reviewer reads one
+ * pattern, not two.
  */
-const EVIDENCE_REF_PATTERN = /^docs\/(?:research|ideation)\/[a-z0-9._-]+\.md(#.+)?$/
+const EVIDENCE_REF_PATTERN =
+  /^(?:docs\/(?:research|ideation)|apps\/\d{4}-\d{2}-\d{2}-[a-z0-9]+(?:-[a-z0-9]+)*\/docs)\/[a-z0-9._-]+\.md(#.+)?$/
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
@@ -430,14 +432,14 @@ function validateEvidence(value, errors) {
   const raw = value.evidence
   if (typeof raw !== 'string') {
     errors.push(
-      'evidence is required and must be a string like docs/research/<file>.md#<section> or docs/ideation/<file>.md#<section>'
+      'evidence is required and must be a string like docs/research/<file>.md#<section>, docs/ideation/<file>.md#<section>, or apps/<date>-<slug>/docs/<file>.md#<section>'
     )
     return
   }
   const trimmed = raw.trim()
   if (!EVIDENCE_REF_PATTERN.test(trimmed)) {
     errors.push(
-      `evidence must be docs/research/<file>.md or docs/ideation/<file>.md with an optional #section (found "${trimmed}")`
+      `evidence must be docs/research/<file>.md, docs/ideation/<file>.md, or apps/<date>-<slug>/docs/<file>.md with an optional #section (found "${trimmed}")`
     )
     return
   }

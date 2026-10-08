@@ -1,0 +1,139 @@
+{
+  "slot": "unit-walk",
+  "applicationId": "com.gexetr.unitwalk",
+  "versionName": "0.1.0",
+  "versionCode": "1",
+  "gitCommit": "449c111ba05fd057e7a79fd88db2d55e50ac4947",
+  "manifestPath": "apps/2026-10-05-unit-walk/dist/release-manifest.json",
+  "artifactPath": "dist/unit-walk-0.1.0-1-release.apk",
+  "artifactSha256": "c185d71ddbc6d6cff9c77df8f68c63058468f631141b595d91352c02721db67d",
+  "installedSha256": "c185d71ddbc6d6cff9c77df8f68c63058468f631141b595d91352c02721db67d",
+  "installedApkPath": "/data/app/~~ts4hRB_2RGjfFrrtKDXLzA==/com.gexetr.unitwalk-E0fB3MkjBSpPVWM22fZjvw==/base.apk",
+  "artifactMatch": "exact",
+  "recordedAt": "2026-10-06T19:26:26.188Z",
+  "note": "Raw captures live under the ignored store/captures/. Re-run scripts/media-capture.mjs to reproduce them; the composed asset hashes below are the committed evidence.",
+  "rawCaptures": [
+    {
+      "file": "store/captures/raw/01.png",
+      "bytes": 195485,
+      "sha256": "145a9d525894a3a94821d9c457d2b1f9b593564efb5b585ce9a4b5b5e19c6dba"
+    },
+    {
+      "file": "store/captures/raw/02.png",
+      "bytes": 156963,
+      "sha256": "d40f520d229ac8a2f8126cc062327cf74346d794df8414a3ffb98f923f0fe664"
+    },
+    {
+      "file": "store/captures/raw/03.png",
+      "bytes": 112336,
+      "sha256": "8873c02ab373108e0f731b120affc8bd1dfe02daa5b55e61025a8842e68d22f2"
+    },
+    {
+      "file": "store/captures/raw/04.png",
+      "bytes": 120806,
+      "sha256": "ba38e8dd8c4b72b603b179e3b0ab4982e7ab88958cc645e70a547d7cfb84fe89"
+    },
+    {
+      "file": "store/captures/raw/05.png",
+      "bytes": 164905,
+      "sha256": "1596b05056039335cab0f4357bf4eb039df7115a7b251953bb134041d7d866a4"
+    },
+    {
+      "file": "store/captures/raw/06.png",
+      "bytes": 193947,
+      "sha256": "78f776450256fb63a7d727a500e5956a596b047d36c9d4cc5600239711df3f69"
+    }
+  ],
+  "composedAssets": [
+    {
+      "file": "store/assets/en-US/feature-graphic-1024x500.png",
+      "bytes": 73895,
+      "sha256": "f8f8bf924e70ef88b367b339c05a594bbb34d270d4cea415d1c7a3990ab862c3"
+    },
+    {
+      "file": "store/assets/en-US/icon-512.png",
+      "bytes": 14020,
+      "sha256": "98f65a0e76930ca7b1ffbbcd72e0fd486e0ae15307d98dcecbd1d08e3e5077af"
+    },
+    {
+      "file": "store/assets/en-US/phone-01.png",
+      "bytes": 226023,
+      "sha256": "e43e61bb223788ea7720c79f03017f29349877929a5e311269ea7e8b1428af8d"
+    },
+    {
+      "file": "store/assets/en-US/phone-02.png",
+      "bytes": 203171,
+      "sha256": "52c36aa9da5a680b08008829dd6e1130ab974b3f55c631643d603390e924ac4b"
+    },
+    {
+      "file": "store/assets/en-US/phone-03.png",
+      "bytes": 178070,
+      "sha256": "2e58c74e9e6bb165ac0f3ffdfc18c2e206974a710b307d6f4f911be4d9a13c9c"
+    },
+    {
+      "file": "store/assets/en-US/phone-04.png",
+      "bytes": 187393,
+      "sha256": "9a1dc7751b366672a6e4ff53c82ad881bd32e280403e30250b4f6e564bf5b9aa"
+    },
+    {
+      "file": "store/assets/en-US/phone-05.png",
+      "bytes": 263030,
+      "sha256": "39855cb73c4f25148145b1a1aec7c7facb142511e23097cb9b61671423776aab"
+    },
+    {
+      "file": "store/assets/en-US/phone-06.png",
+      "bytes": 239418,
+      "sha256": "8f02fb9c405aa5ad1b700940a5f5f06b2e36f2eb4bb3520ecc0ca393c6b59feb"
+    },
+    {
+      "file": "store/assets/en-US/tablet-10-01.png",
+      "bytes": 315202,
+      "sha256": "ffc8ae96d15b34aae00f920fd653b83d8e9be970c35fd11772abd0028ccf2267"
+    },
+    {
+      "file": "store/assets/en-US/tablet-10-02.png",
+      "bytes": 278987,
+      "sha256": "0fd93f2fd3a859349a29eabe97fea4f942bb856f5b81ef8dff6ad59cd5cf7ede"
+    },
+    {
+      "file": "store/assets/en-US/tablet-10-03.png",
+      "bytes": 246249,
+      "sha256": "2f4432965b53f24e87eb44875d4dbb7f81edcf907fd5308f7611365d56a26ade"
+    },
+    {
+      "file": "store/assets/en-US/tablet-10-04.png",
+      "bytes": 259004,
+      "sha256": "e857dae0c5e850061c40d98d6350449df54b8336e27fb62a2924c888652f1772"
+    },
+    {
+      "file": "store/assets/en-US/tablet-7-01.png",
+      "bytes": 226023,
+      "sha256": "e43e61bb223788ea7720c79f03017f29349877929a5e311269ea7e8b1428af8d"
+    },
+    {
+      "file": "store/assets/en-US/tablet-7-02.png",
+      "bytes": 203171,
+      "sha256": "52c36aa9da5a680b08008829dd6e1130ab974b3f55c631643d603390e924ac4b"
+    },
+    {
+      "file": "store/assets/en-US/tablet-7-03.png",
+      "bytes": 178070,
+      "sha256": "2e58c74e9e6bb165ac0f3ffdfc18c2e206974a710b307d6f4f911be4d9a13c9c"
+    },
+    {
+      "file": "store/assets/en-US/tablet-7-04.png",
+      "bytes": 187393,
+      "sha256": "9a1dc7751b366672a6e4ff53c82ad881bd32e280403e30250b4f6e564bf5b9aa"
+    },
+    {
+      "file": "store/assets/feature-graphic-1024x500.png",
+      "bytes": 73895,
+      "sha256": "f8f8bf924e70ef88b367b339c05a594bbb34d270d4cea415d1c7a3990ab862c3"
+    },
+    {
+      "file": "store/assets/icon-512.png",
+      "bytes": 14020,
+      "sha256": "98f65a0e76930ca7b1ffbbcd72e0fd486e0ae15307d98dcecbd1d08e3e5077af"
+    }
+  ]
+}

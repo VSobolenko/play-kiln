@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FileProvider paths for the signed report PDF UNITWALK shares or saves.
+
+     The surface is deliberately narrow: only the `reports/` subtree of the app's own
+     internal files and cache directories is exposed, never the whole domain. The report
+     screen (owned by another worker) writes the PDF under `filesDir/reports/` or, when it
+     stages a copy before a share, `cacheDir/reports/`; both are covered so the one
+     FileProvider authority works whichever route the writer takes, and nothing else on the
+     device is reachable through it. There is no external-storage path and no storage
+     permission: `ACTION_SEND` / `ACTION_CREATE_DOCUMENT` with a content:// URI need none on
+     modern Android.
+
+     `photos/` is the walk draft store's own directory. It is declared so a photo the walk has
+     already committed can be handed out as a content:// URI, rather than only the pre-commit
+     capture staged under `reports/`. Without this root `FileProvider.getUriForFile` over the
+     store's own photo file throws `IllegalArgumentException: Failed to find configured root`. -->
+<paths>
+    <files-path name="reports" path="reports/" />
+    <files-path name="photos" path="photos/" />
+    <cache-path name="reports-cache" path="reports/" />
+</paths>
