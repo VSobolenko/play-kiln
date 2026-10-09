@@ -1,5 +1,12 @@
 # Light-and-sky session planner — consolidated market evidence (2026-10-08)
 
+> **Status, 2026-10-08:** the Orekit pin in this record is now **`org.orekit:orekit:13.1.9`** (latest
+> stable; `13.1.5` was the smoke's vendored build). The open question "does Orekit ship an OMM parser
+> yielding a propagator?" is **resolved — yes**, measured by `javap -public` over `orekit-13.1.9.jar`
+> (`OmmParser` → `Omm`, with `Omm.generateTLE()` and `generateKeplerianOrbit()`). Where this record
+> cites a reading taken *from* the 13.1.5 javadoc or *on* the 13.1.5 jars, that attribution is
+> deliberate and correct — it records when the reading was taken, not what the slot declares.
+
 This is the durable, committed market-evidence record for the **light-and-sky session planner** idea
 (a paid, purchase-only planner that joins a true darkness window, a deep-sky target catalogue,
 satellite passes and hourly cloud cover for one location and one date). It consolidates the measured
@@ -466,7 +473,7 @@ were `INFERRED`; that gap is now closed by `G-android-build-proof.md`, see the p
 |---|---|---|---|---|---|---|
 | **(a) night / darkness window** | **DELIVERABLE** (dark window) / **RISK** (Bortle) | Astro Engine `searchAltitude`, `searchRiseSet`, `moonPhase`, `illumination`, `angleFromSun` — `astronomy.kt`; **only the Sun verified numerically** (0.0248 arcmin) | few dozen lines; **Bortle would need a new bundled raster/lookup asset** | none | none (manual/saved location); coarse location only if auto-locating | Moon path never verified numerically; Bortle is in no claim, and light pollution is already served by a 500K+ free incumbent |
 | **(b) deep-sky catalogue** | **DELIVERABLE-WITH-WORK** | Astro Engine `defineStar` + `searchAltitude`/`horizon` (`astronomy.kt:452`, `:6343`) — API present, **not exercised** | **hand-compiled list of ~250 famous objects** (Messier + showpiece NGC/IC) with RA/Dec, magnitude and apparent size + list/detail UI | build-time only, keyless | none | **no permissive full catalogue exists** — OpenNGC is CC-BY-SA-4.0 (README L15) and Wikidata cannot enumerate one (see §6.1, Resolution); coverage is therefore our own ~250 objects, not 13 000 |
-| **(c) satellite passes** | **DELIVERABLE-WITH-WORK** | Orekit `TLEPropagator` + `TopocentricFrame` + `ElevationDetector`; corpus **29/33 blocks** within tolerance | segmented pass finder (proven fix), OMM→TLE mapping, visible-pass policy, stale-TLE policy | yes — CelesTrak GP JSON keyless HTTP 200 | `INTERNET` | **detector trap (1 vs 15 passes, reproduced 3×)**; Orekit 11.56 MB; stale-TLE 27,924 km error after ~3 weeks |
+| **(c) satellite passes** | **DELIVERABLE-WITH-WORK** | Orekit `TLEPropagator` + `TopocentricFrame` + `ElevationDetector`; corpus **29/33 blocks** within tolerance | segmented pass finder (proven fix), OMM→orbit mapping (now **direct** via Orekit `OmmParser` → `Omm`; the hand field mapping into a `TLE` is the fallback), visible-pass policy, stale-TLE policy | yes — CelesTrak GP JSON keyless HTTP 200 | `INTERNET` | **detector trap (1 vs 15 passes, reproduced 3×)**; Orekit 11.56 MB (the smoke's 13.1.5 jars); stale-TLE 27,924 km error after ~3 weeks |
 | **(d) hourly cloud cover** | **DELIVERABLE-WITH-WORK** (engineering) / **RISK** (reliability) | **nothing** — not an engine capability | HTTP client + model + timeline UI aligned to the dark window | yes — Open-Meteo keyless **but non-commercial-only**; `api.met.no` keyless **CC BY 4.0**, fallback (total cloud only) | `INTERNET` | licence settled (`api.met.no` CC BY 4.0 with attribution); residual **third-party reliability/rate-limit** + recurring cost on a one-time price |
 
 Two `F` findings that decide how the engine is used:
@@ -477,7 +484,8 @@ Two `F` findings that decide how the engine is used:
   `run-passvariants.txt`); an independent 60 s brute-force scan finds **15** (`run-passcrosscheck.txt`).
   Segmenting into ≤1-hour calls reports all 15. `F` §4.2.
 - **Orekit's own verdict was not "use Orekit".** `.kiln/scratch/nv-core-proof/RESULT.md` says
-  `OREKIT_RISKY_USE_VALLADO_SUBSET` (11.56 MB of jars for one job vs a **135,064-byte** Vallado Java
+  `OREKIT_RISKY_USE_VALLADO_SUBSET` (11.56 MB of jars for one job — measured on the smoke's vendored
+  13.1.5 jars; the declared pin is 13.1.9 — vs a **135,064-byte** Vallado Java
   subset) — but the Vallado subset's numerical accuracy against the corpus was **never measured**
   (**MEASURED (absence)**) and its licence is **UNVERIFIED** (`F` §1.2, §6.3).
 - **Corrections to the recon framing** (`F` §1): the SGP4 corpus has **four** divergences (not three) —
@@ -529,6 +537,10 @@ real build in `G-android-build-proof.md` (**MEASURED PASS**, `ANDROID_BUILD=PASS
   only** — the Sun is the only numerically verified astro path, and the dark window, deep-sky
   catalogue and weather capabilities are **untouched** by this proof. A PASS on packaging is **not**
   a PASS on the engine.
+
+*These packaging figures — the R8 class counts (220/249, 49/59), the **4,379,153-byte** APK, the
+**~75.7 %** asset share and the **11.56 MB** Orekit jar set — were measured on the smoke's vendored
+**13.1.5** jars; with the declared pin at **13.1.9** they are re-taken at implementation.*
 
 **The `F` estimate this replaces (`INFERRED`, retained for the record):** Orekit + Hipparchus adds
 **≈ 1.4–2.8 MB** in the realistic case (floor ≈ 0.9–1.2 MB; ceiling ≈ 9.5–12 MB if shrinking does
@@ -724,7 +736,7 @@ The naive ElevationDetector finds 1 pass where 15 exist; maxCheck does not help;
 SGP4 corpus has 4 divergences including 20413#2 (1/70 vectors, worst 27,924.0197880 km) / MEASURED / F §1.1 (corpus-tinydata.txt)
 Only the Sun path is numerically verified (0.0248 arcmin); the three Moon cases are UNVERIFIED / MEASURED / F §2.1 (verbose-astro.txt)
 Orekit+Hipparchus adds ~1.4-2.8 MB realistic (floor 0.9-1.2, ceiling 9.5-12), no APK produced / INFERRED (superseded by the G measurement below) / F §6
-Orekit 13.1.5 + Hipparchus 4.0.3 build, shrink (R8 full mode, zero Orekit keep rules) and run on the target Android config / MEASURED PASS / G-android-build-proof.md §3-§6 (ANDROID_BUILD=PASS, SIZE_MB=4.18)
+Orekit 13.1.5 + Hipparchus 4.0.3 build, shrink (R8 full mode, zero Orekit keep rules) and run on the target Android config (measured on the smoke's vendored 13.1.5; the declared pin is 13.1.9 and the measurement is re-taken at implementation) / MEASURED PASS / G-android-build-proof.md §3-§6 (ANDROID_BUILD=PASS, SIZE_MB=4.18)
 The proof route was a standalone throwaway Gradle project, NOT a slot, built through scripts/lib/gradle.mjs; no contracts were faked / MEASURED / G §1 (no economics/differentiators/naming/OpenSpec change exists for it)
 Zero Orekit-specific R8 keep rules were needed; proguard-rules.pro was comments only; 220/249 org.orekit.* and 49/59 org.hipparchus.* classes survived / MEASURED / G §4 (build/outputs/mapping/release/mapping.txt, 159,144 lines)
 Release APK is 4,379,153 bytes (4.18 MiB), single classes.dex 1,753,644 uncompressed / 900,383 compressed; unshrunk debug APK 18,545,325 bytes / MEASURED / G §5 (ZipFile enumeration; sha256 39FAE799...E25A)

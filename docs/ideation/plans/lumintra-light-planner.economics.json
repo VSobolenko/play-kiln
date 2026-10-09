@@ -22,7 +22,7 @@
     "note": "INFERRED: purchase_only_no_ads needs no capability because the price is set in Play Console; billing is not enabled (no in-app store) and ads are not enabled (every paid row on the light-planning shelf declares no ads)."
   },
   "serverRequired": false,
-  "permissions": "INFERRED: INTERNET only for the keyless forecast and orbital feeds; ACCESS_COARSE_LOCATION only if the user auto-locates instead of entering a saved scout location. No server we would run, so client-secrets.mdc is satisfied by construction.",
+  "permissions": "INFERRED: INTERNET, required by the two keyless network calls (the CelesTrak element fetch and the api.met.no forecast); POST_NOTIFICATIONS, required by the local dark-window reminder, requested only when the user turns that reminder on and never a gate. No location permission of any kind is declared or requested - the spot is set by a map pin the user places plus a typed name. No server we would run, so client-secrets.mdc is satisfied by construction.",
   "archetypesRejected": [
     { "archetype": "purchase_led_single_unlock", "revenueReason": "UNVERIFIED: it rests entirely on an install-to-purchase conversion rate this recon did not observe, and the light shelf's paid apps are purchase-only standalone listings rather than free-plus-unlock; the shape it copies (ISS Detector Pro) rides a free 5M-plus funnel a new standalone entrant does not have." },
     { "archetype": "ads_led_utility", "revenueReason": "ON RECORD: banner-only ads imply roughly 5,500 daily active users for 500 dollars per month, which a few-times-a-month session planner cannot hold, and the light shelf shows zero ads on all of its paid rows." },
