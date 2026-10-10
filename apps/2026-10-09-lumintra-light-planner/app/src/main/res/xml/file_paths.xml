@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FileProvider roots: two subdirectories of cacheDir and nothing else (specs/share-brief/spec.md).
+     Never root-path, files-path or external-path. -->
+<paths>
+    <cache-path name="share" path="share/" />
+    <cache-path name="export" path="export/" />
+</paths>

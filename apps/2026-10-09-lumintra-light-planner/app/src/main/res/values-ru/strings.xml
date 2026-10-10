@@ -1,0 +1,916 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Lumintra: Light Planner — русская редакция каталога строк.
+
+    Ключи повторяют `values/strings.xml` один к одному за двумя исключениями, и оба исключения —
+    правила, а не забывчивость:
+      * строки, помеченные в значениях по умолчанию `translatable="false"` (лицензии, URL, адрес
+        политики, версия, контактный адрес), здесь не объявляются — Android берёт их из `values/`,
+        и копия могла бы только разойтись с оригиналом (`scripts/check-locales.mjs`);
+      * `app_name` переведён как `Lumintra: план съёмки` — это ровно то название для ru-RU, которое
+        записано в `naming.json` и в карточке Play, тогда как латинский носитель бренда остаётся
+        неизменным.
+    Форматные аргументы каждого `%1$s` / `%1$d` и порядок аргументов в каждом блоке множественного
+    числа совпадают с английскими: несовпадение — это дыра в предложении или падение в рантайме.
+-->
+<resources>
+    <!-- =====================================================================================
+         Идентичность приложения
+         ===================================================================================== -->
+    <string name="app_name" translatable="true">Lumintra: план съёмки</string>
+    <string name="app_idea" translatable="true">Офлайн-планировщик световых и ночных сессий: прокручиваемая ночная сцена с вашим горизонтом, тёмное окно, Луна, объекты, пролёты спутников и прогноз облачности для сохранённой точки</string>
+
+    <!-- =====================================================================================
+         Навигация — полоса разделов и общий словарь управления
+         ===================================================================================== -->
+    <string name="nav_night" translatable="true">Ночь</string>
+    <string name="nav_brief" translatable="true">Сводка</string>
+    <string name="nav_targets" translatable="true">Объекты</string>
+    <string name="nav_spots" translatable="true">Точки</string>
+    <string name="nav_settings" translatable="true">Настройки</string>
+    <string name="nav_back" translatable="true">Назад</string>
+    <string name="nav_close" translatable="true">Закрыть</string>
+    <string name="nav_day_previous" translatable="true">Предыдущая ночь</string>
+    <string name="nav_day_next" translatable="true">Следующая ночь</string>
+    <string name="action_cancel" translatable="true">Отмена</string>
+    <string name="action_save" translatable="true">Сохранить</string>
+    <string name="action_delete" translatable="true">Удалить</string>
+    <string name="action_edit" translatable="true">Изменить</string>
+    <string name="action_retry" translatable="true">Повторить</string>
+    <string name="action_refresh" translatable="true">Обновить</string>
+    <string name="action_done" translatable="true">Готово</string>
+    <string name="action_confirm" translatable="true">Подтвердить</string>
+    <string name="state_loading" translatable="true">Идёт вычисление…</string>
+    <string name="state_unavailable" translatable="true">Недоступно</string>
+    <string name="state_offline" translatable="true">Офлайн</string>
+    <string name="label_forecast" translatable="true">прогноз</string>
+    <string name="label_prediction" translatable="true">предсказание</string>
+    <string name="label_measured" translatable="true">измерено</string>
+
+    <!-- =====================================================================================
+         Компоненты — общий словарь `ui/components/`. Румбы — единственные видимые
+         пользователю слова, которыми владеют эти компоненты: сторона света это слово,
+         а не значок, и в русской редакции оно своё (С / СВ / В …), а не латинское.
+         ===================================================================================== -->
+    <string name="component_compass_n" translatable="true">С</string>
+    <string name="component_compass_ne" translatable="true">СВ</string>
+    <string name="component_compass_e" translatable="true">В</string>
+    <string name="component_compass_se" translatable="true">ЮВ</string>
+    <string name="component_compass_s" translatable="true">Ю</string>
+    <string name="component_compass_sw" translatable="true">ЮЗ</string>
+    <string name="component_compass_w" translatable="true">З</string>
+    <string name="component_compass_nw" translatable="true">СЗ</string>
+
+    <!-- =====================================================================================
+         Приветствие — первый запуск, только пока нет ни одной точки
+         ===================================================================================== -->
+    <string name="welcome_title" translatable="true">Спланируйте небо на сегодня</string>
+    <string name="welcome_body" translatable="true">Укажите на карте, где снимаете — Lumintra покажет тьму и цели для этой точки.</string>
+    <!-- Единственная строка, которую спецификация приветствия делает обязательной: это планировщик, а не компас. -->
+    <string name="welcome_compass_line" translatable="true">Без компаса и без геолокации — только сохранённая точка.</string>
+    <string name="welcome_action_set_spot" translatable="true">Задать точку на карте</string>
+    <string name="welcome_action_content_description" translatable="true">Задать точку на карте</string>
+    <string name="welcome_spot_subline" translatable="true">Сохраните точку, чтобы увидеть план на сегодня.</string>
+    <string name="welcome_first_run_note" translatable="true">Пока ничего не вычислено. Небо не нарисуется, пока не появится точка.</string>
+    <string name="welcome_notes_header" translatable="true">Перед началом</string>
+    <string name="welcome_no_network_note" translatable="true">Сеть не нужна: ввод и вставка координат работают полностью офлайн.</string>
+    <string name="welcome_no_account_note" translatable="true">Без учётной записи, без входа, без запроса разрешений.</string>
+
+    <!-- =====================================================================================
+         Ночная сцена — прокручиваемое небо, слои, рамка кадра и строка об авторстве
+         ===================================================================================== -->
+    <string name="night_title" translatable="true">Ночь</string>
+    <string name="night_scrub_label" translatable="true">Время ночи</string>
+    <string name="night_scrub_content_description" translatable="true">Прокрутите ночь с %1$s до %2$s</string>
+    <string name="night_scrub_hint" translatable="true">Потяните, чтобы двигаться по ночи</string>
+    <string name="night_scrub_now" translatable="true">Сейчас</string>
+    <string name="night_named" translatable="true">Ночь %1$s</string>
+    <string name="night_layers_header" translatable="true">Слои</string>
+    <string name="night_layer_milky_way" translatable="true">Млечный Путь</string>
+    <string name="night_layer_constellations" translatable="true">Созвездия</string>
+    <string name="night_layer_horizon" translatable="true">Ваш горизонт</string>
+    <string name="night_layer_star_trails" translatable="true">Звёздные треки</string>
+    <string name="night_layers_shown" translatable="true">Показано слоёв: %1$d из %2$d</string>
+    <string name="night_lens_frame" translatable="true">Рамка кадра</string>
+    <string name="night_lens_frame_content_description" translatable="true">Рамка кадра: фокусное расстояние %1$s мм, поле зрения %2$s на %3$s градусов</string>
+    <string name="night_lens_preset_title" translatable="true">Профиль объектива</string>
+    <string name="night_lens_preset_apply" translatable="true">Применить профиль</string>
+    <string name="night_lens_preset_current" translatable="true">%1$s мм, выбрано для этой сессии</string>
+    <string name="night_satellite_streak" translatable="true">След спутника</string>
+    <string name="night_satellite_streak_on" translatable="true">След спутника: %1$s проходит через кадр</string>
+    <string name="night_red_mode_toggle" translatable="true">Красный ночной режим</string>
+    <!-- Режим называется тем, что он делает, а не рекламным именем (settings-and-credits, раздел про красный режим). -->
+    <string name="night_red_mode_on" translatable="true">Красный ночной режим включён: синий удерживается на нуле, зелёный — не выше 8 из 255.</string>
+    <string name="night_red_mode_off" translatable="true">Красный ночной режим выключен.</string>
+    <string name="night_single_tap_hint" translatable="true">Коснитесь сцены, чтобы выбрать объект ближе всего к месту касания.</string>
+    <string name="night_objects_header" translatable="true">В этом кадре</string>
+    <string name="night_object_row" translatable="true">%1$s — высота %2$s°, азимут %3$s°</string>
+    <string name="night_no_objects" translatable="true">В этом кадре над вашим горизонтом ничего нет.</string>
+    <string name="night_sky_grade_label" translatable="true">Тёмность неба</string>
+    <string name="night_sky_grade_value" translatable="true">%1$s (Бортль %2$s)</string>
+    <string name="night_sky_grade_unknown" translatable="true">Тёмность неба не оценена.</string>
+    <string name="night_user_estimate_label" translatable="true">оценка пользователя</string>
+    <string name="night_user_estimate_sqm" translatable="true">оценка пользователя: %1$s зв. вел./кв. угл. сек</string>
+    <string name="night_user_estimate_bortle" translatable="true">оценка пользователя: Бортль %1$s</string>
+    <!-- Плоский запасной горизонт и профиль, закрывающий всё небо, — два разных состояния и никогда одно (scout-spots E75, E76). -->
+    <string name="night_horizon_flat_note" translatable="true">Для этой точки профиль горизонта не задан — используется плоский горизонт.</string>
+    <string name="night_horizon_blocked_note" translatable="true">Ваш горизонт для этой точки закрывает всё небо, поэтому каждый объект считается находящимся за ним.</string>
+    <string name="night_horizon_blocked_confirm" translatable="true">Оставить этот горизонт</string>
+    <string name="night_horizon_blocked_redraw" translatable="true">Нарисовать заново</string>
+    <string name="night_polar_day_note" translatable="true">Сегодня Солнце не заходит, поэтому сцена всю ночь сохраняет дневную палитру.</string>
+    <string name="night_eso_credit" translatable="true">ESO/S. Brunier</string>
+
+    <!-- =====================================================================================
+         Сводка — итог на ночь и её предложения про тёмное окно
+         ===================================================================================== -->
+    <string name="brief_title" translatable="true">Сегодня ночью</string>
+    <string name="brief_spot_label" translatable="true">Точка</string>
+    <string name="brief_night_of" translatable="true">Ночь с %1$s на %2$s</string>
+    <string name="brief_no_spot_title" translatable="true">Точка не сохранена</string>
+    <string name="brief_no_spot_body" translatable="true">Lumintra вычисляет всё от реального места, поэтому ничего не показывается, пока вы его не сохраните.</string>
+    <string name="brief_no_spot_action" translatable="true">Задать точку</string>
+    <string name="brief_loading" translatable="true">Считаем ночь для %1$s…</string>
+    <string name="brief_offline_note" translatable="true">Офлайн: всё, что считается на устройстве, на месте, а разделы прогноза и пролётов показывают то, что удалось прочитать в последний раз.</string>
+    <string name="brief_dark_window_header" translatable="true">Тёмное окно</string>
+    <string name="brief_dark_window_value" translatable="true">%1$s – %2$s (%3$s)</string>
+    <string name="brief_dark_window_second" translatable="true">Второе тёмное окно: %1$s – %2$s</string>
+    <string name="brief_dark_kind_dark" translatable="true">астрономическая темнота</string>
+    <string name="brief_dark_kind_polar_day" translatable="true">Солнце не заходит</string>
+    <string name="brief_dark_kind_polar_night" translatable="true">Солнце не восходит</string>
+    <string name="brief_dark_kind_no_astro" translatable="true">астрономической темноты нет</string>
+    <string name="brief_dark_kind_no_dark" translatable="true">темноты нет</string>
+    <!-- Четыре исхода, отличных от DARK, по одному предложению каждый, ровно как определяет session-brief. -->
+    <string name="brief_no_sunset_tonight" translatable="true">Сегодня в %1$s Солнце не заходит — темноты нет.</string>
+    <string name="brief_no_sunrise_today" translatable="true">Сегодня в %1$s Солнце не восходит — небо остаётся тёмным, кроме провала сумерек около полудня.</string>
+    <string name="brief_no_astro_dark" translatable="true">Сегодня в %1$s астрономической темноты нет — небо доходит лишь до уровня «%2$s» сумерек (Солнце %3$s° в %4$s).</string>
+    <string name="brief_no_dark" translatable="true">Сегодня в %1$s темноты нет — Солнце остаётся выше гражданских сумерек (минимум %2$s° в %3$s).</string>
+    <string name="brief_twilight_civil" translatable="true">гражданских</string>
+    <string name="brief_twilight_nautical" translatable="true">навигационных</string>
+    <string name="brief_sun_altitude" translatable="true">Солнце %1$s° в %2$s</string>
+    <string name="brief_twilight_table_header" translatable="true">Сумерки</string>
+    <string name="brief_twilight_row" translatable="true">%1$s: %2$s – %3$s</string>
+    <string name="brief_moon_header" translatable="true">Луна</string>
+    <string name="brief_moon_value" translatable="true">освещено %1$s%%, %2$s</string>
+    <string name="brief_moon_up_all_night" translatable="true">всю ночь над горизонтом</string>
+    <string name="brief_moon_below_all_night" translatable="true">всю ночь под горизонтом</string>
+    <string name="brief_moon_rises_sets" translatable="true">восходит в %1$s, заходит в %2$s</string>
+    <string name="brief_moon_rises" translatable="true">восходит в %1$s</string>
+    <string name="brief_moon_sets" translatable="true">заходит в %1$s</string>
+    <string name="brief_moonless_window" translatable="true">Окно без Луны: %1$s – %2$s</string>
+    <string name="brief_moonless_none" translatable="true">Сегодня окна без Луны нет.</string>
+    <string name="brief_targets_header" translatable="true">Объекты</string>
+    <string name="brief_targets_none" translatable="true">Для этой сессии объект не выбран.</string>
+    <string name="brief_passes_header" translatable="true">Пролёты спутников</string>
+    <string name="brief_cloud_header" translatable="true">Облачность</string>
+    <string name="brief_zone_label" translatable="true">Часовой пояс: %1$s</string>
+    <string name="brief_zone_other" translatable="true">Часовой пояс устройства: %1$s</string>
+    <string name="brief_clock_warning" translatable="true">Часы устройства расходятся с сетевым временем на %1$s, поэтому моменты ниже могут относиться к другой ночи.</string>
+    <string name="brief_saved_spot_unreadable" translatable="true">Одну сохранённую точку не удалось прочитать. Всё остальное загрузилось как обычно.</string>
+    <string name="brief_saved_target_missing" translatable="true">Одну сохранённую ссылку не удалось восстановить: такого объекта в каталоге больше нет.</string>
+    <string name="brief_horizon_flat_note" translatable="true">Для этой точки профиль горизонта не задан — используется плоский горизонт.</string>
+    <string name="brief_share_action" translatable="true">Отправить сводку</string>
+    <string name="brief_open_night_action" translatable="true">Открыть ночную сцену</string>
+
+    <!-- =====================================================================================
+         Объекты — каталог, поиск и фильтры, карточка объекта
+         ===================================================================================== -->
+    <string name="target_title" translatable="true">Объекты</string>
+    <string name="target_back" translatable="true">Назад</string>
+    <string name="target_search_field" translatable="true">Поиск объектов по обозначению, названию или псевдониму</string>
+    <string name="target_search_hint" translatable="true">Обозначение, название или псевдоним</string>
+    <string name="target_search_clear" translatable="true">Очистить поиск</string>
+    <string name="target_filter_magnitude" translatable="true">Предел звёздной величины</string>
+    <string name="target_filter_type" translatable="true">Тип объекта</string>
+    <string name="target_filter_any" translatable="true">Любой</string>
+    <string name="target_filter_magnitude_value" translatable="true">%1$s зв. вел.</string>
+    <string name="target_filter_favourites" translatable="true">Только избранное</string>
+    <string name="target_filter_visible_tonight" translatable="true">Видно этой ночью</string>
+    <string name="target_filter_clear" translatable="true">Сбросить фильтры</string>
+    <string name="target_magnitude_unknown" translatable="true">Звёздная величина неизвестна</string>
+    <string name="target_magnitude_limit_any" translatable="true">Без предела звёздной величины</string>
+    <string name="target_mag_line" translatable="true">%1$s (%2$s, %3$s)</string>
+    <string name="target_mag_kind_integrated" translatable="true">интегральная</string>
+    <string name="target_mag_kind_peak" translatable="true">в пике</string>
+    <string name="target_mag_kind_unknown" translatable="true">тип неизвестен</string>
+    <string name="target_magnitude_disputed" translatable="true">спорная величина</string>
+    <string name="target_size_unknown" translatable="true">Размер неизвестен</string>
+    <string name="target_size_format" translatable="true">%1$s′</string>
+    <string name="target_size_pair" translatable="true">%1$s′ × %2$s′</string>
+    <string name="target_row_metrics" translatable="true">%1$s · %2$s</string>
+    <string name="target_favourite_mark" translatable="true">В избранном</string>
+    <string name="target_favourite_add" translatable="true">Добавить %1$s в избранное</string>
+    <string name="target_favourite_remove" translatable="true">Убрать %1$s из избранного</string>
+    <string name="target_up_tonight" translatable="true">видно этой ночью</string>
+    <string name="target_type_galaxy" translatable="true">Галактика</string>
+    <string name="target_type_galaxy_group" translatable="true">Группа галактик</string>
+    <string name="target_type_globular_cluster" translatable="true">Шаровое скопление</string>
+    <string name="target_type_open_cluster" translatable="true">Рассеянное скопление</string>
+    <string name="target_type_emission_nebula" translatable="true">Эмиссионная туманность</string>
+    <string name="target_type_reflection_nebula" translatable="true">Отражательная туманность</string>
+    <string name="target_type_planetary_nebula" translatable="true">Планетарная туманность</string>
+    <string name="target_type_supernova_remnant" translatable="true">Остаток сверхновой</string>
+    <string name="target_type_dark_nebula" translatable="true">Тёмная туманность</string>
+    <string name="target_type_asterism" translatable="true">Астеризм</string>
+    <string name="target_type_double_star" translatable="true">Двойная звезда</string>
+    <string name="target_type_planet" translatable="true">Планета</string>
+    <string name="target_type_moon" translatable="true">Луна</string>
+    <string name="target_type_sun" translatable="true">Солнце</string>
+    <string name="target_list_unavailable" translatable="true">Список объектов недоступен</string>
+    <string name="target_list_unavailable_body" translatable="true">Встроенный каталог не удалось прочитать, поэтому объекты не показаны. Всё остальное в сводке работает.</string>
+    <string name="target_no_result" translatable="true">Ничего не найдено по запросу «%1$s»</string>
+    <string name="target_no_result_body" translatable="true">Попробуйте другое обозначение или название либо сбросьте фильтры.</string>
+    <string name="target_favourites_empty" translatable="true">В избранном пока пусто</string>
+    <string name="target_favourites_empty_body" translatable="true">Отметьте объект звёздочкой, и он появится здесь.</string>
+    <string name="target_none_visible_tonight" translatable="true">В ночь %1$s ничего не видно</string>
+    <string name="target_none_visible_tonight_body" translatable="true">Ни один объект из текущих фильтров не поднимается над вашим горизонтом в эту ночь.</string>
+    <string name="target_needs_spot" translatable="true">Точки наблюдения нет</string>
+    <string name="target_needs_spot_body" translatable="true">Сохраните точку, чтобы вычислить, какие объекты видны этой ночью.</string>
+    <string name="target_needs_spot_action" translatable="true">Сохранить точку</string>
+    <string name="target_needs_night" translatable="true">Ночь не выбрана</string>
+    <string name="target_needs_night_body" translatable="true">Выберите ночь, чтобы вычислить, какие объекты видны этой ночью.</string>
+    <string name="catalogue_count_label" translatable="true">Объектов в каталоге: %1$d</string>
+    <string name="target_results_summary" translatable="true">Найдено: %1$d</string>
+    <string name="target_results_summary_filters" translatable="true">Найдено: %1$d, фильтры: %2$s</string>
+    <string name="target_filters_none" translatable="true">нет</string>
+    <string name="target_night_named" translatable="true">Ночь: %1$s</string>
+    <string name="milky_way_core_name" translatable="true">Ядро Млечного Пути</string>
+    <string name="target_detail_select_prompt" translatable="true">Выберите объект</string>
+    <string name="target_detail_select_prompt_body" translatable="true">Выберите строку, чтобы прочитать данные каталога и окно видимости этой ночью.</string>
+    <string name="target_detail_needs_spot" translatable="true">Активной точки нет</string>
+    <string name="target_detail_needs_spot_body" translatable="true">Для восхода, кульминации и захода нужна сохранённая точка, поэтому здесь ничего не вычислено.</string>
+    <string name="target_detail_needs_night" translatable="true">Ночь не выбрана</string>
+    <string name="target_detail_needs_night_body" translatable="true">Для восхода, кульминации и захода нужна выбранная ночь, поэтому здесь ничего не вычислено.</string>
+    <string name="target_detail_no_dark_night" translatable="true">Окно не указано: этой ночью %1$s.</string>
+    <string name="target_detail_close" translatable="true">Закрыть карточку объекта</string>
+    <string name="target_detail_catalogue_facts" translatable="true">Каталог</string>
+    <string name="target_detail_designations" translatable="true">Обозначения</string>
+    <string name="target_detail_aliases" translatable="true">Другие названия</string>
+    <string name="target_dimension_magnitude" translatable="true">Звёздная величина</string>
+    <string name="target_dimension_size" translatable="true">Видимый размер</string>
+    <string name="target_detail_sources" translatable="true">Сверено по источникам</string>
+    <string name="target_detail_sources_value" translatable="true">%1$s и %2$s (Δ %3$s′)</string>
+    <string name="target_detail_window" translatable="true">Этой ночью</string>
+    <string name="target_detail_fit" translatable="true">Кадр и объектив</string>
+    <string name="target_detail_position" translatable="true">Положение сейчас</string>
+    <string name="target_window_rise" translatable="true">Восходит в %1$s</string>
+    <string name="target_window_transit" translatable="true">Максимум в %1$s (%2$s°)</string>
+    <string name="target_window_set" translatable="true">Заходит в %1$s</string>
+    <string name="target_circumpolar_short" translatable="true">Виден всю ночь</string>
+    <string name="target_never_rises_short" translatable="true">Никогда не восходит из этой точки</string>
+    <string name="target_behind_horizon" translatable="true">%1$s восходит за вашим горизонтом, поэтому не считается видимым.</string>
+    <string name="target_occluded_short" translatable="true">За вашим нарисованным горизонтом</string>
+    <string name="target_never_rises" translatable="true">%1$s никогда не восходит из этой точки.</string>
+    <string name="target_circumpolar" translatable="true">%1$s виден всю ночь; минимум %2$s° в %3$s.</string>
+    <string name="target_partial_window" translatable="true">%1$s виден с %2$s до %3$s; окно обрезано тёмным окном.</string>
+    <string name="target_at_horizon" translatable="true">%1$s проходит над вашим нарисованным горизонтом в %2$s (%3$s°).</string>
+    <string name="target_graze" translatable="true">%1$s лишь касается горизонта: максимум %2$s°, выше него %3$s.</string>
+    <string name="target_reference_missing" translatable="true">Сохранённая ссылка указывает на объект, которого больше нет в каталоге, и была удалена.</string>
+    <string name="target_interval_line" translatable="true">%1$s – %2$s, максимум %3$s° в %4$s</string>
+    <string name="target_interval_no_transit" translatable="true">%1$s – %2$s, максимум %3$s°</string>
+    <string name="target_multiple_intervals" translatable="true">Окон за ночь: %1$d</string>
+    <string name="target_fit_fits" translatable="true">Вписывается в кадр</string>
+    <string name="target_fit_marginal" translatable="true">На пределе кадра</string>
+    <string name="target_fit_too_large" translatable="true">Больше кадра</string>
+    <string name="target_fit_point_source" translatable="true">Видимый размер не указан, поэтому оценка кадра не строится и диск не рисуется.</string>
+    <string name="target_fit_numbers" translatable="true">Объект %1$s°, короткая сторона кадра %2$s°, фокусное расстояние %3$s мм при матрице %4$s × %5$s мм</string>
+    <string name="target_fit_pixels" translatable="true">Около %1$s px по короткой стороне</string>
+    <string name="target_fit_frame_fraction" translatable="true">%1$s короткой стороны кадра при %2$s</string>
+    <string name="target_visible_yes" translatable="true">Виден этой ночью из этой точки.</string>
+    <string name="target_visible_no" translatable="true">Не виден этой ночью из этой точки.</string>
+    <string name="target_alt_az" translatable="true">Высота %1$s°, азимут %2$s°</string>
+    <string name="target_aliases_none" translatable="true">Не записано</string>
+
+    <!-- =====================================================================================
+         Пролёты спутников
+         ===================================================================================== -->
+    <string name="pass_title" translatable="true">Пролёты спутников</string>
+    <string name="pass_empty" translatable="true">Наблюдаемых пролётов спутников этой ночью нет.</string>
+    <string name="pass_no_crossing" translatable="true">Пересечения вашего горизонта в этом окне не предсказано. Это предсказание по предсказанной траектории, а не подтверждённый пролёт.</string>
+    <string name="pass_prediction_note" translatable="true">Предсказание по орбитальным элементам, а не наблюдение.</string>
+    <string name="pass_age_days" translatable="true">Набору элементов %1$d дней — время пролётов может сдвинуться на минуты.</string>
+    <string name="pass_stale_badge" translatable="true">устаревшие элементы: %1$d дней</string>
+    <string name="pass_expired" translatable="true">Набору элементов для %1$s %2$d дней, поэтому пролёты не предсказываются. Обновите элементы, чтобы их вычислить.</string>
+    <string name="pass_malformed" translatable="true">Данные о спутниках не удалось прочитать — пролёты пока недоступны.</string>
+    <string name="pass_shadow_note" translatable="true">спутник в тени Земли</string>
+    <string name="pass_bright_note" translatable="true">небо слишком светлое</string>
+    <string name="pass_row" translatable="true">%1$s: %2$s – %3$s, максимальная высота %4$s°, %5$s</string>
+    <string name="pass_refresh" translatable="true">Обновить орбитальные элементы</string>
+    <string name="pass_refresh_offline" translatable="true">Элементы были получены %1$s. Без сети их не обновить, поэтому используется сохранённый набор с указанием его возраста.</string>
+    <string name="pass_object_picker" translatable="true">Спутник</string>
+    <string name="pass_no_elements_for_object" translatable="true">В полученных элементах нет %1$s, поэтому пролёт для него не предсказывается.</string>
+    <string name="pass_behind_horizon" translatable="true">%1$s восходит за вашим горизонтом, поэтому пролёт не предлагается как видимый.</string>
+    <plurals name="pass_count" translatable="true">
+        <item quantity="one">%1$d пролёт этой ночью</item>
+        <item quantity="few">%1$d пролёта этой ночью</item>
+        <item quantity="many">%1$d пролётов этой ночью</item>
+        <item quantity="other">%1$d пролёта этой ночью</item>
+    </plurals>
+    <plurals name="pass_element_age_days" translatable="true">
+        <item quantity="one">%1$d день</item>
+        <item quantity="few">%1$d дня</item>
+        <item quantity="many">%1$d дней</item>
+        <item quantity="other">%1$d дня</item>
+    </plurals>
+
+    <!-- =====================================================================================
+         Прогноз облачности — MET Norway, её подписи и все формулировки отказов
+         ===================================================================================== -->
+    <string name="cloud_title" translatable="true">Облачность</string>
+    <string name="cloud_total_cover_label" translatable="true">Общая облачность</string>
+    <string name="cloud_clear" translatable="true">Ясно</string>
+    <string name="cloud_partly" translatable="true">Переменная облачность</string>
+    <string name="cloud_overcast" translatable="true">Пасмурно</string>
+    <string name="cloud_hour_row" translatable="true">%1$s: %2$s (%3$s%%)</string>
+    <string name="cloud_hour_label" translatable="true">%1$s: %2$s%%, %3$s</string>
+    <string name="cloud_source_line" translatable="true">Прогноз от %1$s, получен %2$s</string>
+    <string name="cloud_source_reading" translatable="true">%1$s, давность данных %2$s</string>
+    <string name="cloud_mean_over_window" translatable="true">Средняя общая облачность за тёмное окно: %1$s%%</string>
+    <string name="cloud_no_forecast" translatable="true">Прогноз недоступен.</string>
+    <string name="cloud_offline_from" translatable="true">Прогноз недоступен. Последнее измерение давностью %1$s: облачность %2$s%%.</string>
+    <string name="cloud_unavailable" translatable="true">Прогноз недоступен.</string>
+    <string name="cloud_temporarily_unavailable" translatable="true">Прогноз временно недоступен.</string>
+    <string name="cloud_no_hours" translatable="true">Прогноз не покрывает это окно.</string>
+    <string name="cloud_forecast_disclosure" translatable="true">Когда прогноз облачности включён, координаты вашей сохранённой точки отправляются в погодный сервис api.met.no с округлением до 4 знаков после запятой (около 11 м). Когда он выключен, такой запрос не выполняется и ни одна координата не покидает устройство.</string>
+
+    <!-- =====================================================================================
+         Точки — список, редактор, способы задания координат и редактор горизонта
+         ===================================================================================== -->
+    <string name="spot_title" translatable="true">Точки</string>
+    <string name="spot_empty_title" translatable="true">Точка не сохранена</string>
+    <string name="spot_empty_body" translatable="true">Lumintra считает всё от реального места. Добавьте его, и вся ночь развернётся относительно него.</string>
+    <string name="spot_add" translatable="true">Добавить точку</string>
+    <string name="spot_list_header" translatable="true">Сохранённые точки</string>
+    <string name="spot_active_label" translatable="true">Активная</string>
+    <string name="spot_row_subtitle" translatable="true">%1$s, %2$s · %3$s</string>
+    <plurals name="spot_count" translatable="true">
+        <item quantity="one">%1$d сохранённая точка</item>
+        <item quantity="few">%1$d сохранённые точки</item>
+        <item quantity="many">%1$d сохранённых точек</item>
+        <item quantity="other">%1$d сохранённой точки</item>
+    </plurals>
+    <string name="spot_edit_title_new" translatable="true">Новая точка</string>
+    <string name="spot_edit_title_edit" translatable="true">Изменить точку</string>
+    <string name="spot_edit_name" translatable="true">Название</string>
+    <string name="spot_edit_note" translatable="true">Заметка</string>
+    <string name="spot_edit_elevation" translatable="true">Высота над уровнем моря</string>
+    <string name="spot_edit_timezone" translatable="true">Часовой пояс</string>
+    <string name="spot_edit_save" translatable="true">Сохранить точку</string>
+    <string name="spot_edit_delete" translatable="true">Удалить точку</string>
+    <string name="spot_edit_delete_confirm" translatable="true">Удалить %1$s? Вместе с ней уйдут профиль горизонта и профиль оборудования.</string>
+    <string name="spot_edit_discard_confirm" translatable="true">Отменить эту черновую точку? Пока ничего не сохранено.</string>
+    <string name="spot_edit_coordinates_header" translatable="true">Координаты</string>
+    <string name="spot_edit_latitude" translatable="true">Широта</string>
+    <string name="spot_edit_longitude" translatable="true">Долгота</string>
+    <string name="spot_edit_latitude_hint" translatable="true">Широта в десятичных градусах</string>
+    <string name="spot_edit_longitude_hint" translatable="true">Долгота в десятичных градусах</string>
+    <string name="spot_edit_use_decimal" translatable="true">Десятичные</string>
+    <string name="spot_edit_use_dms" translatable="true">ГМС</string>
+    <string name="spot_edit_paste" translatable="true">Вставить координаты</string>
+    <string name="spot_edit_paste_hint" translatable="true">напр. 47.3769, 8.5417</string>
+    <string name="spot_edit_paste_invalid" translatable="true">Эти координаты не удалось прочитать. Используйте десятичные градусы или градусы, минуты и секунды с буквой полушария.</string>
+    <string name="spot_edit_paste_out_of_range" translatable="true">Широта должна быть от −90° до 90°, а долгота — от −180° до 180°.</string>
+    <string name="spot_edit_map_section" translatable="true">Карта</string>
+    <string name="spot_edit_picker" translatable="true">Настроить на карте</string>
+    <string name="spot_edit_picker_hide" translatable="true">Скрыть карту</string>
+    <string name="spot_edit_create_hint" translatable="true">Назовите точку, поставьте метку на карте и нажмите Сохранить.</string>
+    <string name="spot_edit_coordinate_set" translatable="true">Метка: %1$s</string>
+    <string name="spot_edit_advanced_title" translatable="true">Дополнительно</string>
+    <string name="spot_edit_advanced_expand" translatable="true">Показать дополнительно</string>
+    <string name="spot_edit_advanced_collapse" translatable="true">Скрыть дополнительно</string>
+    <string name="spot_edit_picker_content_description" translatable="true">Задать координату собственным выбором координат в приложении</string>
+    <string name="spot_edit_picker_hint" translatable="true">Сдвиньте карту и поставьте метку. Геолокация не нужна.</string>
+    <string name="spot_edit_picker_zoom_in" translatable="true">Приблизить</string>
+    <string name="spot_edit_picker_zoom_out" translatable="true">Отдалить</string>
+    <string name="spot_edit_lookup_title" translatable="true">Поиск по названию места</string>
+    <string name="spot_edit_lookup_action" translatable="true">Найти название</string>
+    <string name="spot_edit_lookup_hint" translatable="true">Введите город, ориентир или адрес</string>
+    <string name="spot_edit_lookup_unavailable" translatable="true">Поиск по адресу недоступен — введите координаты.</string>
+    <string name="spot_edit_lookup_approximate_only" translatable="true">Название — приблизительно; уточните до точки обзора.</string>
+    <string name="spot_edit_approximate_label" translatable="true">приблизительно</string>
+    <string name="spot_edit_lookup_result" translatable="true">%1$s (%2$s, %3$s)</string>
+    <string name="coord_hemisphere_n" translatable="true">С</string>
+    <string name="coord_hemisphere_s" translatable="true">Ю</string>
+    <string name="coord_hemisphere_e" translatable="true">В</string>
+    <string name="coord_hemisphere_w" translatable="true">З</string>
+    <string name="coord_hemisphere_label" translatable="true">Полушарие</string>
+    <string name="coord_degrees" translatable="true">Градусы</string>
+    <string name="coord_minutes" translatable="true">Минуты</string>
+    <string name="coord_seconds" translatable="true">Секунды</string>
+    <string name="coord_decimal_pair" translatable="true">%1$s, %2$s</string>
+    <string name="coord_dms_pair" translatable="true">%1$s°%2$s′%3$s″ %4$s, %5$s°%6$s′%7$s″ %8$s</string>
+    <string name="coord_copy" translatable="true">Скопировать координату</string>
+    <string name="coord_copied" translatable="true">Координата в буфере обмена.</string>
+    <!-- Редактор горизонта живёт внутри карточки точки и хранит массив из 360 отсчётов. -->
+    <string name="spot_edit_horizon_field_label" translatable="true">Горизонт</string>
+    <string name="spot_edit_horizon_hint" translatable="true">Проведите по оси азимута, чтобы нарисовать силуэт, через который вы действительно будете смотреть.</string>
+    <string name="spot_edit_horizon_description" translatable="true">Редактор горизонта: десять строк высоты от −10° до 90°, 360 отсчётов азимута</string>
+    <string name="spot_edit_horizon_axis_range" translatable="true">Азимут от 0° до 360°, высота от −10° до 90°</string>
+    <string name="spot_edit_horizon_selected_azimuth" translatable="true">Азимут %1$s°</string>
+    <string name="spot_edit_horizon_field_value" translatable="true">Высота %1$s°</string>
+    <string name="spot_edit_horizon_elevation_value" translatable="true">%1$s°</string>
+    <string name="spot_edit_horizon_select_azimuth_description" translatable="true">Выберите азимут, чтобы задать его высоту</string>
+    <string name="spot_edit_horizon_set_elevation_description" translatable="true">Задайте высоту для выбранного азимута</string>
+    <string name="spot_edit_horizon_step_up" translatable="true">Поднять горизонт на этом азимуте</string>
+    <string name="spot_edit_horizon_step_down" translatable="true">Опустить горизонт на этом азимуте</string>
+    <string name="spot_edit_horizon_reset" translatable="true">Сбросить горизонт</string>
+    <string name="spot_edit_horizon_no_profile" translatable="true">Профиль ещё не нарисован — пока он не задан, используется плоский горизонт.</string>
+    <string name="spot_edit_horizon_full_sky_note" translatable="true">Этот профиль закрывает всё небо. Он сохранится, но всё будет считаться находящимся за вашим горизонтом.</string>
+    <string name="spot_edit_horizon_flat_note" translatable="true">Профиль из одних нулей — это корректный плоский горизонт, а не отсутствующий.</string>
+    <!-- Оборудование: профили объективов, поле зрения которых вычисляется по формуле, а не вводится вручную. -->
+    <string name="spot_edit_lens_header" translatable="true">Объектив и матрица</string>
+    <string name="spot_edit_lens_preset" translatable="true">Профиль</string>
+    <string name="spot_edit_lens_custom" translatable="true">Свои значения</string>
+    <string name="spot_edit_lens_focal" translatable="true">Фокусное расстояние (мм)</string>
+    <string name="spot_edit_lens_sensor_width" translatable="true">Ширина матрицы (мм)</string>
+    <string name="spot_edit_lens_sensor_height" translatable="true">Высота матрицы (мм)</string>
+    <string name="spot_edit_lens_field_of_view" translatable="true">Поле зрения %1$s° × %2$s°</string>
+    <string name="spot_edit_lens_equipment_profile" translatable="true">Профиль оборудования</string>
+    <string name="spot_export" translatable="true">Экспортировать все точки</string>
+    <string name="spot_export_content_description" translatable="true">Экспортировать все сохранённые точки, их профили горизонта и профили оборудования одним файлом</string>
+    <string name="spot_export_done" translatable="true">Файл точек записан: %1$s.</string>
+    <string name="spot_export_failed" translatable="true">Не удалось записать файл точек.</string>
+    <string name="spot_export_nothing" translatable="true">Экспортировать пока нечего.</string>
+    <string name="spot_import" translatable="true">Импортировать файл точек</string>
+    <string name="spot_import_content_description" translatable="true">Импортировать сохранённые точки, профили горизонта и профили оборудования из одного файла</string>
+    <string name="spot_import_cancelled" translatable="true">Файл не выбран, поэтому ничего не изменилось.</string>
+    <string name="spot_import_not_a_scout_file" translatable="true">Этот файл не является файлом точек Lumintra.</string>
+    <string name="spot_import_unknown_version" translatable="true">Этот файл точек объявляет версию %1$s, которую эта сборка Lumintra не понимает, поэтому ничего не импортировано.</string>
+    <string name="spot_import_invalid_coordinate" translatable="true">Запись %1$s отклонена: %2$s выходит за допустимые пределы, поэтому ничего не импортировано.</string>
+    <string name="spot_import_invalid_horizon" translatable="true">Запись %1$s отклонена: в её профиле горизонта %2$d отсчётов вместо требуемых 360, поэтому ничего не импортировано.</string>
+    <string name="spot_import_invalid_sample" translatable="true">Запись %1$s отклонена: один отсчёт горизонта выходит за пределы от −10° до 90°, поэтому ничего не импортировано.</string>
+    <string name="spot_import_preview" translatable="true">Будут добавлены %1$s и %2$s. Импорт ничего не заменяет.</string>
+    <string name="spot_import_done" translatable="true">Добавлено %1$s, пропущено %2$s, потому что они уже сохранены.</string>
+    <plurals name="spot_import_added_count" translatable="true">
+        <item quantity="one">%1$d запись добавлена</item>
+        <item quantity="few">%1$d записи добавлены</item>
+        <item quantity="many">%1$d записей добавлено</item>
+        <item quantity="other">%1$d записи добавлено</item>
+    </plurals>
+    <plurals name="spot_import_skipped_count" translatable="true">
+        <item quantity="one">%1$d запись пропущена</item>
+        <item quantity="few">%1$d записи пропущены</item>
+        <item quantity="many">%1$d записей пропущено</item>
+        <item quantity="other">%1$d записи пропущено</item>
+    </plurals>
+    <string name="spot_store_quarantined" translatable="true">Одну сохранённую точку не удалось прочитать, и она отложена. Остальные точки загрузились как обычно.</string>
+    <string name="spot_saved_confirm" translatable="true">Точка %1$s сохранена.</string>
+
+    <!-- =====================================================================================
+         Отправка сводки: текстовое сообщение, его шаблоны и открытка
+         ===================================================================================== -->
+    <string name="share_title" translatable="true">Отправить сводку</string>
+    <string name="share_back" translatable="true">Назад</string>
+    <string name="share_mode_text" translatable="true">Текст сводки</string>
+    <string name="share_mode_postcard" translatable="true">Открытка</string>
+    <string name="share_mode_selected" translatable="true">Выбрано</string>
+    <string name="share_preview_header" translatable="true">Что будет отправлено</string>
+    <string name="share_preview_text_description" translatable="true">Предпросмотр текста сводки, символов: %1$d</string>
+    <string name="share_preview_postcard_description" translatable="true">Открытка: %1$s, %2$s в %3$s, %4$s, Луна %5$s</string>
+    <string name="share_postcard_preview" translatable="true">Предпросмотр открытки</string>
+    <string name="share_send" translatable="true">Отправить</string>
+    <string name="share_save" translatable="true">Сохранить открытку</string>
+    <string name="share_loading" translatable="true">Готовим сводку…</string>
+    <string name="share_no_spot_title" translatable="true">Точка не сохранена</string>
+    <string name="share_no_spot_body" translatable="true">Сначала сохраните точку: сводка строится для реального места, а не для координаты по умолчанию.</string>
+    <string name="share_no_spot_action" translatable="true">Открыть точки</string>
+    <string name="share_postcard_unavailable" translatable="true">Открытку собрать не удалось, поэтому можно отправить только текст сводки.</string>
+    <string name="share_no_target_app" translatable="true">На устройстве нет приложения, которое примет отправку, поэтому текст скопирован.</string>
+    <string name="share_copy_text" translatable="true">Скопировать текст сводки</string>
+    <string name="share_copied" translatable="true">Текст сводки в буфере обмена.</string>
+    <string name="share_save_failed" translatable="true">Открытку сохранить не удалось.</string>
+    <string name="share_saved" translatable="true">Открытка сохранена.</string>
+    <string name="share_text_header" translatable="true">%1$s — сводка ночной съёмки</string>
+    <string name="share_text_spot" translatable="true">Точка: %1$s</string>
+    <string name="share_text_position" translatable="true">Координаты: %1$s, %2$s</string>
+    <string name="share_text_zone" translatable="true">Часовой пояс: %1$s</string>
+    <string name="share_text_night" translatable="true">Ночь: %1$s</string>
+    <string name="share_text_dark_window" translatable="true">Астрономическая темнота: %1$s – %2$s</string>
+    <string name="share_text_dark_window_second" translatable="true">Второе тёмное окно: %1$s – %2$s</string>
+    <string name="share_text_dark_kind" translatable="true">Тип тёмного окна: %1$s</string>
+    <string name="share_dark_kind_dark" translatable="true">астрономическая темнота</string>
+    <string name="share_dark_kind_polar_day" translatable="true">Солнце не заходит</string>
+    <string name="share_dark_kind_polar_night" translatable="true">Солнце не восходит</string>
+    <string name="share_dark_kind_no_astro" translatable="true">астрономической темноты нет</string>
+    <string name="share_dark_kind_no_dark" translatable="true">темноты нет вовсе</string>
+    <string name="share_text_polar_day" translatable="true">Сегодня Солнце не заходит, темноты нет, поэтому тёмное окно не указано.</string>
+    <string name="share_text_no_astro_dark" translatable="true">Астрономической темноты этой ночью нет. Самая глубокая стадия — %1$s, Солнце на %2$s° ниже горизонта в %3$s.</string>
+    <string name="share_text_no_dark" translatable="true">Темноты этой ночью не наступает: Солнце не опускается ниже гражданских сумерек и достигает лишь %1$s° под горизонтом в %2$s.</string>
+    <string name="share_text_polar_night" translatable="true">Солнце не восходит. Самый глубокий тёмный интервал суток длится с %1$s до %2$s.</string>
+    <string name="share_text_sunset" translatable="true">Закат: %1$s</string>
+    <string name="share_text_sunrise" translatable="true">Восход: %1$s</string>
+    <string name="share_text_civil" translatable="true">Гражданские сумерки (−6°): %1$s – %2$s</string>
+    <string name="share_text_nautical" translatable="true">Навигационные сумерки (−12°): %1$s – %2$s</string>
+    <string name="share_text_astronomical" translatable="true">Астрономические сумерки (−18°): %1$s – %2$s</string>
+    <string name="share_text_twilight_level" translatable="true">%1$s сумерки: %2$s – %3$s</string>
+    <string name="share_text_twilight_civil_short" translatable="true">гражданские</string>
+    <string name="share_text_twilight_nautical_short" translatable="true">навигационные</string>
+    <string name="share_text_twilight_astronomical_short" translatable="true">астрономические</string>
+    <string name="share_text_moon" translatable="true">Луна: освещено %1$s%%, %2$s, %3$s</string>
+    <string name="share_text_moon_alt_az" translatable="true">высота %1$s°, азимут %2$s°</string>
+    <string name="share_text_moon_up_all_night" translatable="true">всю ночь над горизонтом</string>
+    <string name="share_text_moon_below_all_night" translatable="true">всю ночь под горизонтом</string>
+    <string name="share_text_moon_rises" translatable="true">восходит в %1$s</string>
+    <string name="share_text_moon_sets" translatable="true">заходит в %1$s</string>
+    <string name="share_text_moon_lowest" translatable="true">Минимальная высота %1$s° в %2$s</string>
+    <string name="share_text_targets_header" translatable="true">Объекты</string>
+    <string name="share_text_no_target" translatable="true">Для этого сеанса объект не выбран.</string>
+    <string name="share_text_target_window" translatable="true">%1$s (%2$s): виден %3$s – %4$s, максимум %5$s°</string>
+    <string name="share_text_target_never_rises" translatable="true">%1$s (%2$s): никогда не восходит из этой точки.</string>
+    <string name="share_text_target_circumpolar" translatable="true">%1$s (%2$s): виден всю ночь, минимум %3$s° в %4$s.</string>
+    <string name="share_text_target_partial" translatable="true">%1$s (%2$s): виден %3$s – %4$s, окно обрезано тёмным окном, максимум %5$s°</string>
+    <string name="share_text_passes_header" translatable="true">Пролёты спутников</string>
+    <string name="share_text_no_pass" translatable="true">Наблюдаемых пролётов спутников этой ночью нет.</string>
+    <string name="share_text_pass" translatable="true">%1$s: %2$s, максимальная высота %3$s°, %4$s, элементы возрастом %5$s</string>
+    <string name="share_text_pass_visible" translatable="true">виден</string>
+    <string name="share_text_pass_shadow" translatable="true">происходит, но не виден — спутник в тени Земли</string>
+    <string name="share_text_pass_bright" translatable="true">происходит, но не виден — небо слишком светлое</string>
+    <string name="share_text_cloud_header" translatable="true">Облачность (прогноз, не измерение)</string>
+    <string name="share_text_cloud_source" translatable="true">Источник: %1$s, получено %2$s, давность данных %3$s</string>
+    <string name="share_text_cloud_hour" translatable="true">%1$s: облачность %2$s%%</string>
+    <string name="share_text_cloud_mean" translatable="true">Средняя облачность за тёмное окно: %1$s%%</string>
+    <string name="share_text_cloud_mean_session" translatable="true">Средняя облачность за всю сессию: %1$s%%</string>
+    <string name="share_text_no_forecast" translatable="true">Прогноз недоступен.</string>
+    <string name="share_text_no_forecast_last" translatable="true">Прогноз недоступен. Последнее измерение давностью %1$s: облачность %2$s%%.</string>
+    <string name="share_text_lens_header" translatable="true">Объектив</string>
+    <string name="share_text_lens" translatable="true">Фокусное расстояние %1$s мм, матрица %2$s × %3$s мм, поле зрения %4$s° × %5$s°</string>
+    <string name="share_text_and_more" translatable="true">…и ещё %1$d</string>
+    <string name="share_text_credit" translatable="true">Данные прогноза от MET Norway (met.no) — CC BY 4.0. Панорама Млечного Пути ESO/S. Brunier — CC BY 4.0.</string>
+    <string name="share_phase_new_moon" translatable="true">новолуние</string>
+    <string name="share_phase_waxing_crescent" translatable="true">молодая Луна</string>
+    <string name="share_phase_first_quarter" translatable="true">первая четверть</string>
+    <string name="share_phase_waxing_gibbous" translatable="true">прибывающая Луна</string>
+    <string name="share_phase_full_moon" translatable="true">полнолуние</string>
+    <string name="share_phase_waning_gibbous" translatable="true">убывающая Луна</string>
+    <string name="share_phase_last_quarter" translatable="true">последняя четверть</string>
+    <string name="share_phase_waning_crescent" translatable="true">старая Луна</string>
+    <string name="postcard_instant" translatable="true">Небо на момент %1$s</string>
+    <string name="postcard_credit_modified" translatable="true">Для открытки панорама из кредитов обрезана и тонирована; звёзды, подписи планет и Луна нарисованы собственным рендерером приложения.</string>
+
+    <!-- =====================================================================================
+         Виджет — ночь на одном экране (метку и описание виджета читает
+         `res/xml/night_glance_widget_info.xml` из strings_platform.xml)
+         ===================================================================================== -->
+    <string name="widget_title" translatable="true">Сегодня ночью</string>
+    <string name="widget_dark_window_line" translatable="true">Тёмное окно %1$s – %2$s %3$s</string>
+    <string name="widget_dark_window_second" translatable="true">Затем %1$s – %2$s</string>
+    <string name="widget_no_darkness" translatable="true">Сегодня темноты нет</string>
+    <string name="widget_cloud_line" translatable="true">Облачность %1$s%% — прогноз, %2$s</string>
+    <string name="widget_cloud_none" translatable="true">прогноза нет</string>
+    <string name="widget_stale_badge" translatable="true">устарело</string>
+    <string name="widget_not_ready" translatable="true">Откройте Lumintra, чтобы увидеть тёмное окно на эту ночь</string>
+    <string name="widget_aged" translatable="true">Не обновлялось с %1$s</string>
+    <string name="widget_content_description" translatable="true">Ночь вкратце от Lumintra: тёмное окно на эту ночь, Луна и прогноз облачности для %1$s</string>
+    <string name="widget_moon_up_all_night" translatable="true">Луна всю ночь над горизонтом</string>
+    <string name="widget_moon_down_all_night" translatable="true">Луна всю ночь под горизонтом</string>
+    <string name="widget_moon_rises" translatable="true">Луна восходит за ночь</string>
+    <string name="widget_moon_sets" translatable="true">Луна заходит за ночь</string>
+    <string name="widget_moon_unknown" translatable="true">Положение Луны не определено</string>
+    <string name="widget_open_app" translatable="true">Открыть Lumintra</string>
+
+    <!-- Собственные строки виджета (ui/widget/NightGlanceWidget.kt). Каждая берётся из этой таблицы
+         и никогда не склеивается в коде, и каждая сообщает факт сохранённого снимка: приглашение
+         для первой ночи, приглашение без точки, единственное имя для TalkBack на всю плитку,
+         освещённость Луны с её типизированной формой, честное предложение для каждого
+         DarkWindowKind без темноты и **возраст** облачности, который никогда не отбрасывается
+         ради компактного размера: процент без возраста измерения читается как текущий. -->
+    <string name="widget_not_ready_other_night" translatable="true">План на эту ночь ещё не готов — откройте Lumintra</string>
+    <string name="widget_no_spot" translatable="true">Задайте точку в Lumintra, чтобы увидеть ночь</string>
+    <string name="widget_no_dark_polar_day" translatable="true">Сегодня Солнце не заходит</string>
+    <string name="widget_no_dark_polar_night" translatable="true">Сегодня Солнце не восходит</string>
+    <string name="widget_no_dark_no_astro" translatable="true">Астрономической темноты сегодня нет</string>
+    <string name="widget_moon_line" translatable="true">%1$d%% освещённости — %2$s</string>
+    <string name="widget_cloud_age_now" translatable="true">только что</string>
+    <string name="widget_cloud_age_minutes" translatable="true">%1$d мин назад</string>
+    <string name="widget_cloud_age_hours" translatable="true">%1$d ч назад</string>
+    <string name="widget_a11y" translatable="true">Ночь вкратце от Lumintra: %1$s. %2$s</string>
+    <string name="widget_a11y_not_ready" translatable="true">Ночь вкратце от Lumintra: план на эту ночь ещё не готов. Откройте Lumintra, чтобы увидеть тёмное окно.</string>
+    <string name="widget_a11y_no_spot" translatable="true">Ночь вкратце от Lumintra: точка не сохранена. Задайте точку в Lumintra, чтобы увидеть ночь.</string>
+    <string name="widget_preview_spot" translatable="true">Ваша точка</string>
+
+    <!-- =====================================================================================
+         Напоминание — единственное локальное уведомление о тёмном окне
+         ===================================================================================== -->
+    <string name="reminder_title" translatable="true">Тёмное окно начинается в %1$s</string>
+    <string name="reminder_body" translatable="true">Астрономическая темнота в %1$s длится с %2$s до %3$s.</string>
+    <string name="reminder_body_forecast" translatable="true">Астрономическая темнота в %1$s длится с %2$s до %3$s. Облачность в %4$s — это прогноз, %5$s.</string>
+    <string name="reminder_channel_name" translatable="true">Тёмное окно на сегодня</string>
+    <string name="reminder_channel_description" translatable="true">Одно напоминание перед тёмным окном этой ночью в вашей сохранённой точке.</string>
+    <string name="reminder_explainer" translatable="true">Сейчас Android запросит разрешение на уведомления. Lumintra использует его для этого одного напоминания и больше ни для чего.</string>
+    <string name="reminder_denied" translatable="true">Уведомления для Lumintra отключены, поэтому напоминание показать нельзя. Всё остальное работает как обычно.</string>
+    <string name="reminder_open_settings" translatable="true">Открыть системные настройки уведомлений</string>
+
+    <!-- Собственные строки тела уведомления (notify/DarkWindowReminder.kt), по одной на факт.
+         Заголовок сообщает начало тёмного окна; тело называет точку, оба его предела в зоне точки,
+         освещённость Луны с её типизированной формой и облачность **на момент её получения, с
+         пометкой «прогноз»**. Ни одна из них не является указанием и ни одна не обещает ясного
+         неба: небо может затянуться между измерением и окном, а прогноз даёт только общую
+         облачность, поэтому обещание ясности — это утверждение, которого данные не выдерживают.
+         Строка про отсутствие сети не даёт отсутствующему прогнозу читаться как свежий. -->
+    <string name="reminder_body_spot" translatable="true">Точка: %1$s</string>
+    <string name="reminder_body_window" translatable="true">Тёмное окно %1$s – %2$s %3$s</string>
+    <string name="reminder_body_moon" translatable="true">%1$d%% освещённости — %2$s</string>
+    <string name="reminder_body_cloud" translatable="true">Облачность %1$d%% — прогноз, получен %2$s</string>
+    <string name="reminder_body_no_cloud" translatable="true">Прогноз облачности для этой точки не сохранён.</string>
+    <string name="reminder_body_offline" translatable="true">План составлен без сети, поэтому прогноз не удалось обновить.</string>
+
+    <!-- =====================================================================================
+         Настройки — каждая строка меняет наблюдаемое поведение
+         ===================================================================================== -->
+    <string name="settings_title" translatable="true">Настройки</string>
+    <string name="settings_back" translatable="true">Назад</string>
+    <string name="settings_appearance_header" translatable="true">Внешний вид</string>
+    <string name="settings_theme_supporting" translatable="true">Выберите, как выглядит приложение.</string>
+    <string name="settings_theme_system" translatable="true">Как в системе</string>
+    <string name="settings_theme_light" translatable="true">Светлая</string>
+    <string name="settings_theme_dark" translatable="true">Тёмная</string>
+    <string name="settings_dynamic_color_title" translatable="true">Цвета обоев</string>
+    <string name="settings_dynamic_color_supported" translatable="true">Построить палитру по обоям устройства.</string>
+    <string name="settings_dynamic_color_unsupported" translatable="true">Недоступно в этой версии Android.</string>
+    <string name="settings_red_mode_title" translatable="true">Красный ночной режим</string>
+    <string name="settings_red_mode_summary" translatable="true">Удерживать всё приложение, виджет и напоминание в красном, с синим на нуле и зелёным не выше 8 из 255.</string>
+    <string name="settings_language_header" translatable="true">Язык</string>
+    <string name="settings_language_title" translatable="true">Язык приложения</string>
+    <string name="settings_language_summary" translatable="true">Выберите язык, который использует приложение.</string>
+    <string name="settings_language_system" translatable="true">Как в системе</string>
+    <string name="settings_language_system_hint" translatable="true">Приложение следует системному выбору языка для приложения; оно никогда не просит выбрать язык при первом запуске.</string>
+    <string name="settings_units_header" translatable="true">Единицы и форматы</string>
+    <string name="settings_units_title" translatable="true">Единицы</string>
+    <string name="settings_units_summary" translatable="true">Расстояния, высоты и температуры. Фокусное расстояние и размер матрицы остаются в миллиметрах.</string>
+    <string name="settings_units_metric" translatable="true">Метрические (м, км, °C)</string>
+    <string name="settings_units_imperial" translatable="true">Имперские (футы, мили, °F)</string>
+    <string name="settings_time_format_title" translatable="true">Формат времени</string>
+    <string name="settings_time_format_summary" translatable="true">Действует в сводке, на оси времени сцены, в виджете и в напоминании.</string>
+    <string name="settings_time_format_24" translatable="true">24-часовой</string>
+    <string name="settings_time_format_12" translatable="true">12-часовой</string>
+    <string name="settings_coordinate_format_title" translatable="true">Формат координат</string>
+    <string name="settings_coordinate_format_summary" translatable="true">Как показываются широта и долгота точки. Ввести или вставить можно любую форму; сохранённая координата не меняется.</string>
+    <string name="settings_coordinate_format_decimal" translatable="true">Десятичные градусы</string>
+    <string name="settings_coordinate_format_dms" translatable="true">Градусы, минуты, секунды</string>
+    <string name="settings_data_header" translatable="true">Ночь</string>
+    <string name="settings_reminder_title" translatable="true">Напомнить сегодня</string>
+    <string name="settings_reminder_summary" translatable="true">Одно уведомление перед тёмным окном. Разрешение запрашивается при включении, а не при запуске.</string>
+    <string name="settings_cloud_title" translatable="true">Прогноз облачности</string>
+    <string name="settings_cloud_summary" translatable="true">Запрашивать почасовую общую облачность с api.met.no для сохранённой точки. Выключено — запрос не выполняется вовсе.</string>
+    <string name="settings_lens_preset_title" translatable="true">Профиль объектива по умолчанию</string>
+    <string name="settings_lens_preset_summary" translatable="true">Профиль, с которым открывается рамка кадра и относительно которого считается каждый ответ «влезает ли объект».</string>
+    <string name="settings_sky_brightness_title" translatable="true">Оценка яркости неба</string>
+    <string name="settings_sky_brightness_summary" translatable="true">Добавляет ваше собственное измерение рядом с вычисленной темнотой с пометкой «оценка пользователя». Вычисленное значение оно не меняет.</string>
+    <string name="settings_sky_brightness_none" translatable="true">Нет</string>
+    <string name="settings_sky_brightness_sqm" translatable="true">SQM (зв. вел./кв. угл. сек)</string>
+    <string name="settings_sky_brightness_bortle" translatable="true">Класс по Бортлю (1–9)</string>
+    <string name="settings_sky_brightness_sqm_value" translatable="true">Показание SQM</string>
+    <string name="settings_sky_brightness_bortle_value" translatable="true">Класс по Бортлю</string>
+    <string name="settings_behaviour_header" translatable="true">Поведение</string>
+    <string name="settings_haptics_title" translatable="true">Виброотклик</string>
+    <string name="settings_haptics_summary" translatable="true">Вибрировать при выполнении основного действия.</string>
+    <string name="settings_about_header" translatable="true">О приложении</string>
+    <string name="settings_rate_title" translatable="true">Оценить Lumintra</string>
+    <string name="settings_rate_summary" translatable="true">Расскажите другим, как работает это приложение.</string>
+    <string name="settings_rate_unavailable" translatable="true">Ни Play Маркет, ни браузер на этом устройстве недоступны, поэтому карточку открыть нельзя.</string>
+    <string name="settings_credits_title" translatable="true">Лицензии и авторы</string>
+    <string name="settings_credits_summary" translatable="true">Каждый ресурс, источник данных и библиотека, входящие в приложение.</string>
+
+    <!-- =====================================================================================
+         Лицензии — каждая обязанность по лицензии и указанию авторства, которую показывает
+         приложение. Сами строки указания авторства, адреса лицензий, версия и контактный адрес
+         объявлены в `values/strings.xml` как `translatable="false"` и здесь не повторяются.
+         ===================================================================================== -->
+    <string name="credits_title" translatable="true">Лицензии</string>
+    <string name="credits_back" translatable="true">Назад</string>
+    <string name="credits_section_data" translatable="true">Данные и изображения</string>
+    <string name="credits_section_code" translatable="true">Библиотеки</string>
+    <string name="credits_section_modifications" translatable="true">Изменения</string>
+    <string name="credits_section_links" translatable="true">Текст лицензий</string>
+    <string name="credit_eso_what" translatable="true">%1$s — панорама Млечного Пути eso0932a (CC BY 4.0)</string>
+    <string name="credit_open_cc_by" translatable="true">Текст лицензии (CC BY 4.0)</string>
+    <string name="credit_open_cc0" translatable="true">Текст лицензии (CC0 1.0)</string>
+    <string name="credit_open_met" translatable="true">met.no</string>
+    <string name="credit_open_api_met" translatable="true">api.met.no</string>
+    <string name="credit_open_eso" translatable="true">Панорама ESO eso0932a</string>
+    <string name="credit_open_iau" translatable="true">IAU</string>
+    <string name="credit_mod_met_norway" translatable="true">Координаты усекаются до 4 знаков после запятой (около 11 м), прежде чем отправляются на api.met.no.</string>
+    <string name="credit_mod_imagery" translatable="true">Панорама Млечного Пути и открытка собираются из указанной панорамы и отрисовываются собственной палитрой приложения.</string>
+    <string name="credits_about_header" translatable="true">Об этом приложении</string>
+    <string name="credits_about_version" translatable="true">Версия %1$s (%2$s)</string>
+    <string name="credits_about_contact" translatable="true">Поддержка: %1$s</string>
+    <string name="credits_about_no_account" translatable="true">В Lumintra нет учётной записи и входа, и она не собирает личные данные на сервер разработчика.</string>
+    <string name="credits_about_forecast" translatable="true">Сохранённая координата отправляется на погодный сервис api.met.no только при использовании прогноза облачности, усечённая до 4 знаков после запятой (около 11 м). Если прогноз облачности выключен, такой запрос не выполняется.</string>
+    <string name="credits_about_elements" translatable="true">Орбитальные элементы спутников запрашиваются у CelesTrak; этот запрос не содержит координат.</string>
+    <string name="credits_about_no_ads" translatable="true">В приложении нет рекламы и нет подписки.</string>
+    <string name="credits_about_no_location" translatable="true">Приложение не запрашивает разрешение на геолокацию. Оно никогда не читает положение устройства и не использует компас.</string>
+    <string name="credits_privacy" translatable="true">Политика конфиденциальности</string>
+    <string name="credits_privacy_unpublished" translatable="true">Адрес политики конфиденциальности ещё не опубликован, поэтому открывать нечего.</string>
+    <string name="credits_privacy_failed" translatable="true">Ни один браузер не смог открыть %1$s. Адрес показан выше, чтобы вы могли открыть его сами.</string>
+
+    <!-- =====================================================================================
+         Приветствие, строки списка мест и панели подробностей, проверки редактора и строки
+         про объектив, подписи выбора часового пояса и элементы управления карты выбора
+         координаты. Добавлено вместе с экранами, которые их показывают; ни один ключ выше не
+         переименован и не удалён.
+         ===================================================================================== -->
+    <string name="welcome_have_spot" translatable="true">Ваше место: %1$s</string>
+    <string name="welcome_action_manual" translatable="true">Ввести координаты вручную</string>
+    <string name="welcome_action_skip" translatable="true">Пропустить</string>
+    <string name="welcome_action_add_another" translatable="true">Добавить ещё место</string>
+
+    <string name="spot_row_open_description" translatable="true">Открыть место %1$s</string>
+    <string name="spot_row_set_active_description" translatable="true">Сделать %1$s активным местом</string>
+    <string name="spot_row_edit_description" translatable="true">Изменить место %1$s</string>
+    <string name="spot_row_delete_description" translatable="true">Удалить место %1$s</string>
+    <string name="spot_row_horizon_drawn" translatable="true">горизонт нарисован</string>
+    <string name="spot_row_horizon_flat" translatable="true">ровный горизонт</string>
+    <string name="spot_set_active_action" translatable="true">Сделать активным</string>
+
+    <string name="spot_detail_prompt_title" translatable="true">Выберите место</string>
+    <string name="spot_detail_prompt_body" translatable="true">Выберите сохранённое место, чтобы увидеть его координату, часовой пояс и горизонт.</string>
+    <string name="spot_detail_elevation" translatable="true">Высота</string>
+    <string name="spot_elevation_metres" translatable="true">%1$s м</string>
+    <string name="spot_detail_zone" translatable="true">Часовой пояс</string>
+    <string name="spot_detail_precision" translatable="true">Координата</string>
+    <string name="spot_detail_typed" translatable="true">введена вручную</string>
+
+    <string name="spot_edit_needs_name" translatable="true">Дайте месту название.</string>
+    <string name="spot_edit_needs_coordinate" translatable="true">Задайте координату на карте или в Дополнительно.</string>
+    <string name="spot_edit_elevation_invalid" translatable="true">Высота должна быть числом метров от −500 до 9000.</string>
+    <string name="spot_edit_elevation_hint" translatable="true">Метры над уровнем моря; отрицательное значение — ниже него</string>
+    <string name="spot_edit_paste_applied" translatable="true">Координаты применены.</string>
+    <string name="spot_edit_precision_approximate" translatable="true">приблизительная координата</string>
+    <string name="spot_edit_precision_typed" translatable="true">координата введена вручную</string>
+    <string name="spot_edit_lens_numbers" translatable="true">Объектив %1$s мм, матрица %2$s × %3$s мм</string>
+    <string name="spot_edit_lens_read_only" translatable="true">Профиль техники показан здесь для справки; он редактируется вместе с остальным набором.</string>
+    <string name="spot_edit_lookup_reverse_action" translatable="true">Назвать эту координату</string>
+    <string name="spot_edit_lookup_none" translatable="true">По этому тексту название не найдено.</string>
+    <string name="spot_edit_lookup_reverse_none" translatable="true">Для этой координаты название не найдено. Координата и ваша подпись сохранены.</string>
+
+    <string name="spot_edit_zone_use_device" translatable="true">Взять часовой пояс устройства</string>
+    <string name="spot_edit_zone_search" translatable="true">Поиск часового пояса</string>
+    <string name="spot_edit_zone_search_hint" translatable="true">Например, Europe/Zurich</string>
+    <string name="spot_edit_zone_no_match" translatable="true">Нет часового пояса по запросу «%1$s».</string>
+    <string name="spot_edit_zone_from_coordinates" translatable="true">Определён по координате.</string>
+    <string name="spot_edit_zone_device_fallback" translatable="true">Определить по координате не удалось, поэтому используется часовой пояс устройства. Задайте его вручную, если это неверно.</string>
+    <string name="spot_edit_zone_device_default" translatable="true">Часовой пояс устройства, пока не задана координата.</string>
+
+    <string name="spot_edit_picker_canvas_description" translatable="true">Выбор координаты: тяните полотно, сводите и разводите пальцы для масштаба, коснитесь, чтобы поставить метку</string>
+    <string name="spot_edit_picker_range" translatable="true">%1$s° по долготе, %2$s° по широте</string>
+    <string name="spot_edit_picker_no_pin" translatable="true">Метки пока нет — коснитесь полотна, чтобы поставить её.</string>
+    <string name="spot_edit_picker_pin_at" translatable="true">Метка в точке %1$s</string>
+    <string name="spot_edit_picker_drop_pin" translatable="true">Коснитесь, чтобы поставить метку</string>
+    <string name="spot_edit_picker_centre_on_pin" translatable="true">Центрировать на метке</string>
+
+    <!-- =====================================================================================
+         Унаследованные ключи шаблона. Экраны `ui/home/` и `ui/about/` ещё их отображают;
+         они сохранены, чтобы сборка не сломалась на середине, и уйдут вместе с этими экранами.
+         ===================================================================================== -->
+    <string name="home_about_action" translatable="true">О приложении</string>
+    <string name="home_intro" translatable="true">Собранная точка старта, готовая стать вашим приложением.</string>
+    <string name="home_idea_label" translatable="true">Идея</string>
+    <string name="home_pick_section" translatable="true">Выберите раздел, чтобы открыть его здесь.</string>
+    <string name="home_primary_action" translatable="true">Попробовать действие</string>
+    <string name="home_primary_action_again" translatable="true">Повторить</string>
+    <string name="home_status_ready" translatable="true">Готово, когда вы готовы</string>
+    <string name="home_status_complete" translatable="true">Действие выполнено</string>
+    <string name="home_snackbar_completed" translatable="true">Действие выполнено.</string>
+    <string name="home_snackbar_already_completed" translatable="true">Действие уже выполнено.</string>
+    <string name="about_title" translatable="true">Об этом приложении</string>
+    <string name="about_back" translatable="true">Назад</string>
+    <string name="about_body" translatable="true">%1$s планирует сессию съёмки по координатам сохранённой точки и по часам и никогда не просит наводить телефон куда-либо.</string>
+    <string name="about_privacy_note" translatable="true">Lumintra не запрашивает разрешение на геолокацию и хранит все записи на устройстве.</string>
+
+    <!-- =====================================================================================
+         Ночная сцена — сводка для TalkBack, органы управления, приборная строка и два честных
+         предупреждения: таблица неба не прочиталась и ночь без темноты. Сводку экран склеивает
+         из трёх частей, поэтому ни одна из них не заканчивается точкой.
+         ===================================================================================== -->
+    <string name="night_summary_head" translatable="true">%1$s, %2$s</string>
+    <string name="night_summary_direction" translatable="true">Азимут %1$s, Солнце %2$s</string>
+    <string name="night_summary_moon" translatable="true">Луна освещена на %1$s, высота %2$s</string>
+    <string name="night_body_sun" translatable="true">Солнце</string>
+    <string name="share_phase_moon" translatable="true">Луна</string>
+    <string name="night_planet_mercury" translatable="true">Меркурий</string>
+    <string name="night_planet_venus" translatable="true">Венера</string>
+    <string name="night_planet_mars" translatable="true">Марс</string>
+    <string name="night_planet_jupiter" translatable="true">Юпитер</string>
+    <string name="night_planet_saturn" translatable="true">Сатурн</string>
+    <string name="night_planet_uranus" translatable="true">Уран</string>
+    <string name="night_planet_neptune" translatable="true">Нептун</string>
+    <string name="night_back_to_horizon" translatable="true">Вернуться к виду горизонта</string>
+    <string name="night_red_mode_enable" translatable="true">Включить красный режим</string>
+    <string name="night_red_mode_disable" translatable="true">Выключить красный режим</string>
+    <string name="night_target_label" translatable="true">Объект %1$s</string>
+    <string name="night_trail_age" translatable="true">трек: давность элементов %1$s</string>
+    <string name="night_readout_azimuth" translatable="true">Азимут обзора</string>
+    <string name="night_readout_air_mass" translatable="true">Масса воздуха в центре</string>
+    <string name="night_readout_sun" translatable="true">Высота Солнца</string>
+    <string name="night_lut_fallback_note" translatable="true">Встроенную таблицу неба прочитать не удалось, поэтому цвета неба берутся из встроенной резервной шкалы.</string>
+    <string name="night_no_darkness_note" translatable="true">Сегодня Солнце не опускается до астрономических сумерек, поэтому небо так и не становится полностью тёмным. Сцена всё равно показывает настоящее небо в каждый час.</string>
+    <string name="night_play_start" translatable="true">Проиграть ночь</string>
+    <string name="night_play_pause" translatable="true">Пауза</string>
+    <string name="night_trails_label" translatable="true">Треки звёзд</string>
+    <string name="night_trail_interval_label" translatable="true">Длительность трека</string>
+    <string name="night_trail_interval_option" translatable="true">%1$d мин</string>
+    <string name="night_trail_interval_readout" translatable="true">Длительность трека</string>
+    <string name="night_facts_header" translatable="true">Сегодня ночью</string>
+    <string name="night_window_header" translatable="true">Светлое окно</string>
+    <string name="night_window_value" translatable="true">%1$s - %2$s</string>
+    <string name="night_moon_row" translatable="true">освещено %1$s, высота %2$s</string>
+
+    <!-- =====================================================================================
+         Сводка о ночи — шкала, слова темноты, таблица ключевых времён, панель Луны, строка
+         облачности, строки объектов и пролётов, типизированные условия и примечания
+         ===================================================================================== -->
+    <string name="brief_sky_level_excellent" translatable="true">Отлично</string>
+    <string name="brief_sky_level_good" translatable="true">Хорошо</string>
+    <string name="brief_sky_level_fair" translatable="true">Средне</string>
+    <string name="brief_sky_level_poor" translatable="true">Плохо</string>
+    <string name="brief_sky_level_none" translatable="true">Нет темноты</string>
+
+    <string name="brief_timeline_header" translatable="true">Шкала ночи</string>
+    <string name="brief_timeline_description" translatable="true">Шкала ночи из 96 шагов. Выбранный момент: %1$s.</string>
+    <string name="brief_scrub_hint" translatable="true">Проведите по шкале, чтобы выбрать момент.</string>
+    <string name="brief_zone_toggle" translatable="true">Переключить часовой пояс, используемый в сводке</string>
+    <string name="brief_instant_label" translatable="true">Момент</string>
+    <string name="brief_range" translatable="true">с %1$s до %2$s</string>
+    <string name="brief_moonless_legend" translatable="true">Безлунное окно</string>
+    <string name="brief_window_value" translatable="true">%1$s → %2$s (%3$s)</string>
+
+    <string name="brief_dark_two_windows" translatable="true">В эту ночь тёмных окон: %1$d — каждое перечислено ниже.</string>
+    <string name="brief_no_dark_window_note" translatable="true">Сегодня нет полностью тёмного окна, поэтому сцена показывает настоящее сумеречное небо, а не звёздное.</string>
+    <string name="brief_midday_dip" translatable="true">Самая тёмная часть суток приходится на середину дня: %1$s.</string>
+    <string name="brief_sun_lowest_label" translatable="true">Солнце в нижней точке</string>
+    <string name="brief_sun_highest_label" translatable="true">Солнце в верхней точке</string>
+    <string name="brief_reminder_not_offered" translatable="true">Напоминание не предлагается: тёмного окна, о котором стоило бы напоминать, нет.</string>
+
+    <string name="brief_twilight_astro" translatable="true">астрономические</string>
+    <string name="brief_twilight_golden" translatable="true">золотой час</string>
+    <string name="brief_twilight_blue" translatable="true">синий час</string>
+    <string name="brief_key_times_none" translatable="true">В эту ночь не попадает ни закат, ни восход, ни одна сумеречная полоса.</string>
+    <string name="brief_sunset_label" translatable="true">Закат</string>
+    <string name="brief_sunrise_label" translatable="true">Восход</string>
+    <string name="brief_twilight_table_note" translatable="true">Всё время здесь рассчитано по координатам точки, а не взято из таблицы.</string>
+    <string name="brief_key_time_definition_note" translatable="true">Гражданские, навигационные и астрономические сумерки — три стандартных определения; золотой и синий час — собственные фотографические полосы этого приложения.</string>
+
+    <string name="brief_moon_washed_out" translatable="true">Лунный свет засвечивает небо почти всю ночь.</string>
+    <string name="brief_moon_washed_out_no_window" translatable="true">Лунный свет засвечивает небо, и тёмного окна сегодня нет.</string>
+    <string name="brief_moon_max_altitude" translatable="true">максимум %1$s в %2$s</string>
+    <string name="brief_moon_min_altitude" translatable="true">минимум %1$s в %2$s</string>
+    <string name="brief_moonless_no_dark_window" translatable="true">Тёмного окна сегодня нет, поэтому безлунное окно не рассчитывается.</string>
+    <string name="brief_moon_never_rises" translatable="true">В эту ночь Луна не восходит.</string>
+    <string name="brief_moon_never_sets" translatable="true">В эту ночь Луна не заходит.</string>
+    <string name="brief_moonless_all_night" translatable="true">Луна находится за горизонтом всю ночь.</string>
+    <string name="moon_phase_new_moon" translatable="true">новолуние</string>
+    <string name="moon_phase_waxing_crescent" translatable="true">молодая Луна</string>
+    <string name="moon_phase_first_quarter" translatable="true">первая четверть</string>
+    <string name="moon_phase_waxing_gibbous" translatable="true">прибывающая Луна</string>
+    <string name="moon_phase_full_moon" translatable="true">полнолуние</string>
+    <string name="moon_phase_waning_gibbous" translatable="true">убывающая Луна</string>
+    <string name="moon_phase_last_quarter" translatable="true">последняя четверть</string>
+    <string name="moon_phase_waning_crescent" translatable="true">старая Луна</string>
+
+    <string name="brief_cloud_refresh" translatable="true">Обновить прогноз облачности</string>
+    <string name="brief_cloud_covered_range" translatable="true">Прогноз покрывает: %1$s</string>
+    <string name="brief_forecast_unmodified" translatable="true">Прогноз показан точно таким, каким получен, без поправок.</string>
+    <string name="brief_forecast_licence_link" translatable="true">Лицензия и указание источника MET Norway</string>
+
+    <string name="brief_target_washed_out" translatable="true">засвечен лунным светом</string>
+    <string name="brief_target_open" translatable="true">Открыть %1$s</string>
+    <string name="brief_pass_visible" translatable="true">виден</string>
+
+    <string name="brief_conditions_header" translatable="true">Условия</string>
+    <string name="brief_condition_state_good" translatable="true">хорошо</string>
+    <string name="brief_condition_state_marginal" translatable="true">погранично</string>
+    <string name="brief_condition_state_blocking" translatable="true">мешает</string>
+    <string name="brief_condition_unavailable" translatable="true">нет данных</string>
+    <string name="brief_condition_fact_dark" translatable="true">Тёмное окно: %1$s</string>
+    <string name="brief_condition_fact_moon" translatable="true">Луна: освещена на %1$s, высота %2$s</string>
+    <string name="brief_condition_fact_cloud" translatable="true">Облачность: %1$s</string>
+    <string name="brief_condition_fact_horizon" translatable="true">К этой точке применён ваш профиль горизонта.</string>
+    <string name="brief_condition_dark_window" translatable="true">Тёмное окно</string>
+    <string name="brief_condition_moon" translatable="true">Луна</string>
+    <string name="brief_condition_cloud" translatable="true">Облачность</string>
+    <string name="brief_condition_target" translatable="true">Объект</string>
+    <string name="brief_condition_satellite" translatable="true">Спутник</string>
+    <string name="brief_condition_horizon" translatable="true">Горизонт</string>
+
+    <string name="brief_source_plain" translatable="true">%1$s</string>
+    <string name="brief_source_with_age" translatable="true">%1$s · давность %2$s</string>
+    <string name="brief_source_ephemeris" translatable="true">эфемериды</string>
+    <string name="brief_source_catalogue" translatable="true">каталог</string>
+    <string name="brief_source_horizon" translatable="true">профиль горизонта</string>
+    <string name="brief_source_forecast" translatable="true">прогноз MET Norway</string>
+    <string name="brief_source_elements" translatable="true">элементы орбиты</string>
+    <string name="brief_source_setting" translatable="true">настройка приложения</string>
+    <string name="brief_source_user_estimate" translatable="true">ваша оценка</string>
+
+    <string name="brief_reason_offline" translatable="true">Сейчас устройство офлайн.</string>
+    <string name="brief_reason_source_disabled" translatable="true">Этот источник отключён в настройках.</string>
+    <string name="brief_reason_not_fetched" translatable="true">Этот источник ещё не загружен.</string>
+    <string name="brief_reason_no_spot" translatable="true">Точка не выбрана.</string>
+    <string name="brief_reason_no_night" translatable="true">Ночь не выбрана.</string>
+    <string name="brief_reason_elements_expired" translatable="true">Элементы орбиты слишком старые для расчёта пролётов.</string>
+    <string name="brief_reason_no_dark_window" translatable="true">Сегодня тёмного окна нет.</string>
+    <string name="brief_reason_catalogue_unreadable" translatable="true">Встроенный каталог прочитать не удалось.</string>
+    <string name="brief_reason_horizon_missing" translatable="true">У этой точки нет профиля горизонта.</string>
+
+    <string name="brief_catalogue_unreadable" translatable="true">Встроенный каталог прочитать не удалось, поэтому ни один объект не отмечен на небе.</string>
+    <string name="brief_notices_header" translatable="true">Примечания</string>
+</resources>

@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "serial": "R58MB3SGZVL",
+  "deviceModel": "SM-A405FM",
+  "osRelease": "11",
+  "testedAt": "2026-10-10T15:00:00+03:00",
+  "package": "com.gexetr.lumintralightplanner.debug",
+  "artifact": "app/build/outputs/apk/debug/app-debug.apk",
+  "apkSha256": "e7ee08cbc89f0ad07e5f9be207a83b72372e303231f93ff7a5cd67846b1fda7d",
+  "buildDigest": "bc453389d6c58dcacb05cebdd86f4524c975af82faf8b1ced0fa3c48cd13f5da",
+  "artifactNote": "Night flicker fix: prep key scrubStop buckets + conflate (no collectLatest cancel-storm); no mid-session LoadingPanel; ListDetail removed earlier. Evidence .kiln/scratch/device-lumintra-flicker/ IDLE_SKIPS=0 PLAY3S_SKIPS=0.",
+  "runCommands": [
+    "adb -s R58MB3SGZVL install -r debug APK e7ee08cb…",
+    "Open Night from Brief; idle 3s screenshots; Play 3s",
+    "logcat Skipped frames: idle=0 play3s=0"
+  ],
+  "observations": [
+    "DEVICE — R58MB3SGZVL / SM-A405FM.",
+    "OBSERVATION 1 / NIGHT OPENS STABLE — Night + Play night at 18:59 astronomical; not stuck on Working spinner (night0.xml).",
+    "OBSERVATION 2 / IDLE NO FRAME SKIP — 4 screencaps over ~3s; Choreographer Skipped count 0 (IDLE_SKIPS=0).",
+    "OBSERVATION 3 / PLAY 3S NO FRAME SKIP — Play night 3s then pause; PLAY3S_SKIPS=0.",
+    "ROOT CAUSE — ScenePrepKey used instantEpochMs + collectLatest → cancel-storm during Play; recompute cleared frame and showed LoadingPanel. Fixed: scrubStop buckets, conflate, keep frame while refresh."
+  ],
+  "findings": [
+    {
+      "id": "night-flicker-prep-thrash",
+      "severity": "functional",
+      "status": "closed-verified-on-device",
+      "screen": "Night Scene",
+      "observedNow": "Idle and short Play show 0 skipped frames; no loading blink.",
+      "whyItMatters": "Owner: stars constantly loading/blinking, unusable.",
+      "evidence": ["SceneCanvas.kt scrubStop+conflate", "NightSceneScreen.kt firstLoad only", "IDLE_SKIPS=0 PLAY3S_SKIPS=0"],
+      "ownerDecisionNeeded": "Visual quality of stars still a product judgement."
+    }
+  ]
+}

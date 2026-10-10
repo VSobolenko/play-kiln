@@ -84,6 +84,18 @@
       "createdAt": "2026-10-05T16:46:47.380Z",
       "updatedAt": "2026-10-06T17:35:00.000Z",
       "releaseNote": "Implementation, tests, on-device verification and the signed release artifacts (dist/ APK + AAB) are complete, and the owner's release approval is recorded for this revision. Status stays building until the listing is live — published is only after Play approval."
+    },
+    {
+      "id": "lumintra-light-planner",
+      "dir": "apps/2026-10-09-lumintra-light-planner",
+      "name": "Lumintra: Light Planner",
+      "applicationId": "com.gexetr.lumintralightplanner",
+      "idea": "Offline-first light and night-sky session planner: a scrubbable night scene with your own horizon, dark window, moon, targets, satellite passes and cloud forecast for a saved spot",
+      "archetype": "purchase_only_no_ads",
+      "promises": 13,
+      "status": "scaffolded",
+      "createdAt": "2026-10-09T15:58:20.546Z",
+      "updatedAt": "2026-10-09T15:58:20.546Z"
     }
   ]
 }

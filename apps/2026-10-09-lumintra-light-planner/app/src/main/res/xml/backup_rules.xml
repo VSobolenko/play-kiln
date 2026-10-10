@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Legacy fullBackupContent for API 30 and lower. Same scope as both sections of
+         data_extraction_rules.xml, which carries the reasons: the plan store under filesDir is
+         backed up; caches (cacheDir, files/caches/), copied Orekit data and the WorkManager
+         database are not. The app holds no secrets; those exclusions are defensive. -->
+    <include domain="sharedpref" path="." />
+    <include domain="file" path="." />
+    <exclude domain="file" path="caches/" />
+    <exclude domain="file" path="orekit-data/" />
+    <exclude domain="sharedpref" path="secrets.xml" />
+    <exclude domain="file" path="secrets/" />
+    <exclude domain="file" path="tokens/" />
+</full-backup-content>

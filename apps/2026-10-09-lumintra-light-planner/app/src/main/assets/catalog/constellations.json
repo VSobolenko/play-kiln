@@ -1,0 +1,969 @@
+{
+ "schemaVersion": 1,
+ "manifest": {
+  "rowCount": 88,
+  "generatedBy": "tools/bake-constellations.py",
+  "generatedAt": "2026-10-09",
+  "sources": {
+   "iauPage": {
+    "url": "https://iauarchive.eso.org/public/themes/constellations/",
+    "use": "88 rows: Latin name, IAU abbreviation, English name",
+    "licence": "IAU constellation information (public domain boundary data; IAU WGSN names CC BY 4.0)"
+   },
+   "iauBoundary": {
+    "url": "https://iauarchive.eso.org/static/public/constellations/txt/<abbr>.txt",
+    "use": "Delporte-derived constellation boundary vertices",
+    "licence": "public domain (IAU)"
+   },
+   "figures": {
+    "url": "https://mk.bcgsc.ca/constellations/data/constellation.figures.txt",
+    "use": "Sky & Telescope / Alan MacRobert figure designs, pairwise RA/Dec (degrees, J2000)",
+    "credit": "Constellation figures: IAU and Sky & Telescope (Roger Sinnott, Rick Fienberg; patterns by Alan MacRobert) — CC BY 4.0",
+    "licence": "CC BY 4.0",
+    "compiledBy": "Martin Krzywinski, http://mkweb.bcgsc.ca/constellations"
+   },
+   "wikidata": {
+    "url": "https://query.wikidata.org/sparql",
+    "use": "Russian constellation names (rdfs:label @ ru)",
+    "licence": "CC0 1.0"
+   },
+   "publishedArea": {
+    "url": "https://en.wikipedia.org/wiki/List_of_constellations_by_area",
+    "use": "published IAU constellation area, area rank, and centre, used as the independent reading the computed area and computed centre are checked against; the shipped `areaRank` comes from this table's rank column",
+    "licence": "the tabulated numbers are IAU facts (public domain); the page is a cross-check source and is not bundled"
+   }
+  },
+  "crossCheck": {
+   "ownAreaVsPublishedMaxPct": 0.4545,
+   "ownAreaVsPublishedWorstAbbrev": "Cha",
+   "gnomonicVsFanMaxPct": 0.0072,
+   "gnomonicVsFanWorstAbbrev": "UMi",
+   "areaSumSqDeg": 41252.5129,
+   "skyAreaSqDeg": 41252.9612,
+   "centreVsPublishedMaxArcmin": 1148.4,
+   "centreVsPublishedMaxAbbrev": "Cep",
+   "centreVsPublishedMedianArcmin": 65.2,
+   "centreVsPublishedWithin2deg": 63,
+   "centreVsPublishedFarthest": [
+    {
+     "abbrev": "Cep",
+     "arcmin": 1148.4
+    },
+    {
+     "abbrev": "Ser",
+     "arcmin": 1141.4
+    },
+    {
+     "abbrev": "Hya",
+     "arcmin": 1047.7
+    },
+    {
+     "abbrev": "Cam",
+     "arcmin": 948.6
+    },
+    {
+     "abbrev": "Dra",
+     "arcmin": 620.6
+    }
+   ],
+   "publishedCentreInsideOwnRegion": 79,
+   "computedCentreInsideOwnRegion": 88,
+   "publishedCentreOutsideOwnRegion": [
+    "Cam",
+    "Cep",
+    "Cir",
+    "Dra",
+    "Eri",
+    "Hya",
+    "Pup",
+    "Sco",
+    "Ser"
+   ],
+   "centreLargestRingFallbackRows": [
+    "Ser"
+   ]
+  }
+ },
+ "constellations": [
+  {
+   "id": "andromeda",
+   "nameEn": "Chained Maiden",
+   "nameRu": "Андромеда",
+   "nameLatin": "Andromeda",
+   "abbrev": "And",
+   "raCenterDeg": 10.09355,
+   "decCenterDeg": 40.48405,
+   "areaRank": 19
+  },
+  {
+   "id": "antlia",
+   "nameEn": "Air Pump",
+   "nameRu": "Насос",
+   "nameLatin": "Antlia",
+   "abbrev": "Ant",
+   "raCenterDeg": 151.9889,
+   "decCenterDeg": -34.01028,
+   "areaRank": 62
+  },
+  {
+   "id": "apus",
+   "nameEn": "Bird of Paradise",
+   "nameRu": "Райская Птица",
+   "nameLatin": "Apus",
+   "abbrev": "Aps",
+   "raCenterDeg": 243.99013,
+   "decCenterDeg": -76.01108,
+   "areaRank": 67
+  },
+  {
+   "id": "aquila",
+   "nameEn": "Eagle",
+   "nameRu": "Орёл",
+   "nameLatin": "Aquila",
+   "abbrev": "Aql",
+   "raCenterDeg": 294.72216,
+   "decCenterDeg": 2.10693,
+   "areaRank": 22
+  },
+  {
+   "id": "aquarius",
+   "nameEn": "Water Bearer",
+   "nameRu": "Водолей",
+   "nameLatin": "Aquarius",
+   "abbrev": "Aqr",
+   "raCenterDeg": 335.99228,
+   "decCenterDeg": -10.46332,
+   "areaRank": 10
+  },
+  {
+   "id": "ara",
+   "nameEn": "Altar",
+   "nameRu": "Жертвенник",
+   "nameLatin": "Ara",
+   "abbrev": "Ara",
+   "raCenterDeg": 260.07068,
+   "decCenterDeg": -54.25553,
+   "areaRank": 63
+  },
+  {
+   "id": "aries",
+   "nameEn": "Ram",
+   "nameRu": "Овен",
+   "nameLatin": "Aries",
+   "abbrev": "Ari",
+   "raCenterDeg": 39.88596,
+   "decCenterDeg": 20.09389,
+   "areaRank": 39
+  },
+  {
+   "id": "auriga",
+   "nameEn": "Charioteer",
+   "nameRu": "Возничий",
+   "nameLatin": "Auriga",
+   "abbrev": "Aur",
+   "raCenterDeg": 89.12165,
+   "decCenterDeg": 41.08989,
+   "areaRank": 21
+  },
+  {
+   "id": "bootes",
+   "nameEn": "Herdsman",
+   "nameRu": "Волопас",
+   "nameLatin": "Boötes",
+   "abbrev": "Boo",
+   "raCenterDeg": 218.9114,
+   "decCenterDeg": 29.31436,
+   "areaRank": 13
+  },
+  {
+   "id": "canis-major",
+   "nameEn": "Great Dog",
+   "nameRu": "Большой Пёс",
+   "nameLatin": "Canis Major",
+   "abbrev": "CMa",
+   "raCenterDeg": 102.44698,
+   "decCenterDeg": -21.94303,
+   "areaRank": 43
+  },
+  {
+   "id": "canis-minor",
+   "nameEn": "Lesser Dog",
+   "nameRu": "Малый Пёс",
+   "nameLatin": "Canis Minor",
+   "abbrev": "CMi",
+   "raCenterDeg": 114.44541,
+   "decCenterDeg": 5.91554,
+   "areaRank": 71
+  },
+  {
+   "id": "canes-venatici",
+   "nameEn": "Hunting Dogs",
+   "nameRu": "Гончие Псы",
+   "nameLatin": "Canes Venatici",
+   "abbrev": "CVn",
+   "raCenterDeg": 197.39142,
+   "decCenterDeg": 40.35873,
+   "areaRank": 38
+  },
+  {
+   "id": "caelum",
+   "nameEn": "Engraving Tool",
+   "nameRu": "Резец",
+   "nameLatin": "Caelum",
+   "abbrev": "Cae",
+   "raCenterDeg": 71.29147,
+   "decCenterDeg": -38.0609,
+   "areaRank": 81
+  },
+  {
+   "id": "camelopardalis",
+   "nameEn": "Giraffe",
+   "nameRu": "Жираф",
+   "nameLatin": "Camelopardalis",
+   "abbrev": "Cam",
+   "raCenterDeg": 85.37754,
+   "decCenterDeg": 70.79846,
+   "areaRank": 18
+  },
+  {
+   "id": "capricornus",
+   "nameEn": "Sea Goat",
+   "nameRu": "Козерог",
+   "nameLatin": "Capricornus",
+   "abbrev": "Cap",
+   "raCenterDeg": 315.36311,
+   "decCenterDeg": -18.7502,
+   "areaRank": 40
+  },
+  {
+   "id": "carina",
+   "nameEn": "Keel",
+   "nameRu": "Киль",
+   "nameLatin": "Carina",
+   "abbrev": "Car",
+   "raCenterDeg": 131.63795,
+   "decCenterDeg": -63.05306,
+   "areaRank": 34
+  },
+  {
+   "id": "cassiopeia",
+   "nameEn": "Seated Queen",
+   "nameRu": "Кассиопея",
+   "nameLatin": "Cassiopeia",
+   "abbrev": "Cas",
+   "raCenterDeg": 15.3514,
+   "decCenterDeg": 62.55566,
+   "areaRank": 25
+  },
+  {
+   "id": "centaurus",
+   "nameEn": "Centaur",
+   "nameRu": "Центавр",
+   "nameLatin": "Centaurus",
+   "abbrev": "Cen",
+   "raCenterDeg": 196.49035,
+   "decCenterDeg": -46.08849,
+   "areaRank": 9
+  },
+  {
+   "id": "cepheus",
+   "nameEn": "King",
+   "nameRu": "Цефей",
+   "nameLatin": "Cepheus",
+   "abbrev": "Cep",
+   "raCenterDeg": 334.84373,
+   "decCenterDeg": 72.10124,
+   "areaRank": 27
+  },
+  {
+   "id": "cetus",
+   "nameEn": "Sea Monster",
+   "nameRu": "Кит",
+   "nameLatin": "Cetus",
+   "abbrev": "Cet",
+   "raCenterDeg": 24.40755,
+   "decCenterDeg": -8.9966,
+   "areaRank": 4
+  },
+  {
+   "id": "chamaeleon",
+   "nameEn": "Chameleon",
+   "nameRu": "Хамелеон",
+   "nameLatin": "Chamaeleon",
+   "abbrev": "Cha",
+   "raCenterDeg": 160.25697,
+   "decCenterDeg": -80.08825,
+   "areaRank": 79
+  },
+  {
+   "id": "circinus",
+   "nameEn": "Drawing Compass",
+   "nameRu": "Циркуль",
+   "nameLatin": "Circinus",
+   "abbrev": "Cir",
+   "raCenterDeg": 222.26156,
+   "decCenterDeg": -63.22201,
+   "areaRank": 85
+  },
+  {
+   "id": "cancer",
+   "nameEn": "Crab",
+   "nameRu": "Рак",
+   "nameLatin": "Cancer",
+   "abbrev": "Cnc",
+   "raCenterDeg": 130.23548,
+   "decCenterDeg": 19.28998,
+   "areaRank": 31
+  },
+  {
+   "id": "columba",
+   "nameEn": "Dove",
+   "nameRu": "Голубь",
+   "nameLatin": "Columba",
+   "abbrev": "Col",
+   "raCenterDeg": 86.81989,
+   "decCenterDeg": -35.61443,
+   "areaRank": 54
+  },
+  {
+   "id": "coma-berenices",
+   "nameEn": "Bernice's Hair",
+   "nameRu": "Волосы Вероники",
+   "nameLatin": "Coma Berenices",
+   "abbrev": "Com",
+   "raCenterDeg": 191.3056,
+   "decCenterDeg": 22.37308,
+   "areaRank": 42
+  },
+  {
+   "id": "corona-australis",
+   "nameEn": "Southern Crown",
+   "nameRu": "Южная Корона",
+   "nameLatin": "Corona Australis",
+   "abbrev": "CrA",
+   "raCenterDeg": 279.70848,
+   "decCenterDeg": -41.19889,
+   "areaRank": 80
+  },
+  {
+   "id": "corona-borealis",
+   "nameEn": "Northern Crown",
+   "nameRu": "Северная Корона",
+   "nameLatin": "Corona Borealis",
+   "abbrev": "CrB",
+   "raCenterDeg": 238.2637,
+   "decCenterDeg": 32.17763,
+   "areaRank": 73
+  },
+  {
+   "id": "crater",
+   "nameEn": "Cup",
+   "nameRu": "Чаша",
+   "nameLatin": "Crater",
+   "abbrev": "Crt",
+   "raCenterDeg": 171.10711,
+   "decCenterDeg": -15.69379,
+   "areaRank": 53
+  },
+  {
+   "id": "crux",
+   "nameEn": "Southern Cross",
+   "nameRu": "Южный Крест",
+   "nameLatin": "Crux",
+   "abbrev": "Cru",
+   "raCenterDeg": 186.72468,
+   "decCenterDeg": -60.06034,
+   "areaRank": 88
+  },
+  {
+   "id": "corvus",
+   "nameEn": "Crow",
+   "nameRu": "Ворон",
+   "nameLatin": "Corvus",
+   "abbrev": "Crv",
+   "raCenterDeg": 186.36831,
+   "decCenterDeg": -18.13825,
+   "areaRank": 70
+  },
+  {
+   "id": "cygnus",
+   "nameEn": "Swan",
+   "nameRu": "Лебедь",
+   "nameLatin": "Cygnus",
+   "abbrev": "Cyg",
+   "raCenterDeg": 309.26169,
+   "decCenterDeg": 43.0894,
+   "areaRank": 16
+  },
+  {
+   "id": "delphinus",
+   "nameEn": "Dolphin",
+   "nameRu": "Дельфин",
+   "nameLatin": "Delphinus",
+   "abbrev": "Del",
+   "raCenterDeg": 310.19694,
+   "decCenterDeg": 12.17591,
+   "areaRank": 69
+  },
+  {
+   "id": "dorado",
+   "nameEn": "Swordfish",
+   "nameRu": "Золотая Рыба",
+   "nameLatin": "Dorado",
+   "abbrev": "Dor",
+   "raCenterDeg": 75.42756,
+   "decCenterDeg": -61.32895,
+   "areaRank": 72
+  },
+  {
+   "id": "draco",
+   "nameEn": "Dragon",
+   "nameRu": "Дракон",
+   "nameLatin": "Draco",
+   "abbrev": "Dra",
+   "raCenterDeg": 254.33175,
+   "decCenterDeg": 68.12977,
+   "areaRank": 8
+  },
+  {
+   "id": "equuleus",
+   "nameEn": "Little Horse",
+   "nameRu": "Малый Конь",
+   "nameLatin": "Equuleus",
+   "abbrev": "Equ",
+   "raCenterDeg": 318.02493,
+   "decCenterDeg": 7.46951,
+   "areaRank": 87
+  },
+  {
+   "id": "eridanus",
+   "nameEn": "River",
+   "nameRu": "Эридан",
+   "nameLatin": "Eridanus",
+   "abbrev": "Eri",
+   "raCenterDeg": 57.00832,
+   "decCenterDeg": -21.01911,
+   "areaRank": 6
+  },
+  {
+   "id": "fornax",
+   "nameEn": "Furnace",
+   "nameRu": "Печь",
+   "nameLatin": "Fornax",
+   "abbrev": "For",
+   "raCenterDeg": 41.51529,
+   "decCenterDeg": -31.52457,
+   "areaRank": 41
+  },
+  {
+   "id": "gemini",
+   "nameEn": "Twins",
+   "nameRu": "Близнецы",
+   "nameLatin": "Gemini",
+   "abbrev": "Gem",
+   "raCenterDeg": 107.29169,
+   "decCenterDeg": 23.43661,
+   "areaRank": 30
+  },
+  {
+   "id": "grus",
+   "nameEn": "Crane",
+   "nameRu": "Журавль",
+   "nameLatin": "Grus",
+   "abbrev": "Gru",
+   "raCenterDeg": 337.8622,
+   "decCenterDeg": -45.24854,
+   "areaRank": 45
+  },
+  {
+   "id": "hercules",
+   "nameEn": "Hercules",
+   "nameRu": "Геркулес",
+   "nameLatin": "Hercules",
+   "abbrev": "Her",
+   "raCenterDeg": 259.46154,
+   "decCenterDeg": 28.6004,
+   "areaRank": 5
+  },
+  {
+   "id": "horologium",
+   "nameEn": "Clock",
+   "nameRu": "Часы",
+   "nameLatin": "Horologium",
+   "abbrev": "Hor",
+   "raCenterDeg": 49.51767,
+   "decCenterDeg": -53.29819,
+   "areaRank": 58
+  },
+  {
+   "id": "hydra",
+   "nameEn": "Female Water Snake",
+   "nameRu": "Гидра",
+   "nameLatin": "Hydra",
+   "abbrev": "Hya",
+   "raCenterDeg": 156.52996,
+   "decCenterDeg": -18.94834,
+   "areaRank": 1
+  },
+  {
+   "id": "hydrus",
+   "nameEn": "Male Water Snake",
+   "nameRu": "Южная Гидра",
+   "nameLatin": "Hydrus",
+   "abbrev": "Hyi",
+   "raCenterDeg": 35.61718,
+   "decCenterDeg": -71.58141,
+   "areaRank": 61
+  },
+  {
+   "id": "indus",
+   "nameEn": "Indian",
+   "nameRu": "Индеец",
+   "nameLatin": "Indus",
+   "abbrev": "Ind",
+   "raCenterDeg": 322.23829,
+   "decCenterDeg": -58.493,
+   "areaRank": 49
+  },
+  {
+   "id": "leo-minor",
+   "nameEn": "Lesser Lion",
+   "nameRu": "Малый Лев",
+   "nameLatin": "Leo Minor",
+   "abbrev": "LMi",
+   "raCenterDeg": 155.42185,
+   "decCenterDeg": 33.51217,
+   "areaRank": 64
+  },
+  {
+   "id": "lacerta",
+   "nameEn": "Lizard",
+   "nameRu": "Ящерица",
+   "nameLatin": "Lacerta",
+   "abbrev": "Lac",
+   "raCenterDeg": 337.40385,
+   "decCenterDeg": 45.10999,
+   "areaRank": 68
+  },
+  {
+   "id": "leo",
+   "nameEn": "Lion",
+   "nameRu": "Лев",
+   "nameLatin": "Leo",
+   "abbrev": "Leo",
+   "raCenterDeg": 160.53129,
+   "decCenterDeg": 15.0767,
+   "areaRank": 12
+  },
+  {
+   "id": "lepus",
+   "nameEn": "Hare",
+   "nameRu": "Заяц",
+   "nameLatin": "Lepus",
+   "abbrev": "Lep",
+   "raCenterDeg": 83.62065,
+   "decCenterDeg": -19.07962,
+   "areaRank": 51
+  },
+  {
+   "id": "libra",
+   "nameEn": "Scales",
+   "nameRu": "Весы",
+   "nameLatin": "Libra",
+   "abbrev": "Lib",
+   "raCenterDeg": 228.37455,
+   "decCenterDeg": -15.25045,
+   "areaRank": 29
+  },
+  {
+   "id": "lupus",
+   "nameEn": "Wolf",
+   "nameRu": "Волк",
+   "nameLatin": "Lupus",
+   "abbrev": "Lup",
+   "raCenterDeg": 229.72201,
+   "decCenterDeg": -42.41158,
+   "areaRank": 46
+  },
+  {
+   "id": "lynx",
+   "nameEn": "Lynx",
+   "nameRu": "Рысь",
+   "nameLatin": "Lynx",
+   "abbrev": "Lyn",
+   "raCenterDeg": 121.31008,
+   "decCenterDeg": 46.78697,
+   "areaRank": 28
+  },
+  {
+   "id": "lyra",
+   "nameEn": "Lyre",
+   "nameRu": "Лира",
+   "nameLatin": "Lyra",
+   "abbrev": "Lyr",
+   "raCenterDeg": 282.68031,
+   "decCenterDeg": 36.62681,
+   "areaRank": 52
+  },
+  {
+   "id": "mensa",
+   "nameEn": "Table Mountain",
+   "nameRu": "Столовая Гора",
+   "nameLatin": "Mensa",
+   "abbrev": "Men",
+   "raCenterDeg": 82.07374,
+   "decCenterDeg": -77.51327,
+   "areaRank": 75
+  },
+  {
+   "id": "microscopium",
+   "nameEn": "Microscope",
+   "nameRu": "Микроскоп",
+   "nameLatin": "Microscopium",
+   "abbrev": "Mic",
+   "raCenterDeg": 314.47742,
+   "decCenterDeg": -36.01796,
+   "areaRank": 66
+  },
+  {
+   "id": "monoceros",
+   "nameEn": "Unicorn",
+   "nameRu": "Единорог",
+   "nameLatin": "Monoceros",
+   "abbrev": "Mon",
+   "raCenterDeg": 105.27982,
+   "decCenterDeg": -2.70146,
+   "areaRank": 35
+  },
+  {
+   "id": "musca",
+   "nameEn": "Fly",
+   "nameRu": "Муха",
+   "nameLatin": "Musca",
+   "abbrev": "Mus",
+   "raCenterDeg": 188.56176,
+   "decCenterDeg": -70.05757,
+   "areaRank": 77
+  },
+  {
+   "id": "norma",
+   "nameEn": "Carpenter's Square",
+   "nameRu": "Наугольник",
+   "nameLatin": "Norma",
+   "abbrev": "Nor",
+   "raCenterDeg": 241.20591,
+   "decCenterDeg": -51.61927,
+   "areaRank": 74
+  },
+  {
+   "id": "octans",
+   "nameEn": "Octant",
+   "nameRu": "Октант",
+   "nameLatin": "Octans",
+   "abbrev": "Oct",
+   "raCenterDeg": 318.51355,
+   "decCenterDeg": -84.6027,
+   "areaRank": 50
+  },
+  {
+   "id": "ophiuchus",
+   "nameEn": "Serpent Bearer",
+   "nameRu": "Змееносец",
+   "nameLatin": "Ophiuchus",
+   "abbrev": "Oph",
+   "raCenterDeg": 259.56039,
+   "decCenterDeg": -5.24884,
+   "areaRank": 11
+  },
+  {
+   "id": "orion",
+   "nameEn": "Hunter",
+   "nameRu": "Орион",
+   "nameLatin": "Orion",
+   "abbrev": "Ori",
+   "raCenterDeg": 83.90059,
+   "decCenterDeg": 5.17433,
+   "areaRank": 26
+  },
+  {
+   "id": "pavo",
+   "nameEn": "Peacock",
+   "nameRu": "Павлин",
+   "nameLatin": "Pavo",
+   "abbrev": "Pav",
+   "raCenterDeg": 293.60575,
+   "decCenterDeg": -65.62046,
+   "areaRank": 44
+  },
+  {
+   "id": "pegasus",
+   "nameEn": "Winged Horse",
+   "nameRu": "Пегас",
+   "nameLatin": "Pegasus",
+   "abbrev": "Peg",
+   "raCenterDeg": 340.42526,
+   "decCenterDeg": 19.48416,
+   "areaRank": 7
+  },
+  {
+   "id": "perseus",
+   "nameEn": "Hero",
+   "nameRu": "Персей",
+   "nameLatin": "Perseus",
+   "abbrev": "Per",
+   "raCenterDeg": 53.12356,
+   "decCenterDeg": 44.45062,
+   "areaRank": 24
+  },
+  {
+   "id": "phoenix",
+   "nameEn": "Phoenix",
+   "nameRu": "Феникс",
+   "nameLatin": "Phoenix",
+   "abbrev": "Phe",
+   "raCenterDeg": 11.74563,
+   "decCenterDeg": -47.84777,
+   "areaRank": 37
+  },
+  {
+   "id": "pictor",
+   "nameEn": "Painter's Easel",
+   "nameRu": "Живописец",
+   "nameLatin": "Pictor",
+   "abbrev": "Pic",
+   "raCenterDeg": 83.63824,
+   "decCenterDeg": -52.50436,
+   "areaRank": 59
+  },
+  {
+   "id": "piscis-austrinus",
+   "nameEn": "Southern Fish",
+   "nameRu": "Южная Рыба",
+   "nameLatin": "Piscis Austrinus",
+   "abbrev": "PsA",
+   "raCenterDeg": 334.28863,
+   "decCenterDeg": -30.71898,
+   "areaRank": 60
+  },
+  {
+   "id": "pisces",
+   "nameEn": "Fishes",
+   "nameRu": "Рыбы",
+   "nameLatin": "Pisces",
+   "abbrev": "Psc",
+   "raCenterDeg": 9.55959,
+   "decCenterDeg": 10.97781,
+   "areaRank": 14
+  },
+  {
+   "id": "puppis",
+   "nameEn": "Stern",
+   "nameRu": "Корма",
+   "nameLatin": "Puppis",
+   "abbrev": "Pup",
+   "raCenterDeg": 114.90612,
+   "decCenterDeg": -33.25053,
+   "areaRank": 20
+  },
+  {
+   "id": "pyxis",
+   "nameEn": "Mariner Compass",
+   "nameRu": "Компас",
+   "nameLatin": "Pyxis",
+   "abbrev": "Pyx",
+   "raCenterDeg": 133.63554,
+   "decCenterDeg": -28.4496,
+   "areaRank": 65
+  },
+  {
+   "id": "reticulum",
+   "nameEn": "Reticle",
+   "nameRu": "Сетка",
+   "nameLatin": "Reticulum",
+   "abbrev": "Ret",
+   "raCenterDeg": 58.35512,
+   "decCenterDeg": -60.81627,
+   "areaRank": 82
+  },
+  {
+   "id": "sculptor",
+   "nameEn": "Sculptor",
+   "nameRu": "Скульптор",
+   "nameLatin": "Sculptor",
+   "abbrev": "Scl",
+   "raCenterDeg": 6.95461,
+   "decCenterDeg": -32.24206,
+   "areaRank": 36
+  },
+  {
+   "id": "scorpius",
+   "nameEn": "Scorpion",
+   "nameRu": "Скорпион",
+   "nameLatin": "Scorpius",
+   "abbrev": "Sco",
+   "raCenterDeg": 251.36052,
+   "decCenterDeg": -32.15826,
+   "areaRank": 33
+  },
+  {
+   "id": "scutum",
+   "nameEn": "Shield",
+   "nameRu": "Щит",
+   "nameLatin": "Scutum",
+   "abbrev": "Sct",
+   "raCenterDeg": 280.09671,
+   "decCenterDeg": -9.86201,
+   "areaRank": 84
+  },
+  {
+   "id": "serpens",
+   "nameEn": "Serpent",
+   "nameRu": "Змея",
+   "nameLatin": "Serpens",
+   "abbrev": "Ser",
+   "raCenterDeg": 235.42818,
+   "decCenterDeg": 9.90753,
+   "areaRank": 23
+  },
+  {
+   "id": "sextans",
+   "nameEn": "Sextant",
+   "nameRu": "Секстант",
+   "nameLatin": "Sextans",
+   "abbrev": "Sex",
+   "raCenterDeg": 154.0883,
+   "decCenterDeg": -2.60829,
+   "areaRank": 47
+  },
+  {
+   "id": "sagitta",
+   "nameEn": "Arrow",
+   "nameRu": "Стрела",
+   "nameLatin": "Sagitta",
+   "abbrev": "Sge",
+   "raCenterDeg": 295.65614,
+   "decCenterDeg": 18.72961,
+   "areaRank": 86
+  },
+  {
+   "id": "sagittarius",
+   "nameEn": "Archer",
+   "nameRu": "Стрелец",
+   "nameLatin": "Sagittarius",
+   "abbrev": "Sgr",
+   "raCenterDeg": 287.55174,
+   "decCenterDeg": -27.51657,
+   "areaRank": 15
+  },
+  {
+   "id": "taurus",
+   "nameEn": "Bull",
+   "nameRu": "Телец",
+   "nameLatin": "Taurus",
+   "abbrev": "Tau",
+   "raCenterDeg": 66.17139,
+   "decCenterDeg": 17.09406,
+   "areaRank": 17
+  },
+  {
+   "id": "telescopium",
+   "nameEn": "Telescope",
+   "nameRu": "Телескоп",
+   "nameLatin": "Telescopium",
+   "abbrev": "Tel",
+   "raCenterDeg": 289.93819,
+   "decCenterDeg": -51.22665,
+   "areaRank": 57
+  },
+  {
+   "id": "triangulum-australe",
+   "nameEn": "Southern Triangle",
+   "nameRu": "Южный Треугольник",
+   "nameLatin": "Triangulum Australe",
+   "abbrev": "TrA",
+   "raCenterDeg": 240.95831,
+   "decCenterDeg": -65.84153,
+   "areaRank": 83
+  },
+  {
+   "id": "triangulum",
+   "nameEn": "Triangle",
+   "nameRu": "Треугольник",
+   "nameLatin": "Triangulum",
+   "abbrev": "Tri",
+   "raCenterDeg": 32.05368,
+   "decCenterDeg": 32.15633,
+   "areaRank": 78
+  },
+  {
+   "id": "tucana",
+   "nameEn": "Toucan",
+   "nameRu": "Тукан",
+   "nameLatin": "Tucana",
+   "abbrev": "Tuc",
+   "raCenterDeg": 357.60561,
+   "decCenterDeg": -64.60886,
+   "areaRank": 48
+  },
+  {
+   "id": "ursa-major",
+   "nameEn": "Great Bear",
+   "nameRu": "Большая Медведица",
+   "nameLatin": "Ursa Major",
+   "abbrev": "UMa",
+   "raCenterDeg": 165.5793,
+   "decCenterDeg": 54.38503,
+   "areaRank": 3
+  },
+  {
+   "id": "ursa-minor",
+   "nameEn": "Little Bear",
+   "nameRu": "Малая Медведица",
+   "nameLatin": "Ursa Minor",
+   "abbrev": "UMi",
+   "raCenterDeg": 225.58751,
+   "decCenterDeg": 76.70976,
+   "areaRank": 56
+  },
+  {
+   "id": "vela",
+   "nameEn": "Sails",
+   "nameRu": "Паруса",
+   "nameLatin": "Vela",
+   "abbrev": "Vel",
+   "raCenterDeg": 144.15979,
+   "decCenterDeg": -48.05671,
+   "areaRank": 32
+  },
+  {
+   "id": "virgo",
+   "nameEn": "Maiden",
+   "nameRu": "Дева",
+   "nameLatin": "Virgo",
+   "abbrev": "Vir",
+   "raCenterDeg": 199.32802,
+   "decCenterDeg": -2.67353,
+   "areaRank": 2
+  },
+  {
+   "id": "volans",
+   "nameEn": "Flying Fish",
+   "nameRu": "Летучая Рыба",
+   "nameLatin": "Volans",
+   "abbrev": "Vol",
+   "raCenterDeg": 117.02173,
+   "decCenterDeg": -69.66512,
+   "areaRank": 76
+  },
+  {
+   "id": "vulpecula",
+   "nameEn": "Fox",
+   "nameRu": "Лисичка",
+   "nameLatin": "Vulpecula",
+   "abbrev": "Vul",
+   "raCenterDeg": 304.26619,
+   "decCenterDeg": 24.86248,
+   "areaRank": 55
+  }
+ ]
+}

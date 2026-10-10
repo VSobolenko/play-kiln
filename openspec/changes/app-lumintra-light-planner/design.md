@@ -313,8 +313,10 @@ months of summer, so `NO_ASTRO_DARK` / `NO_DARK` is the ordinary June case for m
 degrees `[0,360)` — `moonPhase(time)`, `astronomy.kt:6173`; 0° = new, 180° = full. Illuminated fraction
 is `illumination(Body.Moon, time).phaseFraction` in `[0.0, 1.0]`; phase angle is `.phaseAngle` in
 degrees. The implementation may assert `k = (1 + cos(phaseAngle)) / 2` in a unit test. The eight phase
-names are mapped from the elongation in **45° sectors offset by 22.5°**, so a waxing crescent near 359°
-does not fall into the wrong bucket. **"Moonless" is two booleans and one stated threshold**:
+names are mapped from the elongation in **45° sectors offset by 22.5°**, so the `new` sector is
+contiguous across the wrap (`[337.5°, 22.5°)`) and `new` is never named at both ends of the table
+(E19; the earlier "waxing crescent near 359°" gloss is withdrawn — 359° is a *waning* crescent 1°
+short of new, and the bin centred on 0° contains it by construction). **"Moonless" is two booleans and one stated threshold**:
 `moonUp = (moonAltDeg > 0.0)`; `darkMoon = (illuminatedFraction ≤ 0.10)` — **a product threshold,
 stated as such**; `session.moonless = (!moonUp) || darkMoon`. The UI must show **both** numbers
 (fraction and altitude), because a 5 % crescent 10° above the horizon is not moonless in practice and a

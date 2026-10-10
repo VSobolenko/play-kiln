@@ -1,0 +1,933 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Lumintra: Light Planner — the slot's own string catalogue (default locale, en-US).
+
+    Grouped by the screen that renders the strings, in the order `tasks.md` §6 walks the app:
+    Welcome → Night → Brief → Targets → Passes → Cloud → Spots → Share → Widget/Reminder →
+    Settings → Credits. `docs/STRING-KEYS.md` is the key-by-key index of this file and of
+    `values-ru/strings.xml`; the two must stay in step.
+
+    Two rules this file obeys, both measured by the factory's gates:
+      * a value rendered with a count is a plural block, and every format argument of the default is
+        repeated in `values-ru/strings.xml` in the same order (`scripts/check-locales.mjs`);
+      * a licence credit, a URL and the privacy-policy address are `translatable="false"` and are
+        declared ONLY here — a copy under `values-ru/` is a duplicate the locale check fails.
+-->
+<resources>
+    <!-- =====================================================================================
+         App identity
+         ===================================================================================== -->
+    <string name="app_name" translatable="true">Lumintra: Light Planner</string>
+    <string name="app_idea" translatable="true">Offline-first light and night-sky session planner: a scrubbable night scene with your own horizon, dark window, moon, targets, satellite passes and cloud forecast for a saved spot</string>
+    <!-- The brand as it appears in a shared payload. A brand is not a translation unit. -->
+    <string name="app_name_short" translatable="false">Lumintra</string>
+
+    <!-- =====================================================================================
+         Navigation — the section strip and the shared control vocabulary
+         ===================================================================================== -->
+    <string name="nav_night" translatable="true">Night</string>
+    <string name="nav_brief" translatable="true">Brief</string>
+    <string name="nav_targets" translatable="true">Targets</string>
+    <string name="nav_spots" translatable="true">Spots</string>
+    <string name="nav_settings" translatable="true">Settings</string>
+    <string name="nav_back" translatable="true">Back</string>
+    <string name="nav_close" translatable="true">Close</string>
+    <string name="nav_day_previous" translatable="true">Previous night</string>
+    <string name="nav_day_next" translatable="true">Next night</string>
+    <string name="action_cancel" translatable="true">Cancel</string>
+    <string name="action_save" translatable="true">Save</string>
+    <string name="action_delete" translatable="true">Delete</string>
+    <string name="action_edit" translatable="true">Edit</string>
+    <string name="action_retry" translatable="true">Retry</string>
+    <string name="action_refresh" translatable="true">Refresh</string>
+    <string name="action_done" translatable="true">Done</string>
+    <string name="action_confirm" translatable="true">Confirm</string>
+    <string name="state_loading" translatable="true">Working…</string>
+    <string name="state_unavailable" translatable="true">Not available</string>
+    <string name="state_offline" translatable="true">Offline</string>
+    <string name="label_forecast" translatable="true">forecast</string>
+    <string name="label_prediction" translatable="true">prediction</string>
+    <string name="label_measured" translatable="true">measured</string>
+
+    <!-- =====================================================================================
+         Components — the shared vocabulary in `ui/components/`. The compass points are the only
+         user-visible words those components own: a cardinal direction is a word, not a glyph, and
+         it is genuinely different in the second language (С / СВ / В … rather than N / NE / E).
+         ===================================================================================== -->
+    <string name="component_compass_n" translatable="true">N</string>
+    <string name="component_compass_ne" translatable="true">NE</string>
+    <string name="component_compass_e" translatable="true">E</string>
+    <string name="component_compass_se" translatable="true">SE</string>
+    <string name="component_compass_s" translatable="true">S</string>
+    <string name="component_compass_sw" translatable="true">SW</string>
+    <string name="component_compass_w" translatable="true">W</string>
+    <string name="component_compass_nw" translatable="true">NW</string>
+
+    <!-- =====================================================================================
+         Welcome — the first-run screen, shown only while the spot store holds no record
+         ===================================================================================== -->
+    <string name="welcome_title" translatable="true">Plan tonight\'s sky</string>
+    <string name="welcome_body" translatable="true">Pick where you shoot on the map — Lumintra shows dark time and targets for that spot.</string>
+    <!-- The one line the welcome spec makes a requirement: a planner, not a compass. -->
+    <string name="welcome_compass_line" translatable="true">No compass and no location permission — only the spot you save.</string>
+    <string name="welcome_action_set_spot" translatable="true">Set a spot on the map</string>
+    <string name="welcome_action_content_description" translatable="true">Set a spot on the map</string>
+    <string name="welcome_spot_subline" translatable="true">Save a spot to see tonight\'s plan.</string>
+    <string name="welcome_first_run_note" translatable="true">Nothing is computed yet. No sky is drawn until a spot exists.</string>
+    <string name="welcome_notes_header" translatable="true">Before you start</string>
+    <string name="welcome_no_network_note" translatable="true">No network needed: typing or pasting coordinates works entirely offline.</string>
+    <string name="welcome_no_account_note" translatable="true">No account, no sign-in, no permission prompt.</string>
+
+    <!-- =====================================================================================
+         Night scene — the scrubbable sky, its layers, its lens frame and its credit line
+         ===================================================================================== -->
+    <string name="night_title" translatable="true">Night</string>
+    <string name="night_scrub_label" translatable="true">Time of night</string>
+    <string name="night_scrub_content_description" translatable="true">Scrub the night from %1$s to %2$s</string>
+    <string name="night_scrub_hint" translatable="true">Drag to move through the night</string>
+    <string name="night_scrub_now" translatable="true">Now</string>
+    <string name="night_named" translatable="true">The night of %1$s</string>
+    <string name="night_layers_header" translatable="true">Layers</string>
+    <string name="night_layer_milky_way" translatable="true">Milky Way</string>
+    <string name="night_layer_constellations" translatable="true">Constellations</string>
+    <string name="night_layer_horizon" translatable="true">Your horizon</string>
+    <string name="night_layer_star_trails" translatable="true">Star trails</string>
+    <string name="night_layers_shown" translatable="true">%1$d of %2$d layers shown</string>
+    <string name="night_lens_frame" translatable="true">Lens frame</string>
+    <string name="night_lens_frame_content_description" translatable="true">Lens frame: %1$s millimetre focal length, field of view %2$s by %3$s degrees</string>
+    <string name="night_lens_preset_title" translatable="true">Lens preset</string>
+    <string name="night_lens_preset_apply" translatable="true">Use this preset</string>
+    <string name="night_lens_preset_current" translatable="true">%1$s mm, chosen for this session</string>
+    <string name="night_satellite_streak" translatable="true">Satellite streak</string>
+    <string name="night_satellite_streak_on" translatable="true">Satellite streak: %1$s crossing the frame</string>
+    <string name="night_red_mode_toggle" translatable="true">Red night mode</string>
+    <!-- The mode is named by what it does, never as a marketing name (settings-and-credits § Red night mode). -->
+    <string name="night_red_mode_on" translatable="true">Red night mode is on: blue is held at zero and green at or below 8 of 255.</string>
+    <string name="night_red_mode_off" translatable="true">Red night mode is off.</string>
+    <string name="night_single_tap_hint" translatable="true">Tap the scene to select the object nearest the tap.</string>
+    <string name="night_objects_header" translatable="true">In this frame</string>
+    <string name="night_object_row" translatable="true">%1$s — altitude %2$s°, azimuth %3$s°</string>
+    <string name="night_no_objects" translatable="true">Nothing is above your horizon in this frame.</string>
+    <string name="night_sky_grade_label" translatable="true">Sky darkness</string>
+    <string name="night_sky_grade_value" translatable="true">%1$s (Bortle %2$s)</string>
+    <string name="night_sky_grade_unknown" translatable="true">Sky darkness has not been estimated.</string>
+    <string name="night_user_estimate_label" translatable="true">user estimate</string>
+    <string name="night_user_estimate_sqm" translatable="true">user estimate: %1$s mag/arcsec²</string>
+    <string name="night_user_estimate_bortle" translatable="true">user estimate: Bortle %1$s</string>
+    <!-- A flat fallback and an all-blocking profile are two different states and never one (scout-spots E75, E76). -->
+    <string name="night_horizon_flat_note" translatable="true">No horizon profile for this spot — using a flat horizon.</string>
+    <string name="night_horizon_blocked_note" translatable="true">Your horizon blocks the whole sky for this spot, so every object is reported as behind it.</string>
+    <string name="night_horizon_blocked_confirm" translatable="true">Keep this horizon</string>
+    <string name="night_horizon_blocked_redraw" translatable="true">Draw it again</string>
+    <string name="night_polar_day_note" translatable="true">The Sun does not set tonight, so the scene keeps its daylight palette all night.</string>
+    <string name="night_eso_credit" translatable="true">ESO/S. Brunier</string>
+
+    <!-- =====================================================================================
+         Brief — the Tonight summary and its dark-window sentences
+         ===================================================================================== -->
+    <string name="brief_title" translatable="true">Tonight</string>
+    <string name="brief_spot_label" translatable="true">Spot</string>
+    <string name="brief_night_of" translatable="true">The night of %1$s → %2$s</string>
+    <string name="brief_no_spot_title" translatable="true">No spot saved</string>
+    <string name="brief_no_spot_body" translatable="true">Lumintra computes every answer from a real place, so nothing is shown until you save one.</string>
+    <string name="brief_no_spot_action" translatable="true">Set a spot</string>
+    <string name="brief_loading" translatable="true">Computing tonight at %1$s…</string>
+    <string name="brief_offline_note" translatable="true">Offline: every locally computed answer is present, and the forecast and pass sections show what they were last able to read.</string>
+    <string name="brief_dark_window_header" translatable="true">Dark window</string>
+    <string name="brief_dark_window_value" translatable="true">%1$s – %2$s (%3$s)</string>
+    <string name="brief_dark_window_second" translatable="true">Second dark window: %1$s – %2$s</string>
+    <string name="brief_dark_kind_dark" translatable="true">astronomical darkness</string>
+    <string name="brief_dark_kind_polar_day" translatable="true">the Sun does not set</string>
+    <string name="brief_dark_kind_polar_night" translatable="true">the Sun does not rise</string>
+    <string name="brief_dark_kind_no_astro" translatable="true">no astronomical darkness</string>
+    <string name="brief_dark_kind_no_dark" translatable="true">no darkness</string>
+    <!-- The four non-DARK outcomes, one sentence each, exactly as session-brief defines them. -->
+    <string name="brief_no_sunset_tonight" translatable="true">The Sun does not set tonight at %1$s — there is no darkness.</string>
+    <string name="brief_no_sunrise_today" translatable="true">The Sun does not rise at %1$s today — the sky is dark except for a twilight dip around midday.</string>
+    <string name="brief_no_astro_dark" translatable="true">No astronomical darkness at %1$s tonight — the sky only reaches %2$s twilight (Sun %3$s° at %4$s).</string>
+    <string name="brief_no_dark" translatable="true">No darkness at %1$s tonight — the Sun stays above civil twilight (lowest %2$s° at %3$s).</string>
+    <string name="brief_twilight_civil" translatable="true">civil</string>
+    <string name="brief_twilight_nautical" translatable="true">nautical</string>
+    <string name="brief_sun_altitude" translatable="true">Sun %1$s° at %2$s</string>
+    <string name="brief_twilight_table_header" translatable="true">Twilights</string>
+    <string name="brief_twilight_row" translatable="true">%1$s: %2$s – %3$s</string>
+    <string name="brief_moon_header" translatable="true">Moon</string>
+    <string name="brief_moon_value" translatable="true">%1$s%% illuminated, %2$s</string>
+    <string name="brief_moon_up_all_night" translatable="true">up all night</string>
+    <string name="brief_moon_below_all_night" translatable="true">below the horizon all night</string>
+    <string name="brief_moon_rises_sets" translatable="true">rises %1$s, sets %2$s</string>
+    <string name="brief_moon_rises" translatable="true">rises %1$s</string>
+    <string name="brief_moon_sets" translatable="true">sets %1$s</string>
+    <string name="brief_moonless_window" translatable="true">Moonless window: %1$s – %2$s</string>
+    <string name="brief_moonless_none" translatable="true">No moonless window tonight.</string>
+    <string name="brief_targets_header" translatable="true">Targets</string>
+    <string name="brief_targets_none" translatable="true">No target has been chosen for this session.</string>
+    <string name="brief_passes_header" translatable="true">Satellite passes</string>
+    <string name="brief_cloud_header" translatable="true">Cloud outlook</string>
+    <string name="brief_zone_label" translatable="true">Time zone: %1$s</string>
+    <string name="brief_zone_other" translatable="true">Device time zone: %1$s</string>
+    <string name="brief_clock_warning" translatable="true">The device clock is %1$s away from the network time, so the instants below may belong to the wrong night.</string>
+    <string name="brief_saved_spot_unreadable" translatable="true">1 saved spot could not be read. Everything else loaded normally.</string>
+    <string name="brief_saved_target_missing" translatable="true">1 saved reference could not be restored, because the catalogue no longer holds it.</string>
+    <string name="brief_horizon_flat_note" translatable="true">No horizon profile for this spot — using a flat horizon.</string>
+    <string name="brief_share_action" translatable="true">Share the brief</string>
+    <string name="brief_open_night_action" translatable="true">Open the night scene</string>
+
+    <!-- =====================================================================================
+         Targets — the catalogue, its search and filters, and the target detail surface
+         ===================================================================================== -->
+    <string name="target_title" translatable="true">Targets</string>
+    <string name="target_back" translatable="true">Back</string>
+    <string name="target_search_field" translatable="true">Search targets by designation, name or alias</string>
+    <string name="target_search_hint" translatable="true">Designation, name or alias</string>
+    <string name="target_search_clear" translatable="true">Clear the search</string>
+    <string name="target_filter_magnitude" translatable="true">Magnitude limit</string>
+    <string name="target_filter_type" translatable="true">Object type</string>
+    <string name="target_filter_any" translatable="true">Any</string>
+    <string name="target_filter_magnitude_value" translatable="true">%1$s mag</string>
+    <string name="target_filter_favourites" translatable="true">Favourites only</string>
+    <string name="target_filter_visible_tonight" translatable="true">Up tonight</string>
+    <string name="target_filter_clear" translatable="true">Clear the filters</string>
+    <string name="target_magnitude_unknown" translatable="true">Magnitude unknown</string>
+    <string name="target_magnitude_limit_any" translatable="true">No magnitude limit</string>
+    <string name="target_mag_line" translatable="true">%1$s (%2$s, %3$s)</string>
+    <string name="target_mag_kind_integrated" translatable="true">integrated</string>
+    <string name="target_mag_kind_peak" translatable="true">peak</string>
+    <string name="target_mag_kind_unknown" translatable="true">kind unknown</string>
+    <string name="target_magnitude_disputed" translatable="true">disputed magnitude</string>
+    <string name="target_size_unknown" translatable="true">Size unknown</string>
+    <string name="target_size_format" translatable="true">%1$s′</string>
+    <string name="target_size_pair" translatable="true">%1$s′ × %2$s′</string>
+    <string name="target_row_metrics" translatable="true">%1$s · %2$s</string>
+    <string name="target_favourite_mark" translatable="true">Favourite</string>
+    <string name="target_favourite_add" translatable="true">Add %1$s to favourites</string>
+    <string name="target_favourite_remove" translatable="true">Remove %1$s from favourites</string>
+    <string name="target_up_tonight" translatable="true">up tonight</string>
+    <string name="target_type_galaxy" translatable="true">Galaxy</string>
+    <string name="target_type_galaxy_group" translatable="true">Group of galaxies</string>
+    <string name="target_type_globular_cluster" translatable="true">Globular cluster</string>
+    <string name="target_type_open_cluster" translatable="true">Open cluster</string>
+    <string name="target_type_emission_nebula" translatable="true">Emission nebula</string>
+    <string name="target_type_reflection_nebula" translatable="true">Reflection nebula</string>
+    <string name="target_type_planetary_nebula" translatable="true">Planetary nebula</string>
+    <string name="target_type_supernova_remnant" translatable="true">Supernova remnant</string>
+    <string name="target_type_dark_nebula" translatable="true">Dark nebula</string>
+    <string name="target_type_asterism" translatable="true">Asterism</string>
+    <string name="target_type_double_star" translatable="true">Double star</string>
+    <string name="target_type_planet" translatable="true">Planet</string>
+    <string name="target_type_moon" translatable="true">Moon</string>
+    <string name="target_type_sun" translatable="true">Sun</string>
+    <string name="target_list_unavailable" translatable="true">Target list unavailable</string>
+    <string name="target_list_unavailable_body" translatable="true">The bundled catalogue could not be read, so no targets are listed. Everything else in the brief still works.</string>
+    <string name="target_no_result" translatable="true">No target matches “%1$s”</string>
+    <string name="target_no_result_body" translatable="true">Try another designation or name, or clear the filters.</string>
+    <string name="target_favourites_empty" translatable="true">No favourites yet</string>
+    <string name="target_favourites_empty_body" translatable="true">Mark a target with the star control and it appears here.</string>
+    <string name="target_none_visible_tonight" translatable="true">Nothing is up on %1$s</string>
+    <string name="target_none_visible_tonight_body" translatable="true">No target in the current filters clears your horizon during that night.</string>
+    <string name="target_needs_spot" translatable="true">No spot yet</string>
+    <string name="target_needs_spot_body" translatable="true">Save a spot to compute which targets are up tonight.</string>
+    <string name="target_needs_spot_action" translatable="true">Save a spot</string>
+    <string name="target_needs_night" translatable="true">No night chosen</string>
+    <string name="target_needs_night_body" translatable="true">Choose a night to compute which targets are up tonight.</string>
+    <string name="catalogue_count_label" translatable="true">%1$d targets in the catalogue</string>
+    <string name="target_results_summary" translatable="true">%1$d results</string>
+    <string name="target_results_summary_filters" translatable="true">%1$d results, filters: %2$s</string>
+    <string name="target_filters_none" translatable="true">none</string>
+    <string name="target_night_named" translatable="true">Night: %1$s</string>
+    <string name="milky_way_core_name" translatable="true">Milky Way core</string>
+    <string name="target_detail_select_prompt" translatable="true">Select a target</string>
+    <string name="target_detail_select_prompt_body" translatable="true">Choose a row to read its catalogue facts and its window for the night.</string>
+    <string name="target_detail_needs_spot" translatable="true">No spot is active</string>
+    <string name="target_detail_needs_spot_body" translatable="true">The rise, transit and set of this target need a saved spot, so nothing is computed here.</string>
+    <string name="target_detail_needs_night" translatable="true">No night is chosen</string>
+    <string name="target_detail_needs_night_body" translatable="true">The rise, transit and set of this target need a chosen night, so nothing is computed here.</string>
+    <string name="target_detail_no_dark_night" translatable="true">No target window is stated: tonight there is %1$s.</string>
+    <string name="target_detail_close" translatable="true">Close the target detail</string>
+    <string name="target_detail_catalogue_facts" translatable="true">Catalogue</string>
+    <string name="target_detail_designations" translatable="true">Designations</string>
+    <string name="target_detail_aliases" translatable="true">Also known as</string>
+    <string name="target_dimension_magnitude" translatable="true">Magnitude</string>
+    <string name="target_dimension_size" translatable="true">Apparent size</string>
+    <string name="target_detail_sources" translatable="true">Verified against</string>
+    <string name="target_detail_sources_value" translatable="true">%1$s and %2$s (Δ %3$s′)</string>
+    <string name="target_detail_window" translatable="true">This night</string>
+    <string name="target_detail_fit" translatable="true">Lens fit</string>
+    <string name="target_detail_position" translatable="true">Position now</string>
+    <string name="target_window_rise" translatable="true">Rises at %1$s</string>
+    <string name="target_window_transit" translatable="true">Highest at %1$s (%2$s°)</string>
+    <string name="target_window_set" translatable="true">Sets at %1$s</string>
+    <string name="target_circumpolar_short" translatable="true">Up all night</string>
+    <string name="target_never_rises_short" translatable="true">Never rises from this spot</string>
+    <string name="target_behind_horizon" translatable="true">%1$s rises behind your horizon, so it is not reported as visible.</string>
+    <string name="target_occluded_short" translatable="true">Behind your drawn horizon</string>
+    <string name="target_never_rises" translatable="true">%1$s never rises from this spot.</string>
+    <string name="target_circumpolar" translatable="true">%1$s is up all night; lowest %2$s° at %3$s.</string>
+    <string name="target_partial_window" translatable="true">%1$s is up from %2$s to %3$s; the window is clipped by the dark window.</string>
+    <string name="target_at_horizon" translatable="true">%1$s clears your drawn horizon at %2$s (%3$s°).</string>
+    <string name="target_graze" translatable="true">%1$s grazes your horizon: peak %2$s°, above it for %3$s.</string>
+    <string name="target_reference_missing" translatable="true">A saved reference points at a target the catalogue no longer holds, so it was dropped.</string>
+    <string name="target_interval_line" translatable="true">%1$s – %2$s, peak %3$s° at %4$s</string>
+    <string name="target_interval_no_transit" translatable="true">%1$s – %2$s, peak %3$s°</string>
+    <string name="target_multiple_intervals" translatable="true">%1$d windows tonight</string>
+    <string name="target_fit_fits" translatable="true">Fits the frame</string>
+    <string name="target_fit_marginal" translatable="true">Marginal for the frame</string>
+    <string name="target_fit_too_large" translatable="true">Too large for the frame</string>
+    <string name="target_fit_point_source" translatable="true">No apparent size is stated, so no fit statement is made and no disc is drawn.</string>
+    <string name="target_fit_numbers" translatable="true">Object %1$s°, frame short side %2$s°, %3$s mm focal length on a %4$s × %5$s mm sensor</string>
+    <string name="target_fit_pixels" translatable="true">About %1$s px across the short side</string>
+    <string name="target_fit_frame_fraction" translatable="true">%1$s of the frame\'s short side at %2$s</string>
+    <string name="target_visible_yes" translatable="true">Up tonight at this spot.</string>
+    <string name="target_visible_no" translatable="true">Not up tonight at this spot.</string>
+    <string name="target_alt_az" translatable="true">Altitude %1$s°, azimuth %2$s°</string>
+    <string name="target_aliases_none" translatable="true">None recorded</string>
+
+    <!-- =====================================================================================
+         Satellite passes
+         ===================================================================================== -->
+    <string name="pass_title" translatable="true">Satellite passes</string>
+    <string name="pass_empty" translatable="true">No observable satellite pass on this night.</string>
+    <string name="pass_no_crossing" translatable="true">No crossing of your horizon is predicted in this window. The result is a prediction from a predicted track, not a confirmed pass.</string>
+    <string name="pass_prediction_note" translatable="true">Prediction from the orbital elements, not an observation.</string>
+    <string name="pass_age_days" translatable="true">The element set is %1$d days old — pass times may shift by minutes.</string>
+    <string name="pass_stale_badge" translatable="true">stale elements: %1$d days old</string>
+    <string name="pass_expired" translatable="true">The element set for %1$s is %2$d days old, so no pass is predicted. Refresh the elements to compute passes.</string>
+    <string name="pass_malformed" translatable="true">Satellite data could not be read — passes are unavailable for now.</string>
+    <string name="pass_shadow_note" translatable="true">the satellite is in the Earth\'s shadow</string>
+    <string name="pass_bright_note" translatable="true">the sky is too bright</string>
+    <string name="pass_row" translatable="true">%1$s: %2$s – %3$s, maximum elevation %4$s°, %5$s</string>
+    <string name="pass_refresh" translatable="true">Refresh the orbital elements</string>
+    <string name="pass_refresh_offline" translatable="true">The elements were last retrieved %1$s. Without a network they cannot be refreshed, so the cached set is used with its age shown.</string>
+    <string name="pass_object_picker" translatable="true">Satellite</string>
+    <string name="pass_no_elements_for_object" translatable="true">The retrieved elements do not include %1$s, so no pass is predicted for it.</string>
+    <string name="pass_behind_horizon" translatable="true">%1$s rises behind your horizon, so the pass is not offered as visible.</string>
+    <plurals name="pass_count" translatable="true">
+        <item quantity="one">%1$d pass tonight</item>
+        <item quantity="other">%1$d passes tonight</item>
+    </plurals>
+    <plurals name="pass_element_age_days" translatable="true">
+        <item quantity="one">%1$d day old</item>
+        <item quantity="other">%1$d days old</item>
+    </plurals>
+
+    <!-- =====================================================================================
+         Cloud forecast — MET Norway, its labels and every failure wording
+         ===================================================================================== -->
+    <string name="cloud_title" translatable="true">Cloud outlook</string>
+    <string name="cloud_total_cover_label" translatable="true">Total cloud cover</string>
+    <string name="cloud_clear" translatable="true">Clear</string>
+    <string name="cloud_partly" translatable="true">Partly cloudy</string>
+    <string name="cloud_overcast" translatable="true">Overcast</string>
+    <string name="cloud_hour_row" translatable="true">%1$s: %2$s (%3$s%%)</string>
+    <string name="cloud_hour_label" translatable="true">%1$s: %2$s%%, %3$s</string>
+    <string name="cloud_source_line" translatable="true">Forecast from %1$s, retrieved %2$s</string>
+    <string name="cloud_source_reading" translatable="true">%1$s, reading %2$s old</string>
+    <string name="cloud_mean_over_window" translatable="true">Mean total cloud over the dark window: %1$s%%</string>
+    <string name="cloud_no_forecast" translatable="true">No forecast available.</string>
+    <string name="cloud_offline_from" translatable="true">No forecast available. Last reading %1$s old: %2$s%% cloud.</string>
+    <string name="cloud_unavailable" translatable="true">Forecast unavailable.</string>
+    <string name="cloud_temporarily_unavailable" translatable="true">Forecast temporarily unavailable.</string>
+    <string name="cloud_no_hours" translatable="true">The forecast does not cover this window.</string>
+    <string name="cloud_forecast_disclosure" translatable="true">With the cloud forecast on, your saved spot\'s coordinates are sent to the weather service at api.met.no, truncated to 4 decimal places (about 11 m). With it off, no such request is made and no coordinate leaves the device.</string>
+    <string name="cloud_forecast_attribution" translatable="false">Data from MET Norway (met.no) — CC BY 4.0</string>
+
+    <!-- =====================================================================================
+         Spots — the list, the editor, the coordinate routes and the horizon editor
+         ===================================================================================== -->
+    <string name="spot_title" translatable="true">Spots</string>
+    <string name="spot_empty_title" translatable="true">No spot saved</string>
+    <string name="spot_empty_body" translatable="true">Lumintra computes everything from a real place. Add one and the whole night resolves against it.</string>
+    <string name="spot_add" translatable="true">Add a spot</string>
+    <string name="spot_list_header" translatable="true">Saved spots</string>
+    <string name="spot_active_label" translatable="true">Active</string>
+    <string name="spot_row_subtitle" translatable="true">%1$s, %2$s · %3$s</string>
+    <plurals name="spot_count" translatable="true">
+        <item quantity="one">%1$d saved spot</item>
+        <item quantity="other">%1$d saved spots</item>
+    </plurals>
+    <string name="spot_edit_title_new" translatable="true">New spot</string>
+    <string name="spot_edit_title_edit" translatable="true">Edit the spot</string>
+    <string name="spot_edit_name" translatable="true">Name</string>
+    <string name="spot_edit_note" translatable="true">Note</string>
+    <string name="spot_edit_elevation" translatable="true">Elevation</string>
+    <string name="spot_edit_timezone" translatable="true">Time zone</string>
+    <string name="spot_edit_save" translatable="true">Save the spot</string>
+    <string name="spot_edit_delete" translatable="true">Delete the spot</string>
+    <string name="spot_edit_delete_confirm" translatable="true">Delete %1$s? Its horizon profile and its equipment profile go with it.</string>
+    <string name="spot_edit_discard_confirm" translatable="true">Discard this draft spot? Nothing has been saved yet.</string>
+    <string name="spot_edit_coordinates_header" translatable="true">Coordinates</string>
+    <string name="spot_edit_latitude" translatable="true">Latitude</string>
+    <string name="spot_edit_longitude" translatable="true">Longitude</string>
+    <string name="spot_edit_latitude_hint" translatable="true">Latitude in decimal degrees</string>
+    <string name="spot_edit_longitude_hint" translatable="true">Longitude in decimal degrees</string>
+    <string name="spot_edit_use_decimal" translatable="true">Decimal</string>
+    <string name="spot_edit_use_dms" translatable="true">DMS</string>
+    <string name="spot_edit_paste" translatable="true">Paste coordinates</string>
+    <string name="spot_edit_paste_hint" translatable="true">e.g. 47.3769, 8.5417</string>
+    <string name="spot_edit_paste_invalid" translatable="true">Those coordinates could not be read. Use decimal degrees, or degrees, minutes and seconds with a hemisphere letter.</string>
+    <string name="spot_edit_paste_out_of_range" translatable="true">Latitude must be between −90° and 90°, and longitude between −180° and 180°.</string>
+    <string name="spot_edit_map_section" translatable="true">Map</string>
+    <string name="spot_edit_picker" translatable="true">Adjust on map</string>
+    <string name="spot_edit_picker_hide" translatable="true">Hide map</string>
+    <string name="spot_edit_create_hint" translatable="true">Name the spot, set a pin on the map, then Save.</string>
+    <string name="spot_edit_coordinate_set" translatable="true">Pin: %1$s</string>
+    <string name="spot_edit_advanced_title" translatable="true">Advanced</string>
+    <string name="spot_edit_advanced_expand" translatable="true">Show advanced options</string>
+    <string name="spot_edit_advanced_collapse" translatable="true">Hide advanced options</string>
+    <string name="spot_edit_picker_content_description" translatable="true">Set the coordinate with the app\'s own coordinate picker</string>
+    <string name="spot_edit_picker_hint" translatable="true">Pan, then Drop pin. No location permission.</string>
+    <string name="spot_edit_picker_zoom_in" translatable="true">Zoom in</string>
+    <string name="spot_edit_picker_zoom_out" translatable="true">Zoom out</string>
+    <string name="spot_edit_lookup_title" translatable="true">Place-name lookup</string>
+    <string name="spot_edit_lookup_action" translatable="true">Look up the name</string>
+    <string name="spot_edit_lookup_hint" translatable="true">Enter a town, a landmark or an address</string>
+    <string name="spot_edit_lookup_unavailable" translatable="true">Address lookup unavailable — enter coordinates.</string>
+    <string name="spot_edit_lookup_approximate_only" translatable="true">Names are approximate — refine to your viewpoint.</string>
+    <string name="spot_edit_approximate_label" translatable="true">approximate</string>
+    <string name="spot_edit_lookup_result" translatable="true">%1$s (%2$s, %3$s)</string>
+    <string name="coord_hemisphere_n" translatable="true">N</string>
+    <string name="coord_hemisphere_s" translatable="true">S</string>
+    <string name="coord_hemisphere_e" translatable="true">E</string>
+    <string name="coord_hemisphere_w" translatable="true">W</string>
+    <string name="coord_hemisphere_label" translatable="true">Hemisphere</string>
+    <string name="coord_degrees" translatable="true">Degrees</string>
+    <string name="coord_minutes" translatable="true">Minutes</string>
+    <string name="coord_seconds" translatable="true">Seconds</string>
+    <string name="coord_decimal_pair" translatable="true">%1$s, %2$s</string>
+    <string name="coord_dms_pair" translatable="true">%1$s°%2$s′%3$s″ %4$s, %5$s°%6$s′%7$s″ %8$s</string>
+    <string name="coord_copy" translatable="true">Copy the coordinate</string>
+    <string name="coord_copied" translatable="true">The coordinate is on the clipboard.</string>
+    <!-- The horizon editor lives inside SpotEdit and stores a fixed 360-sample array. -->
+    <string name="spot_edit_horizon_field_label" translatable="true">Horizon</string>
+    <string name="spot_edit_horizon_hint" translatable="true">Drag across the azimuth axis to draw the silhouette you will actually look over.</string>
+    <string name="spot_edit_horizon_description" translatable="true">Horizon editor: ten elevation rows from −10° to 90°, 360 azimuth samples</string>
+    <string name="spot_edit_horizon_axis_range" translatable="true">Azimuth 0° to 360°, elevation −10° to 90°</string>
+    <string name="spot_edit_horizon_selected_azimuth" translatable="true">Azimuth %1$s°</string>
+    <string name="spot_edit_horizon_field_value" translatable="true">Elevation %1$s°</string>
+    <string name="spot_edit_horizon_elevation_value" translatable="true">%1$s°</string>
+    <string name="spot_edit_horizon_select_azimuth_description" translatable="true">Select an azimuth to set its elevation</string>
+    <string name="spot_edit_horizon_set_elevation_description" translatable="true">Set the elevation for the selected azimuth</string>
+    <string name="spot_edit_horizon_step_up" translatable="true">Raise the horizon at this azimuth</string>
+    <string name="spot_edit_horizon_step_down" translatable="true">Lower the horizon at this azimuth</string>
+    <string name="spot_edit_horizon_reset" translatable="true">Reset the horizon</string>
+    <string name="spot_edit_horizon_no_profile" translatable="true">No profile drawn yet — a flat horizon is used until you draw one.</string>
+    <string name="spot_edit_horizon_full_sky_note" translatable="true">This profile blocks the whole sky. It is stored, but everything will be reported as behind your horizon.</string>
+    <string name="spot_edit_horizon_flat_note" translatable="true">An all-zero profile is a legal flat horizon, not a missing one.</string>
+    <!-- Equipment: the lens presets whose field of view is computed from the formula, never typed in. -->
+    <string name="spot_edit_lens_header" translatable="true">Lens and sensor</string>
+    <string name="spot_edit_lens_preset" translatable="true">Preset</string>
+    <string name="spot_edit_lens_custom" translatable="true">Custom</string>
+    <string name="spot_edit_lens_focal" translatable="true">Focal length (mm)</string>
+    <string name="spot_edit_lens_sensor_width" translatable="true">Sensor width (mm)</string>
+    <string name="spot_edit_lens_sensor_height" translatable="true">Sensor height (mm)</string>
+    <string name="spot_edit_lens_field_of_view" translatable="true">Field of view %1$s° × %2$s°</string>
+    <string name="spot_edit_lens_equipment_profile" translatable="true">Equipment profile</string>
+    <string name="spot_export" translatable="true">Export every spot</string>
+    <string name="spot_export_content_description" translatable="true">Export every saved spot, its horizon profile and its equipment profiles as one file</string>
+    <string name="spot_export_done" translatable="true">The scout file was written: %1$s.</string>
+    <string name="spot_export_failed" translatable="true">The scout file could not be written.</string>
+    <string name="spot_export_nothing" translatable="true">There is no spot to export yet.</string>
+    <string name="spot_import" translatable="true">Import a scout file</string>
+    <string name="spot_import_content_description" translatable="true">Import saved spots, horizon profiles and equipment profiles from one file</string>
+    <string name="spot_import_cancelled" translatable="true">No file was chosen, so nothing changed.</string>
+    <string name="spot_import_not_a_scout_file" translatable="true">That file is not a Lumintra scout file.</string>
+    <string name="spot_import_unknown_version" translatable="true">That scout file declares version %1$s, which this build of Lumintra does not understand, so nothing was imported.</string>
+    <string name="spot_import_invalid_coordinate" translatable="true">Record %1$s was refused: %2$s is outside its valid range, so nothing was imported.</string>
+    <string name="spot_import_invalid_horizon" translatable="true">Record %1$s was refused: its horizon profile holds %2$d samples where 360 are required, so nothing was imported.</string>
+    <string name="spot_import_invalid_sample" translatable="true">Record %1$s was refused: one horizon sample is outside −10° to 90°, so nothing was imported.</string>
+    <string name="spot_import_preview" translatable="true">%1$s and %2$s will be added. Importing replaces nothing.</string>
+    <string name="spot_import_done" translatable="true">%1$s added, %2$s skipped because they were already saved.</string>
+    <plurals name="spot_import_added_count" translatable="true">
+        <item quantity="one">%1$d record added</item>
+        <item quantity="other">%1$d records added</item>
+    </plurals>
+    <plurals name="spot_import_skipped_count" translatable="true">
+        <item quantity="one">%1$d record skipped</item>
+        <item quantity="other">%1$d records skipped</item>
+    </plurals>
+    <string name="spot_store_quarantined" translatable="true">1 saved spot could not be read and was set aside. The other spots loaded normally.</string>
+    <string name="spot_saved_confirm" translatable="true">%1$s was saved.</string>
+
+    <!-- =====================================================================================
+         Sharing the session brief: the text payload, its templates, and the postcard
+         ===================================================================================== -->
+    <string name="share_title" translatable="true">Share the brief</string>
+    <string name="share_back" translatable="true">Back</string>
+    <string name="share_mode_text" translatable="true">Text brief</string>
+    <string name="share_mode_postcard" translatable="true">Postcard</string>
+    <string name="share_mode_selected" translatable="true">Selected</string>
+    <string name="share_preview_header" translatable="true">What will be sent</string>
+    <string name="share_preview_text_description" translatable="true">Text brief preview, %1$d characters</string>
+    <string name="share_preview_postcard_description" translatable="true">Postcard for %1$s, %2$s at %3$s, %4$s, Moon %5$s</string>
+    <string name="share_postcard_preview" translatable="true">Postcard preview</string>
+    <string name="share_send" translatable="true">Send</string>
+    <string name="share_save" translatable="true">Save the postcard</string>
+    <string name="share_loading" translatable="true">Preparing the brief…</string>
+    <string name="share_no_spot_title" translatable="true">No spot saved</string>
+    <string name="share_no_spot_body" translatable="true">Save a spot first: the brief is composed for a real place, never for a default coordinate.</string>
+    <string name="share_no_spot_action" translatable="true">Open spots</string>
+    <string name="share_postcard_unavailable" translatable="true">The postcard could not be composed, so only the text brief can be sent.</string>
+    <string name="share_no_target_app" translatable="true">No app on this device can receive the share, so it was copied instead.</string>
+    <string name="share_copy_text" translatable="true">Copy the text brief</string>
+    <string name="share_copied" translatable="true">The text brief is on the clipboard.</string>
+    <string name="share_save_failed" translatable="true">The postcard could not be saved.</string>
+    <string name="share_saved" translatable="true">The postcard was saved.</string>
+    <string name="share_text_header" translatable="true">%1$s — night session brief</string>
+    <string name="share_text_spot" translatable="true">Spot: %1$s</string>
+    <string name="share_text_position" translatable="true">Position: %1$s, %2$s</string>
+    <string name="share_text_zone" translatable="true">Time zone: %1$s</string>
+    <string name="share_text_night" translatable="true">Night: %1$s</string>
+    <string name="share_text_dark_window" translatable="true">Astronomical darkness: %1$s – %2$s</string>
+    <string name="share_text_dark_window_second" translatable="true">Second dark window: %1$s – %2$s</string>
+    <string name="share_text_dark_kind" translatable="true">Dark window kind: %1$s</string>
+    <string name="share_dark_kind_dark" translatable="true">astronomical dark</string>
+    <string name="share_dark_kind_polar_day" translatable="true">the Sun does not set</string>
+    <string name="share_dark_kind_polar_night" translatable="true">the Sun does not rise</string>
+    <string name="share_dark_kind_no_astro" translatable="true">no astronomical darkness</string>
+    <string name="share_dark_kind_no_dark" translatable="true">no darkness at all</string>
+    <string name="share_text_polar_day" translatable="true">The Sun does not set tonight and there is no darkness, so no dark window is stated.</string>
+    <string name="share_text_no_astro_dark" translatable="true">There is no astronomical darkness tonight. The deepest level is %1$s, with the Sun %2$s° below the horizon at %3$s.</string>
+    <string name="share_text_no_dark" translatable="true">No darkness occurs tonight: the Sun stays above civil twilight, reaching only %1$s° below the horizon at %2$s.</string>
+    <string name="share_text_polar_night" translatable="true">The Sun does not rise. The deepest dark interval of the civil day runs %1$s – %2$s.</string>
+    <string name="share_text_sunset" translatable="true">Sunset: %1$s</string>
+    <string name="share_text_sunrise" translatable="true">Sunrise: %1$s</string>
+    <string name="share_text_civil" translatable="true">Civil twilight (−6°): %1$s – %2$s</string>
+    <string name="share_text_nautical" translatable="true">Nautical twilight (−12°): %1$s – %2$s</string>
+    <string name="share_text_astronomical" translatable="true">Astronomical twilight (−18°): %1$s – %2$s</string>
+    <string name="share_text_twilight_level" translatable="true">%1$s twilight: %2$s – %3$s</string>
+    <string name="share_text_twilight_civil_short" translatable="true">civil</string>
+    <string name="share_text_twilight_nautical_short" translatable="true">nautical</string>
+    <string name="share_text_twilight_astronomical_short" translatable="true">astronomical</string>
+    <string name="share_text_moon" translatable="true">Moon: %1$s%% illuminated, %2$s, %3$s</string>
+    <string name="share_text_moon_alt_az" translatable="true">altitude %1$s°, azimuth %2$s°</string>
+    <string name="share_text_moon_up_all_night" translatable="true">up all night</string>
+    <string name="share_text_moon_below_all_night" translatable="true">below the horizon all night</string>
+    <string name="share_text_moon_rises" translatable="true">rises at %1$s</string>
+    <string name="share_text_moon_sets" translatable="true">sets at %1$s</string>
+    <string name="share_text_moon_lowest" translatable="true">Lowest altitude %1$s° at %2$s</string>
+    <string name="share_text_targets_header" translatable="true">Targets</string>
+    <string name="share_text_no_target" translatable="true">No target is chosen for this session.</string>
+    <string name="share_text_target_window" translatable="true">%1$s (%2$s): up %3$s – %4$s, peak %5$s°</string>
+    <string name="share_text_target_never_rises" translatable="true">%1$s (%2$s): never rises from this spot.</string>
+    <string name="share_text_target_circumpolar" translatable="true">%1$s (%2$s): up all night, lowest %3$s° at %4$s.</string>
+    <string name="share_text_target_partial" translatable="true">%1$s (%2$s): up %3$s – %4$s, clipped by the dark window, peak %5$s°</string>
+    <string name="share_text_passes_header" translatable="true">Satellite passes</string>
+    <string name="share_text_no_pass" translatable="true">No observable satellite pass on this night.</string>
+    <string name="share_text_pass" translatable="true">%1$s: %2$s, maximum elevation %3$s°, %4$s, elements %5$s old</string>
+    <string name="share_text_pass_visible" translatable="true">visible</string>
+    <string name="share_text_pass_shadow" translatable="true">occurs, not visible — the satellite is in Earth\'s shadow</string>
+    <string name="share_text_pass_bright" translatable="true">occurs, not visible — the sky is too bright</string>
+    <string name="share_text_cloud_header" translatable="true">Cloud outlook (forecast, not a measurement)</string>
+    <string name="share_text_cloud_source" translatable="true">Source: %1$s, retrieved %2$s, reading %3$s old</string>
+    <string name="share_text_cloud_hour" translatable="true">%1$s: %2$s%% cloud</string>
+    <string name="share_text_cloud_mean" translatable="true">Mean cloud over the dark window: %1$s%%</string>
+    <string name="share_text_cloud_mean_session" translatable="true">Mean cloud over the whole session: %1$s%%</string>
+    <string name="share_text_no_forecast" translatable="true">No forecast available.</string>
+    <string name="share_text_no_forecast_last" translatable="true">No forecast available. Last reading %1$s old: %2$s%% cloud.</string>
+    <string name="share_text_lens_header" translatable="true">Lens</string>
+    <string name="share_text_lens" translatable="true">%1$s mm focal length, sensor %2$s × %3$s mm, field of view %4$s° × %5$s°</string>
+    <string name="share_text_and_more" translatable="true">…and %1$d more</string>
+    <string name="share_text_credit" translatable="true">Forecast data from MET Norway (met.no) — CC BY 4.0. Milky Way panorama ESO/S. Brunier — CC BY 4.0.</string>
+    <string name="share_phase_new_moon" translatable="true">new moon</string>
+    <string name="share_phase_waxing_crescent" translatable="true">waxing crescent</string>
+    <string name="share_phase_first_quarter" translatable="true">first quarter</string>
+    <string name="share_phase_waxing_gibbous" translatable="true">waxing gibbous</string>
+    <string name="share_phase_full_moon" translatable="true">full moon</string>
+    <string name="share_phase_waning_gibbous" translatable="true">waning gibbous</string>
+    <string name="share_phase_last_quarter" translatable="true">last quarter</string>
+    <string name="share_phase_waning_crescent" translatable="true">waning crescent</string>
+    <string name="postcard_instant" translatable="true">Sky at %1$s</string>
+    <string name="postcard_credit_source" translatable="false">Source: ESO/S. Brunier — Milky Way panorama eso0932a (CC BY 4.0), https://www.eso.org/public/images/eso0932a/</string>
+    <string name="postcard_credit_modified" translatable="true">The credited panorama is cropped and tone-mapped for the postcard; the stars, the planet labels and the Moon are drawn by the app\'s own renderer.</string>
+
+    <!-- =====================================================================================
+         Widget — the night-glance surfaces (`res/xml/night_glance_widget_info.xml` reads the
+         label and the description from strings_platform.xml)
+         ===================================================================================== -->
+    <string name="widget_title" translatable="true">Tonight</string>
+    <string name="widget_dark_window_line" translatable="true">Dark %1$s – %2$s %3$s</string>
+    <string name="widget_dark_window_second" translatable="true">Then %1$s – %2$s</string>
+    <string name="widget_no_darkness" translatable="true">No darkness tonight</string>
+    <string name="widget_cloud_line" translatable="true">%1$s%% cloud — forecast, %2$s</string>
+    <string name="widget_cloud_none" translatable="true">no forecast</string>
+    <string name="widget_stale_badge" translatable="true">stale</string>
+    <string name="widget_not_ready" translatable="true">Open Lumintra to see tonight\'s dark window</string>
+    <string name="widget_aged" translatable="true">Not updated since %1$s</string>
+    <string name="widget_content_description" translatable="true">Lumintra night glance: tonight\'s dark window, the Moon and the cloud forecast for %1$s</string>
+    <string name="widget_moon_up_all_night" translatable="true">Moon up all night</string>
+    <string name="widget_moon_down_all_night" translatable="true">Moon below the horizon all night</string>
+    <string name="widget_moon_rises" translatable="true">Moon rises during the night</string>
+    <string name="widget_moon_sets" translatable="true">Moon sets during the night</string>
+    <string name="widget_moon_unknown" translatable="true">Moon\'s up/down state is unknown</string>
+    <string name="widget_open_app" translatable="true">Open Lumintra</string>
+
+    <!-- The night-glance widget's own lines (ui/widget/NightGlanceWidget.kt). Every one of them is
+         resolved from this table and never concatenated, and every one states a fact of the persisted
+         snapshot: the first-night invitation, the no-spot invitation, the one TalkBack name for the
+         whole tile, the Moon's fraction with its typed form, an honest sentence per DarkWindowKind
+         for a night with no darkness, and the cloud line's **age** — which is never dropped to fit a
+         smaller layout, because a percentage without the age of its reading reads as current. -->
+    <string name="widget_not_ready_other_night" translatable="true">Tonight\'s plan isn\'t ready — open Lumintra</string>
+    <string name="widget_no_spot" translatable="true">Set a spot in Lumintra to see tonight</string>
+    <string name="widget_no_dark_polar_day" translatable="true">The Sun does not set tonight</string>
+    <string name="widget_no_dark_polar_night" translatable="true">The Sun does not rise tonight</string>
+    <string name="widget_no_dark_no_astro" translatable="true">No astronomical darkness tonight</string>
+    <string name="widget_moon_line" translatable="true">%1$d%% illuminated — %2$s</string>
+    <string name="widget_cloud_age_now" translatable="true">just now</string>
+    <string name="widget_cloud_age_minutes" translatable="true">%1$d min old</string>
+    <string name="widget_cloud_age_hours" translatable="true">%1$d h old</string>
+    <string name="widget_a11y" translatable="true">Lumintra night glance: %1$s. %2$s</string>
+    <string name="widget_a11y_not_ready" translatable="true">Lumintra night glance: tonight\'s plan is not ready yet. Open Lumintra to see tonight\'s dark window.</string>
+    <string name="widget_a11y_no_spot" translatable="true">Lumintra night glance: no spot is saved. Set a spot in Lumintra to see tonight.</string>
+    <string name="widget_preview_spot" translatable="true">Your spot</string>
+
+    <!-- =====================================================================================
+         Reminder — the one local notification for the night's dark window
+         ===================================================================================== -->
+    <string name="reminder_title" translatable="true">Dark window begins at %1$s</string>
+    <string name="reminder_body" translatable="true">Astronomical darkness at %1$s runs %2$s – %3$s.</string>
+    <string name="reminder_body_forecast" translatable="true">Astronomical darkness at %1$s runs %2$s – %3$s. Cloud at %4$s is a forecast, %5$s.</string>
+    <string name="reminder_channel_name" translatable="true">Tonight\'s dark window</string>
+    <string name="reminder_channel_description" translatable="true">One reminder before tonight\'s dark window at your saved spot.</string>
+    <string name="reminder_explainer" translatable="true">Android will now ask for notification permission. Lumintra uses it for this one reminder, and for nothing else.</string>
+    <string name="reminder_denied" translatable="true">Notifications are turned off for Lumintra, so the reminder cannot be shown. Everything else works as usual.</string>
+    <string name="reminder_open_settings" translatable="true">Open the system notification settings</string>
+
+    <!-- The notification's own body lines (notify/DarkWindowReminder.kt), one per fact. The title
+         states the dark window's start; the body names the spot, states both bounds in the spot's
+         zone, the Moon's fraction with its typed form, and the cloud reading **as of its retrieval
+         time, labelled a forecast**. None of them is an instruction and none promises clear skies:
+         the sky can cloud over between the reading and the window, and the forecast is total cloud
+         only, so a claim of clarity is a claim the data cannot support. The offline line is what
+         keeps an absent forecast from reading as a fresh one. -->
+    <string name="reminder_body_spot" translatable="true">Spot: %1$s</string>
+    <string name="reminder_body_window" translatable="true">Dark window %1$s – %2$s %3$s</string>
+    <string name="reminder_body_moon" translatable="true">%1$d%% illuminated — %2$s</string>
+    <string name="reminder_body_cloud" translatable="true">Cloud %1$d%% — forecast, retrieved %2$s</string>
+    <string name="reminder_body_no_cloud" translatable="true">No cloud forecast is cached for this spot.</string>
+    <string name="reminder_body_offline" translatable="true">Planned without a network, so the forecast could not be refreshed.</string>
+
+    <!-- =====================================================================================
+         Settings — every row changes observable behaviour
+         ===================================================================================== -->
+    <string name="settings_title" translatable="true">Settings</string>
+    <string name="settings_back" translatable="true">Back</string>
+    <string name="settings_appearance_header" translatable="true">Appearance</string>
+    <string name="settings_theme_supporting" translatable="true">Choose how the app looks.</string>
+    <string name="settings_theme_system" translatable="true">Follow system</string>
+    <string name="settings_theme_light" translatable="true">Light</string>
+    <string name="settings_theme_dark" translatable="true">Dark</string>
+    <string name="settings_dynamic_color_title" translatable="true">Use wallpaper colours</string>
+    <string name="settings_dynamic_color_supported" translatable="true">Build the palette from the device wallpaper.</string>
+    <string name="settings_dynamic_color_unsupported" translatable="true">Not available on this version of Android.</string>
+    <string name="settings_red_mode_title" translatable="true">Red night mode</string>
+    <string name="settings_red_mode_summary" translatable="true">Hold the whole app, the widget and the reminder at red, with blue at zero and green at or below 8 of 255.</string>
+    <string name="settings_language_header" translatable="true">Language</string>
+    <string name="settings_language_title" translatable="true">App language</string>
+    <string name="settings_language_summary" translatable="true">Choose the language this app uses.</string>
+    <string name="settings_language_system" translatable="true">System default</string>
+    <string name="settings_language_system_hint" translatable="true">The app follows the platform\'s own per-app language picker; it never asks you to choose a language on first run.</string>
+    <string name="settings_units_header" translatable="true">Units and formats</string>
+    <string name="settings_units_title" translatable="true">Units</string>
+    <string name="settings_units_summary" translatable="true">Distances, elevations and temperatures. Focal length and sensor size stay in millimetres.</string>
+    <string name="settings_units_metric" translatable="true">Metric (m, km, °C)</string>
+    <string name="settings_units_imperial" translatable="true">Imperial (ft, mi, °F)</string>
+    <string name="settings_time_format_title" translatable="true">Time format</string>
+    <string name="settings_time_format_summary" translatable="true">Applies to the brief, the scene\'s time axis, the widget and the reminder.</string>
+    <string name="settings_time_format_24" translatable="true">24-hour</string>
+    <string name="settings_time_format_12" translatable="true">12-hour</string>
+    <string name="settings_coordinate_format_title" translatable="true">Coordinate format</string>
+    <string name="settings_coordinate_format_summary" translatable="true">How a spot\'s latitude and longitude are displayed. Either form can be typed or pasted; the stored coordinate never changes.</string>
+    <string name="settings_coordinate_format_decimal" translatable="true">Decimal degrees</string>
+    <string name="settings_coordinate_format_dms" translatable="true">Degrees, minutes, seconds</string>
+    <string name="settings_data_header" translatable="true">Tonight</string>
+    <string name="settings_reminder_title" translatable="true">Remind me tonight</string>
+    <string name="settings_reminder_summary" translatable="true">One notification before the dark window. Permission is requested when you turn this on, never at launch.</string>
+    <string name="settings_cloud_title" translatable="true">Cloud forecast</string>
+    <string name="settings_cloud_summary" translatable="true">Fetch hourly total cloud from api.met.no for the saved spot. Off means no request is made at all.</string>
+    <string name="settings_lens_preset_title" translatable="true">Default lens profile</string>
+    <string name="settings_lens_preset_summary" translatable="true">The preset the lens frame opens with, and the frame every does-it-fit answer is computed against.</string>
+    <string name="settings_sky_brightness_title" translatable="true">Sky brightness estimate</string>
+    <string name="settings_sky_brightness_summary" translatable="true">Adds your own reading beside the computed darkness, labelled a user estimate. It never changes the computed value.</string>
+    <string name="settings_sky_brightness_none" translatable="true">None</string>
+    <string name="settings_sky_brightness_sqm" translatable="true">SQM (mag/arcsec²)</string>
+    <string name="settings_sky_brightness_bortle" translatable="true">Bortle class (1–9)</string>
+    <string name="settings_sky_brightness_sqm_value" translatable="true">SQM reading</string>
+    <string name="settings_sky_brightness_bortle_value" translatable="true">Bortle class</string>
+    <string name="settings_behaviour_header" translatable="true">Behaviour</string>
+    <string name="settings_haptics_title" translatable="true">Vibration feedback</string>
+    <string name="settings_haptics_summary" translatable="true">Vibrate when you run the main action.</string>
+    <string name="settings_about_header" translatable="true">About</string>
+    <string name="settings_rate_title" translatable="true">Rate Lumintra</string>
+    <string name="settings_rate_summary" translatable="true">Tell others how this app works for you.</string>
+    <string name="settings_rate_unavailable" translatable="true">Neither the Play Store nor a browser is reachable on this device, so the listing cannot be opened.</string>
+    <string name="settings_credits_title" translatable="true">Credits and licences</string>
+    <string name="settings_credits_summary" translatable="true">Every asset, data source and library this app ships with.</string>
+
+    <!-- =====================================================================================
+         Credits — every licence and attribution obligation the app displays.
+         The attribution lines, the licence URLs, the version and the contact address are
+         `translatable="false"`: a licence credit is not a translation unit, and Android
+         resolves it from the default resources for every locale.
+         ===================================================================================== -->
+    <string name="credits_title" translatable="true">Credits</string>
+    <string name="credits_back" translatable="true">Back</string>
+    <string name="credits_section_data" translatable="true">Data and imagery</string>
+    <string name="credits_section_code" translatable="true">Libraries</string>
+    <string name="credits_section_modifications" translatable="true">Modifications</string>
+    <string name="credits_section_links" translatable="true">Licence text</string>
+    <string name="credit_met_norway" translatable="false">Data from MET Norway (met.no) — CC BY 4.0</string>
+    <string name="credit_eso_credit" translatable="false">ESO/S. Brunier</string>
+    <string name="credit_eso_what" translatable="true">%1$s — Milky Way panorama eso0932a (CC BY 4.0)</string>
+    <string name="credit_nasa_svs" translatable="false">Moon imagery: NASA Scientific Visualization Studio (SVS), public domain</string>
+    <string name="credit_iau_constellations" translatable="false">Constellation figures: IAU and Sky &amp; Telescope (Roger Sinnott, Rick Fienberg; patterns by Alan MacRobert) — CC BY 4.0</string>
+    <string name="credit_fk6" translatable="false">Star positions: The Sixth Fundamental Catalogue (FK6), GAVO Data Centre — CC0 1.0</string>
+    <string name="credit_fk6_short" translatable="false">FK6 (CC0 1.0)</string>
+    <string name="credit_play_review" translatable="false">In-app review: Google Play Core SDK Terms of Service</string>
+    <string name="credit_orekit" translatable="false">Orekit 13.1.9 + Hipparchus 4.0.3 — Apache-2.0</string>
+    <string name="credit_astronomy_kt" translatable="false">astronomy.kt — Astronomy Engine (Kotlin), MIT</string>
+    <string name="credit_met_norway_source" translatable="false">Weather forecast: api.met.no, MET Norway</string>
+    <string name="credit_iau_source" translatable="false">Constellation figures: IAU and Sky &amp; Telescope</string>
+    <string name="credit_open_cc_by" translatable="true">Licence text (CC BY 4.0)</string>
+    <string name="credit_open_cc0" translatable="true">Licence text (CC0 1.0)</string>
+    <string name="credit_open_met" translatable="true">met.no</string>
+    <string name="credit_open_api_met" translatable="true">api.met.no</string>
+    <string name="credit_open_eso" translatable="true">ESO panorama eso0932a</string>
+    <string name="credit_open_iau" translatable="true">IAU</string>
+    <string name="credit_link_cc_by" translatable="false">https://creativecommons.org/licenses/by/4.0/</string>
+    <string name="credit_link_met" translatable="false">https://www.met.no</string>
+    <string name="credit_link_api_met" translatable="false">https://api.met.no</string>
+    <string name="credit_link_eso" translatable="false">https://www.eso.org/public/images/eso0932a/</string>
+    <string name="credit_link_iau" translatable="false">https://www.iau.org</string>
+    <string name="credit_link_cc0" translatable="false">https://creativecommons.org/publicdomain/zero/1.0/</string>
+    <string name="credit_mod_met_norway" translatable="true">Coordinates are truncated to 4 decimal places (about 11 m) before they are sent to api.met.no.</string>
+    <string name="credit_mod_imagery" translatable="true">The Milky Way backdrop and the share postcard are composed from the credited panorama and rendered through the app\'s own palette.</string>
+    <string name="credits_about_header" translatable="true">About this app</string>
+    <string name="credits_about_version" translatable="true">Version %1$s (%2$s)</string>
+    <string name="credits_about_contact" translatable="true">Support: %1$s</string>
+    <string name="credits_about_no_account" translatable="true">Lumintra has no account and no login, and collects no personal information to the developer\'s server.</string>
+    <string name="credits_about_forecast" translatable="true">A saved coordinate is sent to the weather service api.met.no only when the cloud forecast is used, truncated to 4 decimal places (about 11 m). With the cloud forecast turned off, no such request is made.</string>
+    <string name="credits_about_elements" translatable="true">Satellite orbital elements are fetched from CelesTrak; that request carries no coordinates.</string>
+    <string name="credits_about_no_ads" translatable="true">The app shows no advertising and has no subscription.</string>
+    <string name="credits_about_no_location" translatable="true">The app requests no location permission. It never reads the device\'s position and never uses the compass.</string>
+    <string name="credits_privacy" translatable="true">Privacy policy</string>
+    <string name="credits_privacy_unpublished" translatable="true">The privacy policy address has not been published yet, so there is nothing to open.</string>
+    <string name="credits_privacy_failed" translatable="true">No browser could open %1$s. The address is shown above so you can open it yourself.</string>
+    <string name="credits_version_name" translatable="false">1.0.0</string>
+    <string name="credits_version_code" translatable="false">1</string>
+    <string name="credits_contact_email" translatable="false">v.sobolenko.vs@gmail.com</string>
+    <!-- Published by node scripts/publish-privacy.mjs for this slot; must match store/listing.json
+         so Credits can open the policy in-app. -->
+    <string name="privacy_policy_url" translatable="false">https://telegra.ph/Lumintra-Light-Planner--privacy-policy-10-09</string>
+
+    <!-- =====================================================================================
+         Welcome, the spot list's rows and detail pane, the editor's validation and lens lines,
+         the time-zone picker's labels and the picker's own controls. Added with the screens that
+         render them; no key above is renamed or removed by them.
+         ===================================================================================== -->
+    <string name="welcome_have_spot" translatable="true">Your spot: %1$s</string>
+    <string name="welcome_action_manual" translatable="true">Type coordinates instead</string>
+    <string name="welcome_action_skip" translatable="true">Skip for now</string>
+    <string name="welcome_action_add_another" translatable="true">Add another spot</string>
+
+    <string name="spot_row_open_description" translatable="true">Open the spot %1$s</string>
+    <string name="spot_row_set_active_description" translatable="true">Make %1$s the active spot</string>
+    <string name="spot_row_edit_description" translatable="true">Edit the spot %1$s</string>
+    <string name="spot_row_delete_description" translatable="true">Delete the spot %1$s</string>
+    <string name="spot_row_horizon_drawn" translatable="true">horizon drawn</string>
+    <string name="spot_row_horizon_flat" translatable="true">flat horizon</string>
+    <string name="spot_set_active_action" translatable="true">Make active</string>
+
+    <string name="spot_detail_prompt_title" translatable="true">Choose a spot</string>
+    <string name="spot_detail_prompt_body" translatable="true">Pick a saved spot to read its coordinate, its time zone and its horizon.</string>
+    <string name="spot_detail_elevation" translatable="true">Elevation</string>
+    <string name="spot_elevation_metres" translatable="true">%1$s m</string>
+    <string name="spot_detail_zone" translatable="true">Time zone</string>
+    <string name="spot_detail_precision" translatable="true">Coordinate</string>
+    <string name="spot_detail_typed" translatable="true">typed</string>
+
+    <string name="spot_edit_needs_name" translatable="true">Give the spot a name.</string>
+    <string name="spot_edit_needs_coordinate" translatable="true">Set a coordinate on the map or in Advanced.</string>
+    <string name="spot_edit_elevation_invalid" translatable="true">Elevation must be a number of metres between −500 and 9000.</string>
+    <string name="spot_edit_elevation_hint" translatable="true">Metres above sea level; negative below it</string>
+    <string name="spot_edit_paste_applied" translatable="true">Coordinates applied.</string>
+    <string name="spot_edit_precision_approximate" translatable="true">approximate coordinate</string>
+    <string name="spot_edit_precision_typed" translatable="true">typed coordinate</string>
+    <string name="spot_edit_lens_numbers" translatable="true">%1$s mm lens on a %2$s × %3$s mm sensor</string>
+    <string name="spot_edit_lens_read_only" translatable="true">The equipment profile is shown for reference here; it is edited with the rest of the kit.</string>
+    <string name="spot_edit_lookup_reverse_action" translatable="true">Name this coordinate</string>
+    <string name="spot_edit_lookup_none" translatable="true">No place name was found for that text.</string>
+    <string name="spot_edit_lookup_reverse_none" translatable="true">No place name was found for this coordinate. The coordinate and your own label are kept.</string>
+
+    <string name="spot_edit_zone_use_device" translatable="true">Use the device time zone</string>
+    <string name="spot_edit_zone_search" translatable="true">Search the time zones</string>
+    <string name="spot_edit_zone_search_hint" translatable="true">For example Europe/Zurich</string>
+    <string name="spot_edit_zone_no_match" translatable="true">No time zone matches “%1$s”.</string>
+    <string name="spot_edit_zone_from_coordinates" translatable="true">Derived from the coordinate.</string>
+    <string name="spot_edit_zone_device_fallback" translatable="true">Could not be derived from the coordinate, so the device time zone is used. Set it by hand if that is wrong.</string>
+    <string name="spot_edit_zone_device_default" translatable="true">Device time zone, until a coordinate is set.</string>
+
+    <string name="spot_edit_picker_canvas_description" translatable="true">Coordinate picker: drag to move the plate, pinch to zoom, tap to place the pin</string>
+    <string name="spot_edit_picker_range" translatable="true">%1$s° wide, %2$s° high</string>
+    <string name="spot_edit_picker_no_pin" translatable="true">No pin yet — tap the plate to drop one.</string>
+    <string name="spot_edit_picker_pin_at" translatable="true">Pin at %1$s</string>
+    <string name="spot_edit_picker_drop_pin" translatable="true">Tap to drop the pin</string>
+    <string name="spot_edit_picker_centre_on_pin" translatable="true">Centre on the pin</string>
+
+    <!-- =====================================================================================
+         Scaffold-legacy keys. `ui/home/` and `ui/about/` still render them; they are retained
+         so the build is not broken mid-flight and are removed with those two screens.
+         ===================================================================================== -->
+    <string name="home_about_action" translatable="true">About</string>
+    <string name="home_intro" translatable="true">A focused starting point, ready to become your app.</string>
+    <string name="home_idea_label" translatable="true">The idea</string>
+    <string name="home_pick_section" translatable="true">Choose a section to open it here.</string>
+    <string name="home_primary_action" translatable="true">Try the starter action</string>
+    <string name="home_primary_action_again" translatable="true">Run it again</string>
+    <string name="home_status_ready" translatable="true">Ready when you are</string>
+    <string name="home_status_complete" translatable="true">Starter action complete</string>
+    <string name="home_snackbar_completed" translatable="true">Starter action completed.</string>
+    <string name="home_snackbar_already_completed" translatable="true">The starter action is already complete.</string>
+    <string name="about_title" translatable="true">About this app</string>
+    <string name="about_back" translatable="true">Back</string>
+    <string name="about_body" translatable="true">%1$s plans a photography session from a saved spot\'s coordinates and the clock, and never asks the phone to be pointed anywhere.</string>
+    <string name="about_privacy_note" translatable="true">Lumintra requests no location permission and keeps every record on the device.</string>
+
+    <!-- =====================================================================================
+         Night scene — the TalkBack summary, the scene controls, the instrument readout and the
+         two honest notices: a sky table that fell back, and a night with no darkness at all.
+         The summary is three clauses joined by the screen, so none of them ends in a full stop.
+         ===================================================================================== -->
+    <string name="night_summary_head" translatable="true">%1$s at %2$s</string>
+    <string name="night_summary_direction" translatable="true">azimuth %1$s, Sun %2$s</string>
+    <string name="night_summary_moon" translatable="true">Moon %1$s lit, altitude %2$s</string>
+    <string name="night_body_sun" translatable="true">Sun</string>
+    <string name="share_phase_moon" translatable="true">Moon</string>
+    <string name="night_planet_mercury" translatable="true">Mercury</string>
+    <string name="night_planet_venus" translatable="true">Venus</string>
+    <string name="night_planet_mars" translatable="true">Mars</string>
+    <string name="night_planet_jupiter" translatable="true">Jupiter</string>
+    <string name="night_planet_saturn" translatable="true">Saturn</string>
+    <string name="night_planet_uranus" translatable="true">Uranus</string>
+    <string name="night_planet_neptune" translatable="true">Neptune</string>
+    <string name="night_back_to_horizon" translatable="true">Return to the horizon view</string>
+    <string name="night_red_mode_enable" translatable="true">Turn red night mode on</string>
+    <string name="night_red_mode_disable" translatable="true">Turn red night mode off</string>
+    <string name="night_target_label" translatable="true">Target %1$s</string>
+    <string name="night_trail_age" translatable="true">star trail: elements %1$s</string>
+    <string name="night_readout_azimuth" translatable="true">Viewing azimuth</string>
+    <string name="night_readout_air_mass" translatable="true">Air mass at centre</string>
+    <string name="night_readout_sun" translatable="true">Sun altitude</string>
+    <string name="night_lut_fallback_note" translatable="true">The bundled sky table could not be read, so the sky colours come from the built-in fallback ramp.</string>
+    <string name="night_no_darkness_note" translatable="true">The Sun does not reach astronomical twilight tonight, so the sky is never fully dark. The scene still shows the real sky at every hour.</string>
+    <string name="night_play_start" translatable="true">Play night</string>
+    <string name="night_play_pause" translatable="true">Pause</string>
+    <string name="night_trails_label" translatable="true">Star trails</string>
+    <string name="night_trail_interval_label" translatable="true">Trail interval</string>
+    <string name="night_trail_interval_option" translatable="true">%1$d min</string>
+    <string name="night_trail_interval_readout" translatable="true">Trail interval</string>
+    <string name="night_facts_header" translatable="true">Tonight</string>
+    <string name="night_window_header" translatable="true">Light window</string>
+    <string name="night_window_value" translatable="true">%1$s - %2$s</string>
+    <string name="night_moon_row" translatable="true">%1$s lit, altitude %2$s</string>
+
+    <!-- =====================================================================================
+         Session brief — the timeline strip, the darkness words, the key-times table, the moon
+         panel, the cloud row, the target and pass rows, the typed conditions and the notices
+         ===================================================================================== -->
+    <string name="brief_sky_level_excellent" translatable="true">Excellent</string>
+    <string name="brief_sky_level_good" translatable="true">Good</string>
+    <string name="brief_sky_level_fair" translatable="true">Fair</string>
+    <string name="brief_sky_level_poor" translatable="true">Poor</string>
+    <string name="brief_sky_level_none" translatable="true">None</string>
+
+    <string name="brief_timeline_header" translatable="true">Timeline</string>
+    <string name="brief_timeline_description" translatable="true">Night timeline in 96 steps. The selected instant is %1$s.</string>
+    <string name="brief_scrub_hint" translatable="true">Drag across the strip to move the instant.</string>
+    <string name="brief_zone_toggle" translatable="true">Switch the time zone used in the brief</string>
+    <string name="brief_instant_label" translatable="true">Instant</string>
+    <string name="brief_range" translatable="true">%1$s to %2$s</string>
+    <string name="brief_moonless_legend" translatable="true">Moonless window</string>
+    <string name="brief_window_value" translatable="true">%1$s → %2$s (%3$s)</string>
+
+    <string name="brief_dark_two_windows" translatable="true">This night has %1$d dark windows; each is listed below.</string>
+    <string name="brief_no_dark_window_note" translatable="true">There is no fully dark window tonight, so the scene shows the real twilight sky instead of a starry one.</string>
+    <string name="brief_midday_dip" translatable="true">The darkest stretch falls in the middle of the day: %1$s.</string>
+    <string name="brief_sun_lowest_label" translatable="true">Sun at its lowest</string>
+    <string name="brief_sun_highest_label" translatable="true">Sun at its highest</string>
+    <string name="brief_reminder_not_offered" translatable="true">No reminder is offered, because there is no dark window to be reminded about.</string>
+
+    <string name="brief_twilight_astro" translatable="true">astronomical</string>
+    <string name="brief_twilight_golden" translatable="true">golden hour</string>
+    <string name="brief_twilight_blue" translatable="true">blue hour</string>
+    <string name="brief_key_times_none" translatable="true">No sunset, sunrise or twilight band falls inside this night.</string>
+    <string name="brief_sunset_label" translatable="true">Sunset</string>
+    <string name="brief_sunrise_label" translatable="true">Sunrise</string>
+    <string name="brief_twilight_table_note" translatable="true">Every time here is computed from the spot\'s coordinates, not read from a table.</string>
+    <string name="brief_key_time_definition_note" translatable="true">Civil, nautical and astronomical are the three standard definitions of twilight; the golden and blue hours are this app\'s own photography bands.</string>
+
+    <string name="brief_moon_washed_out" translatable="true">Moonlight washes the sky out for most of the night.</string>
+    <string name="brief_moon_washed_out_no_window" translatable="true">Moonlight washes the sky out, and there is no dark window tonight.</string>
+    <string name="brief_moon_max_altitude" translatable="true">highest %1$s at %2$s</string>
+    <string name="brief_moon_min_altitude" translatable="true">lowest %1$s at %2$s</string>
+    <string name="brief_moonless_no_dark_window" translatable="true">There is no dark window tonight, so no moonless window is reported.</string>
+    <string name="brief_moon_never_rises" translatable="true">The Moon does not rise during this night.</string>
+    <string name="brief_moon_never_sets" translatable="true">The Moon stays up and does not set during this night.</string>
+    <string name="brief_moonless_all_night" translatable="true">The Moon is below the horizon for the whole night.</string>
+    <string name="moon_phase_new_moon" translatable="true">new moon</string>
+    <string name="moon_phase_waxing_crescent" translatable="true">waxing crescent</string>
+    <string name="moon_phase_first_quarter" translatable="true">first quarter</string>
+    <string name="moon_phase_waxing_gibbous" translatable="true">waxing gibbous</string>
+    <string name="moon_phase_full_moon" translatable="true">full moon</string>
+    <string name="moon_phase_waning_gibbous" translatable="true">waning gibbous</string>
+    <string name="moon_phase_last_quarter" translatable="true">last quarter</string>
+    <string name="moon_phase_waning_crescent" translatable="true">waning crescent</string>
+
+    <string name="brief_cloud_refresh" translatable="true">Refresh the cloud forecast</string>
+    <string name="brief_cloud_covered_range" translatable="true">Covered by the forecast: %1$s</string>
+    <string name="brief_forecast_unmodified" translatable="true">The forecast is shown exactly as received, with no correction applied.</string>
+    <string name="brief_forecast_licence_link" translatable="true">MET Norway licence and attribution</string>
+
+    <string name="brief_target_washed_out" translatable="true">washed out by moonlight</string>
+    <string name="brief_target_open" translatable="true">Open %1$s</string>
+    <string name="brief_pass_visible" translatable="true">visible</string>
+
+    <string name="brief_conditions_header" translatable="true">Conditions</string>
+    <string name="brief_condition_state_good" translatable="true">good</string>
+    <string name="brief_condition_state_marginal" translatable="true">marginal</string>
+    <string name="brief_condition_state_blocking" translatable="true">blocking</string>
+    <string name="brief_condition_unavailable" translatable="true">unavailable</string>
+    <string name="brief_condition_fact_dark" translatable="true">Dark window: %1$s</string>
+    <string name="brief_condition_fact_moon" translatable="true">Moon: %1$s lit, altitude %2$s</string>
+    <string name="brief_condition_fact_cloud" translatable="true">Cloud cover: %1$s</string>
+    <string name="brief_condition_fact_horizon" translatable="true">Your horizon profile is applied to this spot.</string>
+    <string name="brief_condition_dark_window" translatable="true">Dark window</string>
+    <string name="brief_condition_moon" translatable="true">Moon</string>
+    <string name="brief_condition_cloud" translatable="true">Cloud</string>
+    <string name="brief_condition_target" translatable="true">Target</string>
+    <string name="brief_condition_satellite" translatable="true">Satellite</string>
+    <string name="brief_condition_horizon" translatable="true">Horizon</string>
+
+    <string name="brief_source_plain" translatable="true">%1$s</string>
+    <string name="brief_source_with_age" translatable="true">%1$s · %2$s old</string>
+    <string name="brief_source_ephemeris" translatable="true">ephemeris</string>
+    <string name="brief_source_catalogue" translatable="true">catalogue</string>
+    <string name="brief_source_horizon" translatable="true">horizon profile</string>
+    <string name="brief_source_forecast" translatable="true">MET Norway forecast</string>
+    <string name="brief_source_elements" translatable="true">orbital elements</string>
+    <string name="brief_source_setting" translatable="true">app setting</string>
+    <string name="brief_source_user_estimate" translatable="true">your estimate</string>
+
+    <string name="brief_reason_offline" translatable="true">The device is offline right now.</string>
+    <string name="brief_reason_source_disabled" translatable="true">This source is turned off in settings.</string>
+    <string name="brief_reason_not_fetched" translatable="true">This source has not been fetched yet.</string>
+    <string name="brief_reason_no_spot" translatable="true">No spot is selected.</string>
+    <string name="brief_reason_no_night" translatable="true">No night is selected.</string>
+    <string name="brief_reason_elements_expired" translatable="true">The orbital elements are too old to predict passes from.</string>
+    <string name="brief_reason_no_dark_window" translatable="true">There is no dark window tonight.</string>
+    <string name="brief_reason_catalogue_unreadable" translatable="true">The bundled catalogue could not be read.</string>
+    <string name="brief_reason_horizon_missing" translatable="true">This spot has no horizon profile.</string>
+
+    <string name="brief_catalogue_unreadable" translatable="true">The bundled catalogue could not be read, so no target is marked in the sky.</string>
+    <string name="brief_notices_header" translatable="true">Notices</string>
+</resources>

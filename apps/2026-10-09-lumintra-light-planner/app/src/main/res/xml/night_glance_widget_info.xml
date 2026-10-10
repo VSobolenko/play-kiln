@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Night glance (specs/night-glance/spec.md): two size classes, Compact 2 x 2 (110 x 110 dp) and
+     Wide 4 x 2 (250 x 110 dp), resizable on both axes; placed at 4 x 2 by default on API 31+.
+     updatePeriodMillis is 1 hour, at or above the platform's 30-minute floor. The app also pushes
+     an update whenever the brief changes. initialLayout is Glance's own loading layout. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/widget_description"
+    android:initialLayout="@layout/glance_default_loading_layout"
+    android:minWidth="110dp"
+    android:minHeight="110dp"
+    android:minResizeWidth="110dp"
+    android:minResizeHeight="110dp"
+    android:previewImage="@mipmap/ic_launcher"
+    android:resizeMode="horizontal|vertical"
+    android:targetCellWidth="4"
+    android:targetCellHeight="2"
+    android:updatePeriodMillis="3600000"
+    android:widgetCategory="home_screen" />

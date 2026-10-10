@@ -420,6 +420,47 @@ UNIT_PLAN: tuple[dict, ...] = (
     stroke("amber", [_unit_point(x, y) for x, y in _UNIT_TICK_FRACTIONS], "bold"),
 )
 
+# mark-lumintra
+# A light's path over the horizon: one bold horizon line, the body's arc above it as a bold
+# half-ring broken where the body sits, the body itself as an ember disc on the arc at 55°, and
+# one small star in the dark upper left. Geometry is the slot's store/studio.json `_mark` note,
+# in the same fractions every other mark here uses. The arc is two stroked polylines (not a ring)
+# because the body breaks the path: left piece 180°→83°, right piece 27°→0°, both sampled on the
+# circle whose centre sits on the horizon and whose centreline radius is 19.5dp. Outermost ink is
+# the horizon's round cap at ~30.58dp of the 31dp circle keyline.
+_LUMINTRA_HORIZON_Y = 0.601852
+_LUMINTRA_ARC_CENTER = (0.5, _LUMINTRA_HORIZON_Y)
+_LUMINTRA_ARC_R = 0.180556  # 19.5dp centreline
+_LUMINTRA_BODY = (0.603611, 0.453981)  # on the arc at 55°
+_LUMINTRA_BODY_R = 0.046296  # 5dp
+_LUMINTRA_STAR = (0.356481, 0.384259)
+_LUMINTRA_STAR_R = 0.018519  # 2dp radius → 4dp diameter, above the 16px MIN_FEATURE
+
+
+def _lumintra_point(angle_deg: float, radius: float = _LUMINTRA_ARC_R) -> tuple[float, float]:
+    """A point on the lumintra arc: `angle_deg` counter-clockwise from three o'clock, y up."""
+    radians = math.radians(angle_deg)
+    cx, cy = _LUMINTRA_ARC_CENTER
+    return (cx + radius * math.cos(radians), cy - radius * math.sin(radians))
+
+
+def _lumintra_arc(start_deg: float, end_deg: float, steps: int) -> tuple[tuple[float, float], ...]:
+    """Sample a circular arc from `start_deg` to `end_deg` (inclusive) in `steps` vertices."""
+    count = max(2, steps)
+    return tuple(
+        _lumintra_point(start_deg + (end_deg - start_deg) * i / (count - 1))
+        for i in range(count)
+    )
+
+
+LUMINTRA: tuple[dict, ...] = (
+    stroke("paper", ((0.259259, _LUMINTRA_HORIZON_Y), (0.740741, _LUMINTRA_HORIZON_Y)), "bold"),
+    stroke("paper", _lumintra_arc(180.0, 83.0, 16), "bold"),
+    stroke("paper", _lumintra_arc(27.0, 0.0, 8), "bold"),
+    disc("amber", _LUMINTRA_BODY, _LUMINTRA_BODY_R),
+    disc("paper", _LUMINTRA_STAR, _LUMINTRA_STAR_R),
+)
+
 MARK_REGISTRY: dict[str, dict] = {
     "pipe": {"primitives": PIPE, "keyline": "circle",
              "note": "a pipe cross-section measured across its bore"},
@@ -432,6 +473,9 @@ MARK_REGISTRY: dict[str, dict] = {
     "mark-unit-plan": {"primitives": UNIT_PLAN, "keyline": "circle",
                        "note": "a rental unit in plan: the walls as one closed bold stroke with "
                                "the walk's tick inside them"},
+    "mark-lumintra": {"primitives": LUMINTRA, "keyline": "circle",
+                      "note": "a light on its arc over the horizon: horizon, broken arc, ember "
+                              "body and one star"},
 }
 DEFAULT_MARK = "pipe"
 

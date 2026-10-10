@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Strings the manifest and the appwidget-provider XML read. -->
+    <string name="widget_label">Ночь вкратце</string>
+    <string name="widget_description">Тёмное окно, Луна и облачность на эту ночь для вашего места</string>
+</resources>

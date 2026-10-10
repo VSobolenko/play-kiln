@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <!-- API 31+ (design.md "Persistence", backup rules). Cloud backup and device transfer are stated
+         separately because a user can permit one restoration path without the other.
+
+         Included: the plan store - DataStore files under files/datastore/ (saved spots, horizon
+         profiles, equipment, favourites, settings) and any other file the scout store writes under
+         filesDir, plus AppCompat's stored per-app language under filesDir.
+         Not included: the database domain, so WorkManager's queue (androidx.work.workdb) is not
+         restored onto another device; the reminder is re-derived from the restored plan.
+         Excluded: regenerable caches. Forecast and element-set caches live in cacheDir (never
+         backed up) or under files/caches/, so a restore cannot present a stale cache as fresh.
+         Orekit runtime data, if copied out of assets, lives under files/orekit-data/ and is
+         re-copied from the APK.
+         Secrets: the app holds none (no account, no key). The secrets/tokens exclusions are
+         defensive, so a later file with such a name can never ride along in a backup. -->
+    <cloud-backup>
+        <include domain="sharedpref" path="." />
+        <include domain="file" path="." />
+        <exclude domain="file" path="caches/" />
+        <exclude domain="file" path="orekit-data/" />
+        <exclude domain="sharedpref" path="secrets.xml" />
+        <exclude domain="file" path="secrets/" />
+        <exclude domain="file" path="tokens/" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="sharedpref" path="." />
+        <include domain="file" path="." />
+        <exclude domain="file" path="caches/" />
+        <exclude domain="file" path="orekit-data/" />
+        <exclude domain="sharedpref" path="secrets.xml" />
+        <exclude domain="file" path="secrets/" />
+        <exclude domain="file" path="tokens/" />
+    </device-transfer>
+</data-extraction-rules>

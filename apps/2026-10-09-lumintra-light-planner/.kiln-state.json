@@ -1,0 +1,17 @@
+{
+  "slug": "lumintra-light-planner",
+  "applicationId": "com.gexetr.lumintralightplanner",
+  "appName": "Lumintra: Light Planner",
+  "idea": "Offline-first light and night-sky session planner: a scrubbable night scene with your own horizon, dark window, moon, targets, satellite passes and cloud forecast for a saved spot",
+  "createdAt": "2026-10-09T15:58:20.546Z",
+  "scaffoldVersion": "android-compose-v1",
+  "status": "scaffolded",
+  "economics": {
+    "archetype": "purchase_only_no_ads",
+    "priceUsd": 9.99
+  },
+  "differentiators": {
+    "promises": 13,
+    "core": 5
+  }
+}

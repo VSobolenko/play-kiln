@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "mark": "mark-lumintra",
+  "palette": {
+    "ink": "#0B0E14",
+    "ink_soft": "#141924",
+    "ink_lift": "#262A33",
+    "amber": "#FF8F6B",
+    "amber_deep": "#886156",
+    "amber_pale": "#FFD2C2",
+    "accent_deep": "#333E7A",
+    "paper": "#F3F1EC",
+    "muted": "#A9B0C2",
+    "bezel": "#1C1A17",
+    "bezel_rim": "#8C8A86",
+    "onPrimary": "#3A1206",
+    "secondary": "#B4C0FF",
+    "tertiary": "#7FD8C4",
+    "outline": "#8A91A3"
+  },
+  "headlines": [
+    "Tonight, read in one glance",
+    "When the sky is truly dark",
+    "Golden and blue hour, to the minute",
+    "Plan the shot before you leave",
+    "Satellite passes you can catch",
+    "Red mode keeps your night eyes"
+  ],
+  "kickers": [
+    "TONIGHT",
+    "DARK WINDOW",
+    "LIGHT",
+    "SESSION",
+    "PASSES",
+    "RED MODE"
+  ],
+  "headlinesByLocale": {
+    "en-US": [
+      "Tonight, read in one glance",
+      "When the sky is truly dark",
+      "Golden and blue hour, to the minute",
+      "Plan the shot before you leave",
+      "Satellite passes you can catch",
+      "Red mode keeps your night eyes"
+    ],
+    "ru-RU": [
+      "Вся ночь с одного взгляда",
+      "Когда небо по-настоящему тёмное",
+      "Золотой и синий час до минуты",
+      "Спланируйте кадр заранее",
+      "Пролёты спутников, которые успеть",
+      "Красный режим бережёт глаза"
+    ]
+  },
+  "kickersByLocale": {
+    "en-US": ["TONIGHT", "DARK WINDOW", "LIGHT", "SESSION", "PASSES", "RED MODE"],
+    "ru-RU": ["СЕГОДНЯ", "ТЁМНОЕ ОКНО", "СВЕТ", "СЪЁМКА", "ПРОЛЁТЫ", "КРАСНЫЙ РЕЖИМ"]
+  },
+  "featureTagline": "Plan the light and the dark: golden hour, moonless windows, clouds and passes, offline.",
+  "featureTaglineByLocale": {
+    "en-US": "Plan the light and the dark: golden hour, moonless windows, clouds and passes, offline.",
+    "ru-RU": "Планируйте свет и темноту: золотой час, безлунные окна, облака и пролёты — офлайн."
+  },
+  "featurePill": "NO ACCOUNT  \u00b7  RED NIGHT MODE",
+  "featurePillByLocale": {
+    "en-US": "NO ACCOUNT  \u00b7  RED NIGHT MODE",
+    "ru-RU": "БЕЗ АККАУНТА  \u00b7  КРАСНЫЙ РЕЖИМ"
+  },
+  "_comment": "The composed visual identity for this slot, read by scripts/store-studio.py, scripts/store/render.py and scripts/core/palette.mjs. The launcher icon, the adaptive-icon vectors in app/src/main/res/drawable, the feature graphic and the screenshot compositions are derived from `mark` and `palette` here. `headlines`, `kickers`, `featureTagline` and `featurePill` are the en-US default the studio reads today; the `*ByLocale` members carry the same copy for every declared locale (en-US, ru-RU) so a renderer that composes per locale reads translations written by the slot rather than inventing them. Every palette value is a constant of app/src/main/java/com/gexetr/lumintralightplanner/ui/theme/Color.kt, value for value.",
+  "_mark": "`mark-lumintra` is a light's path over the horizon: one bold horizon line, the body's arc above it as a bold half-ring broken where the body sits, the body itself as an ember disc on the arc at 55 degrees, and one small star in the dark upper left. It says exactly what the app plans - where a light is relative to the horizon, and the dark beside it - and it is not a ring-with-hands (`mark-clock`), a bore (`pipe`), a page (`mark-book`), stripes (`mark-stripes`) or a plan (`mark-unit-plan`). No letters, no numerals. Geometry in the canonical fractions of scripts/lib/icon_design.py (canvas = the 108dp adaptive viewport; dp/108): horizon `stroke('paper', ((0.259259, 0.601852), (0.740741, 0.601852)), 'bold')`; arc centre (0.5, 0.601852), centreline radius 0.180556 (19.5dp), drawn as two `stroke('paper', …, 'bold')` polylines sampled along the circle - left piece from 180 to 83 degrees, right piece from 27 to 0 degrees (counter-clockwise from three o'clock, y up); body `disc('amber', (0.603611, 0.453981), 0.046296)` (5dp radius, centre on the arc at 55 degrees, a 28-degree break each side so >= 1.8dp of field separates it from the arc's round caps); star `disc('paper', (0.356481, 0.384259), 0.018519)` (4dp diameter = 18.96px at 512, above the 16px MIN_FEATURE). Measured against the grid by hand (not yet by icon_qa.py, because the mark is not registered): silhouette x=[25.47, 82.53]dp, y=[39.50, 67.53]dp, centre (54.0, 53.5)dp - 0.5dp above the optical anchor, inside OPTICAL_TOLERANCE; outermost ink is the horizon's round cap at 30.58dp from centre = 98.6% of the 31dp circle keyline. The launcher foreground in app/src/main/res/drawable/ic_launcher_foreground.xml is this geometry outlined as filled paths. Registered as `mark-lumintra` in scripts/lib/icon_design.py MARK_REGISTRY (keyline 'circle').",
+  "_palette": "One identity, shared with the app's own theme (ui/theme/Color.kt): a night field of near-neutral blue-black (`ink` #0B0E14 / `ink_soft` #141924 / `ink_lift` #262A33, HCT chroma under 12), starlight off-white for display text and the mark (`paper`), a cool slate for secondary text (`muted`), and three chromatic families with one job each: the ember (`amber`/`amber_deep` #886156/`amber_pale`, also `primary`) is the light the user plans around - golden hour, the Sun or Moon on its arc, the one call to action; moonlight (`secondary`, glow `accent_deep`) is the Moon's interference; aurora (`tertiary`) means the dark window is open. `bezel`/`bezel_rim` are the device mock-up frame, warm on purpose so it cannot be confused with the field. `onPrimary` is the ink on an ember control and `outline` the hairline. The Material roles that equal an identity role (`primary` = `amber`, `background` = `ink`, `surface` = `ink_soft`, `surfaceVariant` = `ink_lift`, `onSurface` = `paper`, `onSurfaceVariant` = `muted`) are not repeated here, because two names for one hex is what palette.mjs rule 21 reports as two roles a user cannot tell apart; Theme.kt maps them. Red night-vision mode is a separate full role remapping (ui/theme/NightVisionPalette.kt) with B=0 and G=0 in every colour, and is not part of the store identity. The palette is not shared with any other slot: no other slot uses a coral ember on a neutral blue-black field.",
+  "_claim_bounds": "Every headline must be true of the shipped build: a one-glance night summary, an astronomical-darkness window that accounts for the Moon, golden/blue-hour times, a session plan, satellite passes computed on the device, and a red night mode. It does not guarantee a clear sky (the cloud forecast is a forecast), and it does not control a camera. Each headline names something the app does, and the shot behind it is asserted by store/journey.json in phase 2."
+}

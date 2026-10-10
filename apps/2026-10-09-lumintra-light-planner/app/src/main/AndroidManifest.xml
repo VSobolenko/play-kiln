@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Factory policy: request the fewest permissions possible, never export a component
+         without a reason, and never enable cleartext traffic.
+
+         Exactly two permissions (openspec/changes/app-lumintra-light-planner/design.md,
+         "Network and permission policy"):
+         - INTERNET: the keyless CelesTrak GP fetch and the api.met.no forecast.
+         - POST_NOTIFICATIONS (API 33+): the dark-window reminder only; denial disables the reminder
+           and nothing else.
+         Deliberately absent: every location permission, every storage/media permission,
+         RECEIVE_BOOT_COMPLETED (WorkManager reschedules its own work; the widget re-renders from
+         persisted state), SCHEDULE_EXACT_ALARM / USE_EXACT_ALARM, CAMERA, BILLING. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- The Rate row falls back to the Play listing with setPackage("com.android.vending");
+         package visibility on API 30+ needs this query. -->
+    <queries>
+        <package android:name="com.android.vending" />
+    </queries>
+
+    <application
+        android:name=".LumintraApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:localeConfig="@xml/locales_config"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.PlayKilnSlot">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Night glance widget. exported="true" is the AppWidget platform contract: the launcher
+             delivers APPWIDGET_UPDATE from another process. The receiver accepts only that action. -->
+        <receiver
+            android:name=".ui.widget.NightGlanceWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/night_glance_widget_info" />
+        </receiver>
+
+        <!-- Share postcard and export staging: content:// URIs under cacheDir only, granted per
+             intent with FLAG_GRANT_READ_URI_PERMISSION. Never exported. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <!-- AndroidX per-app language backport: on API 26-32 (the platform picker exists only from
+             API 33) AppCompat stores the chosen languages and re-applies them before the first
+             composition. disabled because the service is a metadata holder the library reads,
+             never a component that runs. -->
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
+    </application>
+
+</manifest>

@@ -267,8 +267,17 @@ convention shared by the brief, the scene and the widget (E21). The brief SHALL 
 **illuminated fraction** as a number in `[0.0, 1.0]` (shown as a percentage) **and** the Moon's
 **altitude** in degrees, because a 5 % crescent ten degrees above the horizon is not moonless in
 practice and one boolean would hide that. The app SHALL name the phase with eight 45°-wide bins
-centred on each exact phase (offset 22.5°), so a waxing crescent near 359° is not bucketed as new
-(E19).
+centred on each exact phase (offset 22.5°), so that `new` is **one contiguous sector** spanning the
+wrap — `[337.5°, 22.5°)` — and is never named at both ends of the table (E19).
+
+**Corrected 2026-10-09, by the owner's decision.** This requirement previously continued "so a
+waxing crescent near 359° is not bucketed as new". Both clauses could not hold: a 45° bin centred on
+0° contains 359° **by construction**, and 359° is 1° short of new, hence a *waning* crescent — so the
+"not bucketed as new" half was astronomically wrong and is withdrawn. E19's operative clause is its
+**refusal** ("the wrap bug: `new` at both ends of the table"), and the centred bins satisfy it.
+`domain/Moon.kt` already implemented the corrected requirement with no change; the withdrawn gloss
+also appears in `annex/L-depth-retention-edges.md:394` and `design.md` § satellite/astronomy
+inputs, whose refusal clauses are the binding half.
 
 The app SHALL compute the **moonless window** as the set of intervals inside the dark window in which
 the Moon is below the horizon (E15, E16); "moonless" SHALL be the product threshold
@@ -308,9 +317,12 @@ such rather than counted (E78).
 
 #### Scenario: Phase naming wraps correctly
 
-- **WHEN** the Moon's elongation is near 360° (just before new)
-- **THEN** the phase is named as a waxing crescent, not as new, because the bins are centred on each
-  exact phase (E19)
+- **WHEN** the Moon's elongation is just before 360° (1° short of new)
+- **THEN** the phase is named with the same 45° bin that contains 0°, because the bins are centred on
+  each exact phase and that bin spans the wrap (E19)
+- **AND** `ofElongation(337.5)`, `ofElongation(0.0)` and `ofElongation(359.0)` all yield `new`, while
+  `ofElongation(22.5)` yields `waxing crescent` — the sector is contiguous, so `new` is named once
+  rather than at both ends of the table
 
 #### Scenario: Both numbers are always shown
 

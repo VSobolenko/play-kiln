@@ -50,7 +50,15 @@ export const FORBIDDEN_PATTERNS = Object.freeze([
 export const ALLOWED_PACKAGE_ROOTS = Object.freeze([
   'androidx', 'android', 'kotlin', 'kotlinx', 'java', 'javax',
   'com.google', 'com.android', // AGP's plugin id, devtools.ksp, the AndroidX test runner
-  'org.jetbrains' // JetBrains annotations and the Compose compiler plugin marker
+  'org.jetbrains', // JetBrains annotations and the Compose compiler plugin marker
+  // The JDK's own namespace, which a build script names when it excludes a JDK service file the
+  // merge would otherwise carry into the APK. Measured 2026-10-09 on the Lumintra slot: the exclude
+  // `"META-INF/services/com.sun.source.util.Plugin"` is preceded by a slash and the sweep never saw
+  // it, but the *comment* documenting that exclude read as a package declaration and failed two
+  // rows — `build.namespaceSweep` and the repo-wide leg of `build.fixtures`. `com.sun` is not a
+  // namespace this factory ever shipped under, so the finding was the sweep's false positive rather
+  // than a leftover; a JDK root is the same kind of occurrence the roots above already are.
+  'com.sun'
 ])
 
 // Build outputs, IDE state, machine-local caches and worker ledgers. A sweep that descends into
@@ -873,7 +881,13 @@ export function buildFixtures() {
           `path ${packagePrefix.replaceAll('.', '/')}/Widget.kt`,
           'implementation("com.google.devtools.ksp")',
           'plugins { id("com.android.application") }',
-          'import androidx.compose.runtime.Composable'
+          'import androidx.compose.runtime.Composable',
+          // The measured false positive (2026-10-09, the Lumintra slot): a JDK service path named in
+          // a comment that documents a packaging exclude is prose, not a package declaration, and the
+          // sweep failed two rows over it. The line below is the one that fired; the one under it is
+          // the real exclude, which the sweep never matched because a slash precedes `com`.
+          '// com.sun.source.util.Plugin is a javac plugin service Orekit never uses at run time',
+          'excludes += "META-INF/services/com.sun.source.util.Plugin"'
         ]
         for (const line of clean) expectEqual(namespaceTokenProblems(line), [], `findings for: ${line}`)
       }

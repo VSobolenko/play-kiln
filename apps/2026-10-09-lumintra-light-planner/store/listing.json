@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "appName": "Lumintra: Light Planner",
+  "slug": "lumintra-light-planner",
+  "applicationId": "com.gexetr.lumintralightplanner",
+  "idea": "Offline-first light-and-sky session planner: for one saved spot and date it joins the twilight and dark windows, the Moon, ~250 deep-sky targets, satellite passes and cloud into one brief, a scrubbable night scene and a share handoff.",
+  "defaultLocale": "en-US",
+  "category": "PHOTOGRAPHY",
+  "tags": [
+    "astrophotography",
+    "night photography",
+    "golden hour",
+    "blue hour",
+    "dark window",
+    "deep sky",
+    "satellite passes",
+    "cloud forecast",
+    "sun and moon",
+    "offline"
+  ],
+  "contactEmail": "v.sobolenko.vs@gmail.com",
+  "privacyPolicyUrl": "https://telegra.ph/Lumintra-Light-Planner--privacy-policy-10-09",
+  "locales": {
+    "en-US": {
+      "title": "Lumintra: Light Planner",
+      "shortDescription": "A light-session planner: dark window, targets, passes, cloud, no account.",
+      "fullDescription": "One paid, offline-first planner for the photographer who plans a shoot around the light — the Sun, the Moon, the darkness between them, and the sky the frame will sit in front of.\n\nMost light planners tell you where an object is. Lumintra answers what the night actually asks: when is it truly dark, is the Moon in the way, what is up, will a satellite cross the frame, and what will the clouds do — for one spot on one date, in one brief.\n\nWHAT YOU CAN DO\n\n• Save a spot — a name and a coordinate, plus a horizon line you draw yourself. Enter coordinates by hand, paste them, or place the pin in the built-in coordinate picker; a place name is filled in through the phone's own geocoder when it can. The app never asks for a location permission.\n• Read the night in one scene — a scrubbable sky with your own horizon silhouette in the foreground, the Sun and Moon where they will be, the Milky Way as it crosses, a star-trail mode along the timeline, and a true red night mode that keeps your night vision.\n• See the dark window — the true moonless astronomical-dark interval, computed from the Sun's altitude at −18° and intersected with the Moon's rise, set and illuminated fraction, beside the golden, blue, civil and nautical twilight boundaries to the minute. On a night that never goes fully dark, the app says so in words instead of drawing an empty interval.\n• Plan the targets — around 250 famous deep-sky objects (the Messier list and showpiece NGC/IC entries) with magnitudes and apparent sizes, each with its altitude window above your horizon for the chosen night. Search by name or catalogue number, or filter by brightness.\n• Fit your lens — your focal length and sensor become an angular frame drawn on the scene, and a chosen target is stated as fitting, marginal or too large for the shot before you drive anywhere.\n• Catch a pass — visible satellite passes (the ISS, Tiangong, Hubble and other tracked objects) above your drawn horizon, each with the age of the orbital element set it was computed from.\n• See the cloud — hourly total cloud cover for the session window, drawn on the same time axis as the dark window and the target's altitude curve, labelled a forecast with its source and its age.\n• Take it with you — send the finished brief off the phone as plain-language text or as a postcard rendered from the very scene on screen, through the Android share sheet. Export your spots, horizons and equipment to a file you own, and import it on another phone.\n• Glance at tonight — a home-screen widget states tonight's dark window, Moon and cloud for your saved home spot, and one opt-in local notification can tell you when the dark window starts.\n\nWHAT IT DOES NOT DO\n\nNo compass and no camera overlay, no light-pollution map and no Bortle class, no telescope control, no eclipse or tide calculators, no quizzes. It plans the shot; it does not aim the phone or take the picture.\n\nOFFLINE, PAID ONCE, AND PRIVATE\n\nAlmost everything is computed on the device. Two keyless calls are the only times anything leaves it: the hourly cloud forecast from api.met.no, which receives the saved spot's coordinate truncated to about 11 m, and a satellite element-set fetch from CelesTrak, which carries no coordinate at all. There is no account, no sign-in, no advertising, no analytics and no subscription. One price, paid once, and the app is yours.\n\nData from MET Norway (met.no) — CC BY 4.0.",
+      "screenshotCaptions": [
+        "Tonight, read in one glance",
+        "When the sky is truly dark",
+        "Golden and blue hour, to the minute",
+        "Plan the shot before you leave",
+        "Satellite passes you can catch",
+        "Red mode keeps your night eyes"
+      ],
+      "featureBullets": [
+        "One brief joins the dark window, twilight, Moon, deep-sky targets, satellite passes and hourly cloud",
+        "A scrubbable night scene with your own drawn horizon, the Milky Way, star trails and a true red mode",
+        "Around 250 famous deep-sky objects with per-target altitude windows and a lens frame",
+        "Share the finished brief as text or a postcard; export and import your spots, horizons and equipment",
+        "No account, no ads, no analytics, no subscription — one price, and the app is yours"
+      ]
+    },
+    "ru-RU": {
+      "title": "Lumintra: план съёмки",
+      "shortDescription": "Планировщик съёмки: тёмное окно, цели, пролёты и облака, без аккаунта.",
+      "fullDescription": "Платный планировщик съёмки, который работает офлайн: для фотографа, который строит кадр вокруг света — Солнца, Луны, темноты между ними и неба, на фоне которого будет снят кадр.\n\nБольшинство планировщиков света говорят, где находится объект. Lumintra отвечает на то, что ночь спрашивает на самом деле: когда по-настоящему темно, не мешает ли Луна, что сейчас в небе, пройдёт ли по кадру спутник и что сделают облака — для одной точки и одной даты, в одной сводке.\n\nЧТО МОЖНО СДЕЛАТЬ\n\n• Сохранить точку — название и координаты, а также линию горизонта, которую вы рисуете сами. Введите координаты вручную, вставьте их или поставьте метку во встроенном выборе точки; название места подставляется через геокодер телефона, когда это возможно. Разрешение на геолокацию приложение не запрашивает.\n• Прочитать ночь одним полотном — прокручиваемое небо, где ваш собственный силуэт горизонта стоит на переднем плане, Солнце и Луна — там, где они будут, Млечный Путь — так, как он проходит, режим звёздных треков по таймлайну и настоящий красный ночной режим, который бережёт зрение.\n• Увидеть тёмное окно — истинный безлунный интервал астрономической темноты, посчитанный по высоте Солнца на −18° и пересечённый с восходом, заходом и фазой Луны, рядом с границами золотого, синего, гражданского и навигационного сумерек с точностью до минуты. Если ночь не становится полностью тёмной, приложение скажет это словами, а не нарисует пустой интервал.\n• Спланировать цели — около 250 известных объектов глубокого космоса (список Мессье и заметные объекты NGC/IC) со звёздными величинами и видимыми размерами, каждый — с окном высоты над вашим горизонтом для выбранной ночи. Поиск по названию или номеру каталога, фильтр по яркости.\n• Примерить объектив — фокусное расстояние и матрица становятся угловой рамкой на сцене, и про выбранную цель сказано, помещается она, подходит на грани или слишком велика для кадра — до того, как вы куда-то поедете.\n• Поймать пролёт — видимые пролёты спутников (МКС, Тяньгунь, «Хаббл» и другие отслеживаемые объекты) над нарисованным горизонтом, у каждого — возраст набора орбитальных элементов, по которым сделан расчёт.\n• Увидеть облака — почасовая общая облачность на окно сессии, построенная на той же оси времени, что и тёмное окно, и кривая высоты цели, с пометкой «прогноз», источником и его возрастом.\n• Забрать с собой — отправить готовую сводку с телефона обычным текстом или открыткой, отрисованной из самой сцены на экране, через системное меню «Поделиться». Экспорт ваших точек, горизонтов и снаряжения в файл, которым вы владеете, и импорт на другом телефоне.\n• Взглянуть на сегодняшнюю ночь — виджет на главном экране показывает тёмное окно, Луну и облачность для сохранённой точки, а одно уведомление по желанию сообщает начало тёмного окна.\n\nЧЕГО ПРИЛОЖЕНИЕ НЕ ДЕЛАЕТ\n\nНи компаса и камеры с наложением, ни карты светового загрязнения и класса Бортля, ни управления телескопом, ни калькуляторов затмений и приливов, ни викторин. Оно планирует кадр; оно не наводит телефон и не снимает.\n\nОФЛАЙН, ОДНА ЦЕНА, ПРИВАТНОСТЬ\n\nПочти всё вычисляется на устройстве. Два запроса без ключей — единственное, что покидает телефон: почасовой прогноз облачности от api.met.no, который получает координату сохранённой точки, усечённую примерно до 11 м, и запрос наборов элементов спутников от CelesTrak, в котором координат нет вовсе. Ни аккаунта, ни входа, ни рекламы, ни аналитики, ни подписки. Одна цена, один раз — и приложение ваше.\n\nДанные MET Norway (met.no) — CC BY 4.0.",
+      "screenshotCaptions": [
+        "Вся ночь с одного взгляда",
+        "Когда небо по-настоящему тёмное",
+        "Золотой и синий час до минуты",
+        "Спланируйте кадр заранее",
+        "Пролёты спутников, которые успеть",
+        "Красный режим бережёт глаза"
+      ],
+      "featureBullets": [
+        "Одна сводка собирает тёмное окно, сумерки, Луну, цели глубокого космоса, пролёты спутников и почасовую облачность",
+        "Прокручиваемая ночная сцена с вашим горизонтом, Млечным Путём, звёздными треками и красным режимом",
+        "Около 250 известных объектов глубокого космоса с окнами высоты и рамкой объектива",
+        "Поделитесь готовой сводкой текстом или открыткой; экспорт и импорт точек, горизонтов и снаряжения",
+        "Без аккаунта, рекламы, аналитики и подписки — одна цена, и приложение ваше"
+      ]
+    }
+  },
+  "dataSafety": {
+    "collectsData": true,
+    "reason": "One collected row: a saved spot's coordinate is transmitted to api.met.no to fetch the hourly cloud forecast. The CelesTrak element-set query carries no coordinates, and share/export are user-initiated.",
+    "dataTypes": [
+      {
+        "type": "Location",
+        "purpose": "App functionality",
+        "shared": false,
+        "optional": true,
+        "notes": "Approximate location: the saved spot's coordinate, truncated to 4 decimal places (about 11 m), is sent to the MET Norway Locationforecast service (api.met.no) to fetch the hourly total cloud cover for the session window. It is sent only while the user is viewing that spot's forecast, never in the background. The CelesTrak orbital element-set request carries no coordinate, and the share/postcard and export paths are user-initiated and go only to the recipient the user picks. See store/data-safety.md."
+      }
+    ],
+    "thirdPartySdks": [],
+    "encryptedInTransit": true,
+    "hasAccountDeletion": false
+  },
+  "permissions": [
+    {
+      "name": "android.permission.INTERNET",
+      "why": "Required by the two keyless network calls: the api.met.no hourly cloud-forecast fetch and the CelesTrak orbital element-set fetch. Nothing else leaves the device."
+    },
+    {
+      "name": "android.permission.POST_NOTIFICATIONS",
+      "why": "API 33+ only; used solely by the opt-in dark-window reminder. Denial disables the reminder and nothing else."
+    }
+  ],
+  "ads": {
+    "containsAds": false,
+    "reason": "No advertising SDK is present; the app ships no ads on any screen."
+  },
+  "contentRating": {
+    "questionnaire": "notes",
+    "targetAudience": "adults-only"
+  },
+  "graphicsSource": {
+    "iconGlyph": "mark-lumintra",
+    "brandColor": "#0B0E14",
+    "accentColor": "#FF8F6B"
+  },
+  "capabilityCompliance": {
+    "enabled": [],
+    "requiresConsent": false,
+    "requiresPurchaseAuthority": false,
+    "purchaseAuthority": null
+  }
+}

@@ -964,3 +964,43 @@ Entries are append-only and remain in chronological insertion order.
 - Root cause: live ideation, economics and role text grouped infrastructure with a runtime permission that buys nothing, so a cost/compliance distinction was expressed as an avoidance rule.
 - Fix class: policy + arithmetic — infrastructure is admissible and its recurring or one-off cost is stated against price; recurring per-user cost must be near-zero, funded by repeat purchases, or covered by paid-upfront lifetime margin, while the subscription ban and client-secret gate remain intact.
 
+### 2026-10-09 - the namespace sweep read a comment about an exclude as a package declaration
+
+- Symptom: `node scripts/verify.mjs` reported `60 PASS, 2 FAIL`, both naming one line -
+  `apps/2026-10-09-lumintra-light-planner/app/build.gradle.kts: com.sun (line 108)`. The rows were
+  `build.namespaceSweep` and the repo-wide leg of `build.fixtures`, so one false positive failed a
+  slot gate and a core fixture at once, and the slot it named was brand new and could not have
+  carried a leftover.
+- Root cause: **the line the sweep fired on is prose, and the declaration it documents is not
+  swept.** Line 108 is `// com.sun.source.util.Plugin is a javac plugin service Orekit never uses at
+  run time`, a comment written to explain the packaging exclude on line 114. The sweep's pattern is
+  `(?:^|[^\w.$/])com\.([a-z][a-z0-9_]*)` - the `/` in `META-INF/services/com.sun...` keeps the real
+  exclude out of the match, so only the comment matched, and `com.sun` was on no allowlist. The
+  finding was therefore the sweep's own false positive: `com.sun` is the JDK's namespace, not a
+  namespace this factory ever shipped under, so it cannot be a leftover of a rename.
+- Fix class: sensor data (extend the allowlist at its one home) + fixtures cut from the line that
+  actually fired.
+- Change made: `'com.sun'` joined `ALLOWED_PACKAGE_ROOTS` in `scripts/core/build.mjs`, with the
+  measured incident in the reason comment. That list is the only place the decision is taken - it is
+  read solely by `namespaceTokenProblems`, and no fixture seats a foreign token through it - so the
+  change is one line of data rather than a weakened pattern. A fixture leg was added to
+  `buildFixtures()` in the same file, seating the firing comment **and** the real exclude alongside
+  the clean lines the case already asserted, which is what makes the fix falsifiable rather than
+  merely green: the leg fails on the code as it was before the allowlist entry.
+- Falsified before it was trusted: `.kiln/scratch/lumintra/probe-namespace-allowlist.mjs` prints
+  four rows - the comment and the real exclude at `0` findings, and an unlisted root (`com.acme`) and
+  a former-style root (`com.oldprefix`) each at `1`. The last two are the load-bearing ones: without
+  them an allowlist that had stopped the sensor from firing at all would look identical to a fix.
+  `node scripts/verify.mjs` then reported `62 PASS, 0 FAIL, 9 SKIP`.
+- Rules this leaves: **a sweep that matches text will match the comment that explains the text** -
+  the exclude was correctly spelled and correctly never matched, and the sentence documenting it was
+  the finding, so a textual sensor needs its own prose accounted for before its row is believed. And
+  **an allowlist is data, and data is where a false positive is fixed** - the alternative, narrowing
+  the pattern until it skipped `com.sun`, would have changed every future judgement the sweep makes
+  to answer one incident; adding the JDK root answers the incident and leaves the sensor's coverage
+  intact, which the probe's third and fourth rows are there to prove. And **a fixture cut from the
+  firing line is the only fixture that can close this class** - a leg written from the pattern's
+  author's idea of a package declaration (an `import`, a `package =` assignment) passes before the
+  fix and proves nothing, exactly as the `2026-10-07` classifier entry already recorded for a
+  different sensor.
+

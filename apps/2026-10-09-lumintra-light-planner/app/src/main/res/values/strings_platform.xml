@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Strings the manifest and the appwidget-provider XML read. -->
+    <string name="widget_label">Night glance</string>
+    <string name="widget_description">Tonight\'s dark window, Moon and cloud for your spot</string>
+</resources>
