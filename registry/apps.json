@@ -93,9 +93,12 @@
       "idea": "Offline-first light and night-sky session planner: a scrubbable night scene with your own horizon, dark window, moon, targets, satellite passes and cloud forecast for a saved spot",
       "archetype": "purchase_only_no_ads",
       "promises": 13,
-      "status": "scaffolded",
+      "status": "killed",
       "createdAt": "2026-10-09T15:58:20.546Z",
-      "updatedAt": "2026-10-09T15:58:20.546Z"
+      "updatedAt": "2026-10-10T12:00:40.257Z",
+      "killedAt": "2026-10-10T12:00:40.257Z",
+      "killReason": "Owner 2026-10-10: полный провал; спецификация закрывается; проект не удалять; больше никто ничего не делает. Потратили больше всего денег и крутейшие модели — не оправдал. Релиз не утверждается.",
+      "killVerdict": "NO-DATA"
     }
   ]
 }

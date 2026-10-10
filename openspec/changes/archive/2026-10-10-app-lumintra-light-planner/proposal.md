@@ -1,5 +1,9 @@
 # Proposal: app-lumintra-light-planner
 
+> **KILLED — archived without merging the delta spec.**  
+> Owner decision, 2026-10-10 (own words): полный провал; спецификация закрывается; проект не удалять; больше никто ничего не делает. Потратили больше всего денег и крутейшие модели — не оправдал. Релиз не утверждается.  
+> Registry: `lumintra-light-planner` status `killed`. Slot directory left at `apps/2026-10-09-lumintra-light-planner/`. No further work on this change.
+
 **Slot:** `apps/<date>-lumintra-light-planner` — **Lumintra: Light Planner** — slug
 `lumintra-light-planner` — `applicationId` **`com.gexetr.lumintralightplanner`** —
 `purchase_only_no_ads`, one-time price **$9.99** set in Play Console.
