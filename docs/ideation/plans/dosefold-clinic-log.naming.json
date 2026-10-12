@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "slot": "dosefold-clinic-log",
+  "reconRef": "docs/ideation/2026-10-10-dosefold-glp1-clinic-log.md#name",
+  "title": "DoseFold Clinic Log",
+  "slug": "dosefold-clinic-log",
+  "applicationId": "com.gexetr.dosefoldcliniclog",
+  "archetype": "carrier_job_noun",
+  "candidates": [
+    {
+      "name": "GLP-1 Tracker",
+      "archetype": "descriptive",
+      "score": 67,
+      "dimensions": {
+        "jobFit": 4,
+        "searchability": 5,
+        "distinctiveness": 1,
+        "radioTest": 4.5,
+        "uniqueness": 1,
+        "lengthFit": 5,
+        "localeSurvival": 3
+      },
+      "why": "Negative control: it is the measured search phrase and the head term Shotsy already spends its title on."
+    },
+    {
+      "name": "DoseFold Clinic Log",
+      "archetype": "carrier_job_noun",
+      "score": 87,
+      "dimensions": {
+        "jobFit": 4.5,
+        "searchability": 3.5,
+        "distinctiveness": 4.5,
+        "radioTest": 4.5,
+        "uniqueness": 4,
+        "lengthFit": 5,
+        "localeSurvival": 4.5
+      },
+      "why": "DoseFold names the folded clinic packet; Clinic Log keeps the job noun. Nineteen characters in English."
+    },
+    {
+      "name": "VialDay Packet",
+      "archetype": "compound",
+      "score": 82,
+      "dimensions": {
+        "jobFit": 3.5,
+        "searchability": 2.5,
+        "distinctiveness": 4.5,
+        "radioTest": 5,
+        "uniqueness": 4.5,
+        "lengthFit": 5,
+        "localeSurvival": 4
+      },
+      "why": "Easy to hear and type, but it understates the clinic file and is weak on the measured GLP-1 tracker query."
+    },
+    {
+      "name": "ShotLedger",
+      "archetype": "metaphorical",
+      "score": 79,
+      "dimensions": {
+        "jobFit": 4,
+        "searchability": 3,
+        "distinctiveness": 4,
+        "radioTest": 4,
+        "uniqueness": 3.5,
+        "lengthFit": 5,
+        "localeSurvival": 4.5
+      },
+      "why": "Ledger fits a durable record; it does not say the packet leaves the phone for a visit."
+    },
+    {
+      "name": "Sitewise Dose Book",
+      "archetype": "compound",
+      "score": 75,
+      "dimensions": {
+        "jobFit": 4,
+        "searchability": 3,
+        "distinctiveness": 3.5,
+        "radioTest": 4,
+        "uniqueness": 3.5,
+        "lengthFit": 4.5,
+        "localeSurvival": 4
+      },
+      "why": "It foregrounds the site map and reads as a notebook, which is only half of the clinic-packet job."
+    }
+  ],
+  "rejected": [
+    {
+      "name": "GLP-1 Tracker",
+      "reason": "Rejected as the bare category phrase on the 2026-10-10 Play search page; a new listing cannot take that head term from Shotsy and it gives the user nothing to prefer."
+    },
+    {
+      "name": "VialDay Packet",
+      "reason": "Rejected because the radio-friendly carrier does not carry the clinic-file job noun and is weaker on the measured search phrases than DoseFold Clinic Log."
+    }
+  ],
+  "searchPhrases": ["GLP-1 tracker", "shot tracker", "Ozempic tracker"],
+  "audience": "An adult on a weekly GLP-1 shot who needs a crash-safe log and a file for the next clinic visit.",
+  "rationale": "The carrier names the folded packet the user takes to clinic; the job noun keeps the log visible in the title without spending the field on the category head term.",
+  "collisionCheck": "UNVERIFIED: neither an exact-title Play search nor a trademark-register search was performed for DoseFold; approval requires searches of Google Play, USPTO, EUIPO/TMview, WIPO, and the relevant national register.",
+  "localisationCheck": "INFERRED: DoseFold Clinic Log is 19 characters and DoseFold журнал доз is 19 characters, each leaving 11 characters under Play's 30-character cap, which is more than the required 5 characters of slack.",
+  "evidence": "docs/ideation/2026-10-10-dosefold-glp1-clinic-log.md#name",
+  "localizedTitles": {
+    "en-US": "DoseFold Clinic Log",
+    "ru-RU": "DoseFold журнал доз"
+  },
+  "scoringRubric": {
+    "scale": "0-5 per dimension, weighted",
+    "weights": {
+      "jobFit": 20,
+      "searchability": 15,
+      "distinctiveness": 15,
+      "radioTest": 15,
+      "uniqueness": 15,
+      "lengthFit": 10,
+      "localeSurvival": 10
+    },
+    "floor": "chosen >= 70 with no dimension below 2.5; a hard collision check outranks the score"
+  },
+  "assumptionsUnverified": [
+    "DoseFold has not been cleared against existing Play titles or class-9 marks.",
+    "The Latin carrier remains intelligible for Russian-speaking users next to the native job noun."
+  ]
+}

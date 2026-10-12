@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "An adult already paying for a branded or compounded GLP-1 shot who will not add a monthly tracker bill on top of the medication.",
+  "paidUnit": "A permanent on-device unlock for unlimited shot history, the dated clinic PDF and CSV, and a restorable local backup file.",
+  "priceUsd": 5.99,
+  "momentOfPayment": "After the first free shot, side-effect tag and plate photo, when the user asks for the clinic packet or for more than one month of history.",
+  "distinctnessSentence": "A person on a weekly GLP-1 shot keeps every dose, site, side-effect and plate photo on the phone without an account, and hands the clinician a dated PDF, without a subscription and without an AI that guesses the meal.",
+  "evidenceRef": "docs/research/2026-10-10-glp1-tracker-shelf.md#incumbents-with-money-on-the-card",
+  "day1RevenuePath": "The free first week demonstrates the log; the user buys the permanent unlock from Google Play Billing before exporting the clinic packet or keeping more than one month.",
+  "killCriteria": { "windowDays": 45, "minInstalls": 300, "minRevenueUsd": 80 },
+  "assumptionsUnverified": [
+    "A 5.99 dollar one-time unlock converts often enough against a free-ish Shotsy and a fortress MyFitnessPal GLP-1 module to produce about 43 paying sales per month.",
+    "Play treats a no-advice, no-levels GLP-1 log as Health and Fitness rather than a medical-device disclosure that blocks a first listing.",
+    "Featured reviews that describe Shotsy data loss and MeAgain subscription anger describe a payable pocket, not only the loudest unhappy users."
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "slot": "dosefold-clinic-log",
+  "reconRef": "docs/ideation/2026-10-10-dosefold-glp1-clinic-log.md#promise-contract",
+  "jobCoverage": {
+    "before": { "claimId": "import-the-paper-month" },
+    "during": { "claimId": "one-tap-shot-and-site" },
+    "after": { "claimId": "clinic-pdf-handoff" }
+  },
+  "claims": [
+    {
+      "id": "import-the-paper-month",
+      "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "data_in",
+      "promise": "The first week is not a blank app: the user photographs or picks the paper log or screenshot they already have, and those rows become the starting history.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-10-glp1-tracker-shelf.md#complaints-that-name-a-product",
+        "finding": "A 2026-09-17 Shotsy review says the app asked to add a first shot after weeks of logging and the previous entry was gone, so users already keep a history the phone must be able to take in."
+      },
+      "status": "deferred",
+      "deferredReason": "No paper-log capture or row importer exists; resolve when a fixture photo or picked image produces the expected starting shot rows."
+    },
+    {
+      "id": "one-tap-shot-and-site",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "One tap logs the prescribed dose on a body-site map that remembers the last eight weeks, with side effects tagged in hours-since-shot rather than as a detached diary.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-10-glp1-tracker-shelf.md#the-glp-1-shelf-hand-classified",
+        "finding": "14 of 15 visible titles on the 2026-10-10 GLP-1 tracker search page name a shot or GLP-1 tracking job, so the weekly dose-and-site act is the shelf, not a side feature."
+      },
+      "status": "deferred",
+      "deferredReason": "No dose row, site map or hours-since-shot tagger exists; resolve when a unit test writes one dose on a named site with a side-effect offset."
+    },
+    {
+      "id": "plate-photo-not-guessed",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "data_in",
+      "promise": "A plate is a photograph plus a caption and optional typed protein grams; no model guesses the meal.",
+      "comparison": {
+        "incumbent": "app.meagain.app",
+        "limitation": "A 2026-08-21 featured review says meal photos consistently get it wrong and the AI edit cursor jumps.",
+        "source": "docs/research/2026-10-10-glp1-tracker-shelf.md#complaints-that-name-a-product"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-10-glp1-tracker-shelf.md#complaints-that-name-a-product",
+        "finding": "Jenna's 2026-08-21 MeAgain review reports wrong AI meal photos; Pep's listing sells an AI food scanner on the same shelf."
+      },
+      "status": "deferred",
+      "deferredReason": "No plate capture path exists; resolve when TakePicture or PickVisualMedia stores a still with a caption and no nutrition API call."
+    },
+    {
+      "id": "crash-safe-no-account",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "durability",
+      "promise": "Killing the process or never signing in cannot wipe the shot history; there is no login that can ask for a first shot after month three.",
+      "comparison": {
+        "incumbent": "com.shotsy.app",
+        "limitation": "A 2026-09-17 featured review says shot entries vanish after login and the app asks to add a first shot.",
+        "source": "docs/research/2026-10-10-glp1-tracker-shelf.md#complaints-that-name-a-product"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-10-glp1-tracker-shelf.md#complaints-that-name-a-product",
+        "finding": "Nikolai Efimov's 2026-09-17 Shotsy review describes lost weekly shot entries after login; AppInsider's October 2026 roll-up of 118 US reviews names login and account problems as a top complaint cluster."
+      },
+      "status": "deferred",
+      "deferredReason": "No local store or process-death test exists; resolve when a kill-and-recreate test restores the same shot rows without an account."
+    },
+    {
+      "id": "clinic-pdf-handoff",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "A dated PDF and CSV of doses, sites, side effects, weights and plate thumbnails leave through the system share sheet or a SAF create-document write.",
+      "comparison": {
+        "incumbent": "app.meagain.app",
+        "limitation": "The listing offers notes to discuss with a provider but the featured 2026-08-30 review says the useful screen is a subscription paywall.",
+        "source": "docs/research/2026-10-10-glp1-tracker-shelf.md#complaints-that-name-a-product"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-10-glp1-tracker-shelf.md#complaints-that-name-a-product",
+        "finding": "MeAgain's own listing tells the user to keep notes for a healthcare provider, and Lauren Freeman's 2026-08-30 review says that place to track is locked behind a monthly or yearly fee."
+      },
+      "status": "deferred",
+      "deferredReason": "No PDF or share path exists; resolve when instrumentation sees ACTION_SEND or ACTION_CREATE_DOCUMENT with a FileProvider or SAF URI."
+    },
+    {
+      "id": "shot-day-widget",
+      "weight": "supporting",
+      "jobStage": "before",
+      "depthFamily": "widget",
+      "promise": "A home-screen tile shows next shot day and the last site so the routine is visible without opening another subscription tracker.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-10-glp1-tracker-shelf.md#complaints-that-name-a-product",
+        "finding": "Jenna's 2026-08-21 MeAgain review calls that app's widget cute but useless, so a tile that only shows next shot day and last site is the part of the widget job the shelf has not kept."
+      },
+      "status": "deferred",
+      "deferredReason": "No Glance widget exists; resolve when a GlanceAppWidget reads next shot day and last site from the local store."
+    }
+  ]
+}
