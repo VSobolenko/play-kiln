@@ -39,12 +39,12 @@ UNVERIFIED values are `annex/M-spikes-and-reads.md`. Name/slug decided: `plinth-
 
 ## 4. Server (`apps/<slot>/server/`, one writer) — `annex/C-data-model.md`, `annex/D-server-api.md`
 
-- [ ] 4.1 Implement device session with an integrity check and starter credits bound to the device (API-01, STARTER_CREDITS=10); verify tests show a reinstall does not refill (E40 related).
-- [ ] 4.2 Implement purchase confirmation against the store interface with consume or acknowledge and an idempotent credit (API-03); verify tests: forged token refused, replayed token credited once, voided purchase clawed back (E39).
-- [ ] 4.3 Implement the ledger (reserve, settle-at-first-download, release, idempotency keys; D14 / E55); verify tests: insufficient balance refused before any model call, concurrent spends cannot overspend, release on failure is idempotent, undelivered expiry releases.
+- [ ] 4.1 Implement Play Integrity Standard requests for session creation (API-00/API-01): bind the single-use challenge and canonical request fields into `requestHash`, verify package/version/certificate, `PLAY_RECOGNIZED`, `LICENSED` and device verdict server-side, and use Device Recall bit 1 only if S4 proves it available; never use `installId` as anti-reinstall proof and grant zero starter credits otherwise; verify altered-hash, replay, unevaluated-verdict, unavailable-recall and reinstall/reset cases.
+- [ ] 4.2 Implement purchase confirmation plus encrypted client Room outbox/unique WorkManager retry; set and verify the wallet-derived `obfuscatedAccountId`, validate package/product/state/token/quantity/ownership before idempotent fulfillment, then consume/acknowledge server-side; implement authenticated Pub/Sub RTDN deduplication plus the Voided Purchases reconciliation sweep; verify forged, mismatch, duplicate-message, replay, process-death, pending, cancellation and voided/clawback cases.
+- [ ] 4.3 Implement the ledger (reserve, settle only after API-09R accepts the idempotent receipt for an atomically stored result with matching declared length/digest, release, idempotency keys; D14 / E55); verify tests: insufficient balance refused before any model call, concurrent spends cannot overspend, disconnect/short-write/missing-or-wrong receipt does not settle, lost receipt retries safely, release on failure is idempotent, undelivered expiry releases.
 - [ ] 4.4 Implement the model registry and job queue with bounded concurrency and the fal queue API behind a fake provider for tests (API-07…API-10, annex E registry); verify a contract test passes against the fake and one real call passes in scratch.
 - [ ] 4.5 Implement the fidelity guard with thresholds from task 2.3 (annex E); verify tests: a drifting result is rejected and refunded, a faithful one is delivered and charged once, a changed label is rejected, identity and swap controls (annex M §S2).
-- [ ] 4.6 Implement cost caps, the emergency switch, report and delete-data endpoints (API-11, API-14), short image retention and no image logging; verify tests for the global limit refusal, report recording, deletion, and an expiry sweep.
+- [ ] 4.6 Implement resource ownership, opaque result tokens and durable delivery receipts, partial series ledger, caps/refund debt, moderation cases and truthful revoking deletion; verify cross-wallet denial, disconnect/no-receipt-no-charge, partial series, old-token denial, report threshold, deletion receipt/provider status and expiry.
 - [ ] 4.7 Deploy to the VPS by the path found in task 2.1 and verify HTTPS health plus one end-to-end job from the phone; secrets exist only in the server environment.
 
 ## 5. M1 — end-to-end basic path (client) — `annex/C`, `E`, `F`, `L`, `B`
@@ -56,10 +56,11 @@ UNVERIFIED values are `annex/M-spikes-and-reads.md`. Name/slug decided: `plinth-
 - [ ] 5.5 Implement the rules linter and fix-for-marketplace (annex L L01–L20, S-09); verify fixture tests for every rule type, every first-queue marketplace, pass and fail (e.g. WB 699×933 fails / 700×933 passes).
 - [ ] 5.6 Implement the auto-card (recognition, editable category, scene selection, marketplace mode; annex E §Auto-card, S-04); verify tests that different categories choose different scenes and that a no-editing marketplace returns the unaltered photo (E31).
 - [ ] 5.7 Implement export (formats, size, SKU names, share, gallery, ZIP) and provenance labels (S-12, annex H); verify tests for naming, size and the metadata declaration.
-- [ ] 5.8 Implement the wallet, purchase screens with store-provided prices, unlock restore, recovery code (S-15, API-04/05, E40) and the client of the purchase authority; verify tests that no subscription product is queried and that prices come from the store.
+- [ ] 5.8 Implement wallet/purchases, durable fulfillment, unlock restore and recovery-code transfer; enforce free watermark and 5-item batch limit; verify marketplace watermark blocking, no subscriptions, store prices and no wallet backup/transfer.
 - [ ] 5.9 Implement settings (every listed preference changes behaviour, annex C keys), the in-app privacy policy and delete-my-data (S-17, S-18, API-14); verify `node scripts/check-in-app-policy.mjs --slot <slug>` and `node scripts/verify.mjs --slot <slug>` settings checks pass.
 - [ ] 5.10 Write all strings in the six locales and lay out for the longest; verify `node scripts/verify.mjs --slot <slug>` localization checks pass and no `values-<locale>` is missing a key.
 - [ ] 5.11 Build the slot-owned theme, components (`PlinthStage`, `ProofRing`, …) and iconography from one licensed icon set with `icons/provenance.json` (annex J, F); verify the `icon` and `palette` groups pass.
+- [ ] 5.12 Publish the truthful privacy policy in phase 1 before any device/server photo transmission (`node scripts/publish-privacy.mjs --slot <slug>`), verify HTTPS reachability and S-17/S-18 link; this is not store-pack generation or console submission.
 
 ## 6. M2 — seller workflow — `annex/F`, `I`, `G`
 
@@ -91,5 +92,5 @@ UNVERIFIED values are `annex/M-spikes-and-reads.md`. Name/slug decided: `plinth-
 
 - [ ] 9.1 Hand the owner the checkpoint 1.5 report with device evidence; the approval is recorded only from his words with `node scripts/approve-release.mjs --slot <slug> --note "<owner's words>"`.
 - [ ] 9.2 [BLOCKED] `node scripts/prepare-release.mjs --slot <slug>`, `python scripts/store/render.py --slot <slug>`, `node scripts/media-capture.mjs --slot <slug>`, store pack validation, 16 KB check.
-- [ ] 9.3 [BLOCKED] Publish the privacy policy (`node scripts/publish-privacy.mjs --slot <slug>`), then, on a separate publish yes, submit through the console per `docs/play-publishing-playbook.md` §5.1.
+- [ ] 9.3 [BLOCKED] On a separate checkpoint-2 publish yes, submit through the console per `docs/play-publishing-playbook.md` §5.1.
 - [ ] 9.4 [BLOCKED] Update `registry/apps.json` and start the earn readings for `node scripts/check-outcomes.mjs --slot <slug>`.

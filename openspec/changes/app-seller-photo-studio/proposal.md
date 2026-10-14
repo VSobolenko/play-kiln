@@ -44,6 +44,13 @@ not a selection criterion.
 **Non-goals for 1.0:** video cards, publishing through marketplace APIs, accounts, multi-device sync, a
 web version, ads, subscriptions, and any client-side secret.
 
+**Contract clarifications:** Original fidelity applies only while item-region pixels receive no tonal or
+generative edit; local tonal edits are labelled manually adjusted, procedural backgrounds are not called
+AI-generated, and `original-only` follows each preset's sourced allow-list. Quick cut-out ships only if its
+spike selects a stable local engine. Free entitlement is a watermarked export with a 5-item batch limit;
+the unlock removes those limits while credits continue to fund server work. Purchases, result delivery,
+starter grant and deletion use the durable/revoking contracts in design D17–D18.
+
 ## Capabilities
 
 ### New Capabilities

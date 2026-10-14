@@ -29,6 +29,10 @@ first-party page says. Inventing, rounding or "fixing" a number from memory is f
 `textOnMain` (`forbidden` \| `penalised-by-size` \| `forbidden-categories-only` \| `infographic-allowed-except-select` \| `not-stated` \| `n/a-original-only`),
 `forbidWatermark`, `forbidBorders`, `forbidPackaging`, `itemMustBeFullyVisible`.
 
+`original-only` is not synonymous with `ORIGINAL_PIXELS`: `originalOnlyAllowed` is the operation
+allow-list. Permitted exposure or white-balance is labelled `MANUALLY_ADJUSTED`; cut-out/background
+replacement remains disabled unless explicitly sourced as allowed.
+
 ## Rules for the data
 
 1. **A shown preset needs a source and a date.** `build.presets` (project check, task 5.4) fails when an

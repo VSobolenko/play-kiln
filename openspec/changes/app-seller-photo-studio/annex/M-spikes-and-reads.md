@@ -51,12 +51,15 @@ seller types or confirms, with the feature described in the UI as "reads what it
 
 ## S4 — Walking skeleton (task 2.5)
 
-One request from the phone over HTTPS to the server → one purchase-token verification with the Play
+One Play Integrity Standard request from the phone over HTTPS to the server, with a changed-field negative
+control for `requestHash`, and a Device Recall bit-1 read/write/read probe → one purchase-token verification with the Play
 Developer API (a **real test product** if the console allows one, otherwise the `products.get` 400-on-fake
 and 200-on-voided-list checks already observed) → one ledger reserve/settle → one model call via
 `FalProvider` → result back on the phone. Pass: server request log lines, a phone screenshot via
 `adb -s R58MB3SGZVL exec-out screencap -p`, and `node scripts/check-client-secrets.mjs` clean on the
-skeleton. Artifacts only in scratch; the real server and client are built in sections 4–5.
+skeleton. If Device Recall is not enabled or any read/write verdict is unevaluated, record
+`starterCreditsDefault = 0`; do not substitute `installId` or another fingerprint. Artifacts only in
+scratch; the real server and client are built in sections 4–5.
 
 ## S5 — Reads for facts the specs treat as secondary (task 2.6)
 

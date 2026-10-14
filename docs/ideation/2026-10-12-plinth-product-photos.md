@@ -110,7 +110,7 @@ without it.
   or video.
 - microphone: not used
 - location: not used — EXIF GPS is stripped from outputs; the app never reads location.
-- motion sensors: used — accelerometer / gravity for the coach level overlay; without it the framing
+- motion sensors: used — `SensorManager` with `Sensor.TYPE_GRAVITY` for the coach level overlay; without it the framing
   guide still works but the seller loses the level cue. No extra permission beyond sensors already
   available to the app.
 - contacts / calendar: not used

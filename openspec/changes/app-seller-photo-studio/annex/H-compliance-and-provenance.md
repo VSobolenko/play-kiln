@@ -13,6 +13,10 @@ Labels per `.cursor/rules/grounded-claims.mdc`. Everything marked `S6` is read a
 | Privacy policy: public URL and in-app | `privacy-policy.mdc` | `node scripts/publish-privacy.mjs` during development; policy opened from S-17/S-18 |
 | Permissions minimised | AGENTS.md | picker needs none; `CAMERA` and `POST_NOTIFICATIONS` requested at point of use only |
 
+The truthful public privacy policy is published in phase 1 before any device/server test transmits a user
+photo. This is required compliance infrastructure, not a signed artifact, screenshot, store pack or console
+submission, so it does not cross the release gate.
+
 ## What leaves the phone (the privacy facts the policy and Data safety must state)
 
 | Data | Leaves the phone? | To whom | Retention | Note |
@@ -68,15 +72,18 @@ records the provider terms before any "not used for training" sentence is allowe
   person, which touches Deceptive Behavior and consent questions the other operations do not.
 - Provider content filters are honoured (`MODERATION_BLOCKED`, E51); the server never retries around a
   filter.
-- Reports (`API-11`) are stored and reviewed by the operator; a `WRONG_PRODUCT` or `UNSAFE` report on an
-  operation increments a per-op counter in the server log used by the operator to disable that op via
-  `/config`.
+- Reports (`API-11`) are durable moderation cases in `OPEN`, `REVIEWED`, `ACTIONED` or `DISMISSED` state,
+  linked to operation, provider endpoint, model version and a non-image result fingerprint. An operator
+  query/export lists open cases oldest first. Any 3 `OFFENSIVE` or `UNSAFE` reports for the same endpoint
+  in a rolling 24 hours automatically set that endpoint `enabled:false` pending review; an operator may
+  disable earlier. Review target is 2 business days, and every action/dismissal records time and reason.
+  Tests prove the third qualifying report changes `/config`; provider filters are never bypassed.
 
 ## Intellectual property
 
 Sellers upload product photos. The Terms line (shown at S-01 and S-18): "You confirm you have the rights
 to the photos you use." The app cannot detect counterfeit goods; Play's Intellectual Property policy is
-ON RECORD in the same policy document. A report category `OTHER` is available for a rights complaint and
+ON RECORD in the same policy document. A report category `RIGHTS` is available for a rights complaint and
 the operator contact is the listing's `contactEmail`.
 
 ## Billing facts

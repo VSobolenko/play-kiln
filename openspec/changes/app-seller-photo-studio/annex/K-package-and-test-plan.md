@@ -35,6 +35,17 @@ res/  values/ and values-ru/ values-de/ values-fr/ values-es/ values-pt-rBR/ ; d
 assets/ marketplaces.json slide-templates.json prohibited-text.json scene-recipes.json categories.json fonts/
 ```
 
+## Android architecture details (normative)
+
+- `MainActivity : AppCompatActivity`; locales use `AppCompatDelegate.setApplicationLocales` and survive
+  activity/process recreation.
+- Navigation 3 owns one serializable back stack. Compact uses one pane, medium list-detail, expanded may
+  add a supporting pane; scene selection follows current window size/posture. Predictive back pops it.
+- Edge-to-edge is enabled once. Scaffolds consume safe-drawing/IME insets; media may draw behind bars but
+  controls may not. Actions have semantic names, 48 dp targets, focus order and keyboard activation.
+- WorkManager uses unique work and constraints; Room transactions own claiming/idempotent terminal state.
+  Classified transient failures use bounded backoff. Paging 3 backs Library/search using annex C indexes.
+
 ## Dependencies (each needs a reason; versions are the latest stable read from release notes at scaffold
 time through the version catalog; none is a beta/alpha — `dependency-freshness.mdc`)
 
@@ -83,18 +94,31 @@ key; the six `values-*` dirs exist), `ProofRingStateTest`, `BackupRulesTest` (wa
 included).
 
 Server tests: `ledger.test` (insufficient balance refused before any provider call; concurrent spends
-cannot overspend; release idempotent), `purchases.test` (forged token refused; replay credits once; voided
-purchase claws back; unknown product refused), `session.test` (reinstall does not refill; integrity failure
-caps starter credits), `jobs.test` (concurrency bound; timeout releases; cancel releases),
+cannot overspend; receipt settle; wrong/missing/duplicate/lost receipt; release idempotent),
+`purchases.test` (forged token refused; replay credits once; product/quantity/account/profile binding;
+pending refused; crash recovery at every saga boundary; consume/ack retry; full/partial void creates
+nonnegative debt and removes unlock; unknown product refused), `rtdn.test` (OIDC auth, package filter,
+Pub/Sub message dedupe, authoritative API re-read, paginated overlap reconciliation), `session.test`
+(canonical requestHash; changed/stale/replayed/wrong-package/wrong-cert rejection; Device Recall read/write;
+unavailable/unevaluated recall grants zero; reinstall/reset does not refill), `jobs.test` (concurrency bound; timeout releases; cancel releases),
 `guard.test` (drift rejected and refunded; faithful delivered and charged once; changed label rejected;
 identity control passes; swap control rejected), `spend.test` (daily cap refusal, emergency switch),
-`retention.test` (expiry sweep deletes), `reports.test`, `delete.test`, `noimagelog.test` (no image bytes
+`retention.test` (expiry sweep deletes), `reports.test` (case lifecycle and third-report kill threshold),
+`delete.test` (revocation, de-identification and truthful provider status), `noimagelog.test` (no image bytes
 or URLs in the log), `contract.test` (client models vs server schemas generated from one JSON schema file
 `server/schema/api.schema.json`, which both sides import).
 
 Device run (task 8.4) on `R58MB3SGZVL` follows annex F first-run journey plus: purchase of test credits,
 batch of 6, coach in airplane mode, forced Enhanced failure shows refund, Original export file hash equals
 the interior pixel hash recorded by the pipeline.
+
+## Required test matrix
+
+Add coverage for provenance transitions, conditional quick-cut absence, free watermark/5-item limit,
+purchase-outbox process death, purchase mismatch, starter-binding unavailable, partial series ledger,
+delivery-receipt settlement/disconnect/wrong digest/lost retry, deletion revocation, cross-wallet resources, Navigation restore/back,
+compact/medium/expanded scenes, edge-to-edge gesture/3-button/IME, Paging invalidation, worker replacement,
+TalkBack semantics, keyboard, RTL and 200% font. Exercise API 26 and target API, phone and tablet forms.
 
 ## Worker partition (disjoint file lists; Gradle is never run by workers)
 

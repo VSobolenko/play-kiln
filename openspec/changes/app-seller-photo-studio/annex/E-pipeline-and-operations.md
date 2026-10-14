@@ -165,6 +165,17 @@ Only `endpointId` values read from the provider's own model page at S2 may repla
 types an endpoint id from memory. `O-01`'s and `O-02`'s ids come from the session's earlier probes
 (MEASURED), `O-15` is `UNVERIFIED` until S3 runs one text call.
 
+## Provenance and entitlement
+
+`ORIGINAL_PIXELS` covers an untouched item region over solid, gradient, gallery or deterministic
+procedural backgrounds. A trained-model scene is `COMPOSITE_GENERATED_BACKGROUND`. Any tonal edit over
+item pixels is `MANUALLY_ADJUSTED`; generative/restorative item edits are `ENHANCED`. `original-only`
+evaluates the preset's exact `originalOnlyAllowed` list; allowed tonal edits remain manually adjusted.
+
+Free entitlement permits batches of at most 5 and applies a visible Plinth watermark to exported pixels.
+The unlock removes both limits after server confirmation. Preview watermarking never mutates sources.
+A marketplace rule forbidding watermarks blocks free export with a purchase explanation.
+
 ## Honest limits
 
 The guard bounds drift; it does not prove a generative result is "the same product". Original mode is the

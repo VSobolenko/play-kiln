@@ -47,6 +47,13 @@ pt-BR `Plinth: foto de produto` (23). The owner confirms the name at checkpoint 
 - **Icons:** one licence-cleared set vendored with `icons/provenance.json`; the mark and the `ProofRing`
   are slot-owned.
 
+`ProofRing` has four semantic states: solid = `ORIGINAL_PIXELS`, double solid =
+`MANUALLY_ADJUSTED`, split = generated background with untouched item, dashed = `ENHANCED`. Visible
+text/semantics accompany the shape; colour or style alone never carries provenance.
+
+Free entitlement watermarks exported pixels and limits a batch to 5 items. The unlock removes both
+restrictions; provider-funded operations continue to require credits.
+
 ## Money
 
 ### Archetype and what is rejected (revenue terms)

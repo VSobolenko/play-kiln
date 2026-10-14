@@ -6,6 +6,14 @@ handles: empty, loading, error, offline, process death, 200 % font scale and the
 locales. Interactive elements are ≥ 48 dp with a content description. The wallet pill (balance) is in the
 top bar of S-02, S-04, S-05, S-07, S-14 and opens S-15.
 
+## Adaptive and accessibility contract (normative)
+
+Navigation 3 owns one saved/restored back stack and predictive back pops it. Compact uses one pane;
+medium uses list-detail; expanded may add a supporting preview pane. Scene choice follows current window
+size/posture. Edge-to-edge scaffolds consume safe-drawing and IME insets; media may draw behind bars but
+controls may not. Every action is keyboard reachable, semantically named and at least 48 dp; status is not
+colour-only and `ProofRing` exposes its label to accessibility services.
+
 ## Destinations
 
 Strip: **Studio** (S-02), **Library** (S-13), **Coach** (S-16), **Settings** (S-17).

@@ -27,16 +27,22 @@ generated or styled. Original mode SHALL be the default mode.
 
 ### Requirement: Cut-out has a fast path and a studio path
 
-The app SHALL offer a quick cut-out and a studio cut-out for finer edges (hair, fur, glass, thin straps).
-The quick cut-out SHALL work without network access and without spending a credit when the measured
-quality of the on-device option meets the project's acceptance benchmark; otherwise the app SHALL route
-every cut-out through the studio path and SHALL tell the seller why it costs a credit. The seller SHALL be
+The app SHALL offer a studio cut-out for finer edges (hair, fur, glass, thin straps), and SHALL additionally
+offer a quick cut-out only when spike S1 selects an eligible stable on-device engine. When present, quick
+cut-out SHALL work without network access and without spending a credit. When S1 selects no local engine,
+the quick action SHALL be absent, every cut-out SHALL route through the studio path, and the cost SHALL be
+shown before starting. The seller SHALL be
 able to refine the mask by painting regions in or out, and to undo each refinement.
 
-#### Scenario: Quick cut-out offline
+#### Scenario: Selected quick cut-out works offline
 
-- **WHEN** the device has no network and the seller requests a quick cut-out
+- **WHEN** S1 selected a local engine, the device has no network and the seller requests a quick cut-out
 - **THEN** a mask is produced and no request leaves the device
+
+#### Scenario: Quick cut-out is not selected
+
+- **WHEN** S1 selected no eligible local engine
+- **THEN** no quick-cut action or free-cut claim is shown and studio cut-out shows its credit cost before starting
 
 #### Scenario: Mask refinement is reversible
 
@@ -62,14 +68,18 @@ composition SHALL be computed on the device without spending a credit.
 
 ### Requirement: Manual editor
 
-The app SHALL provide rotate, mirror, crop with standard ratios, brightness, contrast, saturation,
-sharpness and colour temperature, each applied without spending a credit and each reversible through undo
-and redo. This editor SHALL work on the original photo and on a finished card.
+The app SHALL provide rotate, mirror and crop as non-destructive geometry steps, plus brightness, contrast,
+saturation, sharpness and colour temperature as non-destructive tonal steps, each without spending a credit
+and reversible through undo and redo. Geometry steps MAY retain `ORIGINAL_PIXELS` only when export merely
+repositions/resamples the source under the Original invariant. Applying any tonal step to the item region
+SHALL change provenance to `MANUALLY_ADJUSTED`; it SHALL never be labelled `ORIGINAL_PIXELS`. On an
+`original-only` preset, only the preset's explicit `originalOnlyAllowed` steps are enabled. The editor
+SHALL store recipes without overwriting the source bytes.
 
 #### Scenario: Plain edits need no credit
 
 - **WHEN** the seller rotates and crops a photo
-- **THEN** no network request is made and the credit balance is unchanged
+- **THEN** no network request is made, the credit balance is unchanged, and the output is labelled manually adjusted
 
 #### Scenario: Undo restores the previous state
 

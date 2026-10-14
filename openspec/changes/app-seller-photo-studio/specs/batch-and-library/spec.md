@@ -28,6 +28,17 @@ closed and reopened, SHALL show per-item status, and SHALL let the seller cancel
 - **WHEN** one item of a batch fails
 - **THEN** the seller can retry that item and the other items are unaffected
 
+### Requirement: Durable queue ownership
+
+Room SHALL be the source of truth for queue state, attempt and terminal outcome. Unique WorkManager work
+SHALL claim rows transactionally, resume only non-terminal rows after process death, and never re-run a
+completed item. Sellers without the unlock SHALL be limited to 5 items per batch.
+
+#### Scenario: Worker is replaced
+
+- **WHEN** Android stops and later replaces a batch worker
+- **THEN** it resumes claimed non-terminal rows and does not duplicate completed outputs or charges
+
 ### Requirement: Looks are reusable and portable
 
 The app SHALL save a Look under a name, apply it to any later project in one action, and include saved

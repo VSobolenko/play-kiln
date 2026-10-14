@@ -8,8 +8,8 @@ privacy policy, and no client secret ships. Detail: `annex/H-compliance-and-prov
 
 ### Requirement: Provenance is recorded and shown
 
-Every output SHALL carry one of three provenance values — original pixels, composite with a generated
-background, or AI-enhanced — and the app SHALL show that value as a visible badge (`ProofRing`, annex J).
+Every output SHALL carry one of four provenance values — original pixels, manually adjusted, composite
+with a generated background, or AI-enhanced — and the app SHALL show that value as a visible badge (`ProofRing`, annex J).
 Exported files SHALL declare the provenance in metadata once spike S6 has recorded the exact IPTC
 DigitalSourceType URIs; until then the export manifest SHALL carry the provenance in plain text and the
 in-app badge SHALL still appear (annex H).
@@ -24,16 +24,34 @@ in-app badge SHALL still appear (annex H).
 - **WHEN** an Enhanced operation delivers a result
 - **THEN** the result shows the AI-enhanced badge and the export manifest records `ENHANCED`
 
+### Requirement: Provenance distinguishes procedural and generated work
+
+Deterministic procedural backgrounds SHALL preserve `ORIGINAL_PIXELS` when item pixels are untouched.
+Trained-model backgrounds SHALL use `COMPOSITE_GENERATED_BACKGROUND`; tonal item edits SHALL use
+`MANUALLY_ADJUSTED`; generated/restorative item edits SHALL use `ENHANCED`.
+
+#### Scenario: Tonal edit cannot claim original pixels
+
+- **WHEN** a tonal edit changes the item region
+- **THEN** the badge and manifest record `MANUALLY_ADJUSTED`
+
 ### Requirement: In-app report without leaving the app
 
 The app SHALL let the seller report an offensive, wrong, unsafe or rights-related generative result from
-the result screen without leaving the app, and the report SHALL reach the server and be stored with the
-operation it concerns (Play AI-Generated Content policy, ON RECORD 2026-08-26; API-11).
+the result screen without leaving the app, and the report SHALL reach the server as a reviewable moderation
+case stored with its operation/provider/model metadata. Three offensive or unsafe reports for one endpoint
+within 24 hours SHALL disable that endpoint pending operator review (Play AI-Generated Content policy,
+ON RECORD 2026-08-26; API-11).
 
 #### Scenario: Report is recorded
 
 - **WHEN** the seller reports a result with a category and an optional note
 - **THEN** the server stores the report under the job id and the seller sees a confirmation
+
+#### Scenario: Repeated safety reports stop generation
+
+- **WHEN** a third qualifying offensive or unsafe report reaches one endpoint within 24 hours
+- **THEN** `/config` reports that endpoint disabled and no new job is sent to it until review
 
 ### Requirement: No free-text generative prompts in v1
 

@@ -47,7 +47,7 @@ re-derives them. Labels: ON RECORD unless stated.
 | F-24 | Look backup / restore | none documented | `batch-and-library`: Backup | M2 |
 | F-25 | Resume a queue after restart | none documented | `batch-and-library`: Queue durability | M2 |
 | F-26 | Failed result not charged | WildCard refunds only "technical" failures; Nightjar retries free after its own review | `credits-wallet-server`: Failure never charged — **core** `failure-never-charged` | M1 |
-| F-27 | Free tier | WildCard 5 then 2/week, Photoroom 250 exports/month with watermark, Pebblely 40/month no watermark | 10 starter credits per device, no watermark, no weekly refill (D10) | M1 |
+| F-27 | Free tier | WildCard 5 then 2/week, Photoroom 250 exports/month with watermark, Pebblely 40/month no watermark | integrity-bound starter grant when supported; free exports watermarked and batches capped at 5; no refill (D10/D18) | M1 |
 | F-28 | Pricing | Photoroom Pro $90/yr, Pixelcut Pro $96/yr, WildCard from 299 ₽/month, WB Jam from 22 990 ₽/30 days | credit packs + one-time unlock (annex J) | M1 |
 | F-29 | One look, many marketplaces | Ozon editor's stated gap (secondary) | `listing-and-export`: Export pack per marketplace — **core** `export-pack-per-marketplace` | M1 |
 | F-30 | Item pixels untouched | none; every generative competitor redraws, Nightjar reviews afterwards | `card-pipeline`: Original mode — **core** `item-pixels-untouched` | M1 |

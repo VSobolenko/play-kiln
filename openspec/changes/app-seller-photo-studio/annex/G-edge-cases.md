@@ -55,10 +55,10 @@ Specs cite these ids. "T:" names the test class or journey step (annex K).
 | E36 | Purchase pending (cash/slow payment) | Pack shows "Pending"; credits arrive when Play reports it purchased; no double credit | T:PendingPurchase |
 | E37 | Purchase confirmed by Play but server unreachable | Purchase is not consumed or acknowledged on the client; retried on next launch and on resume; Play's 3-day acknowledge window is respected; UI shows "confirming" | T:ConfirmRetry |
 | E38 | Forged or replayed token | Server `PURCHASE_INVALID` or the first result again; never credits twice | T:ForgedToken |
-| E39 | Refund / voided purchase | A nightly job reads voided purchases (`purchases.voidedpurchases`); credits already spent stay; unspent credits equal to the voided pack are deducted down to zero (never negative) | T:Voided |
+| E39 | Refund / voided purchase | Authenticated RTDN triggers an authoritative Play API re-read; a scheduled paginated Voided Purchases sweep with persisted cursor and overlap reconciles missed events. Apply one idempotent `REFUND_ADJUST` for the full/partial voided quantity: deduct available credits to zero and place the remainder in nonnegative `refundDebt`; block new paid model jobs while debt exists, and future purchased credits repay debt before becoming spendable. Local/free features remain usable. A voided unlock removes its entitlement. | T:Voided |
 | E40 | Reinstall after buying credits | Settings → "Restore wallet" accepts the recovery code; the unlock is restored from Play (`queryPurchasesAsync`); credits are not recoverable without the code and the first purchase screen says so | T:Recovery |
-| E41 | New phone | Device-to-device transfer carries `walletId` and Room; otherwise as E40 | T:Transfer |
-| E42 | Starter credits farmed by reinstalls | Starter credit is bound to `installId`; daily global starter budget caps the loss; reinstalls farm at most `STARTER_DAILY_BUDGET_USD` per day | T:StarterCap |
+| E41 | New phone | Device transfer may carry Room content but no wallet id/token; wallet access requires the recovery code and unlock restore uses Play; otherwise as E40 | T:Transfer |
+| E42 | Starter credits farmed by reinstalls | `installId` is not anti-reinstall proof; a challenged supported integrity binding grants once, otherwise grant zero; daily budget is secondary containment | T:StarterCap |
 | E43 | Daily spend cap reached | `CAP_REACHED`; Original-mode local work continues; the message offers "try again tomorrow" | T:SpendCap |
 | E44 | Kill switch on | As E43 with `KILL_SWITCH` | T:KillSwitch |
 | E45 | App too old | `VERSION_TOO_OLD` blocks paid operations; local work continues | T:MinVersion |
@@ -76,7 +76,7 @@ Specs cite these ids. "T:" names the test class or journey step (annex K).
 | E52 | Result contains text/logo not in the source | Guard `text` fails; reject | T:TextDrift |
 | E53 | Enhanced result on a marketplace gated `original-only` or white main | Action disabled before it can run | T:Gate |
 | E54 | Report an output | `POST /reports`; confirmation; the output stays on the user's phone | T:Report |
-| E55 | Result expired (> 24 h) before download | The client downloads immediately after `SUCCEEDED` and persists; if a download fails the job's result is re-fetchable until `expiresAt`, after which the item shows "result expired" and charges are already settled only if downloaded — settlement happens at first successful download (SETTLE follows the first byte delivered) | T:ResultExpiry |
+| E55 | Result expired (> 24 h) before receipt | The client downloads immediately after `SUCCEEDED` into a temporary file, verifies length/digest, fsyncs where supported, atomically renames and durably retries API-09R. Failed/partial delivery is re-fetchable until `expiresAt`; only a valid idempotent receipt settles, otherwise expiry releases | T:ResultExpiry |
 
 ## Batch, library, shoot coach, text
 

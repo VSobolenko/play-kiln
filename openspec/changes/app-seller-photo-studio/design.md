@@ -111,9 +111,11 @@ with bundled fonts (`annex/I-slide-kit.md`, capability `slide-kit`). This remove
 characters" failure WB names and that WildCard's own page documents. *Rejected:* letting the scene model
 draw title plates.
 
-**D14. Credits settle at first successful download.** A job reserves on create, releases on failure /
-timeout / cancel / guard reject, and settles only when the client has received the first byte of the
-result (`annex/D-server-api.md`, E55). A result that expires undelivered releases rather than settles.
+**D14. Credits settle after a verified delivery receipt.** A job reserves on create and releases on failure,
+timeout, cancel, guard rejection or undelivered expiry. Downloading never settles by itself because an HTTP
+server cannot prove that the client received or durably stored the final byte. The client atomically writes
+the result, verifies its declared length and SHA-256, then submits an idempotent delivery receipt; only that
+receipt settles (`annex/D-server-api.md`, E55).
 
 ## Implementation annex (read before coding)
 
@@ -150,3 +152,32 @@ implements from the annex will not. Spikes that decide UNVERIFIED values are `an
   (S0).
 - Server language is decided: Node + TypeScript + Fastify + better-sqlite3 + sharp (`annex/D-server-api.md`,
   `annex/K-package-and-test-plan.md`).
+
+## Additional implementation decisions
+
+**D15. Fidelity labels describe item transformations.** `ORIGINAL_PIXELS` means no item-region tonal
+transform. Crop/rotate/mirror and resampling may preserve it; tonal edits yield `MANUALLY_ADJUSTED`.
+Procedural backgrounds keep `ORIGINAL_PIXELS`; trained-model backgrounds yield
+`COMPOSITE_GENERATED_BACKGROUND`. An `original-only` preset enables only its sourced allow-list.
+
+**D16. Conditional capabilities are absent when unproved.** Quick cut-out exists only if S1 selects a
+stable local engine. Otherwise only the priced studio route is exposed and no offline/free claim is made.
+
+**D17. Durable commerce and delivery.** Purchase reports live in an encrypted, app-private Room outbox
+and unique WorkManager work retries them until a terminal server result. Before opening Billing, the client
+sets a deterministic wallet-derived `obfuscatedAccountId`; the server validates that returned binding plus
+package, product, quantity, state and token. Authenticated, deduplicated RTDN and a Voided Purchases sweep
+reconcile changes that happen while the app is closed. Uploads/results are wallet-owned resource rows;
+download uses an opaque short-lived token reusable until expiry or receipt, and only the client's
+idempotent length/digest delivery receipt settles the reservation.
+
+**D18. Starter and deletion are honest.** Random `installId` cannot prevent reinstall farming. A Play
+Integrity Standard token binds a single-use server challenge and canonical session fields through
+`requestHash`. Starter grant uses Device Recall bit 1 only if S4 proves the beta capability is enabled and
+read/write works for this Play app; the server checks the bit, commits the grant, writes it true, and fails
+closed to zero on unavailable/unevaluated/write failure. Delete revokes sessions/recovery, deletes
+resources/reports/linkage and tombstones the wallet; minimal accounting/replay rows are de-identified.
+
+**D19. Android ownership.** `AppCompatActivity`/`AppCompatDelegate` own per-app locales. Navigation 3 owns
+one saved back stack; adaptive scenes select compact single-pane or medium/expanded list-detail/supporting
+pane from current window size. WorkManager orchestrates durable work; Room owns queue truth and idempotency.
