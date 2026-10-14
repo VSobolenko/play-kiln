@@ -14,10 +14,15 @@ Exported files SHALL declare the provenance in metadata once spike S6 has record
 DigitalSourceType URIs; until then the export manifest SHALL carry the provenance in plain text and the
 in-app badge SHALL still appear (annex H).
 
-#### Scenario: Original composite is labelled
+#### Scenario: Procedural background preserves original-pixels provenance
 
-- **WHEN** a card is composed in Original mode over a generated or procedural background
-- **THEN** the result shows the composite provenance badge and not an AI-enhanced badge
+- **WHEN** a card is composed in Original mode over a deterministic solid, gradient or bundled procedural background
+- **THEN** the result shows `ORIGINAL_PIXELS`
+
+#### Scenario: Trained-model background is labelled as a generated composite
+
+- **WHEN** untouched item pixels are composed over a background produced by a trained model
+- **THEN** the result shows `COMPOSITE_GENERATED_BACKGROUND` and not `ORIGINAL_PIXELS` or `ENHANCED`
 
 #### Scenario: Enhanced is labelled
 

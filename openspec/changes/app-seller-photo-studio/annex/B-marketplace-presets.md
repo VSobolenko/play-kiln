@@ -7,14 +7,17 @@ first-party page says. Inventing, rounding or "fixing" a number from memory is f
 
 ## Schema (`MarketplacePreset`)
 
+The document also carries top-level `localeDefaults: Map<BCP47 language tag, marketplaceId[]>`; every
+supported UI locale (`en`, `ru`, `de`, `fr`, `es`, `pt-BR`) must exist and may reference only shown preset ids.
+
 | Field | Type | Meaning |
 |---|---|---|
 | `id` | string | stable key; also the `M-<id>` citation |
-| `name`, `regions[]`, `queue` | | display; ISO region codes; 1 = ships M1, 2 = ships M2 |
-| `editPolicy` | `enhanced-allowed` \| `original-only` | `original-only` disables cut-out, background replacement, generated and Enhanced operations (E31) |
+| `name`, `regions[]`, `defaultLocale`, `queue` | | display; ISO region codes; BCP-47 locale used for preset copy; 1 = ships M1, 2 = ships M2 |
+| `editPolicy` | `original-only` \| `limited-overlay` \| `free` | exact capability mode from the delta spec; `limited-overlay` also requires `allowedOverlays[]`; `original-only` disables cut-out, background replacement, overlays and Enhanced operations except its sourced `originalOnlyAllowed[]` geometry/tonal allow-list (E31) |
 | `status` | `first-party` \| `secondary` \| `unread` | `unread` never reaches the UI |
 | `verifiedAt` | ISO date | shown in the UI; older than 120 days shows "rules may have changed" (DECISION) |
-| `sources[]` | `{title, site, printedDate, label, firstParty, quotes}` | the evidence; at least one per shown entry |
+| `sources[]` | `{title, url, site, printedDate, label, firstParty, quotes}` | the evidence; `url` is an absolute HTTPS page URL, not a domain label; at least one per shown entry |
 | `image` | see below | the technical limits |
 | `main` | see below | the main-photo rules |
 | `text` | `{prohibited[], contrastMin, avoidColourPairs[]}` | slide-text rules; `prohibited` uses ids from `textCategories` |
@@ -35,9 +38,10 @@ replacement remains disabled unless explicitly sourced as allowed.
 
 ## Rules for the data
 
-1. **A shown preset needs a source and a date.** `build.presets` (project check, task 5.4) fails when an
-   entry with `status != unread` has no `sources` or no `verifiedAt`, and when a number field appears with
-   no entry in `sources`. It is verified by deleting a source from a copy of the file and seeing it fail.
+1. **A shown preset needs a URL, locale and date.** `build.presets` (project check, task 5.4) fails when an
+   entry with `status != unread` lacks `defaultLocale`, `verifiedAt`, a valid three-value `editPolicy`, or
+   a non-empty `sources[]` whose every row has an absolute HTTPS `url`; it also fails when a number field
+   appears with no source. It is verified by deleting each required field from fixture copies.
 2. **Conflicts are data.** The WB minimum height is 900 in one help article and 933 in another; the entry
    states the larger in the field and the other in `minHeightAlternative`, and the linter message names both.
 3. **Rejected sources are recorded** (`rejectedSources`) so a later session does not re-add the Ozon
@@ -49,6 +53,8 @@ replacement remains disabled unless explicitly sourced as allowed.
 6. **The app never claims acceptance.** It says "meets the rules we read on <date> from <source>"
    (`S-09` Marketplaces & check, and repeated on `S-12` Export), never "approved by <marketplace>" — no
    marketplace's moderation is observable from here.
+7. **Locale ordering is data.** `localeDefaults` contains all six shipped UI locales, has no unknown or
+   duplicate id, and excludes `unread` presets. Exact locale match wins, then language match, then `en`.
 
 ## First-party reads required (spike S5)
 

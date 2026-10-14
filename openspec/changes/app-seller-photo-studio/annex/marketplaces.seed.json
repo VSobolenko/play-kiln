@@ -14,18 +14,27 @@
     "third_party_logo",
     "watermark"
   ],
+  "localeDefaults": {
+    "en": ["ebay", "etsy", "vinted", "depop", "amazon", "shopify"],
+    "ru": ["wb", "ozon", "avito", "etsy", "ebay"],
+    "de": ["vinted", "ebay", "etsy", "amazon", "shopify"],
+    "fr": ["vinted", "etsy", "ebay", "amazon", "shopify"],
+    "es": ["vinted", "ebay", "etsy", "amazon", "shopify"],
+    "pt-BR": ["amazon", "shopify", "etsy", "ebay"]
+  },
   "marketplaces": [
     {
       "id": "wb",
       "name": "Wildberries",
       "regions": ["RU", "BY", "KZ"],
+      "defaultLocale": "ru-RU",
       "queue": 1,
-      "editPolicy": "enhanced-allowed",
+      "editPolicy": "free",
       "status": "secondary",
       "verifiedAt": "2026-10-12",
       "sources": [
-        { "title": "Карточка товара вб: требования и размеры — GEN202", "site": "gen202", "printedDate": "checked 2026-08-26", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "WB help: Фото товаров (27.07.2026, 28.08.2026), Как создать карточку товара (21.08.2026), WB API docs" },
-        { "title": "Инфографика для вб: требования WB и что работает в 2026", "site": "platform blog", "printedDate": "2026-10-06", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "WB help: Как создать карточку товара (02.10.2026)" }
+        { "title": "Фото товаров: правила, рекомендации и частые ошибки", "url": "https://seller.wildberries.ru/instructions/ru/am/material/item-photo-rules-recommendations-and-common-mistakes", "site": "seller.wildberries.ru", "printedDate": "fetched 2026-10-14", "label": "ON RECORD (vendor)", "firstParty": true, "quotes": "minimum 700x900; main photo shows the product without packaging; background must not distract" },
+        { "title": "Фото для целевой аудитории: как настроить разные главные фото", "url": "https://seller.wildberries.ru/instructions/ru/kz/material/two-main-photos-on-the-product-card-kz", "site": "seller.wildberries.ru", "printedDate": "fetched 2026-10-14", "label": "ON RECORD (vendor)", "firstParty": true, "quotes": "minimum 700x933; must show the same product as the main photo" }
       ],
       "image": {
         "formats": ["jpg", "png", "webp"],
@@ -63,13 +72,14 @@
       "id": "ozon",
       "name": "Ozon",
       "regions": ["RU", "BY", "KZ"],
+      "defaultLocale": "ru-RU",
       "queue": 1,
-      "editPolicy": "enhanced-allowed",
+      "editPolicy": "free",
       "status": "secondary",
       "verifiedAt": "2026-10-12",
       "sources": [
-        { "title": "Карточка товара озон: что требует справка площадки", "site": "third-party, checked 2026-08-26", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "Ozon help articles" },
-        { "title": "Требования к фото для Ozon 2026: официальное руководство", "site": "third-party", "printedDate": "2026-03-26", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "unread detail" }
+        { "title": "Требования к медиа", "url": "https://docs.ozon.ru/global/products/requirements/media", "site": "docs.ozon.ru", "printedDate": "first-party re-read required by S5", "label": "UNVERIFIED until S5", "firstParty": true, "quotes": "URL recorded; exact current rules must be read at S5 before status can become first-party" },
+        { "title": "Требования к фото на Ozon 2026", "url": "https://progon.pro/blog/ozon-photo-requirements", "site": "progon.pro", "printedDate": "fetched 2026-10-14", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "3:4; 900x1200 recommendation; supported formats and marketplace guidance" }
       ],
       "rejectedSources": [
         { "title": "Требования Ozon к фону на фотографиях товаров — инструкция для продавцов", "reason": "states 1:1 / 1000x1000 / white RGB 255, contradicts the help-quoting source, no help-centre quotations; treated as unreliable" }
@@ -103,12 +113,13 @@
       "id": "avito",
       "name": "Avito",
       "regions": ["RU"],
+      "defaultLocale": "ru-RU",
       "queue": 1,
-      "editPolicy": "enhanced-allowed",
+      "editPolicy": "free",
       "status": "secondary",
       "verifiedAt": "2026-10-12",
       "sources": [
-        { "title": "Фото для Авито в 2026: размер, формат, модерация", "site": "platform blog", "printedDate": "2026-09-25", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "support.avito.ru and Avito rules" }
+        { "title": "Как эффективно продать на Avito", "url": "https://severgazbank.ru/upload/iblock/1d3/3pno1qis04ftzolpq1q327tbtmos7oc0/SGB_new_look_12_24pgs_web.pdf", "site": "severgazbank.ru", "printedDate": "fetched 2026-10-14", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "JPG/JPEG/PNG/GIF; up to 25 MB; up to ten photos; remaining rules require S5 first-party read" }
       ],
       "image": {
         "formats": ["jpg", "jpeg", "png", "gif"],
@@ -140,13 +151,14 @@
       "id": "vinted",
       "name": "Vinted",
       "regions": ["GB", "FR", "DE", "ES", "PT", "PL", "LT", "NL", "BE", "IT", "CZ"],
+      "defaultLocale": "en-GB",
       "queue": 1,
       "editPolicy": "original-only",
       "status": "secondary",
       "verifiedAt": "2026-10-12",
       "sources": [
-        { "title": "Catalogue Rules | Vinted", "site": "vinted.co.uk", "printedDate": "undated page fetched 2026-10-12", "label": "ON RECORD (vendor)", "firstParty": true, "quotes": "'They have to represent the item as it is - no image editing is allowed'; 'They cannot be replaced with stock photos, photos from ads and watermarked images.'" },
-        { "title": "Product Image Requirements for Every Major Marketplace", "site": "mochify", "printedDate": "2026-10-01", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "up to 20 photos; vertical 3:4 guidance without documented specs" }
+        { "title": "What photos you should upload", "url": "https://www.vinted.co.uk/help/48-what-photos-should-i-add", "site": "vinted.co.uk", "printedDate": "fetched 2026-10-14", "label": "ON RECORD (vendor)", "firstParty": true, "quotes": "up to 20 informative photos; privacy and quality guidance; Catalogue Rules editing restriction must be re-read at S5" },
+        { "title": "Product Image Requirements for Every Major Marketplace", "url": "https://mochify.app/guides/product-image-requirements-marketplace-guide", "site": "mochify.app", "printedDate": "2026-10-01", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "up to 20 photos; vertical 3:4 guidance without documented specs" }
       ],
       "image": {
         "formats": ["jpg", "png"],
@@ -164,12 +176,13 @@
       "id": "ebay",
       "name": "eBay",
       "regions": ["US", "GB", "DE", "FR", "ES", "IT", "AU", "CA"],
+      "defaultLocale": "en-US",
       "queue": 1,
-      "editPolicy": "enhanced-allowed",
+      "editPolicy": "free",
       "status": "secondary",
       "verifiedAt": "2026-10-12",
       "sources": [
-        { "title": "Product Image Requirements for Every Major Marketplace", "site": "mochify", "printedDate": "2026-10-01", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "eBay help 'Adding pictures to your listings', EPS developer docs" }
+        { "title": "Adding pictures to your listings", "url": "https://www.ebay.com/help/selling/listings/pictures-videos/picture-requirements?id=4148", "site": "ebay.com", "printedDate": "fetched 2026-10-14", "label": "ON RECORD (vendor)", "firstParty": true, "quotes": "up to 24; 12 MB; minimum 500x500; about 1600x1600 recommended; formats and editing guidance" }
       ],
       "image": {
         "formats": ["jpg", "png", "gif", "bmp", "tiff", "avif", "heic", "webp"],
@@ -190,12 +203,13 @@
       "id": "etsy",
       "name": "Etsy",
       "regions": ["US", "GB", "DE", "FR", "ES", "CA", "AU"],
+      "defaultLocale": "en-US",
       "queue": 1,
-      "editPolicy": "enhanced-allowed",
+      "editPolicy": "free",
       "status": "secondary",
       "verifiedAt": "2026-10-12",
       "sources": [
-        { "title": "Product Image Requirements for Every Major Marketplace", "site": "mochify", "printedDate": "2026-10-01", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "Etsy 'How to Use the Etsy Search Visibility Page'" }
+        { "title": "Requirements and Best Practices for Images in Your Etsy Shop", "url": "https://help.etsy.com/hc/en-gb/articles/115015663347-Requirements-and-Best-Practices-for-Images-in-Your-Etsy-Shop?segment=selling", "site": "help.etsy.com", "printedDate": "fetched 2026-10-14", "label": "ON RECORD (vendor)", "firstParty": true, "quotes": "2000px recommended; first image at least 635px; supported formats; transparent PNG appears black" }
       ],
       "image": {
         "formats": ["jpg", "png", "gif"],
@@ -217,12 +231,13 @@
       "id": "depop",
       "name": "Depop",
       "regions": ["GB", "US", "IT", "AU"],
+      "defaultLocale": "en-GB",
       "queue": 2,
-      "editPolicy": "enhanced-allowed",
+      "editPolicy": "free",
       "status": "secondary",
       "verifiedAt": "2026-10-12",
       "sources": [
-        { "title": "Product Image Requirements for Every Major Marketplace", "site": "mochify", "printedDate": "2026-10-01", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "Depop seller video: upload square 1:1 and show the full item; other numbers are third-party" }
+        { "title": "Product Image Requirements for Every Major Marketplace", "url": "https://mochify.app/guides/product-image-requirements-marketplace-guide", "site": "mochify.app", "printedDate": "2026-10-01", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "Depop seller video: upload square 1:1 and show the full item; other numbers are third-party" }
       ],
       "image": {
         "formats": ["jpg", "png"],
@@ -244,12 +259,13 @@
       "id": "amazon",
       "name": "Amazon",
       "regions": ["US", "GB", "DE", "FR", "ES", "IT", "CA", "BR"],
+      "defaultLocale": "en-US",
       "queue": 2,
-      "editPolicy": "enhanced-allowed",
+      "editPolicy": "free",
       "status": "secondary",
       "verifiedAt": "2026-10-12",
       "sources": [
-        { "title": "Product Image Requirements for Every Major Marketplace", "site": "mochify", "printedDate": "2026-10-01", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "Amazon Seller Central image requirements checked 2026-06" }
+        { "title": "Product Image Requirements for Every Major Marketplace", "url": "https://mochify.app/guides/product-image-requirements-marketplace-guide", "site": "mochify.app", "printedDate": "2026-10-01", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "Amazon Seller Central image requirements checked 2026-06" }
       ],
       "image": {
         "formats": ["jpg", "tiff", "png", "gif"],
@@ -276,12 +292,13 @@
       "id": "shopify",
       "name": "Shopify",
       "regions": ["GLOBAL"],
+      "defaultLocale": "en-US",
       "queue": 2,
-      "editPolicy": "enhanced-allowed",
+      "editPolicy": "free",
       "status": "secondary",
       "verifiedAt": "2026-10-12",
       "sources": [
-        { "title": "Product Image Requirements for Every Major Marketplace", "site": "mochify", "printedDate": "2026-10-01", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "Shopify help" }
+        { "title": "Product media types", "url": "https://help.shopify.com/en/manual/products/product-media/product-media-types", "site": "help.shopify.com", "printedDate": "fetched 2026-10-14", "label": "ON RECORD (vendor)", "firstParty": true, "quotes": "up to 5000x5000 or 25 MP; under 20 MB; 2048x2048 usually displays best; accepted formats" }
       ],
       "image": {
         "formats": ["jpg", "png", "webp", "heic", "gif", "tiff", "bmp"],

@@ -18,7 +18,7 @@ number from the preset and its `verifiedAt`.
 | L05 | aspect | `aspect != null` and `|w/h − aspect| > 0.01` | WARNING (ERROR when the marketplace crops) | `PadToAspect` or `CropToAspect` (item kept inside safe margin) | all |
 | L06 | count | pack items `> maxCount` | ERROR | none; lists which items exceed | pack |
 | L07 | white main | `backgroundPolicy = white-255` and any of the 4 border bands has a pixel with a channel `< 255` outside the item mask | ERROR | `SetBackgroundWhite255` (Original mode composites on `#FFFFFF`) | MAIN |
-| L08 | fill ratio | `minFillRatio` set and `itemArea/canvasArea < minFillRatio` | WARNING | `FillToRatio` (scale item within safe margin) | MAIN |
+| L08 | fill ratio | `minFillRatio` set and `max(itemBBoxWidth/canvasWidth, itemBBoxHeight/canvasHeight) < minFillRatio` | WARNING | `FillToRatio` (scale item within safe margin using annex E's bbox long-axis definition) | MAIN |
 | L09 | neutral-only background | `backgroundPolicy = neutral-only` and mean chroma of background `> 12 (Lab C*)` | ERROR | `SetBackgroundNeutral` | MAIN, EXTRA |
 | L10 | text on main | OCR finds ≥ 1 block with ≥ 3 characters outside the item mask and `textOnMain ∈ {forbidden, penalised-by-size}` | `forbidden` → ERROR; `penalised-by-size` → WARNING with the block's height share | none; shows the box | MAIN |
 | L11 | slide text categories | any `SlideText` string matches a category in `preset.text.prohibited` (annex I §Prohibited text) | ERROR (the slide is not rendered) | edit text | SLIDE |

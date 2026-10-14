@@ -27,9 +27,9 @@ checks and SHALL NOT be offered to the seller.
 
 ### Requirement: Editing mode per marketplace
 
-Each preset SHALL declare one editing mode: original-only, limited overlay or free. In original-only mode
+Each preset SHALL declare exactly one editing mode: `original-only`, `limited-overlay` or `free`. In `original-only` mode
 the app SHALL disable every operation that alters the photo and SHALL offer shooting guidance and a rule
-check. In limited-overlay mode it SHALL permit only the overlays the preset lists. In free mode it SHALL
+check. In `limited-overlay` mode it SHALL permit only the `allowedOverlays[]` the preset lists. In `free` mode it SHALL
 permit all operations.
 
 #### Scenario: Original-only disables editing

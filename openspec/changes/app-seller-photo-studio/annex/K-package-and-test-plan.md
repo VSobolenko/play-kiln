@@ -81,10 +81,12 @@ Stack: Node LTS + TypeScript + Fastify + better-sqlite3 + sharp + undici; tests 
 ## Tests (named, each asserts a thing the specs state)
 
 Client unit tests (`app/src/test/`):
-`CompositorInvariantTest` (core bytes identical at scale 1; one resample otherwise; fill ratios 0.80±0.02),
+`CompositorInvariantTest` (core bytes identical at scale 1; one resample otherwise; bbox long-axis occupancy 0.80±0.02),
 `FillAndMarginTest`, `MaskRefinerUndoTest`, `ShadowTest`, `LinterRulesTest` (every L-rule pass and fail
-with the annex fixtures, e.g. 699×933 fails / 700×933 passes), `PresetSourceTest` (every entry has source
-and `verifiedAt`; fails on a copy without), `PresetStalenessTest`, `FixActionsTest`, `FileNamingTest`,
+with the annex fixtures, e.g. 699×933 fails / 700×933 passes), `PresetSourceTest` (every shown entry has
+absolute HTTPS source URLs, `verifiedAt`, `defaultLocale` and a valid edit policy; limited-overlay requires
+`allowedOverlays`; all six locale-default lists resolve and exclude unread ids; one failing fixture per field),
+`PresetStalenessTest`, `FixActionsTest`, `FileNamingTest`,
 `XmpWriterTest` (round trip, merge, decode still works), `ZipWriterTest`, `ManifestTest`,
 `GroupingTest`, `SkuPatternTest`, `ShotListsTest`, `FrameQualityTest`, `LimitsTest`,
 `SlideKitTest` (annex I), `LedgerClientTest` (CostLine shown before charge, idempotency keys),
