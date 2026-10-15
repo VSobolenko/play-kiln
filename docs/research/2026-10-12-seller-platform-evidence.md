@@ -161,5 +161,141 @@ The promise list, its jobCoverage and its depth families are in
    is beta and Jam-gated, Ozon's is free inside the cabinet).
 2. Provider prices per call beyond the one measured model.
 3. First-party marketplace rules for Ozon, Avito, eBay, Etsy and the second queue.
-4. Whether the VPS has a domain and TLS (first blocker, design D9).
+4. Whether the Plinth service has an application-specific HTTPS health route; the existing `pikupo.com`
+   certificate is valid, but its current `/health` response is the site's static SPA fallback (S0, 2026-10-14).
 5. The segmentation engine decision (spike S1) and the fidelity thresholds (spike S2).
+
+## M0 spikes — 2026-10-14
+
+### S0 — VPS and host discovery
+
+- MEASURED (read-only SSH to `78.111.89.46` using the locally configured deployment identity, 2026-10-14):
+  host `main`; Ubuntu 26.04; 1 vCPU; 954 MiB RAM, 761 MiB available at observation; root filesystem
+  49 GiB with 41 GiB available; Caddy active; uptime 10 days 4:16 and load average 0.00. SSH access
+  succeeded. No credential material was read or copied.
+- MEASURED (remote unauthenticated HTTPS requests, 2026-10-14): outbound TLS verification succeeded
+  (`TLS_VERIFY=0`) for `queue.fal.run` and `androidpublisher.googleapis.com`; both returned HTTP 404
+  for the unauthenticated probe URL. This proves network/TLS reachability only, not API authorization.
+- MEASURED (Caddy host/certificate inventory, 2026-10-14): configured public names include
+  `pikupo.com`, `www.pikupo.com`, `78-111-89-46.sslip.io` and `www.78-111-89-46.sslip.io`; certificate
+  files exist for these names. The IP-based `sslip.io` names redirect to `https://pikupo.com`.
+- MEASURED (HTTPS GET, 2026-10-14): `https://pikupo.com/health` returns HTTP 200 with
+  `Content-Type: text/html` and the same 35,236-byte body and SHA-256 as `/` and `/api/health`.
+  It is the static SPA fallback, **not** an application health handler. `plinth.pikupo.com` did not
+  resolve, and `plinth.78-111-89-46.sslip.io` resolved to the VPS but did not complete TLS because
+  Caddy has no route/certificate for that name.
+- INFERRED: the already-certificate-backed `pikupo.com` host can carry the Plinth service behind a
+  dedicated path route without creating DNS records. The server's deployment must add a truthful
+  health handler/reverse-proxy route while preserving the existing site; no Caddy or site files were
+  changed during this read.
+- RESULT: VPS/SSH access, Caddy state, resources, and outbound TLS prerequisites are measured. The
+  domain/TLS blocker in D9 is resolved by the existing `pikupo.com` host. A Plinth-specific health
+  route does not exist yet and must be verified after the server is implemented/deployed (task 4.7);
+  no hostname question is required.
+
+### S3 — Vision and OCR
+
+- MEASURED (2026-10-14): the existing Amazon Berkeley Objects corpus has 30 product images and was
+  assembled for S1. It has no first-party crosswalk to Plinth's 21 categories, no verified scale/SKU/
+  ruler/label ground truth, and no six-language listing references. Twelve Plinth categories have no
+  representative. No S3 accuracy result can be honestly derived from it; a separate labelled corpus is
+  required before those accuracy claims can be made. Details and claim ledger:
+  `.kiln/scratch/plinth-m0-s3/report.md`.
+- MEASURED (Google ML Kit release notes, fetched 2026-10-14): unbundled text recognition
+  `play-services-mlkit-text-recognition:19.0.1` is listed stable; subject segmentation
+  `play-services-mlkit-subject-segmentation:16.0.0-beta1` is not stable and cannot qualify as S1 local
+  segmentation.
+- MEASURED / UNVERIFIED (fal model pages, fetched 2026-10-14): machine-readable pages list
+  `fal-ai/any-llm/vision` at $0.01/request standard ($0.03 premium, above O-01's $0.02 ceiling) and
+  `fal-ai/any-llm` at $0.001/request standard ($0.01 premium). Their human-readable pages report the
+  models are no longer supported; endpoint availability is unresolved and no inference call was made.
+- RESULT: S3 is inconclusive pending a labelled dataset and confirmation of supported O-01/O-15 routes.
+  The specified defaults remain: category editable; scale/SKU are seller-confirmed suggestions; do not
+  claim measured accuracy. See `.kiln/scratch/plinth-m0-s3/report.md`.
+
+### S1 — Cut-out benchmark
+
+- MEASURED (2026-10-14): 29 of 29 eligible images in the prepared 30-photo CC BY 4.0 corpus returned
+  a BRIA background-removal result. Estimated provider cost was $0.522 at the recorded $0.018 per
+  success. Remote API response latency was median 2.4 s and nearest-rank p95 5.298 s; it excludes
+  result download and is not phone/device latency.
+- MEASURED: source/output dimensions and SHA-256 records matched for all 29; opaque-interior RGB and
+  white/black composites had 0 differences across 49,084,957 alpha-255 pixels.
+- UNVERIFIED: there is no eligible stable local segmentation candidate measured, no local-vs-reference
+  IoU, no hand-corrected-mask IoU, and no A40 latency. The six review crops were manually selected
+  challenges rather than objectively ranked worst masks. The corpus lacks an explicitly tagged
+  transparent-bag case. Do not report this reference-only test as segmentation accuracy.
+- RESULT: use server-only cut-out at 1 credit; make no free/offline cut-out claim. This is the
+  specified default because no eligible local candidate was demonstrated, not proof that all possible
+  custom models fail. Full results, table, crops and claim ledger:
+  `.kiln/scratch/plinth-m0-s1/S1-report.md`.
+
+### S2 — Enhanced fidelity controls and route research
+
+- MEASURED (2026-10-14, local zero-cost controls): an identity re-encode proxy across 30 corpus images
+  produced mean dE00 0.000000; this verifies only a no-op pixel path, not a provider round-trip.
+  Reusing the 29 existing BRIA masks, 812 ordered cross-item mask pairs had maximum IoU 0.7939,
+  below the provisional 0.95/0.97 guard thresholds. This tests only the mask-IoU arm; there are no
+  Enhanced outputs, reviewer-labelled same-product results, or measured 95th-percentile thresholds.
+- ON RECORD: first-party fal metadata identifies candidate schemas for O-07 `fal-ai/flux/dev`,
+  O-08 `fal-ai/iclight-v2`, O-09 `fal-ai/bria/expand`, O-10 `fal-ai/flux-pro/kontext`,
+  O-11 `fal-ai/clarity-upscaler`, O-12 `fal-ai/bria/eraser`, and O-14 virtual try-on candidates.
+  No first-party O-13 ghost-mannequin endpoint was found in the bounded search.
+- UNVERIFIED: exact prices for these candidates. fal's exact pricing route requires authentication;
+  exact per-operation costs were not queried and no paid fidelity calls were made. Third-party price
+  estimates are not used to accept routes. All remain disabled; candidate recommendations do not
+  replace the specified defaults.
+- RESULT: S2 is incomplete as an Enhanced fidelity benchmark. The provider route/retention conditions
+  identified by S6 must be established before transmitting benchmark photos; then exact price and
+  spend can be confirmed before any run. Full report and local controls:
+  `.kiln/scratch/plinth-m0-s2/S2-findings-and-route-recommendation.md`,
+  `.kiln/scratch/plinth-m0-s2/controls_local_results.json`.
+
+### S5 — Marketplace, provider and pricing re-reads
+
+- MEASURED (first-party pages, fetched 2026-10-14): Shopify states product images up to 5000×5000 px
+  / 25 MP, under 20 MB, and 2048×2048 usually displays best for square images. Poshmark's current
+  article describes a 3:4 portrait display; its older guide states up to 16 photos, which should be
+  confirmed in-app if operationally critical.
+- MEASURED (attempts, 2026-10-14): Ozon, Avito, eBay, Etsy, Depop, Amazon Seller Central and Mercari
+  did not yield readable first-party photo-rule content in this pass. Their existing secondary/unread
+  status is not promoted. Mercari's apparent search-result claims could not be verified by direct
+  fetch, so no dimensions, formats or edit policy are adopted.
+- MEASURED (fal Bria model page, fetched 2026-10-14): `fal-ai/bria/background/remove` costs $0.018
+  per no-prompt inference; prompt requests cost $0.03 and exceed the light-operation $0.025 ceiling.
+  The no-prompt route is required to fit that ceiling.
+- MEASURED / UNVERIFIED: the fal `fal-ai/any-llm/vision` human-readable page reports unsupported; the
+  old approximate O-01 price is not a current supported-route price. No selected O-15 price or S2
+  Enhanced endpoint prices were confirmed.
+- INFERRED (strategy assumptions, not observed Play settlement): server-confirmed deductions yield a
+  net factor of 0.8081766 and required multiple K = 3.0933833 at a 60% target margin. At the
+  $0.025/credit cost ceiling, the floor is $0.0773346/credit. Existing packs range from $0.0799833 to
+  $0.081/credit and exceed this floor only under the stated assumptions. A 25% billing-fee sensitivity
+  would require $0.0876459/credit; that fee is a scenario, not a measured rate.
+- RESULT: the money owner recommends carrying the existing ladder ($7.29/90, $18.49/230,
+  $47.99/600 and $28.99 non-consumable unlock) as checkpoint hypotheses, not validated market prices
+  or approval. The 0.80 factor and “market price minus a couple percent” are not measured facts. Full
+  source ledger and objections: `.kiln/scratch/plinth-m0-s5/report.md`.
+
+### S6 — Play policy and metadata
+
+- ON RECORD / UNVERIFIED: no Plinth app exists, so this is a design-only review, not a compliance
+  verdict. Photos transmitted to the service are collected under Play's off-device definition.
+  Proposed Plinth retention (uploads ≤1 h, results ≤24 h) does not prove provider retention; fal's
+  documented default payload storage is 30 days and media/CDN expiration is separate. Confirm the
+  selected model's terms, storage controls and processor/sharing treatment before real-photo
+  transmissions or Data safety declarations.
+- ON RECORD: fal's terms have an Excluded Models exception to the content-training restriction and
+  state an 18-or-age-of-majority requirement for Customer Solution users; applicability must be
+  checked against the selected endpoint. The actual audience and content rating must describe the
+  shipped app.
+- ON RECORD: the in-app generated-content report is required by the specification, but its flow and
+  server moderation behavior remain unverified. O-14 virtual model remains disabled pending a selected
+  route and safeguards. No C2PA conformance claim is supported.
+- MEASURED: IPTC vocabulary URIs read 2026-10-14:
+  `http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia`,
+  `http://cv.iptc.org/newscodes/digitalsourcetype/compositeWithTrainedAlgorithmicMedia`, and
+  `http://cv.iptc.org/newscodes/digitalsourcetype/algorithmicallyEnhanced`. Select per actual output
+  transformation, not a blanket Enhanced label.
+- RESULT: policy audit findings and source ledger are preserved in
+  `.kiln/scratch/plinth-m0-s6/report.md`; no declaration, endpoint or policy status was changed.
