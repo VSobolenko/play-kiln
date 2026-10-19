@@ -1,0 +1,105 @@
+# Competitor generative product-photo UX — W71
+
+**Research date:** 2026-10-17
+**Scope:** Public product/help pages and store listings only; no competitor app was installed or exercised.
+**Evidence key:** `ON RECORD` means the linked public source states the claim. `INFERRED` means the conclusion follows from the cited source facts. `UNVERIFIED` means public evidence reviewed here cannot settle it.
+
+## Findings at a glance
+
+| Product | Publicly documented path | Metering / result destination | Evidence limit |
+|---|---|---|---|
+| Photoroom (Android; also App Store listing) | Choose AI Backgrounds, supply an image and direction, generate, choose a result, edit/export | AI-credit allowance; exact placement of price in the live flow not shown | Exact cold-open screens, zoom, and wallet/history location not established |
+| Pebblely (web product) | Add/save a product, open its generation screen, select a template or prompt, choose output options, Create | Standard output 1 credit; high-resolution 2; Create displays total credit cost; Recent Images | First-run account screens and editor chrome not established |
+| Claid.ai Studio (web product) | Upload, position, choose ratio/mode, prompt, choose 1–4 variations, save to Creations | Monthly operation credits; per-operation rate, but not the live pre-Generate display | UI screen count, chrome, and price-wall placement not established |
+| Remove.bg / BG Eraser (App Store listing) | Remove background, choose or generate a background, refine, save/export | Free and premium options stated; exact generation charge and its UI location not established | The help article was not retrievable as article text; editor path/chrome not established |
+| Product Plus: AI Product Photo (Google Play) | Listing describes “upload, pick a style, generate” | Free starter credits and in-app purchases | Store listing does not disclose the app’s actual screen sequence, rate display, or history placement |
+
+## Per-app measured notes
+
+### Photoroom
+
+- **Happy path:** `ON RECORD` — Photoroom’s Android help search excerpt describes selecting a Space, opening **AI Tools → AI Backgrounds**, choosing/uploading a source photo, entering a prompt or choosing a theme, then selecting the arrow/Generate control. The excerpt says a generation returns two suggested backgrounds to choose from, followed by editing or export. Sources: [Create a design with an AI Background (Android)](https://help.photoroom.com/en/articles/13003455-create-a-design-with-an-ai-background-android) and [Upload an image and apply an AI Background (Android)](https://help.photoroom.com/en/articles/13003455-upload-an-image-and-apply-an-ai-background-android). Direct fetches returned the article title but not its body; the sequence above is from the search-indexed excerpt, not an in-app observation.
+- **Cold open / number of screens / Generate location:** `UNVERIFIED` — the help sequence starts inside a Space and does not describe first launch, sign-in, onboarding, or screen count. It places Generate in the AI Background operation, not on a verified home screen. Deciding this requires a first-run Android session or a current, legible public screen recording.
+- **Tool organization:** `ON RECORD` — the Android help routes through an **AI Tools** entry to the specialized AI Backgrounds flow. The App Store listing separately enumerates a broader product-photo toolkit (background removal/replacement, fashion models, batch editing, videos, recoloring, ironing, Studio Shot). Sources: [Photoroom Android help](https://help.photoroom.com/en/articles/13003455-create-a-design-with-an-ai-background-android); [App Store listing](https://apps.apple.com/us/app/photoroom-ai-photo-editor/id1455009060). This establishes a tool catalogue and one tool-specific flow, not the exact visual layout of a tools grid.
+- **Cutout/editor controls:** `ON RECORD` (limited) — the help center has an Android-specific [Undo and Redo an action](https://help.photoroom.com/en/articles/13868112-undo-and-redo-an-action-android) article; its search-indexed excerpt places Undo/Redo in the editor’s top toolbar. `UNVERIFIED` — whether the controls are icon-only or text-labelled, and whether zoom controls are present, was not discernible from the article text. Do not assume the general editor layout described by third-party pages.
+- **Credits and price:** `ON RECORD` — Photoroom’s [AI credits help page](https://help.photoroom.com/en/articles/15284787-ai-credits) is the linked account of its AI-credit system; the official help search excerpt says generating uses credits, usage varies by operation, and allowances depend on plan. The Android AI-background excerpt says each Generate action consumes credits. `UNVERIFIED` — the exact numeric charge, whether that charge is printed beside Generate, and whether exhaustion opens a modal/paywall were not established. The App Store listing says advanced tools, faster processing, and increased credit limits are account upgrades; it does not show where an offer appears in the generation flow.
+- **Profile, wallet, history:** `UNVERIFIED` — reviewed public material did not establish where profile, balance, or past generations appear in the Android navigation. The credits help page is the relevant source to inspect in-app, but its fetched text exposed only the title.
+- **Generative scene vs padding:** `ON RECORD` — the AI-background help describes choosing a theme or entering a prompt and generating background options; the App Store listing describes creating lifestyle imagery from a product photo. That is explicit scene/background generation, not merely resizing the canvas with blank bars.
+
+### Pebblely
+
+- **Happy path:** `ON RECORD` — Pebblely’s [How does it work?](https://pebblely.com/how-to/) guide says to save a product, open it to reach a generation screen, select a template, image count and size (or use Custom to write a background prompt), optionally choose a style image/brand color and high-resolution mode, then tap **Create**. The guide gives “marble countertop with soft morning light” as a prompt example and describes scene creation. Its earlier product-onboarding steps are summarized by its official page/search excerpt as adding a product from Home; exact first-run sign-up screens are not documented there.
+- **Cold open / screen count / Generate placement:** `UNVERIFIED` — the guide documents a product-generation screen after saving a product, but not account creation, first launch, or a total screen count. **Create** is on the documented generation screen; the source does not establish its exact position.
+- **Tool organization:** `ON RECORD` — the guide presents generation as product-centred: open a saved product, then choose a template or Custom prompt, image size, and optional style/color inputs. `INFERRED` — the documented primary task is a compose flow around a product, rather than choosing from a set of unrelated editing operations; this inference is about the guide, not a verified screen layout.
+- **Cutout/editor controls:** `UNVERIFIED` — the guide excerpt does not describe a cutout editor, undo/redo, zoom, or control iconography. It is not evidence those controls are absent.
+- **Credits and price:** `ON RECORD` — the guide says high-resolution output costs **2 credits instead of 1** and takes about 30 seconds. Pebblely's [new workflow announcement](https://www.pebblely.com/blog/introducing-new-pebblely/) explicitly says the **Create button shows the total credit cost before commitment**. `UNVERIFIED` — whether the balance is also shown on that screen or insufficient credit presents a modal.
+- **Profile, wallet, history:** `ON RECORD` — the official how-to page’s search-indexed excerpt identifies **Recent Images** as the destination after Create. The fetched page excerpt in this session confirms the generation screen and credit cost but does not itself include the Recent Images section. This establishes a result-history destination, not profile/wallet placement.
+- **Generative scene vs padding:** `ON RECORD` — the guide prompts users to describe the background/scene and supports templates and reference-style images. The examples ask for a woman holding a serum bottle or a product on a lit marble countertop. These describe generated scene content, not letterbox padding.
+
+### Claid.ai Studio — AI Photoshoot
+
+- **Happy path:** `ON RECORD` — Claid’s [AI Photoshoot help](https://help.claid.ai/en/article/ai-photoshoot-76as8m/) lists six setup actions: upload/select the product image; place it on the canvas; choose aspect ratio; select a generation mode; write a scene prompt; choose **1–4** variations. The chosen result is saved to the **Creations** library. The page was updated 2026-09-15. This is an operation checklist, not six verified screens.
+- **Cold open / screen count / Generate placement:** `UNVERIFIED` — this web help article begins at the operation and does not document first launch, login, or the number of screens. It describes choosing variation count but does not name or locate the final button.
+- **Tool organization:** `ON RECORD` — the guide presents AI Photoshoot as a single configured operation and lists modes within it: Precise, Creative, Inspiration, Background, and Product Swap. `INFERRED` — this is a compose-style operation within Claid Studio, not proof that the broader product lacks a tool catalogue.
+- **Cutout/editor controls:** `UNVERIFIED` — the guide confirms product placement on a canvas and optional background removal but does not document undo, redo, zoom, or whether editor controls use icons or text.
+- **Credits and price:** `ON RECORD` — Claid’s [pricing page](https://claid.ai/pricing) says accounts receive a monthly credit allocation and that each operation, including background removal and AI Photoshoot, has a credit cost. The AI Photoshoot guide does not give the operation’s numeric cost. `UNVERIFIED` — no checked source shows the rate beside the live final action, or the placement/behavior of an exhaustion paywall.
+- **Profile, wallet, history:** `ON RECORD` — the help says to save the strongest result to **Creations**. `UNVERIFIED` — the placement of profile and credit balance, and the exact history navigation, are not given in the operation guide.
+- **Generative scene vs padding:** `ON RECORD` — Claid says AI Photoshoot creates a visual direction around the product, including lighting, mood, setting, composition, styling, and camera feel, and explicitly says it is “not just ‘add a background.’” The guide’s prompt and mode descriptions confirm generative scene composition rather than blank canvas extension.
+
+### Remove.bg / BG Eraser
+
+- **Source boundary:** `ON RECORD` — the [App Store listing](https://apps.apple.com/us/app/remove-bg-bg-eraser/id6748509597) describes the app as removing photo backgrounds, replacing them with AI-generated designs/themes, supporting user-uploaded backgrounds, and offering manual edge refinement/erase/restore and photo adjustments. It identifies seller product photos as a use case and says free and premium options exist.
+- **Happy path / number of screens / Generate location:** `UNVERIFIED` — the store listing is feature copy, not a walkthrough. It does not establish upload-to-first-result steps, screen count, or a Generate control’s location. A linked [Magic Background help article](https://www.remove.bg/help/a/how-to-enhance-your-background-with-the-new-magic-background-feature) could not be retrieved as article text in this session; the fetch redirected to a generic help page.
+- **Tool organization:** `ON RECORD` — the listing describes background removal, AI backgrounds, custom background upload, manual refinement, effects, and export as capabilities. `UNVERIFIED` — whether they are a grid, tabs, or one editor flow is not established by the listing.
+- **Cutout/editor controls:** `ON RECORD` — manual edge refinement and erase/restore are listed. `UNVERIFIED` — undo/redo, zoom, and icon-versus-text treatment are not described.
+- **Credits and price:** `ON RECORD` — the listing says free and premium options exist. `UNVERIFIED` — the exact credit charge for generated backgrounds, the point at which price is disclosed, and any modal/paywall behavior were not established by accessible official source text.
+- **Profile, wallet, history:** `UNVERIFIED` — not documented in the listing or accessible help text.
+- **Generative scene vs padding:** `ON RECORD` — the listing says the user can replace the background with AI-generated designs/themes. It does not describe this as letterbox padding.
+
+### Product Plus: AI Product Photo (Google Play)
+
+- **Source:** [Google Play listing](https://play.google.com/store/apps/details?id=com.gizastudios.productplus&hl=en-US), fetched in this session.
+- **Happy path:** `ON RECORD` — the listing calls the workflow “upload, pick a style, generate.” It does not document cold open, screen count, or the exact placement of Generate.
+- **Tool organization:** `ON RECORD` — the listing names distinct capabilities: AI Edit, Background Removal, Photo Upscale, Product Variations, Product on Model, Multi-Angle Shots, and Backdrop Select. It describes a broad product-photo toolset. `UNVERIFIED` — listing copy does not prove these are presented as a grid in the installed app.
+- **Cutout/editor controls:** `UNVERIFIED` — no listing description of undo/redo, zoom, or control labels/icons.
+- **Credits and price:** `ON RECORD` — the listing says new users receive free starter credits and additional product photos/premium features are available through in-app purchases. `UNVERIFIED` — it does not disclose the per-generation credit rate, where balance/cost appears, or whether a modal wall interrupts generation.
+- **Profile, wallet, history:** `UNVERIFIED` — not described in the listing.
+- **Generative scene vs padding:** `ON RECORD` — the listing describes prompts that customize background and composition, AI-generated product variations, and placing products in lifestyle backdrops. These are generative/editing claims, not a description of blank-bar padding.
+
+### Pixelcut (credit-disclosure reference)
+
+- **Source boundary:** This is a targeted check of credit-cost disclosure, not a full app-flow teardown.
+- **Credits and price:** `ON RECORD` — Pixelcut's [official Credits help page](https://help.pixelcut.ai/article/33-gpu-credits) says credit balance is viewable in-app, cost depends on the AI model, and each model's credit cost is visible in the app's model picker **before generating**. Manual top-ups are available from Settings. `UNVERIFIED` — this help page does not establish the cold-open flow or whether a separate paywall/modal appears.
+
+## Repeated patterns: Plinth must match
+
+The checklist below uses only behaviors documented by at least two named products. It does **not** claim that undocumented screen placement is a cross-app convention.
+
+- [ ] **Make the product photo the start of the job.** Photoroom, Pebblely, Claid, and Product Plus document a user-supplied product image as the input to its product-photo workflow. Keep import/review of the seller’s own photo before the scene-generation action. *(ON RECORD: each product’s per-app source above.)*
+- [ ] **Make scene direction a meaningful choice, not fake “AI scene” padding.** Photoroom offers prompt/theme direction; Pebblely offers templates/prompts; Claid prompts for the surrounding world and scene direction; Product Plus describes prompt-led background/composition. A scene-generation claim should correspond to changed generated surroundings, not merely added margins. *(ON RECORD: those four sources above.)*
+- [ ] **Give the generation action a clear, explicit label.** The reviewed flows call the action **Generate** (Photoroom) or **Create** (Pebblely), while Product Plus’s Play listing describes the simple “upload, pick a style, generate” sequence. Do not hide the primary creation action among unrelated utilities. *(ON RECORD: Photoroom Android help, Pebblely how-to, Product Plus Play listing.)*
+- [ ] **Disclose credit cost before generation is committed.** Pebblely says Create shows total credit cost before commitment; Pixelcut says the model picker shows the per-model cost before generating. These support pre-commit cost disclosure, not one required widget or a universal rule about paywall modals. *(ON RECORD: [Pebblely new-workflow announcement](https://www.pebblely.com/blog/introducing-new-pebblely/); [Pixelcut Credits help](https://help.pixelcut.ai/article/33-gpu-credits).)*
+- [ ] **Treat generation as metered work and keep the result usable afterward.** Photoroom and Claid document AI-operation credit usage; Pebblely specifies 1 credit standard / 2 high-resolution. Pebblely names Recent Images and Claid names Creations as destinations for generated work. Make Plinth’s charge/allowance and saved result understandable; the evidence does not dictate a specific price label location or a wallet design. *(ON RECORD: sources above.)*
+
+## Explicitly unresolved (do not copy an invented pattern)
+
+- **Exact cold-open-to-first-result screen count:** `UNVERIFIED` for every product; the cited help pages are workflow descriptions, not observed first-run sessions.
+- **Credit price before commitment:** `ON RECORD` for Pebblely (total cost on Create) and Pixelcut (per-model cost in picker); `UNVERIFIED` for the other apps in this set. Whether any app also shows a modal/paywall, and what happens when balance is insufficient, remains `UNVERIFIED`.
+- **Undo/redo glyphs and zoom:** only Photoroom’s Android help search excerpt places Undo/Redo in a top toolbar. Icon-versus-text treatment, zoom, and the other products’ controls remain `UNVERIFIED`.
+- **Profile and wallet placement:** no reviewed public evidence supports a shared placement. Pebblely Recent Images and Claid Creations are output-history evidence, not profile/wallet evidence.
+- **Job IDs and pipeline statuses:** `UNVERIFIED` across the public material reviewed. No source inspected documents whether they are shown or hidden inside the live apps; absence from help/listing copy is not proof of absence. Do not present a competitor-derived claim here.
+
+## Claim ledger
+
+| CLAIM | LABEL | EVIDENCE |
+|---|---|---|
+| Photoroom Android help describes AI Tools → AI Backgrounds, source image, prompt/theme, Generate, two suggestions, and edit/export | ON RECORD | [Android AI Background help](https://help.photoroom.com/en/articles/13003455-create-a-design-with-an-ai-background-android); search-indexed official excerpt read 2026-10-17. Direct fetch returned title only. |
+| Photoroom editor has Android Undo/Redo help and its indexed excerpt places controls in the top toolbar | ON RECORD | [Undo and Redo an action (Android)](https://help.photoroom.com/en/articles/13868112-undo-and-redo-an-action-android); title fetched and official excerpt read 2026-10-17. |
+| Pebblely documents template/prompt generation, 1-vs-2 credit output, Create, and Recent Images after generation | ON RECORD | [How does it work?](https://pebblely.com/how-to/); fetched page excerpt and search-indexed official excerpt read 2026-10-17. |
+| Pebblely says Create shows total credit cost before commitment | ON RECORD | [Introducing the New Pebblely](https://www.pebblely.com/blog/introducing-new-pebblely/); fetched 2026-10-17. |
+| Claid documents six configuration actions, 1–4 variations, Creations, and operation-based credits | ON RECORD | [AI Photoshoot help](https://help.claid.ai/en/article/ai-photoshoot-76as8m/) and [pricing](https://claid.ai/pricing); both fetched 2026-10-17. |
+| Remove.bg App Store listing describes generated backgrounds, manual refinement, and free/premium options | ON RECORD | [Remove.bg: BG Eraser listing](https://apps.apple.com/us/app/remove-bg-bg-eraser/id6748509597); fetched 2026-10-17. |
+| Product Plus Play listing describes upload/style/generate, multiple tools, starter credits, and in-app purchases | ON RECORD | [Product Plus Play listing](https://play.google.com/store/apps/details?id=com.gizastudios.productplus&hl=en-US); fetched 2026-10-17. |
+| Pixelcut says credit balance is in-app and per-model cost is shown before generation | ON RECORD | [Pixelcut Credits help](https://help.pixelcut.ai/article/33-gpu-credits); fetched 2026-10-17. |
+| Screen counts, price-wall placement, wallet placement, most editor chrome, and visibility of job IDs/statuses cannot be established from reviewed public sources | UNVERIFIED | Exact deciding evidence: current first-run app sessions/screenshots for each product, especially the generation and insufficient-credit states; a researcher with access to those apps must observe them. |
+| Checklist patterns are repeated across at least two reviewed products | INFERRED | Input-photo flow and explicit generation labels: Photoroom, Pebblely, Claid, Product Plus. Scene direction: Photoroom, Pebblely, Claid, Product Plus. Pre-commit cost: Pebblely and Pixelcut. Metering and result destination: Photoroom, Pebblely, Claid. See linked sources in each app section. |

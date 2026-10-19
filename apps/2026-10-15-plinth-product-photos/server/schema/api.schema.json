@@ -1,0 +1,476 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://plinth.invalid/server-api.schema.json",
+  "definitions": {
+    "ErrorResponse": {
+      "type": "object",
+      "required": ["error"],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": ["code", "message", "retryAfterSec", "details"],
+          "properties": {
+            "code": { "type": "string" },
+            "message": { "type": "string" },
+            "retryAfterSec": { "type": ["integer", "null"], "minimum": 0 },
+            "details": { "type": "object" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "ServiceState": {
+      "type": "string",
+      "enum": ["ok", "maintenance", "closed", "update_required"]
+    },
+    "ServiceNotice": {
+      "type": "object",
+      "required": ["code", "messageByLocale", "dismissible"],
+      "properties": {
+        "code": { "enum": ["SERVICE_CLOSED", "SERVICE_MAINTENANCE", "UPDATE_REQUIRED"] },
+        "messageByLocale": {
+          "type": "object",
+          "required": ["en-US", "ru-RU"],
+          "properties": {
+            "en-US": { "type": "string" },
+            "ru-RU": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "dismissible": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "HealthResponse": {
+      "type": "object",
+      "required": ["ok", "service", "version", "time", "databaseReachable", "serviceState"],
+      "properties": {
+        "ok": { "const": true },
+        "service": { "const": "plinth-product-photos-server" },
+        "version": { "type": "string" },
+        "time": { "type": "integer" },
+        "databaseReachable": { "const": true },
+        "serviceState": { "$ref": "#/definitions/ServiceState" }
+      },
+      "additionalProperties": false
+    },
+    "HealthUnavailableResponse": {
+      "type": "object",
+      "required": ["ok", "service", "version", "time", "databaseReachable", "serviceState"],
+      "properties": {
+        "ok": { "const": false },
+        "service": { "const": "plinth-product-photos-server" },
+        "version": { "type": "string" },
+        "time": { "type": "integer" },
+        "databaseReachable": { "const": false },
+        "serviceState": { "$ref": "#/definitions/ServiceState" }
+      },
+      "additionalProperties": false
+    },
+    "ConfigResponse": {
+      "type": "object",
+      "required": ["ops", "starterCredits", "killSwitch", "minAppVersion", "dailyCapReached",
+        "serviceState", "notice"],
+      "properties": {
+        "ops": { "type": "object", "additionalProperties": { "$ref": "#/definitions/OperationConfig" } },
+        "starterCredits": { "type": "integer", "minimum": 0 },
+        "killSwitch": { "type": "boolean" },
+        "minAppVersion": { "type": "string" },
+        "dailyCapReached": { "type": "boolean" },
+        "serviceState": { "$ref": "#/definitions/ServiceState" },
+        "notice": {
+          "anyOf": [{ "$ref": "#/definitions/ServiceNotice" }, { "type": "null" }]
+        }
+      },
+      "additionalProperties": false
+    },
+    "OperationConfig": {
+      "type": "object",
+      "required": ["credits", "enabled"],
+      "properties": {
+        "credits": { "type": "integer", "minimum": 0 },
+        "enabled": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "IntegrityChallengeRequest": {
+      "type": "object",
+      "required": ["installId", "appVersion"],
+      "properties": {
+        "installId": { "type": "string", "minLength": 1 },
+        "appVersion": { "type": "string", "minLength": 1 },
+        "locale": { "type": "string", "minLength": 2, "maxLength": 35 }
+      },
+      "additionalProperties": false
+    },
+    "IntegrityChallengeResponse": {
+      "type": "object",
+      "required": ["challengeId", "challenge", "expiresAt"],
+      "properties": {
+        "challengeId": { "type": "string", "pattern": "^[0-9a-fA-F-]{36}$" },
+        "challenge": { "type": "string" },
+        "expiresAt": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "UploadResponse": {
+      "type": "object",
+      "required": ["uploadId", "expiresAt"],
+      "properties": {
+        "uploadId": { "type": "string" },
+        "expiresAt": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "ItemRecognitionResponse": {
+      "type": "object",
+      "required": ["category", "confidence", "attributes", "visibleText", "scaleHint"],
+      "properties": {
+        "category": {
+          "enum": [
+            "clothing_top", "clothing_bottom", "dress", "outerwear", "shoes", "bag", "accessory",
+            "jewelry", "watch", "cosmetics", "skincare", "packaged_food", "beverage", "electronics_small",
+            "home_decor", "kitchenware", "toy", "book", "furniture_small", "tool", "other"
+          ]
+        },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "attributes": { "type": "array", "items": { "type": "string" }, "maxItems": 8 },
+        "visibleText": { "type": "array", "items": { "type": "string" }, "maxItems": 6 },
+        "scaleHint": {
+          "type": "object",
+          "required": ["kind"],
+          "properties": {
+            "kind": { "enum": ["none", "ruler", "coin", "hand", "label"] },
+            "valueMm": { "type": "number" }
+          },
+          "additionalProperties": false
+        },
+        "sku": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "WalletResponse": {
+      "type": "object",
+      "required": ["balance", "reserved", "refundDebt", "purchaseHold", "unlocked", "entries"],
+      "properties": {
+        "balance": { "type": "integer", "minimum": 0 },
+        "reserved": { "type": "integer", "minimum": 0 },
+        "refundDebt": { "type": "integer", "minimum": 0 },
+        "purchaseHold": { "type": "integer", "minimum": 0 },
+        "unlocked": { "type": "boolean" },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["kind", "delta", "createdAt"],
+            "properties": {
+              "kind": { "type": "string" },
+              "delta": { "type": "integer" },
+              "createdAt": { "type": "integer" }
+            },
+            "additionalProperties": false
+          },
+          "maxItems": 50
+        }
+      },
+      "additionalProperties": false
+    },
+    "SessionRequest": {
+      "type": "object",
+      "required": ["installId", "appVersion", "locale", "integrityToken", "challengeId", "challenge"],
+      "properties": {
+        "installId": { "type": "string" },
+        "appVersion": { "type": "string" },
+        "locale": { "type": "string" },
+        "integrityToken": { "type": "string" },
+        "challengeId": { "type": "string", "format": "uuid" },
+        "challenge": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "SessionResponse": {
+      "type": "object",
+      "required": ["deviceToken", "walletId", "balance", "starterGranted", "config"],
+      "properties": {
+        "deviceToken": { "type": "string" },
+        "walletId": { "type": "string", "pattern": "^[0-9a-fA-F-]{36}$" },
+        "balance": { "type": "integer", "minimum": 0 },
+        "starterGranted": { "type": "boolean" },
+        "config": { "$ref": "#/definitions/ConfigResponse" }
+      },
+      "additionalProperties": false
+    },
+    "PurchaseIntentRequest": {
+      "type": "object",
+      "required": ["productId"],
+      "properties": { "productId": { "type": "string" } },
+      "additionalProperties": false
+    },
+    "PurchaseIntentResponse": {
+      "type": "object",
+      "required": ["intentId", "obfuscatedAccountId", "obfuscatedProfileId", "expiresAt"],
+      "properties": {
+        "intentId": { "type": "string", "pattern": "^[0-9a-fA-F-]{36}$" },
+        "obfuscatedAccountId": { "type": "string" },
+        "obfuscatedProfileId": { "type": "string" },
+        "expiresAt": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "PurchaseConfirmRequest": {
+      "type": "object",
+      "required": ["intentId", "productId", "purchaseToken"],
+      "properties": {
+        "intentId": { "type": "string" },
+        "productId": { "type": "string" },
+        "purchaseToken": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "PurchaseConfirmResponse": {
+      "type": "object",
+      "required": ["credited", "balance", "state"],
+      "properties": {
+        "credited": { "type": "integer", "minimum": 0 },
+        "balance": { "type": "integer", "minimum": 0 },
+        "state": { "const": "CREDITED" }
+      },
+      "additionalProperties": false
+    },
+    "JobRequest": {
+      "type": "object",
+      "required": ["clientRequestId", "op", "uploadIds", "params", "estimateCredits"],
+      "properties": {
+        "clientRequestId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "op": { "enum": ["O-01", "O-02", "O-07", "O-08", "O-09", "O-10", "O-11", "O-12", "O-13", "O-14", "O-15"] },
+        "uploadIds": { "type": "array", "items": { "type": "string" }, "minItems": 1, "maxItems": 10 },
+        "params": { "type": "object" },
+        "marketplaceId": { "type": "string" },
+        "estimateCredits": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "JobWork": {
+      "type": "object",
+      "required": ["jobId", "walletId", "clientRequestId", "op", "imageBase64", "uploadIds", "params", "credits"],
+      "properties": {
+        "jobId": { "type": "string", "minLength": 1 },
+        "walletId": { "type": "string", "minLength": 1 },
+        "clientRequestId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "op": { "enum": ["O-01", "O-02", "O-07", "O-08", "O-09", "O-10", "O-11", "O-12", "O-13", "O-14", "O-15"] },
+        "imageBase64": { "type": "string", "contentEncoding": "base64" },
+        "maskBase64": { "type": "string", "contentEncoding": "base64" },
+        "uploadIds": { "type": "array", "items": { "type": "string" } },
+        "params": { "type": "object" },
+        "credits": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "JobAccepted": {
+      "type": "object",
+      "required": ["jobId", "reserved", "state"],
+      "properties": {
+        "jobId": { "type": "string" },
+        "reserved": { "type": "integer" },
+        "state": { "enum": ["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "CANCELLED"] }
+      },
+      "additionalProperties": false
+    },
+    "JobStatus": {
+      "type": "object",
+      "required": ["state", "charged"],
+      "properties": {
+        "state": { "enum": ["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "CANCELLED"] },
+        "progress": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "result": { "$ref": "#/definitions/JobResult" },
+        "charged": { "type": "integer", "minimum": 0 },
+        "error": { "$ref": "#/definitions/JobError" }
+      },
+      "additionalProperties": false
+    },
+    "JobResult": {
+      "type": "object",
+      "required": ["resultToken", "expiresAt", "width", "height", "bytes", "sha256", "provenance"],
+      "properties": {
+        "resultToken": { "type": "string" },
+        "expiresAt": { "type": "integer" },
+        "width": { "type": "integer" },
+        "height": { "type": "integer" },
+        "bytes": { "type": "integer" },
+        "sha256": { "type": "string" },
+        "provenance": { "type": "string" },
+        "guard": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "JobError": {
+      "type": "object",
+      "required": ["code", "message"],
+      "properties": {
+        "code": { "type": "string" },
+        "message": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "DeliveryReceipt": {
+      "type": "object",
+      "required": ["deliveryAttemptId", "bytes", "sha256"],
+      "properties": {
+        "deliveryAttemptId": { "type": "string" },
+        "bytes": { "type": "integer", "minimum": 0 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      },
+      "additionalProperties": false
+    },
+    "CancelResponse": {
+      "type": "object",
+      "required": ["state", "released"],
+      "properties": {
+        "state": { "enum": ["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "CANCELLED"] },
+        "released": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "ReportRequest": {
+      "type": "object",
+      "required": ["jobId", "category"],
+      "properties": {
+        "jobId": { "type": "string" },
+        "category": { "enum": ["OFFENSIVE", "WRONG_PRODUCT", "UNSAFE", "RIGHTS", "OTHER"] },
+        "note": { "type": "string", "maxLength": 500 }
+      },
+      "additionalProperties": false
+    },
+    "ReportResponse": {
+      "type": "object",
+      "required": ["id", "status"],
+      "properties": {
+        "id": { "type": "integer" },
+        "status": { "const": "OPEN" }
+      },
+      "additionalProperties": false
+    },
+    "ReportStatusResponse": {
+      "type": "object",
+      "required": ["id", "status", "category", "createdAt", "caseStatus"],
+      "properties": {
+        "id": { "type": "integer" },
+        "status": { "type": "string" },
+        "category": { "enum": ["OFFENSIVE", "WRONG_PRODUCT", "UNSAFE", "RIGHTS", "OTHER"] },
+        "createdAt": { "type": "integer" },
+        "caseStatus": { "enum": ["OPEN", "ESCALATED", "REVIEWED", "ACTIONED", "DISMISSED"] }
+      },
+      "additionalProperties": false
+    },
+    "RecoveryRequest": {
+      "type": "object",
+      "required": ["code"],
+      "properties": { "code": { "type": "string", "minLength": 16, "maxLength": 16 } },
+      "additionalProperties": false
+    },
+    "DeleteRequest": {
+      "type": "object",
+      "required": ["confirm"],
+      "properties": { "confirm": { "const": true } },
+      "additionalProperties": false
+    },
+    "DeleteResponse": {
+      "type": "object",
+      "required": ["receiptToken", "status"],
+      "properties": {
+        "receiptToken": { "type": "string" },
+        "status": { "enum": ["PENDING", "COMPLETE"] },
+        "providerStatus": { "enum": ["NO_PROVIDER_DATA", "RETENTION_WINDOW", "RETENTION_UNCONFIRMED"] },
+        "providerRetentionUntil": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "DeleteStatusResponse": {
+      "type": "object",
+      "required": ["status", "controlledSystemsComplete"],
+      "properties": {
+        "status": { "enum": ["PENDING", "COMPLETE"] },
+        "controlledSystemsComplete": { "type": "boolean" },
+        "providerRetentionUntil": { "type": "integer" },
+        "providerStatus": { "enum": ["NO_PROVIDER_DATA", "RETENTION_WINDOW", "RETENTION_UNCONFIRMED"] },
+        "completedAt": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "PubSubPush": {
+      "type": "object",
+      "required": ["message"],
+      "properties": {
+        "message": {
+          "type": "object",
+          "required": ["messageId", "data"],
+          "properties": {
+            "messageId": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "data": { "type": "string", "minLength": 1 }
+          },
+          "additionalProperties": true
+        },
+        "subscription": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "LedgerReserveRequest": {
+      "type": "object",
+      "required": ["walletId", "jobId", "credits"],
+      "properties": {
+        "walletId": { "type": "string" },
+        "jobId": { "type": "string" },
+        "credits": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "LedgerReserveResult": {
+      "type": "object",
+      "required": ["accepted", "balance", "reserved"],
+      "properties": {
+        "accepted": { "type": "boolean" },
+        "balance": { "type": "integer", "minimum": 0 },
+        "reserved": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "LedgerSettlementRequest": {
+      "type": "object",
+      "required": ["walletId", "jobId", "receipt"],
+      "properties": {
+        "walletId": { "type": "string" },
+        "jobId": { "type": "string" },
+        "receipt": { "$ref": "#/definitions/DeliveryReceipt" }
+      },
+      "additionalProperties": false
+    },
+    "LedgerSettlementResult": {
+      "type": "object",
+      "required": ["charged", "state"],
+      "properties": {
+        "charged": { "type": "integer", "minimum": 0 },
+        "state": { "const": "SETTLED" }
+      },
+      "additionalProperties": false
+    },
+    "LedgerReleaseRequest": {
+      "type": "object",
+      "required": ["walletId", "jobId"],
+      "properties": {
+        "walletId": { "type": "string" },
+        "jobId": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "LedgerReleaseResult": {
+      "type": "object",
+      "required": ["released", "state"],
+      "properties": {
+        "released": { "type": "integer", "minimum": 0 },
+        "state": { "enum": ["RELEASED", "SETTLED", "NONE"] }
+      },
+      "additionalProperties": false
+    }
+  }
+}

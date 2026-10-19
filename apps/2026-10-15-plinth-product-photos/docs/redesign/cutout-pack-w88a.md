@@ -1,0 +1,18 @@
+# Cutout pack W88a
+
+| Complaint | Change and source evidence | Phone observation |
+|---|---|---|
+| C5 | Replaced the source-photo panel with a 48 dp thumbnail row and an optional “Change photo” action; only a missing source shows the photo picker, with one short empty-state line. `app/src/main/java/com/gexetr/plinthproductphotos/ui/cutout/CutoutScreen.kt:239-245,344-351,556-605`; English copy: `app/src/main/res/values/strings_cutout.xml:4-6,12`; Russian copy: `app/src/main/res/values-ru/strings_cutout.xml:4-6,12`. | **UNVERIFIED.** No post-change build was installed. `adb devices -l` listed `SM_A165F`, not the required A40 (`R58MB3SGZVL`). After the integrated build, verify on the A40 that a bound photo shows the thumbnail and Change photo (not Choose photo), and that the empty state alone shows the picker. Measure the preview against usable screen height there. |
+| C6 | The report context now uses a fixed localized output label instead of the selected filename; job identity remains only report submission data, while screen status text comes from human-readable phase/notice resources. `app/src/main/java/com/gexetr/plinthproductphotos/ui/cutout/CutoutScreen.kt:316-324,361-378`; the report action renders operation/output labels at `app/src/main/java/com/gexetr/plinthproductphotos/ui/report/ReportOutputAction.kt:80-87` and submits its job id at `:181-185`. | **UNVERIFIED.** No post-change build was installed. On the A40, observe the cutting, success and failure states and confirm that no job/request/terminal id or UUID substring appears in visible text. |
+| C7 | Removed the unused refresh-cost resource and separate cost/balance line; the price is on the Generate action. The no-session report copy no longer directs users to refresh cost or wallet. Retry remains the recovery action. `app/src/main/java/com/gexetr/plinthproductphotos/ui/cutout/CutoutScreen.kt:384-403`; English: `app/src/main/res/values/strings_cutout.xml:7,15,46,59-60` and `app/src/main/res/values/strings_report.xml:3`; Russian: `app/src/main/res/values-ru/strings_cutout.xml:7,15,46,59-60` and `app/src/main/res/values-ru/strings_report.xml:3`. | **UNVERIFIED.** No post-change build was installed. On the A40, open the no-session report state and confirm its text names no refresh control; confirm the primary action carries the price and Retry remains available only for recovery. |
+
+## Claim ledger
+
+| CLAIM | LABEL | EVIDENCE |
+|---|---|---|
+| A bound source photo is represented by a compact thumbnail row, not a 300 dp-minimum preview. | MEASURED | `CutoutScreen.kt:556-605` (48 dp thumbnail and row); the source stage is called at `:344-351`. |
+| The photo picker is shown only when the source bitmap is absent; the empty state has one short prompt. | MEASURED | `CutoutScreen.kt:239-245`; `strings_cutout.xml:12`; `values-ru/strings_cutout.xml:12`. |
+| A filename is not used as report-facing text; the report context receives a fixed output label. | MEASURED | `CutoutScreen.kt:316-324`; `ReportOutputAction.kt:80-87` renders labels, while `:181-185` uses the job id for submission. |
+| The primary action carries the quoted price and retry remains the recovery label. | MEASURED | `CutoutScreen.kt:384-403`; `strings_cutout.xml:15`; `values-ru/strings_cutout.xml:15`. |
+| Refresh-cost / refresh-wallet instructions are absent from the touched English and Russian Cutout/report strings. | MEASURED | Static acceptance check scanned those four resource files and passed; `strings_report.xml:3`; `values-ru/strings_report.xml:3`. |
+| C5–C7 are visually correct on the required A40 after the integrated build. | UNVERIFIED | `adb devices -l` observed `SM_A165F`; no post-change app build was installed or observed on `R58MB3SGZVL`. |

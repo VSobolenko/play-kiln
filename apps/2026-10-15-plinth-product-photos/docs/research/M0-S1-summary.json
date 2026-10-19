@@ -1,0 +1,113 @@
+{
+  "corpus_manifest": ".kiln/scratch/plinth-bench-prep/index.json",
+  "prepared_photo_count": 30,
+  "excluded_non_product_count": 1,
+  "eligible_photo_count": 29,
+  "visually_tagged_hard_case_count": 25,
+  "hard_case_tag_counts": {
+    "shiny_metal": 5,
+    "jewellery": 4,
+    "gem": 1,
+    "thin_structure": 3,
+    "thin_chain": 2,
+    "gold": 1,
+    "glass_transparent": 1,
+    "knit": 1,
+    "white_on_white_edges": 2,
+    "pair": 1,
+    "fur_knit": 2,
+    "shadow_reflection": 1,
+    "reflection": 1,
+    "thin_straps": 1,
+    "lifestyle_background_not_cutout_ready": 1,
+    "multi_item": 6,
+    "white_on_white": 2,
+    "lifestyle_background": 1,
+    "thin_handles": 1,
+    "hanging_charm": 1,
+    "glossy_ceramic": 1,
+    "framed_full_bleed": 1,
+    "no_clear_cutout_edge": 1,
+    "animal_in_frame": 1,
+    "hand_or_person_like_occluder": 1,
+    "overlay_badge": 1,
+    "transparent_white_bottles": 1,
+    "overlay_swatches": 1,
+    "transparent_plastic": 1
+  },
+  "successful_reference_calls": 29,
+  "complete_eligible_reference_calls": true,
+  "failed_or_missing_eligible_results": 0,
+  "source_sha256_mismatches": [],
+  "output_sha256_mismatches": [],
+  "source_output_dimension_mismatches": [],
+  "provider_price_usd_per_success_on_record": 0.018,
+  "total_estimated_provider_cost_usd": 0.522,
+  "incremental_calls_after_prior_10": 19,
+  "incremental_estimated_cost_usd_after_prior_10": 0.342,
+  "reference_elapsed_ms": {
+    "semantics": "Remote wall time from immediately before POST through the BRIA HTTP response; excludes output image download and is not phone or A40 inference latency.",
+    "sample_count": 29,
+    "min": 1217,
+    "median": 2400,
+    "p95_nearest_rank": 5298,
+    "max": 6027
+  },
+  "visually_tagged_hard_case_reference_elapsed_ms": {
+    "sample_count": 25,
+    "median": 2295,
+    "p95_nearest_rank": 3524,
+    "not_local_device_latency": true
+  },
+  "interior_rgb_invariant": {
+    "definition": "For pixels where returned alpha is exactly 255, compare returned RGB and composites over white and black against source RGB.",
+    "opaque_core_pixels": 49084957,
+    "returned_rgb_different_pixels": 0,
+    "white_composite_different_pixels": 0,
+    "black_composite_different_pixels": 0,
+    "verdict": "EXACT_MATCH"
+  },
+  "reference_vs_reference_iou": "NOT_APPLICABLE",
+  "local_candidate_iou": "NOT_MEASURED_NO_LOCAL_MASKS",
+  "iou_vs_hand_corrected_masks": "NOT_MEASURED_NO_HAND_MASKS",
+  "local_latency_on_target_phone": "NOT_MEASURED",
+  "crop_selection": "Six manually selected visually suspicious challenge cases from the full reference contact sheet, not a ground-truth-ranked worst-six list.",
+  "review_crop_bounds_xyxy_1_to_1": {
+    "B07T4RGJZT": [
+      0,
+      136,
+      2560,
+      2560
+    ],
+    "B07B4WR342": [
+      0,
+      0,
+      1000,
+      1100
+    ],
+    "B07XXS6JMD": [
+      79,
+      281,
+      1447,
+      1199
+    ],
+    "B073P1S8VZ": [
+      74,
+      75,
+      2209,
+      2485
+    ],
+    "B07N3D8YR2": [
+      1100,
+      1400,
+      1862,
+      1884
+    ],
+    "B07HZJ334C": [
+      154,
+      1494,
+      1819,
+      2098
+    ]
+  }
+}
