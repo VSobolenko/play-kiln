@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wallet_title" translatable="true">Кошелёк кредитов</string>
+    <string name="wallet_back" translatable="true">Назад</string>
+    <string name="wallet_balance" translatable="true">%1$d кредитов</string>
+    <string name="wallet_balance_unavailable" translatable="true">Баланс недоступен</string>
+    <string name="wallet_balance_heading" translatable="true">Ваш баланс</string>
+    <string name="wallet_reserved" translatable="true">%1$d кредитов зарезервировано активными задачами</string>
+    <string name="wallet_offline" translatable="true">Офлайн · сохранённые проекты и локальные инструменты доступны</string>
+    <string name="wallet_refresh" translatable="true">Обновить баланс</string>
+    <string name="wallet_refund_debt" translatable="true">Долг за возврат: %1$d кредитов</string>
+    <string name="wallet_unlock_active" translatable="true">Разблокировано · без водяного знака · пакеты больше 5</string>
+    <string name="wallet_free_limits" translatable="true">Бесплатно · водяной знак · до 5 товаров в пакете</string>
+    <string name="wallet_pack_starter" translatable="true">Стартовый</string>
+    <string name="wallet_pack_studio" translatable="true">Студия</string>
+    <string name="wallet_pack_pro" translatable="true">Профи</string>
+    <string name="wallet_choose_pack" translatable="true">Выберите пакет кредитов</string>
+    <string name="wallet_best_value" translatable="true">Выгоднее</string>
+    <string name="wallet_pack_too_small" translatable="true">Не хватит на одно удаление фона</string>
+    <string name="wallet_pack_price_per_use" translatable="true">Около %1$s за удаление фона</string>
+    <string name="wallet_pack_accessibility" translatable="true">%1$s, %2$d %3$s, %4$s, %5$s</string>
+    <string name="wallet_pack_best_accessibility" translatable="true">%1$s, %2$d %3$s, %4$s, %5$s, выгоднее остальных</string>
+    <string name="wallet_cta_buy" translatable="true">Купить %1$d кредитов · %2$s</string>
+    <string name="wallet_cta_retry" translatable="true">Повторить · %1$d кредитов · %2$s</string>
+    <string name="wallet_cta_purchases_unavailable" translatable="true">Покупка недоступна · %1$d кредитов</string>
+    <string name="wallet_cta_price_unavailable" translatable="true">Цена недоступна · %1$d кредитов</string>
+    <string name="wallet_purchase_trust" translatable="true">Оплата через Google Play; подтвердите итоговую цену в окне покупки.</string>
+    <string name="wallet_unlock_purchase" translatable="true">Разблокировать · %1$s</string>
+    <string name="wallet_unlock" translatable="true">Постоянная разблокировка</string>
+    <string name="wallet_play_price" translatable="true">Цена Google Play: %1$s</string>
+    <string name="wallet_price_unavailable" translatable="true">Цена в магазине недоступна</string>
+    <string name="wallet_buy" translatable="true">Добавить</string>
+    <string name="wallet_restore" translatable="true">Восстановить покупки</string>
+    <string name="wallet_recovery_code_label" translatable="true">Код восстановления</string>
+    <string name="wallet_recover" translatable="true">Восстановить кошелёк по коду</string>
+    <string name="wallet_failed_not_charged" translatable="true">Списание не выполнено.</string>
+    <string name="wallet_purchase_pending" translatable="true">Платёж обрабатывается · кредиты пока недоступны</string>
+    <string name="wallet_purchase_confirming" translatable="true">Подтверждаем покупку</string>
+    <string name="wallet_purchase_unconfirmed" translatable="true">Покупка не подтверждена</string>
+    <string name="wallet_purchase_success" translatable="true">Покупка подтверждена</string>
+    <string name="wallet_purchase_unavailable" translatable="true">Покупки недоступны</string>
+    <string name="wallet_history_title" translatable="true">Недавние операции кошелька</string>
+    <string name="wallet_history_entry" translatable="true">%1$s · %2$d кредитов</string>
+    <string name="wallet_empty_history" translatable="true">Операций пока нет.</string>
+    <string name="wallet_jobs_title" translatable="true">Недавние задачи</string>
+    <string name="wallet_job_released" translatable="true">Задача завершилась с ошибкой или была отменена. Списания не было; возвращено кредитов: %1$d.</string>
+    <string name="wallet_job_settled" translatable="true">Результат доставлен. Списано кредитов: %1$d.</string>
+    <string name="wallet_job_receipt_pending" translatable="true">Ожидается подтверждение доставки результата. Списание пока не выполнено.</string>
+    <string name="wallet_job_release_unconfirmed" translatable="true">Задача завершилась, но возврат кредитов ещё проверяется.</string>
+    <string name="wallet_job_history_unavailable" translatable="true">Можно проверить только текущую сохранённую задачу; история завершённых задач пока недоступна.</string>
+    <string name="wallet_recovery_help" translatable="true">Баланс кредитов восстанавливается с помощью кода. Храните его в надёжном месте.</string>
+    <string name="wallet_recovery_success" translatable="true">Кошелёк восстановлен</string>
+    <string name="wallet_recovery_failed" translatable="true">Не удалось восстановить кошелёк</string>
+    <string name="wallet_restore_success" translatable="true">Покупки восстановлены</string>
+    <string name="wallet_restore_failure" translatable="true">Не удалось восстановить покупки</string>
+    <string name="wallet_job_status_unavailable" translatable="true">Не удалось проверить статус последней задачи.</string>
+    <plurals name="wallet_balance_uses">
+        <item quantity="one">Баланс оплатит %1$d удаление фона</item>
+        <item quantity="few">Баланс оплатит %1$d удаления фона</item>
+        <item quantity="many">Баланс оплатит %1$d удалений фона</item>
+        <item quantity="other">Баланс оплатит %1$d удаления фона</item>
+    </plurals>
+    <plurals name="wallet_pack_uses">
+        <item quantity="one">Хватит на %1$d удаление фона</item>
+        <item quantity="few">Хватит на %1$d удаления фона</item>
+        <item quantity="many">Хватит на %1$d удалений фона</item>
+        <item quantity="other">Хватит на %1$d удаления фона</item>
+    </plurals>
+    <plurals name="wallet_pack_credit_cost">
+        <item quantity="one">%1$d кредит за удаление фона</item>
+        <item quantity="few">%1$d кредита за удаление фона</item>
+        <item quantity="many">%1$d кредитов за удаление фона</item>
+        <item quantity="other">%1$d кредита за удаление фона</item>
+    </plurals>
+    <plurals name="wallet_credit_unit">
+        <item quantity="one">кредит</item>
+        <item quantity="few">кредита</item>
+        <item quantity="many">кредитов</item>
+        <item quantity="other">кредита</item>
+    </plurals>
+    <string name="import_batch_limit_free" translatable="true">Бесплатно: до %1$d фото за раз. Чтобы импортировать больше, откройте разблокировку в кошельке.</string>
+    <string name="import_batch_limit_unlocked" translatable="true">Разблокировано: до %1$d фото за раз.</string>
+    <string name="import_batch_truncated" translatable="true">Сохранены только первые %1$d фото — это бесплатный лимит. Разблокировка в кошельке снимает его.</string>
+</resources>

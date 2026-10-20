@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="coach_title" translatable="true">Shoot coach</string>
+    <string name="coach_intro" translatable="true">Take a clear, complete source photo. Guidance stays on this device.</string>
+    <string name="coach_camera_permission_explanation" translatable="true">Camera access lets you frame a product here. You can still choose a photo if you decline.</string>
+    <string name="coach_camera_denied_title" translatable="true">Camera access was declined</string>
+    <string name="coach_camera_denied_body" translatable="true">The camera preview is unavailable. Choose a photo from your library instead.</string>
+    <string name="coach_no_camera_title" translatable="true">No camera is available</string>
+    <string name="coach_no_camera_body" translatable="true">You can still choose an existing photo from your library.</string>
+    <string name="coach_camera_unavailable" translatable="true">The camera could not start. Choose a photo or try opening the coach again.</string>
+    <string name="coach_open_picker" translatable="true">Choose a photo</string>
+    <string name="coach_open_camera" translatable="true">Request camera access</string>
+    <string name="coach_back" translatable="true">Back</string>
+    <string name="coach_marketplace" translatable="true">Marketplace</string>
+    <string name="coach_marketplace_label" translatable="true">%1$s: %2$s</string>
+    <string name="coach_main_guidance" translatable="true">Show the whole item clearly against an uncluttered background.</string>
+    <string name="coach_background_white" translatable="true">Use a pure white background for the main photo.</string>
+    <string name="coach_background_neutral" translatable="true">Choose a clean, neutral background that does not distract from the item.</string>
+    <string name="coach_background_neutral_only" translatable="true">Use a neutral background; coloured backgrounds are not allowed.</string>
+    <string name="coach_main_packaging" translatable="true">Show the item outside its packaging.</string>
+    <string name="coach_main_no_text" translatable="true">Do not add text to the main photo.</string>
+    <string name="coach_main_text_penalty" translatable="true">Text on the main photo may reduce its placement.</string>
+    <string name="coach_main_no_marks" translatable="true">Avoid watermarks, logos, decorative borders and promotional graphics.</string>
+    <string name="coach_category" translatable="true">Item type</string>
+    <string name="coach_category_clothing" translatable="true">Clothing</string>
+    <string name="coach_category_shoes" translatable="true">Shoes</string>
+    <string name="coach_category_jewellery" translatable="true">Jewellery</string>
+    <string name="coach_category_electronics" translatable="true">Electronics</string>
+    <string name="coach_category_other" translatable="true">Other</string>
+    <string name="coach_shot_progress" translatable="true">%1$d of %2$d shots complete</string>
+    <string name="coach_shot_current" translatable="true">Next shot: %1$s</string>
+    <string name="coach_shot_front" translatable="true">Front</string>
+    <string name="coach_shot_back" translatable="true">Back</string>
+    <string name="coach_shot_label" translatable="true">Label or care tag</string>
+    <string name="coach_shot_flaw" translatable="true">Close-up of a flaw</string>
+    <string name="coach_shot_measurement" translatable="true">Measurement with ruler</string>
+    <string name="coach_shot_side" translatable="true">Side</string>
+    <string name="coach_shot_sole" translatable="true">Sole</string>
+    <string name="coach_shot_clasp" translatable="true">Clasp</string>
+    <string name="coach_shot_mark" translatable="true">Maker mark</string>
+    <string name="coach_shot_ports" translatable="true">Ports and connectors</string>
+    <string name="coach_shot_done" translatable="true">Done</string>
+    <string name="coach_shot_skipped" translatable="true">Skipped</string>
+    <string name="coach_skip_shot" translatable="true">Skip this shot</string>
+    <string name="coach_all_shots_done" translatable="true">Shot list complete. You can take another photo if needed.</string>
+    <string name="coach_level_good" translatable="true">Level</string>
+    <string name="coach_level_tilted" translatable="true">Tilt the phone until the level settles</string>
+    <string name="coach_level_unavailable" translatable="true">Level sensor is unavailable; use the frame guide</string>
+    <string name="coach_frame_hint" translatable="true">Keep the whole item inside the frame</string>
+    <string name="coach_capture" translatable="true">Take photo</string>
+    <string name="coach_review_title" translatable="true">Check this photo</string>
+    <string name="coach_quality_sharpness" translatable="true">Sharpness</string>
+    <string name="coach_quality_exposure" translatable="true">Exposure</string>
+    <string name="coach_quality_fill" translatable="true">Item fill</string>
+    <string name="coach_quality_aspect" translatable="true">Aspect</string>
+    <string name="coach_quality_pass" translatable="true">Looks within the available rule</string>
+    <string name="coach_quality_attention" translatable="true">Needs another look</string>
+    <string name="coach_quality_unverified_sharpness" translatable="true">There is no on-device sharpness score or sourced threshold, so this check is unverified.</string>
+    <string name="coach_quality_unverified_exposure" translatable="true">There is no exposure measurement or sourced threshold, so this check is unverified.</string>
+    <string name="coach_quality_sharpness_measurement_missing" translatable="true">No on-device sharpness score was measured.</string>
+    <string name="coach_quality_sharpness_threshold_missing" translatable="true">No sourced sharpness threshold is specified.</string>
+    <string name="coach_quality_exposure_measurement_missing" translatable="true">No on-device exposure measurement was made.</string>
+    <string name="coach_quality_exposure_threshold_missing" translatable="true">No sourced exposure threshold is specified.</string>
+    <string name="coach_quality_unverified_fill" translatable="true">The item outline is not measured here; a subject boundary is needed to verify fill.</string>
+    <string name="coach_quality_no_fill_rule" translatable="true">This preset does not specify a minimum item fill.</string>
+    <string name="coach_quality_unverified_aspect" translatable="true">The preset aspect could not be read.</string>
+    <string name="coach_quality_no_aspect_rule" translatable="true">This preset does not specify an aspect.</string>
+    <string name="coach_remedy_sharpness" translatable="true">Hold the phone steady and tap the item to focus.</string>
+    <string name="coach_remedy_exposure" translatable="true">Find even light and avoid bright glare or deep shadow.</string>
+    <string name="coach_remedy_fill" translatable="true">Move closer while keeping the whole item in frame.</string>
+    <string name="coach_remedy_aspect" translatable="true">Reposition the item to fit the marketplace frame.</string>
+    <string name="coach_use_photo" translatable="true">Use photo</string>
+    <string name="coach_shoot_again" translatable="true">Shoot again</string>
+    <string name="coach_import_failed" translatable="true">This photo could not be opened. Choose another photo or try again.</string>
+    <string name="coach_capture_failed" translatable="true">The photo could not be captured. Check the camera and try again.</string>
+    <string name="coach_saving" translatable="true">Saving photo…</string>
+    <string name="coach_camera_photo_name" translatable="true">Camera photo</string>
+    <string name="coach_reference_note" translatable="true">This label or measurement photo is marked as a reference and is excluded from export.</string>
+    <string name="coach_reference_short">Reference only · not exported</string>
+    <string name="coach_show_shots">Shot list and skip</string>
+    <string name="coach_hide_shots">Hide shot list</string>
+    <string name="coach_setup_label">%1$s · item type and photo rules</string>
+    <string name="coach_hint_label">Move close enough to read the label or mark</string>
+    <string name="coach_hint_measurement">Keep the ruler and measured edges visible</string>
+    <string name="coach_hint_detail">Fill the frame with the detail; tap to focus</string>
+    <string name="coach_review_manual">Check focus, light and item edges yourself. Not all checks are measured.</string>
+    <string name="coach_show_checks">Why these results? Show checks</string>
+    <string name="coach_hide_checks">Hide check details</string>
+    <string name="coach_check_no_rule">No preset rule</string>
+    <string name="coach_check_adjust">Adjust</string>
+    <string name="coach_check_manual">Check yourself</string>
+    <string name="coach_check_matches">Matches rule</string>
+</resources>

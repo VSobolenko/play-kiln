@@ -68,6 +68,17 @@ interface BillingController {
     /** Launches the purchase flow for [product] and grants or credits on success. */
     suspend fun purchase(product: ProductId): PlayKilnResult<Entitlements>
 
+    /**
+     * Launches an intent-bound purchase and reports whether Play merely observed the purchase or
+     * an entitlement was actually granted. Implementations that do not support server intents fail
+     * closed rather than dropping the binding and launching the legacy flow.
+     */
+    suspend fun purchase(
+        product: ProductId,
+        intent: PurchaseIntent,
+    ): PlayKilnResult<PurchaseResolution> =
+        PlayKilnResult.Failure(PlayKilnResult.Reason.NOT_CONFIGURED)
+
     /** Acknowledges purchases that Play reported as pending; call on cold start. */
     suspend fun acknowledgePendingPurchases(): PlayKilnResult<Unit>
 

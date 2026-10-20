@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="w3_preview_failed">This photo could not be previewed. Choose another photo or try opening it again.</string>
+    <string name="w3_selected_ready">Selected photo · private copy ready</string>
+    <string name="w3_selected_photo">Your selected photo</string>
+    <string name="w3_import_copying">Saving a private copy of your photo…</string>
+    <string name="w3_selected">Selected</string>
+    <string name="w3_tap_select">Tap to select</string>
+    <string name="w3_change_photo">Choose another photo</string>
+    <string name="w3_swipe_back">Swipe the photo left to go back, or use Back above.</string>
+    <string name="w3_composing">Preparing your card preview…</string>
+    <string name="w3_choose_manually">Choose category manually instead</string>
+    <string name="w3_confirm_card">Create card</string>
+    <string name="w3_choose_available_scene">Choose an available background below, or keep the original photo.</string>
+    <string name="w3_original_size">Original photo · %1$d × %2$d px</string>
+    <string name="w3_result_size">Card preview · %1$d × %2$d px</string>
+    <string name="w3_original">Original</string>
+    <string name="w3_card_preview">Card preview</string>
+    <string name="w3_scene_no_preview">No scene preview</string>
+    <string name="w3_scene_unavailable">Scene not downloaded</string>
+    <string name="w3_scene_solid">Plain background %1$d</string>
+    <string name="w3_scene_gradient">Soft gradient %1$d</string>
+    <string name="w3_scene_studio">Studio scene %1$d</string>
+    <string name="w3_scene_generated">AI scene %1$d</string>
+    <string name="w3_category_fashion">Clothing &amp; accessories</string>
+    <string name="w3_category_beauty">Beauty &amp; care</string>
+    <string name="w3_category_food">Food &amp; drink</string>
+    <string name="w3_category_home">Home &amp; tools</string>
+    <string name="w3_category_more">Electronics, hobbies &amp; other</string>
+    <string name="w3_home_start">Start with a product photo</string>
+    <string name="w3_home_continue">Continue with your photo</string>
+    <string name="w3_home_steps">Choose a photo, review the category and background, then create your card.</string>
+    <string name="w3_home_open_card">Open the listing card</string>
+    <string name="w3_more_tools">More tools &amp; workflows</string>
+    <string name="w3_hide_tools">Hide additional tools</string>
+    <string name="w3_tools_note">Optional tools. Review the credit quote before running an AI operation.</string>
+</resources>

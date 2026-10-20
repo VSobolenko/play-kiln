@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_w76_title">Profile</string>
+    <string name="profile_w76_credits_title">Credits</string>
+    <plurals name="profile_w76_credits_amount">
+        <item quantity="one">%1$d credit</item>
+        <item quantity="other">%1$d credits</item>
+    </plurals>
+    <string name="profile_w76_credits_unavailable">Balance unavailable</string>
+    <string name="profile_w76_balance_loading">Checking your server balance…</string>
+    <string name="profile_w76_balance_current">Current balance from the server</string>
+    <string name="profile_w76_balance_cached">Last saved balance · couldn’t refresh</string>
+    <string name="profile_w76_balance_unavailable">No saved balance is available yet</string>
+    <string name="profile_w76_balance_error">Couldn’t refresh your balance</string>
+    <string name="profile_w76_open_wallet">Add credits</string>
+    <string name="profile_w76_refresh_balance">Refresh balance</string>
+    <string name="profile_w76_history_title">Recent results</string>
+    <string name="profile_w76_history_source">Results saved on this device. Full server job history isn’t available yet.</string>
+    <string name="profile_w76_history_loading">Looking for saved results…</string>
+    <string name="profile_w76_history_error">Saved results couldn’t be loaded.</string>
+    <string name="profile_w76_history_empty_title">No recent results</string>
+    <string name="profile_w76_history_empty_body">This quick view checks the 30 most recently updated projects. Open projects to browse your full library.</string>
+    <string name="profile_w76_open_library">View projects</string>
+    <string name="profile_w76_result_image">Saved result: %1$s</string>
+    <string name="profile_w76_retry">Try again</string>
+    <string name="profile_w76_history_ready">Saved on this device</string>
+    <string name="profile_w76_history_loading_title">Finding your saved results</string>
+    <string name="profile_w76_history_error_title">Results are unavailable</string>
+    <string name="profile_w76_history_error_body">Try again, or open your projects to browse saved work.</string>
+    <string name="profile_w76_library_title">Your projects</string>
+    <string name="profile_w76_library_body">Browse every saved product photo and project.</string>
+    <string name="profile_w76_date_now">Just now</string>
+    <string name="profile_w76_date_today">Today</string>
+    <plurals name="profile_w76_date_minutes_ago">
+        <item quantity="one">%1$d min ago</item>
+        <item quantity="other">%1$d min ago</item>
+    </plurals>
+    <plurals name="profile_w76_date_hours_ago">
+        <item quantity="one">%1$d hr ago</item>
+        <item quantity="other">%1$d hr ago</item>
+    </plurals>
+    <plurals name="profile_w76_date_days_ago">
+        <item quantity="one">%1$d day ago</item>
+        <item quantity="other">%1$d days ago</item>
+    </plurals>
+</resources>

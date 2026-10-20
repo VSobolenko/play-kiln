@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "languages": {
+    "en": {
+      "price_discount": ["sale", "discount", "off"],
+      "contacts_links": [],
+      "qr_code": [],
+      "evaluative_claim": ["best", "bestseller"],
+      "review_reward": ["review for", "cashback for"],
+      "sold_count": [],
+      "call_to_action": ["buy now", "call", "order"],
+      "delivery_returns": ["free shipping", "returns"]
+    },
+    "ru": {
+      "price_discount": ["скидка", "распродажа", "акция", "дёшево"],
+      "contacts_links": [],
+      "qr_code": [],
+      "evaluative_claim": ["хит", "топ", "лучший", "лидер продаж"],
+      "review_reward": ["отзыв за", "кешбэк за"],
+      "sold_count": [],
+      "call_to_action": ["купи", "купите", "звоните", "закажи"],
+      "delivery_returns": ["доставка", "возврат"]
+    }
+  }
+}

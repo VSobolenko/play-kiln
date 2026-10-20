@@ -11,6 +11,7 @@ data class PurchaseRecord(
     val productIds: List<String>,
     val state: PurchaseState,
     val acknowledged: Boolean = false,
+    val intentId: String? = null,
 )
 
 /** Mirrors `Purchase.PurchaseState` without importing it. */
@@ -32,8 +33,14 @@ sealed interface PurchaseOutcome {
     /** An entitlement or subscription was granted. */
     data class Granted(val product: ProductId, val isSubscription: Boolean) : PurchaseOutcome
 
-    /** A consumable already credited under this token; crediting again would duplicate it. */
-    data class AlreadySettled(val token: String) : PurchaseOutcome
+    /** An intent-bound entitlement was seen, but the authority did not confirm it. */
+    data class UnconfirmedEntitlement(val product: ProductId) : PurchaseOutcome
+
+    /** A purchase token already settled; applying it again would duplicate its grant. */
+    data class AlreadySettled(
+        val token: String,
+        val product: ProductId? = null,
+    ) : PurchaseOutcome
 
     /** Reported by Play but not paid for yet, so nothing was granted. */
     data class AwaitingPayment(val token: String) : PurchaseOutcome
@@ -71,7 +78,8 @@ data class Settlement(
  *    pack exactly once, forever.
  * 3. Settlement is **idempotent per token**. Play re-reports an unconsumed purchase on every
  *    cold start, so crediting on each report would multiply the user's balance for one payment.
- * 4. A server-cost pack is credited only when the authority confirms the token.
+ * 4. A server-cost pack is credited only when the authority confirms the token, and an
+ *    intent-bound entitlement is granted only when the authority confirms that intent.
  * 5. A failure grants nothing: no credit, no entitlement, and no consume, so it retries later.
  */
 class PurchaseLedger(
@@ -105,13 +113,16 @@ class PurchaseLedger(
                 // payment, because Play keeps re-reporting them until they are consumed.
                 val pack = catalog.packFor(product)
 
-                if (pack != null && store.isSettled(record.token)) {
-                    outcomes += PurchaseOutcome.AlreadySettled(record.token)
+                if ((pack != null || record.intentId != null) && store.isSettled(record.token)) {
+                    outcomes += PurchaseOutcome.AlreadySettled(
+                        record.token,
+                        product = product.takeIf { record.intentId != null },
+                    )
                     return@productLoop
                 }
 
                 if (pack != null) {
-                    if (!authorizePurchase(pack, product, record.token)) {
+                    if (!authorizePurchase(pack, product, record.token, record.intentId)) {
                         outcomes += PurchaseOutcome.NotAuthorized(product)
                         return@productLoop
                     }
@@ -123,7 +134,12 @@ class PurchaseLedger(
                 }
 
                 val isSubscription = catalog.isSubscription(product)
+                if (record.intentId != null && !authorizePurchase(product, record.token, record.intentId)) {
+                    outcomes += PurchaseOutcome.UnconfirmedEntitlement(product)
+                    return@productLoop
+                }
                 entitlements = entitlements.granting(product.key(), isSubscription)
+                if (record.intentId != null) store.markSettled(record.token)
                 if (!record.acknowledged) acknowledge += record.token
                 outcomes += PurchaseOutcome.Granted(product, isSubscription)
             }
@@ -146,12 +162,79 @@ class PurchaseLedger(
         pack: ConsumablePack,
         product: ProductId,
         token: String,
+        intentId: String?,
     ): Boolean {
-        if (pack.fulfillment != Fulfillment.SERVER_COST) return true
+        if (intentId == null && pack.fulfillment != Fulfillment.SERVER_COST) return true
         val authority = authority ?: return false
-        return when (authority.confirmPurchase(token, product)) {
+        return when (confirm(authority, token, product, intentId)) {
             is PlayKilnResult.Success<*> -> true
             is PlayKilnResult.Failure -> false
         }
     }
+
+    private suspend fun authorizePurchase(
+        product: ProductId,
+        token: String,
+        intentId: String,
+    ): Boolean {
+        val authority = authority ?: return false
+        return authority.confirmPurchase(token, product, intentId) is PlayKilnResult.Success<*>
+    }
+
+    private suspend fun confirm(
+        authority: PurchaseAuthority,
+        token: String,
+        product: ProductId,
+        intentId: String?,
+    ): PlayKilnResult<Unit> =
+        if (intentId == null) {
+            authority.confirmPurchase(token, product)
+        } else {
+            authority.confirmPurchase(token, product, intentId)
+        }
+}
+
+/** State exposed by the intent-bound controller entry point. */
+enum class PurchaseResolutionState {
+    ENTITLEMENT_GRANTED,
+    CONSUMABLE_CREDITED,
+    PURCHASE_OBSERVED,
+    AWAITING_PAYMENT,
+}
+
+/**
+ * What the capability actually settled for an intent-bound flow.
+ *
+ * `PURCHASE_OBSERVED` is deliberately distinct from `ENTITLEMENT_GRANTED`: seeing a Play
+ * purchase is not proof that the authority accepted it.
+ */
+data class PurchaseResolution(
+    val product: ProductId,
+    val state: PurchaseResolutionState,
+    val entitlements: Entitlements,
+    val wallet: Wallet,
+)
+
+internal fun Settlement.resolutionFor(product: ProductId): PurchaseResolution {
+    val productOutcome = outcomes.firstOrNull { outcome ->
+        when (outcome) {
+            is PurchaseOutcome.CreditedPack -> outcome.product == product
+            is PurchaseOutcome.Granted -> outcome.product == product
+            is PurchaseOutcome.UnconfirmedEntitlement -> outcome.product == product
+            is PurchaseOutcome.NotAuthorized -> outcome.product == product
+            is PurchaseOutcome.UnknownProduct -> outcome.product == product
+            is PurchaseOutcome.AlreadySettled -> outcome.product == product
+            else -> false
+        }
+    }
+    val state = when {
+        productOutcome is PurchaseOutcome.Granted -> PurchaseResolutionState.ENTITLEMENT_GRANTED
+        productOutcome is PurchaseOutcome.CreditedPack -> PurchaseResolutionState.CONSUMABLE_CREDITED
+        productOutcome is PurchaseOutcome.AlreadySettled && entitlements.owns(product.key()) ->
+            PurchaseResolutionState.ENTITLEMENT_GRANTED
+        outcomes.any { it is PurchaseOutcome.AwaitingPayment } ->
+            PurchaseResolutionState.AWAITING_PAYMENT
+        else -> PurchaseResolutionState.PURCHASE_OBSERVED
+    }
+    return PurchaseResolution(product, state, entitlements, wallet)
 }

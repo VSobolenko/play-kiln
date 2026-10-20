@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "appName": "Plinth AI: Product Photos",
+  "slug": "plinth-product-photos",
+  "applicationId": "com.gexetr.plinthproductphotos",
+  "idea": "Turn a seller's own product photos into per-marketplace listing cards: server cut-out, original-pixel composition, marketplace rule linter, export with provenance.",
+  "defaultLocale": "en-US",
+  "category": "PHOTOGRAPHY",
+  "tags": [
+    "photography",
+    "business"
+  ],
+  "contactEmail": "v.sobolenko.vs@gmail.com",
+  "locales": {
+    "en-US": {
+      "title": "Plinth AI: Product Photos",
+      "shortDescription": "Create product photos, check marketplace rules, and export listing-ready images.",
+      "fullDescription": "Make product photos ready for the places you sell.\n\nPlinth helps sellers turn their own product photos into polished listing images. Cut out a product, compose it on a clean or generated background, check marketplace image requirements, and export with a clear record of how the image was made.\n\n• Keep the product's original pixels when composing a new background.\n• See whether an image is original, manually adjusted, AI-enhanced, or uses a generated background.\n• Review image dimensions and marketplace rules before exporting.\n• Use the camera or choose photos from your device.\n\nStart with 10 free credits per device. Processing that uses paid providers costs credits; one-time credit packs add more. A separate one-time Plinth Unlock removes the free export watermark and five-item batch limit; it does not include processing credits. There are no subscriptions. Review the credit cost and price shown in the app before confirming a purchase.\n\nPhotos you choose for server processing are sent to Plinth's server and its image-processing provider. Our server deletes uploaded photos within one hour and results within 24 hours; the provider may retain media for 30 days under its own policy. See the privacy policy for details.\n\nYou must have the rights to the photos you use. AI-generated content is labelled in the app and its export metadata; Plinth does not claim C2PA Content Credentials. You can report a generated result from inside the app.\n\nTell us what would make Plinth more useful by leaving a note in your Google Play review.",
+      "screenshotCaptions": [
+        "Choose a product photo",
+        "Cut out the product",
+        "Compose a clean listing image",
+        "Check image rules before export",
+        "See how the image was made",
+        "Export a listing-ready result"
+      ],
+      "featureBullets": [
+        "Prepare product photos for marketplace listings",
+        "Preserve original pixels and label generated content",
+        "See costs before processing and export"
+      ]
+    }
+  },
+  "dataSafety": {
+    "collectsData": true,
+    "reason": "Derived from the enabled capabilities and their bundled SDK declarations.",
+    "dataTypes": [
+      {
+        "type": "Financial info",
+        "purpose": "App functionality",
+        "shared": false,
+        "optional": false,
+        "notes": "Play Billing purchase history, product IDs, and entitlement state are used to grant credits and unlocks. The payment instrument remains with Google Play. A purchase token is sent to Plinth's server for verification."
+      },
+      {
+        "type": "Photos and videos",
+        "purpose": "App functionality",
+        "shared": true,
+        "optional": true,
+        "notes": "Photos selected for server operations go from Plinth's server to fal for cut-out, recognition, or image generation. Plinth deletes uploads within 1 hour and results within 24 hours; fal may retain media for 30 days."
+      },
+      {
+        "type": "Personal info",
+        "purpose": "App functionality",
+        "shared": true,
+        "optional": true,
+        "notes": "User-supplied listing text could include personal details and is sent to a text-generation provider only when the user requests copy. It is not retained after the request."
+      },
+      {
+        "type": "Device or other IDs",
+        "purpose": "App functionality",
+        "shared": false,
+        "optional": false,
+        "notes": "Random installation and wallet identifiers, not hardware identifiers, are sent to Plinth's server for wallet and app-data operations and retained until deletion is requested."
+      },
+      {
+        "type": "Other user-generated content",
+        "purpose": "App functionality",
+        "shared": true,
+        "optional": true,
+        "notes": "Listing text is sent to the text-generation provider for the request and not retained; optional report notes are sent to Plinth's server and retained until deletion is requested."
+      }
+    ],
+    "thirdPartySdks": [
+      {
+        "name": "Google Play Billing Library",
+        "version": "9.1.0",
+        "policyUrl": "https://developer.android.com/google/play/billing"
+      }
+    ],
+    "encryptedInTransit": true,
+    "hasAccountDeletion": false
+  },
+  "permissions": [],
+  "ads": {
+    "containsAds": false,
+    "reason": "Enabled capabilities declare no advertising SDKs."
+  },
+  "contentRating": {
+    "questionnaire": "notes",
+    "targetAudience": "adults-only"
+  },
+  "graphicsSource": {
+    "iconGlyph": "mark-plinth",
+    "brandColor": "#212627",
+    "accentColor": "#315B54"
+  },
+  "capabilityCompliance": {
+    "enabled": [
+      "billing"
+    ],
+    "requiresConsent": false,
+    "requiresPurchaseAuthority": false,
+    "purchaseAuthority": null
+  },
+  "privacyPolicyUrl": "https://telegra.ph/Plinth-Product-Photos--privacy-policy-10-15"
+}

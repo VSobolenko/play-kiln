@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">Plinth AI: Product Photos</string>
+    <string name="more_group_account" translatable="true">Your account</string>
+    <string name="more_group_preferences" translatable="true">Preferences</string>
+    <string name="more_group_about_legal" translatable="true">About &amp; legal</string>
+    <string name="app_idea" translatable="true">Prepare seller product photos for marketplace listings with background cut-out, image checks, and provenance-aware export.</string>
+    <string name="home_about_action" translatable="true">About</string>
+    <string name="home_wallet_action" translatable="true">Wallet · credit packs</string>
+    <string name="home_intro" translatable="true">Prepare product photos for the places you sell.</string>
+    <string name="home_idea_label" translatable="true">Your product photos</string>
+    <string name="home_pick_section" translatable="true">Choose a product photo to see its workspace here.</string>
+    <string name="home_primary_action" translatable="true">Import product photos</string>
+    <string name="home_primary_action_again" translatable="true">Choose more photos</string>
+    <string name="home_status_ready" translatable="true">Ready for your next product photo</string>
+    <string name="home_status_complete" translatable="true">Product photo ready</string>
+    <string name="home_snackbar_completed" translatable="true">Product photo is ready.</string>
+    <string name="home_snackbar_already_completed" translatable="true">This product photo is already ready.</string>
+    <string name="about_title" translatable="true">About this app</string>
+    <string name="about_back" translatable="true">Back</string>
+    <string name="about_body" translatable="true">%1$s helps sellers prepare product photos for marketplace listings. Import a photo, remove its background, compose and check the image, then export it with information about how it was made.</string>
+    <string name="about_privacy_note" translatable="true">Photos are sent to Plinth’s server and processing provider only when you start a server-based operation. Review the privacy policy for data use and retention.</string>
+
+    <!-- Settings. Every preference here is read by code outside the settings screen, because a
+         control that changes nothing teaches the user that Settings is decoration. -->
+    <string name="settings_title" translatable="true">Settings</string>
+    <string name="settings_back" translatable="true">Back</string>
+    <string name="settings_appearance_header" translatable="true">Appearance</string>
+    <string name="settings_theme_supporting" translatable="true">Choose how the app looks.</string>
+    <string name="settings_theme_system" translatable="true">Follow system</string>
+    <string name="settings_theme_light" translatable="true">Light</string>
+    <string name="settings_theme_dark" translatable="true">Dark</string>
+    <string name="settings_language_header" translatable="true">Language</string>
+    <string name="settings_language_title" translatable="true">App language</string>
+    <string name="settings_language_summary" translatable="true">Choose the language this app uses.</string>
+    <string name="settings_language_system" translatable="true">System default</string>
+    <string name="action_cancel" translatable="true">Cancel</string>
+    <string name="settings_behaviour_header" translatable="true">Behaviour</string>
+    <string name="settings_haptics_title" translatable="true">Vibration feedback</string>
+    <string name="settings_haptics_summary" translatable="true">Use vibration feedback when importing a product photo.</string>
+    <string name="settings_about_header" translatable="true">About</string>
+    <string name="settings_wallet_summary" translatable="true">Check your credit balance and available packs.</string>
+    <string name="settings_rate_title" translatable="true">Rate app</string>
+    <string name="settings_rate_summary" translatable="true">Tell others how this app works for you.</string>
+</resources>

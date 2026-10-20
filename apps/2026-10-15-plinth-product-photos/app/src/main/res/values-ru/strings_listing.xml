@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="listing_title" translatable="true">Текст объявления</string>
+    <string name="listing_back" translatable="true">Назад</string>
+    <string name="listing_explanation" translatable="true">Текст составляется из ваших данных и готовых фраз. Генерации текста с помощью ИИ нет.</string>
+    <string name="listing_offline" translatable="true">Нет подключения: текст объявления составляется на этом устройстве.</string>
+    <string name="listing_marketplace_label" translatable="true">Формат для площадки</string>
+    <string name="listing_language_label" translatable="true">Язык объявления</string>
+    <string name="listing_attributes_label" translatable="true">Проверьте данные товара</string>
+    <string name="listing_confirm_attributes" translatable="true">Подтвердить эти данные</string>
+    <string name="listing_item_name" translatable="true">Название товара (обязательно)</string>
+    <string name="listing_brand" translatable="true">Бренд</string>
+    <string name="listing_material" translatable="true">Материал</string>
+    <string name="listing_size" translatable="true">Размер</string>
+    <string name="listing_colour" translatable="true">Цвет</string>
+    <string name="listing_quantity" translatable="true">Количество (обязательно)</string>
+    <string name="listing_no_marketplaces" translatable="true">Нет доступных настроек торговых площадок.</string>
+    <string name="listing_choose_marketplace" translatable="true">Выберите торговую площадку, чтобы увидеть её поля объявления.</string>
+    <string name="listing_missing_item_name" translatable="true">Введите название товара для составления текста объявления.</string>
+    <string name="listing_missing_quantity" translatable="true">Введите положительное целое количество.</string>
+    <string name="listing_field_title" translatable="true">Заголовок</string>
+    <string name="listing_field_description" translatable="true">Краткое описание</string>
+    <string name="listing_limit_unavailable" translatable="true">Поле «%1$s» отключено для площадки «%2$s»: в данных нет ограничения %3$s.</string>
+    <string name="listing_below_minimum" translatable="true">В поле «%1$s» — %2$d символов; указан минимум %3$d. Добавьте свои сведения: приложение не будет дополнять текст.</string>
+    <string name="listing_overflow" translatable="true">В поле «%1$s» — %2$d символов; ограничение — %3$d. Текст отклонён, а не сокращён.</string>
+    <string name="listing_unsupported_language" translatable="true">Для языка %1$s нет таблицы фраз. Выберите один из шести поддерживаемых языков объявления.</string>
+    <string name="listing_preview_title" translatable="true">Предварительный просмотр</string>
+    <string name="listing_title_field" translatable="true">Заголовок: %1$s</string>
+    <string name="listing_description_field" translatable="true">Краткое описание: %1$s</string>
+    <string name="listing_character_count" translatable="true">%1$s: %2$d / %3$d символов</string>
+    <string name="listing_copy" translatable="true">Скопировать текст</string>
+    <string name="listing_share" translatable="true">Поделиться текстом</string>
+    <string name="listing_share_chooser" translatable="true">Поделиться текстом объявления</string>
+    <string name="listing_copied" translatable="true">Текст объявления скопирован</string>
+    <string name="listing_workspace_title" translatable="true">Соберите объявление</string>
+    <string name="listing_product_placeholder" translatable="true">Ваш товар</string>
+    <string name="listing_photo_empty" translatable="true">Добавьте фото товара, чтобы оценить текст рядом с изображением.</string>
+    <string name="listing_photo_choose" translatable="true">Добавить фото для просмотра</string>
+    <string name="listing_photo_replace" translatable="true">Заменить фото</string>
+    <string name="listing_photo_remove" translatable="true">Убрать фото</string>
+    <string name="listing_photo_description" translatable="true">Выбранное фото товара для просмотра</string>
+    <string name="listing_photo_failed" translatable="true">Не удалось открыть фото. Выберите его ещё раз или добавьте другое.</string>
+    <string name="listing_photo_preview_only" translatable="true">Только для просмотра, не точный макет площадки. Фото не загружается в сеть и не включается в скопированный или отправленный текст.</string>
+    <string name="listing_feedback_attention" translatable="true">Нужна правка</string>
+    <string name="listing_feedback_setup" translatable="true">Выберите площадку</string>
+    <string name="listing_feedback_review" translatable="true">Черновик · проверьте данные</string>
+    <string name="listing_feedback_confirmed" translatable="true">Данные подтверждены</string>
+    <string name="listing_feedback_draft" translatable="true">Текст укладывается в записанные ограничения. Подтвердите данные товара перед копированием или отправкой.</string>
+    <string name="listing_feedback_ready" translatable="true">Текст укладывается в записанные ограничения. Его можно скопировать или отправить; принятие площадкой не гарантируется.</string>
+</resources>

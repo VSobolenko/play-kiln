@@ -58,7 +58,8 @@ export const ALLOWED_PACKAGE_ROOTS = Object.freeze([
   // rows — `build.namespaceSweep` and the repo-wide leg of `build.fixtures`. `com.sun` is not a
   // namespace this factory ever shipped under, so the finding was the sweep's false positive rather
   // than a leftover; a JDK root is the same kind of occurrence the roots above already are.
-  'com.sun'
+  'com.sun',
+  'com.squareup', // OkHttp is a third-party library root, not a leftover.
 ])
 
 // Build outputs, IDE state, machine-local caches and worker ledgers. A sweep that descends into

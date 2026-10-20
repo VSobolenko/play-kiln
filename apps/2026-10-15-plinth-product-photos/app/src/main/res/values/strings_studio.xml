@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="studio_tools_title" translatable="true">Studio tools</string>
+    <string name="studio_tools_heading" translatable="true">Tools for this product photo</string>
+    <string name="studio_catalogue_notice" translatable="true">This catalogue shows configured availability; it does not claim that a tool works.</string>
+    <string name="studio_s2_notice" translatable="true">Enhanced tools remain unavailable until fidelity thresholds are measured (S2).</string>
+    <string name="studio_balance" translatable="true">Credit balance: %1$d</string>
+    <string name="studio_cost_and_balance" translatable="true">Cost: %1$d credits · available now: %2$d</string>
+    <string name="studio_cost_balance_after" translatable="true">Cost: %1$d credits · available now: %2$d · after delivery: %3$d</string>
+    <string name="studio_series_cost_after" translatable="true">Total reservation: %1$d credits · %2$d variants at %3$d each · available now: %4$d · after all are delivered: %5$d</string>
+    <string name="studio_series_cost_insufficient" translatable="true">Total reservation: %1$d credits · %2$d variants at %3$d each · available now: %4$d</string>
+    <string name="studio_insufficient_credits" translatable="true">%1$d more credits needed · balance: %2$d</string>
+    <string name="studio_operation_available" translatable="true">Available</string>
+    <string name="studio_operation_unavailable" translatable="true">Unavailable</string>
+    <string name="studio_operation_select" translatable="true">Select</string>
+    <string name="studio_open_wallet" translatable="true">Open wallet</string>
+    <string name="studio_provenance_original" translatable="true">Output provenance: Original pixels</string>
+    <string name="studio_provenance_adjusted" translatable="true">Output provenance: Manually adjusted</string>
+    <string name="studio_provenance_composite" translatable="true">Output provenance: Item untouched · background generated</string>
+    <string name="studio_provenance_enhanced" translatable="true">Output provenance: ENHANCED</string>
+    <string name="studio_provenance_inherited" translatable="true">Output provenance: Inherited from the output</string>
+    <string name="studio_reason_original_only" translatable="true">This marketplace forbids editing; only its allowed original-photo actions remain.</string>
+    <string name="studio_reason_s2" translatable="true">Unavailable: fidelity thresholds are unmeasured (S2).</string>
+    <string name="studio_reason_operation_disabled" translatable="true">This operation is disabled in the current operation configuration.</string>
+    <string name="studio_reason_server_disabled" translatable="true">This server operation is not enabled by the server configuration.</string>
+    <string name="studio_reason_background" translatable="true">The marketplace background policy does not allow this operation.</string>
+    <string name="studio_reason_white_main" translatable="true">Generated or Enhanced output is not offered for a white MAIN image.</string>
+    <string name="studio_reason_real_photo" translatable="true">This MAIN image must remain a real photograph.</string>
+    <string name="studio_reason_slide_overlay" translatable="true">This preset does not allow slide overlays.</string>
+    <string name="studio_reason_ghost_route" translatable="true">No first-party ghost-mannequin route was found.</string>
+    <string name="studio_reason_virtual_model" translatable="true">Virtual model is disabled pending the recorded safety review (S6).</string>
+    <string name="studio_reason_series_variant" translatable="true">A series can contain only recolour or virtual-model variants.</string>
+    <string name="studio_reason_preset_required" translatable="true">Choose a marketplace preset to check this operation\'s rules.</string>
+    <string name="studio_series_options" translatable="true">Series price preview</string>
+    <string name="studio_series_recolour" translatable="true">Recolour variants</string>
+    <string name="studio_series_virtual_model" translatable="true">Virtual-model variants</string>
+    <string name="studio_series_selected" translatable="true">Selected</string>
+    <string name="studio_series_choose" translatable="true">Choose</string>
+    <string name="studio_series_decrease" translatable="true">Fewer</string>
+    <string name="studio_series_increase" translatable="true">More</string>
+    <string name="studio_series_variant_count" translatable="true">Variants: %1$d</string>
+    <string name="studio_series_progress" translatable="true">Series progress</string>
+    <string name="studio_series_not_started" translatable="true">No series is in progress.</string>
+    <string name="studio_series_delivered_count" translatable="true">%1$d of %2$d variants delivered</string>
+    <string name="studio_series_ledger_movements" translatable="true">Reserved: %1$d · settled: %2$d · released: %3$d credits</string>
+    <string name="studio_series_running" translatable="true">In progress</string>
+    <string name="studio_series_complete" translatable="true">Complete</string>
+    <string name="studio_operation_recognise" translatable="true">Recognise item</string>
+    <string name="studio_operation_cut_out" translatable="true">Cut out</string>
+    <string name="studio_operation_refine_mask" translatable="true">Refine mask</string>
+    <string name="studio_operation_compose_original" translatable="true">Compose card (Original)</string>
+    <string name="studio_operation_shadow_margin_fill" translatable="true">Shadow, margin and fill</string>
+    <string name="studio_operation_local_background" translatable="true">Solid, gradient or procedural scene</string>
+    <string name="studio_operation_generated_scene" translatable="true">Generated scene background</string>
+    <string name="studio_operation_relight" translatable="true">Change the lighting</string>
+    <string name="studio_operation_expand_canvas" translatable="true">Expand canvas</string>
+    <string name="studio_operation_recolour" translatable="true">Recolour</string>
+    <string name="studio_operation_upscale" translatable="true">Upscale</string>
+    <string name="studio_operation_erase_region" translatable="true">Erase region</string>
+    <string name="studio_operation_ghost_mannequin" translatable="true">Ghost mannequin</string>
+    <string name="studio_operation_virtual_model" translatable="true">Virtual model</string>
+    <string name="studio_operation_listing_text" translatable="true">Listing text</string>
+    <string name="studio_operation_series" translatable="true">Series</string>
+    <string name="studio_operation_slide_render" translatable="true">Slide render</string>
+    <string name="studio_operation_export_pack" translatable="true">Export pack</string>
+    <string name="studio_live_purpose_scene" translatable="true">Create a setting from your description.</string>
+</resources>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="session_title">Подключение кошелька</string>
+    <string name="session_connecting">Проверяем установку через Google Play и подключаем кошелёк…</string>
+    <string name="session_configuration">Проверка кошелька не настроена для этой сборки или сервера. Установите последнюю версию из Google Play. Если ошибка повторяется, обратитесь в поддержку через страницу приложения в Google Play. Кредиты не списаны.</string>
+    <string name="session_integrity">Google Play не смог проверить установку. Проверьте подключение, обновите Google Play и установите или откройте Plinth через Google Play, затем повторите попытку. Кредиты не списаны.</string>
+    <string name="session_network">Не удалось подключить кошелёк. Проверьте подключение к интернету и повторите попытку. Кредиты не списаны.</string>
+    <string name="session_network_debug">Кошелёк недоступен: нет связи с удалённым debug API (pikupo.com/plinth-debug). Проверьте интернет и повторите попытку. Можно пользоваться приложением без кошелька. Кредиты не списаны.</string>
+    <string name="session_browse_without_wallet">Продолжить без кошелька</string>
+    <string name="session_server">Сервис кошелька не смог завершить проверку. Повторите попытку позже. Если ошибка повторяется, обратитесь в поддержку через страницу приложения в Google Play. Кредиты не списаны.</string>
+    <string name="session_storage">Не удалось сохранить подключение кошелька на устройстве. Освободите место и повторите попытку. Кредиты не списаны.</string>
+    <string name="session_retry">Повторить подключение</string>
+    <string name="session_link_failed">Не удалось открыть политику конфиденциальности. Установите браузер и повторите попытку.</string>
+    <string name="service_maintenance">Сервис приостановлен. Средства не списаны.</string>
+    <string name="service_maintenance_detail">Новые задачи временно недоступны. Кошелёк и готовые результаты остаются доступны.</string>
+    <string name="service_daily_cap">Дневной лимит достигнут.</string>
+    <string name="service_daily_cap_detail">Новые задачи станут доступны завтра. Средства не списаны.</string>
+    <string name="service_retry">Повторить</string>
+    <string name="service_retry_countdown">Повторить через %1$d с</string>
+    <string name="service_dismiss">Закрыть</string>
+    <string name="service_closed">Plinth закрыт.</string>
+    <string name="service_closed_detail">Готовые результаты можно получить, а кошелёк сохранён.</string>
+    <string name="service_open_results">Открыть результаты</string>
+    <string name="service_open_wallet">Открыть кошелёк</string>
+    <string name="service_update_required">Требуется обновление</string>
+    <string name="service_update_detail">Обновитесь до версии %1$s или выше, чтобы начать новую работу.</string>
+    <string name="service_open_play">Открыть Google Play</string>
+</resources>

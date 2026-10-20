@@ -661,7 +661,28 @@ export const REQUIRED = Object.freeze({
   startNew: 'the listing sells "Add each customer once" (the editor entry point)',
   startEdit: 'the listing sells "Edit or delete a customer" (the editor entry point)',
   setFilter: 'the listing sells every visit "on the record" (the history filter)',
-  clearExportStatus: 'the listing sells the app telling "you how many rows it wrote"'
+  clearExportStatus: 'the listing sells the app telling "you how many rows it wrote"',
+  // --- plinth-product-photos (apps/2026-10-15-plinth-product-photos) ---
+  // The product-photo operations kept by this listing: importing a photo, cutting it out,
+  // composing a card, choosing a marketplace and exporting the result. Each claim quotes or
+  // paraphrases `store/listing.json`'s `fullDescription`.
+  importUris: 'the listing sells "Use the camera or choose photos from your device"',
+  select: 'the listing sells choosing "photos from your device" for a product cut-out',
+  startCutout: 'the listing sells "Cut out a product"',
+  setBrushMode: 'the listing sells identifying images that are "manually adjusted"',
+  applyBrushStroke: 'the listing sells identifying images that are "manually adjusted"',
+  undoBrushStroke: 'the listing sells identifying images that are "manually adjusted"',
+  makeCard: 'the listing sells composing a product "on a clean ... background"',
+  updateSettings: 'the listing sells "compose it on a clean or generated background"',
+  setShadow: 'the listing sells composing a polished listing image on a clean background',
+  undo: 'the listing sells editing a composition while keeping "the product\'s original pixels"',
+  redo: 'the listing sells editing a composition while keeping "the product\'s original pixels"',
+  refreshCostAndBalance: 'the listing sells reviewing "the credit cost and price shown in the app before confirming a purchase"',
+  start: 'the listing sells a "five-item batch limit" that the one-time unlock removes',
+  saveCategory: 'the listing sells checking "marketplace image requirements" before export',
+  setMarketplaceTarget: 'the listing sells "per-marketplace listing images"',
+  changeMarketplaceForSelected: 'the listing sells "per-marketplace listing images"',
+  reExportSelected: 'the listing sells "export listing-ready images"'
 })
 
 /** Operations that are deliberately not called from a screen, with the reason they are not. */
@@ -673,7 +694,8 @@ export const NOT_A_CONTROL = Object.freeze({
   classroom: 'a state accessor a screen reads through `state`, not an action',
   averageOf: 'a read, reached through the average surface or the shell',
   csvFor: 'produces the export payload; `requestExport` is the control',
-  backupDocument: 'produces the backup payload; `requestBackup` is the control'
+  backupDocument: 'produces the backup payload; `requestBackup` is the control',
+  createServerSession: 'bootstraps the device session from an integrity token; it is app setup, not a user control'
 })
 
 /**

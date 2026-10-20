@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "title": "Warp: Print Mockups",
+  "slug": "warp-print-mockups",
+  "applicationId": "com.gexetr.warpprintmockups",
+  "archetype": "carrier_job_noun",
+  "localizedTitles": {
+    "en-US": "Warp: Print Mockups",
+    "ru-RU": "Warp: Принт-мокапы"
+  },
+  "searchPhrases": [
+    "t shirt mockup",
+    "print on demand mockup",
+    "product mockup generator",
+    "etsy listing photo"
+  ],
+  "candidates": [
+    {
+      "name": "Warp: Print Mockups",
+      "archetype": "carrier_job_noun",
+      "score": 85,
+      "why": "Carrier plus the job noun a print-on-demand seller actually types. Warp is both the textile term and the real operation this app performs, a flat design warped onto a woven garment, so the carrier describes the wedge rather than decorating it; Print Mockups is the searched head term and is counted as part of the name, not of the carrier."
+    },
+    {
+      "name": "Printfold",
+      "archetype": "compound",
+      "score": 82,
+      "why": "Compact, ownable and easy to spell after hearing it once, but it leaves out the head term a seller searches for, so it spends the strongest ranking field on a word nobody types and needs its whole discovery budget bought with ads."
+    },
+    {
+      "name": "Mockforge",
+      "archetype": "coined",
+      "score": 80,
+      "why": "Coins cleanly and is distinctive, but an English reader hears mock as ridicule rather than as a mockup, and the word carries no textile or printing meaning, so it describes nothing about the job it names."
+    },
+    {
+      "name": "Drape",
+      "archetype": "evocative",
+      "score": 75,
+      "why": "Evokes fabric strongly and reads well at 48dp, but a one-word evocative title with no job noun is unsearchable for what the app does, and on this shelf the seller is looking for a mockup rather than for cloth."
+    },
+    {
+      "name": "Product Mockup Studio",
+      "archetype": "descriptive",
+      "score": 73,
+      "why": "States the job plainly and is legal, but it is a generic phrase with no carrier to distinguish it, so it competes for the same words as the 500K+ incumbent without offering the searcher a reason to prefer it."
+    },
+    {
+      "name": "Ghost Draft",
+      "archetype": "metaphorical",
+      "score": 73,
+      "why": "Ties the name to the ghost-mannequin garment shot, which is evocative but promises a specific form this plan deliberately does not build: the ghost-mannequin operation has no endpoint and no price, so the name would advertise a capability the app cannot honour."
+    },
+    {
+      "name": "Mockup Generator",
+      "archetype": "descriptive",
+      "score": 69,
+      "why": "The negative control: the bare category head term the shelf's 500K+ leaders already own, which Google itself says does not improve ranking, and the exact generic phrase the naming methodology forbids as a title rather than as a job description."
+    }
+  ],
+  "rejected": [
+    {
+      "name": "Mockup Generator",
+      "reason": "Bare category head term, and the negative control of the field: it is the phrase the 500K+ incumbent already ranks for, Google states unnecessary keywords do not help ranking, and it names the category instead of the wedge this app has."
+    },
+    {
+      "name": "Printfold",
+      "reason": "Lost on discoverability rather than on art: it drops the head term a seller actually types, so every install it wins has to be bought with ads instead of earned by a title that contains the searched words."
+    },
+    {
+      "name": "Ghost Draft",
+      "reason": "Names a capability this plan refuses to build, because the ghost-mannequin operation carries no endpoint and no price in the factory's own capability inventory, and a title must not promise what the app cannot do."
+    }
+  ],
+  "audience": "One-person print-on-demand, merch and digital-download shops on Etsy, eBay, Depop, Vinted, Amazon Merch and small Shopify stores, producing listing imagery for designs they have finished but not yet printed.",
+  "rationale": "A carrier plus the real two-to-three-word job noun is the methodology's recommended shape for a small focused tool: Warp is the true textile operation the app performs, and Print Mockups is the term a seller types into Play, so one title carries both the wedge and the demand.",
+  "collisionCheck": "UNVERIFIED. This scan did not run a Play title search and did not query any trademark register. The decider is a Google Play search for the exact title plus a class-9 search of TMview, USPTO, EUIPO and WIPO for Warp and its close variants; a clean search is not legal clearance, and a Cloudflare product named WARP is a known non-Play collision.",
+  "localisationCheck": "Nineteen characters in en-US and eighteen in ru-RU, so both declared locales clear Play's thirty-character cap with eleven or more characters of slack, and neither is a machine translation. The Latin carrier and job noun carry into both locales, but whether a Russian-speaking seller discovers an English job noun is unmeasured and needs a native review before the listing is written.",
+  "evidence": "docs/ideation/2026-10-16-ecosystem-marketplace-sellers.md#the-name-derived-rather-than-invented"
+}

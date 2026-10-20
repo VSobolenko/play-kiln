@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wallet_one_balance">Один баланс · все инструменты</string>
+    <string name="wallet_top_up">Пополнить</string>
+    <string name="wallet_credit_explanation">Кредиты оплачивают обработку на сервере, а не фиксированное число фото. Они списываются только за полученный результат.</string>
+    <string name="wallet_topup_title">Пополнить баланс</string>
+    <string name="wallet_topup_pack">Добавить %1$d кредитов</string>
+    <string name="wallet_pack_help">Купите пакет и тратьте кредиты на генерацию сцен, удаление фона и другие серверные инструменты. У каждого указана стоимость в кредитах.</string>
+    <string name="wallet_topup_balance_preview">Сейчас доступно: %1$d · после подтверждения пополнения: %2$d кредитов</string>
+    <string name="wallet_unlock_balance_preview">Сейчас доступно: %1$d кредитов · разблокировка не списывает и не добавляет кредиты</string>
+    <string name="wallet_buy_at_price">%1$s · %2$s</string>
+    <string name="wallet_unlock_title">Разовая покупка для экспорта</string>
+    <string name="wallet_unlock_help">Уберите водяной знак и лимит пакета одной покупкой.</string>
+    <string name="wallet_recovery_title">Восстановить доступ по коду</string>
+    <string name="wallet_credits_label">кредитов</string>
+    <string name="wallet_restore_section">Восстановить покупки и доступ</string>
+    <string name="wallet_shortfall_title">Недостаточно кредитов</string>
+    <string name="wallet_shortfall_body">Стоимость инструмента — %1$d кредитов. У вас — %2$d.</string>
+    <string name="wallet_shortfall_action">Добавить кредиты</string>
+    <string name="wallet_shortfall_dismiss">Не сейчас</string>
+</resources>

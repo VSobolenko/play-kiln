@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="listing_title" translatable="true">Listing text</string>
+    <string name="listing_back" translatable="true">Back</string>
+    <string name="listing_explanation" translatable="true">Text is assembled from your own details and fixed phrases. There is no AI text generation.</string>
+    <string name="listing_offline" translatable="true">Offline: your listing text is assembled on this device.</string>
+    <string name="listing_marketplace_label" translatable="true">Format for marketplace</string>
+    <string name="listing_language_label" translatable="true">Listing language</string>
+    <string name="listing_attributes_label" translatable="true">Confirm item details</string>
+    <string name="listing_confirm_attributes" translatable="true">Confirm these details</string>
+    <string name="listing_item_name" translatable="true">Item name (required)</string>
+    <string name="listing_brand" translatable="true">Brand</string>
+    <string name="listing_material" translatable="true">Material</string>
+    <string name="listing_size" translatable="true">Size</string>
+    <string name="listing_colour" translatable="true">Colour</string>
+    <string name="listing_quantity" translatable="true">Quantity (required)</string>
+    <string name="listing_no_marketplaces" translatable="true">No marketplace presets are available.</string>
+    <string name="listing_choose_marketplace" translatable="true">Choose a marketplace to preview its listing fields.</string>
+    <string name="listing_missing_item_name" translatable="true">Enter an item name to assemble the listing text.</string>
+    <string name="listing_missing_quantity" translatable="true">Enter a positive whole-number quantity.</string>
+    <string name="listing_field_title" translatable="true">Title</string>
+    <string name="listing_field_description" translatable="true">Short description</string>
+    <string name="listing_limit_unavailable" translatable="true">The %1$s field is disabled for %2$s: its %3$s limit is not recorded.</string>
+    <string name="listing_below_minimum" translatable="true">%1$s has %2$d characters; the recorded minimum is %3$d. Add your own details; the app will not pad the text.</string>
+    <string name="listing_overflow" translatable="true">%1$s has %2$d characters; the limit is %3$d. The text is refused, not shortened.</string>
+    <string name="listing_unsupported_language" translatable="true">No phrase table is available for %1$s. Choose one of the six supported listing languages.</string>
+    <string name="listing_preview_title" translatable="true">Preview</string>
+    <string name="listing_title_field" translatable="true">Title: %1$s</string>
+    <string name="listing_description_field" translatable="true">Short description: %1$s</string>
+    <string name="listing_character_count" translatable="true">%1$s: %2$d / %3$d characters</string>
+    <string name="listing_copy" translatable="true">Copy text</string>
+    <string name="listing_share" translatable="true">Share text</string>
+    <string name="listing_share_chooser" translatable="true">Share listing text</string>
+    <string name="listing_copied" translatable="true">Listing text copied</string>
+    <string name="listing_workspace_title" translatable="true">Shape your listing</string>
+    <string name="listing_product_placeholder" translatable="true">Your product</string>
+    <string name="listing_photo_empty" translatable="true">Add a product photo to review your copy in context.</string>
+    <string name="listing_photo_choose" translatable="true">Add reference photo</string>
+    <string name="listing_photo_replace" translatable="true">Replace photo</string>
+    <string name="listing_photo_remove" translatable="true">Remove photo</string>
+    <string name="listing_photo_description" translatable="true">Selected product reference photo</string>
+    <string name="listing_photo_failed" translatable="true">This photo could not be opened. Choose it again or select another photo.</string>
+    <string name="listing_photo_preview_only" translatable="true">Reference only, not an exact marketplace layout. The photo is not uploaded or included when you copy or share text.</string>
+    <string name="listing_feedback_attention" translatable="true">Needs an edit</string>
+    <string name="listing_feedback_setup" translatable="true">Set the destination</string>
+    <string name="listing_feedback_review" translatable="true">Draft · review your details</string>
+    <string name="listing_feedback_confirmed" translatable="true">Details confirmed</string>
+    <string name="listing_feedback_draft" translatable="true">Fits the recorded text limits. Confirm the item details before copying or sharing.</string>
+    <string name="listing_feedback_ready" translatable="true">Fits the recorded text limits. Copy or share the text; marketplace acceptance is not guaranteed.</string>
+</resources>

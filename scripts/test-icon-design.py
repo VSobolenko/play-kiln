@@ -18,8 +18,9 @@ The replacement is three files, and this suite is the part that can fail:
 
 Three kinds of leg, and the distinction matters:
 
-1. **The design passes** every gated leg, for every mark in the registry, deterministically, with the
-   raster and the vector agreeing about how big the mark is.
+1. **Each declared icon is measured** with its owning slot's production-resolved palette, with the
+   raster and the vector agreeing about how big the mark is. Unowned registry marks are notes, not
+   shipped-icon gates. ``--slot`` selects the production round-trip, not a palette for other marks.
 2. **Every sensor can fail.** A gate that cannot be shown failing is not a gate, so each leg is
    driven with an icon built to break exactly it - the pre-change field composition, an oversized
    mark, a mark off its optical centre, a mark scaled below the negative-space floor, a mark drawn
@@ -31,13 +32,13 @@ Three kinds of leg, and the distinction matters:
    produced) and reports its failing legs; a reproduction of the old field composition always runs,
    so the demonstration does not depend on git history.
 
-Nothing here writes into a slot: renders go to ``--out`` (default ``.kiln/icon-design/suite``),
+Nothing here writes into a slot: renders go to ``--out`` (default ``.kiln/scratch/icon-design/suite``),
 which is gitignored, because rewriting a committed ``store/assets/*.png`` would break the
 ``store/provenance.json`` record that binds it to a build.
 
-    python scripts/test-icon-design.py                       # exits 0 when every leg holds
+    python scripts/test-icon-design.py                       # all owning slots; exit 1 for real findings
     python scripts/test-icon-design.py --legacy-rev HEAD      # + the pre-change renderer's failures
-    python scripts/test-icon-design.py --json .kiln/icon-design/suite/measurements.json
+    python scripts/test-icon-design.py --json .kiln/scratch/icon-design/suite/measurements.json
 """
 
 from __future__ import annotations
@@ -93,6 +94,10 @@ def check(ok: bool, message: str, detail: str = "") -> bool:
     if not ok:
         failures.append(message)
     return ok
+
+
+def note(message: str, detail: str = "") -> None:
+    print(f"  NOTE {message}" + (f"  [{detail}]" if detail else ""))
 
 
 def record(key: str, value) -> None:
@@ -202,20 +207,23 @@ def load_module(name: str, path: Path):
 
 def slot_palette(slot: Path) -> dict:
     studio = json.loads((slot / "store" / "studio.json").read_text(encoding="utf-8"))
-    resolved = studio_default_palette()
-    for role, value in (studio.get("palette") or {}).items():
-        resolved[role] = tuple(int(value[index:index + 2], 16) for index in (1, 3, 5))
-    return resolved
+    renderer = load_module("pk_palette_suite", HERE / "store-studio.py")
+    return renderer.resolve_palette(studio.get("palette"), slot)
 
 
 def studio_default_palette() -> dict:
-    """The slot-independent palette `store-studio.py` declares when a slot overrides nothing."""
-    return {
-        "ink": (7, 16, 30), "ink_soft": (15, 36, 64), "ink_lift": (26, 62, 102),
-        "amber": (255, 170, 40), "amber_deep": (238, 118, 18), "amber_pale": (255, 206, 128),
-        "accent_deep": (24, 116, 176), "paper": (248, 250, 252), "muted": (170, 188, 210),
-        "bezel": (13, 18, 27), "bezel_rim": (126, 148, 176),
-    }
+    """A fixed palette for synthetic falsification controls, never a shipped-icon verdict."""
+    renderer = load_module("pk_control_palette_suite", HERE / "store-studio.py")
+    return dict(renderer.PALETTE_DEFAULTS)
+
+
+def owning_slots() -> list[tuple[Path, str]]:
+    owners = []
+    for path in sorted((ROOT / "apps").glob("*/store/studio.json")):
+        studio = json.loads(path.read_text(encoding="utf-8"))
+        if studio.get("mark"):
+            owners.append((path.parent.parent, studio["mark"]))
+    return owners
 
 
 def legacy_renderer(rev: str):
@@ -350,7 +358,7 @@ def verify_renderers_agree(mark: str, result: dict) -> None:
                              "raster_minus_vector_dp": round(raster - vector_reach, 4)})
 
 
-def verify_identity(mark: str, palette: dict) -> None:
+def verify_identity(mark: str, palette: dict, peers: list[tuple[str, dict]]) -> None:
     """A palette change must repaint the icon, and two marks must not be the same silhouette."""
     print(f"\n-- {mark}: identity is per slot and per mark --")
     other = dict(palette)
@@ -360,14 +368,23 @@ def verify_identity(mark: str, palette: dict) -> None:
     check(palette["ink"] != other["ink"], "sanity: the alternative palette differs")
     check(not np.array_equal(new_icon(mark, palette), new_icon(mark, other)),
           f"{mark}: a different slot palette repaints the icon")
-    others = [name for name in design.MARK_REGISTRY if name != mark]
+    others = [(name, colours) for name, colours in peers if name != mark]
     if others:
+        other_mark, other_palette = others[0]
+        missing = sorted({primitive["role"] for primitive in design.mark_primitives(mark)}
+                         - other_palette.keys())
+        if missing:
+            note(f"{mark}: cross-palette repaint skipped",
+                 f"{other_mark}'s palette lacks {', '.join(missing)}")
+        else:
+            check(not np.array_equal(new_icon(mark, palette), new_icon(mark, other_palette)),
+                  f"{mark}: another owning slot's palette repaints the icon")
         first = qa.mark_mask(new_icon(mark, palette), None, palette, mark)
-        second = qa.mark_mask(new_icon(others[0], palette), None, palette, others[0])
+        second = qa.mark_mask(new_icon(other_mark, other_palette), None, other_palette, other_mark)
         intersection = float((first & second).sum()) / max(1, int(first.sum() + second.sum()))
-        check(intersection < 0.5, f"{mark}: its silhouette differs from {others[0]}'s",
+        check(intersection < 0.5, f"{mark}: its silhouette differs from {other_mark}'s",
               f"overlap={round(intersection, 3)}")
-        record(f"silhouette_overlap_{mark}_vs_{others[0]}", round(intersection, 4))
+        record(f"silhouette_overlap_{mark}_vs_{other_mark}", round(intersection, 4))
 
 
 # ---------------------------------------------------------------------------------------
@@ -375,9 +392,8 @@ def verify_identity(mark: str, palette: dict) -> None:
 # ---------------------------------------------------------------------------------------
 
 
-def verify_field_legs(palette: dict) -> None:
+def verify_field_legs(palette: dict, mark: str) -> None:
     print("\n-- falsification: the field --")
-    mark = design.DEFAULT_MARK
     good = new_icon(mark, palette)
     legacy = legacy_field()
     legacy.alpha_composite(design.render_mark(CANVAS, mark, palette))
@@ -407,10 +423,9 @@ def verify_field_legs(palette: dict) -> None:
           f"rms={legacy_result['measured']['field_linear_ramp_rms']}")
     ratio = (legacy_result["measured"]["field_grid_periodicity"]
              / max(1e-9, good_result["measured"]["field_grid_periodicity"]))
-    check(ratio >= 10.0,
-          "the report-only grid-periodicity reading separates the grid from the ramp",
-          f"pre-change={legacy_result['measured']['field_grid_periodicity']} vs "
-          f"new={good_result['measured']['field_grid_periodicity']} ({round(ratio, 1)}x)")
+    note("report-only grid-periodicity reading (not a gate)",
+         f"pre-change={legacy_result['measured']['field_grid_periodicity']} vs "
+         f"new={good_result['measured']['field_grid_periodicity']} ({round(ratio, 1)}x)")
 
 
 def verify_mark_legs(palette: dict) -> None:
@@ -517,13 +532,12 @@ def verify_legacy_renderer(rev: str) -> None:
         return
     listing = {"title": "icon-design probe"}
     counts = {}
-    for mark in design.MARK_REGISTRY:
-        if mark.startswith("test-"):
-            continue
+    for slot, mark in owning_slots():
+        studio_spec = json.loads((slot / "store" / "studio.json").read_text(encoding="utf-8"))
         module.CURRENT_MARK = mark
-        module.apply_palette(module.resolve_palette(None))
+        palette = module.resolve_palette(studio_spec.get("palette"))
+        module.apply_palette(palette)
         image = module.render_icon(listing, {"mark": mark})
-        palette = module.resolve_palette(None)
         array = np.asarray(image.convert("RGBA"), dtype=np.uint8)
         result = qa.evaluate_icon(array, palette, mark=mark)
         counts[mark] = result["failed_legs"]
@@ -538,24 +552,30 @@ def verify_legacy_renderer(rev: str) -> None:
 
 def verify_slot_render_round_trip(slot: Path) -> None:
     """Drive the studio's own renderer end to end, into a scratch slot - never into a real one."""
-    print("\n-- the studio's own renderer, into a scratch slot --")
+    print(f"\n-- {slot.name}: the studio's own renderer, into a scratch slot --")
     studio = load_module("pk_studio_suite", HERE / "store-studio.py")
     studio_spec = json.loads((slot / "store" / "studio.json").read_text(encoding="utf-8"))
-    palette = studio.resolve_palette(studio_spec.get("palette"))
+    palette = studio.resolve_palette(studio_spec.get("palette"), slot)
     studio.apply_palette(palette)
     colours = {role: studio.hex_of(colour) for role, colour in palette.items()}
     checks: dict[str, dict] = {}
-    for mark in design.MARK_REGISTRY:
-        if mark.startswith("test-"):
-            continue
+    for mark in (studio_spec["mark"],):
         studio.CURRENT_MARK = mark
-        image = studio.render_icon({"title": "probe"}, {"mark": mark})
-        array = np.asarray(image.convert("RGBA"), dtype=np.uint8)
-        result = qa.evaluate_icon(array, palette, mark=mark)
-        checks[mark] = {"verdict": result["verdict"], "failed": result["failed_legs"]}
-        image.save(out_dir() / f"studio-icon-512-{mark}.png")
-        image.convert("RGBA").resize((48, 48), Image.Resampling.LANCZOS).save(
-            out_dir() / f"studio-icon-48px-{mark}.png")
+        try:
+            image = studio.render_icon({"title": "probe"}, {"mark": mark})
+        except SystemExit as error:
+            if not str(error).startswith(f"BLOCKED: the icon for mark {mark!r} failed "):
+                raise
+            result = qa.evaluate_icon(new_icon(mark, palette), palette, mark=mark)
+            checks[mark] = {"verdict": "FAIL", "failed": result["failed_legs"],
+                            "renderer_rejected": True}
+        else:
+            array = np.asarray(image.convert("RGBA"), dtype=np.uint8)
+            result = qa.evaluate_icon(array, palette, mark=mark)
+            checks[mark] = {"verdict": result["verdict"], "failed": result["failed_legs"]}
+            image.save(out_dir() / f"studio-icon-512-{mark}.png")
+            image.convert("RGBA").resize((48, 48), Image.Resampling.LANCZOS).save(
+                out_dir() / f"studio-icon-48px-{mark}.png")
         digs = []
         for attempt in ("first", "second"):
             res = out_dir() / f"scratch-slot-{mark}-{attempt}"
@@ -566,9 +586,9 @@ def verify_slot_render_round_trip(slot: Path) -> None:
               f"sha256={digs[0][:16]}")
         for name, preview in studio.adaptive_previews().items():
             preview.save(out_dir() / f"preview-{mark}-{Path(name).stem}.png")
-    record("studio_render", checks)
+    measured.setdefault("studio_render", {})[slot.name] = checks
     check(all(value["verdict"] == "PASS" for value in checks.values()),
-          "the studio renders and gates every mark without a failing leg",
+          f"{slot.name}: the studio renders and gates its own mark without a failing leg",
           f"{ {name: value['failed'] for name, value in checks.items()} }")
 
     # The enforcement, not just the report: a mark the gate rejects must stop the render, because a
@@ -584,12 +604,12 @@ def verify_slot_render_round_trip(slot: Path) -> None:
             message = str(error)
             check("BLOCKED" in message and "failed" in message,
                   "render_icon raises instead of writing an icon that fails the gate",
-                  " ".join(message.split())[:150])
+                  "the production gate rejected the injected oversized control")
         else:
             check(False, "render_icon raises instead of writing an icon that fails the gate",
                   "it returned an image")
         finally:
-            studio.CURRENT_MARK = design.DEFAULT_MARK
+            studio.CURRENT_MARK = studio_spec["mark"]
 
 
 # ---------------------------------------------------------------------------------------
@@ -599,45 +619,67 @@ def verify_slot_render_round_trip(slot: Path) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--slot", default="2026-09-26-teacher-gradebook",
-                        help="slot whose palette the renders use (read-only)")
-    parser.add_argument("--out", default=str(ROOT / ".kiln" / "icon-design" / "suite"))
+    parser.add_argument("--slot", default=None,
+                        help="round-trip this slot's own mark; omitted: round-trip all owning slots")
+    parser.add_argument("--out", default=str(ROOT / ".kiln" / "scratch" / "icon-design" / "suite"))
     parser.add_argument("--legacy-rev", default=None,
                         help="git revision holding the pre-change store-studio.py (e.g. HEAD)")
     parser.add_argument("--json", default=None, help="write the measurements here")
     options = parser.parse_args()
 
-    matches = sorted(path for path in (ROOT / "apps").iterdir()
-                     if path.is_dir() and (path.name == options.slot
-                                           or path.name.endswith(f"-{options.slot}")))
-    if len(matches) != 1:
-        raise SystemExit(f"BLOCKED: slot '{options.slot}' resolved to {[m.name for m in matches]}")
-    slot = matches[0]
+    owners = owning_slots()
+    round_trips = owners
+    if options.slot:
+        round_trips = [(slot, mark) for slot, mark in owners
+                       if slot.name == options.slot or slot.name.endswith(f"-{options.slot}")]
+        if len(round_trips) != 1:
+            parser.error(f"slot '{options.slot}' resolved to "
+                         f"{[slot.name for slot, _ in round_trips]} among slots declaring marks")
     output = Path(options.out)
     output.mkdir(parents=True, exist_ok=True)
     measured["_out"] = str(output)
-    palette = slot_palette(slot)
-    marks = [name for name in design.MARK_REGISTRY if not name.startswith("test-")]
-    print(f"slot: {slot.name}  palette roles: {len(palette)}  marks: {', '.join(marks)}")
+    palettes = {slot: slot_palette(slot) for slot, _ in owners}
+    peers = [(mark, palettes[slot]) for slot, mark in owners]
+    print("palette routing: each mark uses its owning slot's palette")
+    print(f"production round-trips: {', '.join(slot.name for slot, _ in round_trips)}")
     print(f"scratch renders: {output}")
+    owned_marks = {mark for _, mark in owners}
+    for mark in design.MARK_REGISTRY:
+        if not mark.startswith("test-") and mark not in owned_marks:
+            note(f"{mark}: no slot declares this registered mark; not a shipped-icon gate")
 
-    for mark in marks:
+    for slot, mark in owners:
+        palette = palettes[slot]
+        slot_output = output / slot.name
+        slot_output.mkdir(parents=True, exist_ok=True)
+        print(f"\nslot: {slot.name}  palette roles: {len(palette)}  mark: {mark}")
         design.assert_mark_on_grid(mark)  # raises if the mark is off the grid at all
         check(True, f"{mark}: declared on the grid (weights, keyline, optical centre, margin)")
+        before = len(failures)
         result = verify_design(mark, palette)
         verify_mask_survival(mark, result)
         verify_geometry_legs(mark, result)
         verify_opacity(mark, new_icon(mark, palette), palette)
         verify_determinism(mark, palette)
         verify_renderers_agree(mark, result)
-        verify_identity(mark, palette)
-        Image.fromarray(new_icon(mark, palette)).save(output / f"icon-{mark}-512.png")
+        verify_identity(mark, palette, peers)
+        measured.setdefault("slots", {})[slot.name] = {
+            "mark": mark, "palette": palette, "gate": result,
+            "suite_failures": failures[before:],
+        }
+        Image.fromarray(new_icon(mark, palette)).save(slot_output / f"icon-{mark}-512.png")
         Image.fromarray(new_icon(mark, palette)).resize((48, 48), Image.Resampling.LANCZOS).save(
-            output / f"icon-{mark}-48px.png")
+            slot_output / f"icon-{mark}-48px.png")
 
-    verify_field_legs(palette)
-    verify_mark_legs(palette)
-    verify_slot_render_round_trip(slot)
+    print("\n-- synthetic falsification controls, independent of the selected slot --")
+    controls = studio_default_palette()
+    with injected("field-control", design.mark_primitives(design.DEFAULT_MARK)) as mark:
+        verify_field_legs(controls, mark)
+    verify_mark_legs(controls)
+    for slot, _ in round_trips:
+        measured["_out"] = str(output / slot.name)
+        verify_slot_render_round_trip(slot)
+    measured["_out"] = str(output)
     if options.legacy_rev:
         verify_legacy_renderer(options.legacy_rev)
 

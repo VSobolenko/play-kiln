@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_load_retry_hint">Попробуйте снова загрузить главную страницу.</string>
+    <plurals name="home_tool_count">
+        <item quantity="one">Готов %1$d инструмент</item>
+        <item quantity="few">Готово %1$d инструмента</item>
+        <item quantity="many">Готово %1$d инструментов</item>
+        <item quantity="other">Готово %1$d инструмента</item>
+    </plurals>
+    <string name="home_studio_eyebrow">Студия обработки фото товаров</string>
+    <string name="home_hero_title">Фото вашего товара</string>
+    <string name="home_hero_promise">Превратите одно фото товара в изображение для объявления.</string>
+    <string name="home_import_photo">Выбрать фото</string>
+    <string name="home_hero_quiet_hint">Камера, галерея или файлы — выбираете вы.</string>
+    <string name="home_change_photo">Сменить фото</string>
+    <string name="home_preview_label">Выбранное фото товара</string>
+    <string name="home_preview_empty">Фото не выбрано</string>
+    <string name="home_preview_hint">Выберите фото, чтобы начать.</string>
+    <string name="home_preview_original">Ваш исходный снимок</string>
+    <string name="home_continue_title">Недавние фото</string>
+    <string name="home_continue_action">Открыть фото товара</string>
+    <string name="home_toolbox_title">Инструменты</string>
+    <string name="home_tool_accessibility_description">%1$s. %2$s. %3$s</string>
+    <string name="home_toolbox_note">Стоимость в кредитах указана на каждой карточке.</string>
+    <string name="home_tool_price">Цена за результат: %1$d кр.</string>
+    <string name="home_included_tool">Входит в набор инструментов</string>
+    <string name="home_cutout_description">Уберите фон с фотографии товара.</string>
+    <string name="home_listing_card_title">Карточка товара</string>
+    <string name="home_listing_card_description">Ваше фото на чистом макете с названием и ценой</string>
+    <string name="home_scene_description">Сгенерируйте новое окружение для фото товара.</string>
+    <string name="home_tool_scene_title">Сгенерировать фон</string>
+    <string name="home_relight_description">Настройте свет и тени на фотографии.</string>
+    <string name="home_expand_description">Расширьте фото до квадратного холста.</string>
+    <string name="home_recolour_description">Измените цвет товара.</string>
+    <string name="home_model_description">Посмотрите, как одежда выглядит на модели.</string>
+    <string name="home_workflow_title">Другие инструменты и экспорт</string>
+    <string name="home_auto_card_description">Превратите последнее фото в карточку для маркетплейса.</string>
+    <string name="home_slide_kit_description">Оформите серию товаров в едином фоне и стиле.</string>
+    <string name="home_listing_description">Подготовьте текст объявления на шести языках отдельно от обработки фото.</string>
+    <string name="home_coach_description">Получите подсказки для чёткого снимка до обработки.</string>
+    <string name="home_library_description">Находите товары, упорядочивайте их и обрабатывайте группами.</string>
+    <string name="home_export_description">Проверьте правила маркетплейса и подготовьте пакет экспорта.</string>
+    <string name="home_review_quote">Проверьте цену перед генерацией</string>
+    <string name="home_slide_price">Макет на устройстве · ИИ-сцена оплачивается отдельно</string>
+    <string name="home_on_device">Работа на устройстве</string>
+    <string name="home_load_failed">Не удалось загрузить недавние работы. Ваши фотографии не изменены.</string>
+    <string name="home_thumbnail_failed">Предпросмотр недоступен. Откройте товар для проверки.</string>
+    <plurals name="home_cost_chip">
+        <item quantity="one">%1$d кредит</item>
+        <item quantity="few">%1$d кредита</item>
+        <item quantity="many">%1$d кредитов</item>
+        <item quantity="other">%1$d кредита</item>
+    </plurals>
+    <string name="home_listing_text_separate">Текст объявления (отдельно)</string>
+    <string name="home_slide_kit_separate">Слайды для маркетплейсов (отдельно)</string>
+    <string name="home_marketplace_card_separate">Создать карточку объявления</string>
+    <string name="home_workflow_more">Другие инструменты и экспорт</string>
+</resources>

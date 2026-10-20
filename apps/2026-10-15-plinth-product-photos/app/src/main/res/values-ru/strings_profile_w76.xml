@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="profile_w76_title">Профиль</string>
+    <string name="profile_w76_credits_title">Кредиты</string>
+    <plurals name="profile_w76_credits_amount">
+        <item quantity="one">%1$d кредит</item>
+        <item quantity="few">%1$d кредита</item>
+        <item quantity="many">%1$d кредитов</item>
+        <item quantity="other">%1$d кредитов</item>
+    </plurals>
+    <string name="profile_w76_credits_unavailable">Баланс недоступен</string>
+    <string name="profile_w76_balance_loading">Проверяем баланс на сервере…</string>
+    <string name="profile_w76_balance_current">Текущий баланс с сервера</string>
+    <string name="profile_w76_balance_cached">Сохранённый баланс · не удалось обновить</string>
+    <string name="profile_w76_balance_unavailable">Сохранённый баланс пока недоступен</string>
+    <string name="profile_w76_balance_error">Не удалось обновить баланс</string>
+    <string name="profile_w76_open_wallet">Добавить кредиты</string>
+    <string name="profile_w76_refresh_balance">Обновить баланс</string>
+    <string name="profile_w76_history_title">Недавние результаты</string>
+    <string name="profile_w76_history_source">Здесь показаны результаты, сохранённые на этом устройстве. Полная история серверных задач пока недоступна.</string>
+    <string name="profile_w76_history_loading">Ищем сохранённые результаты…</string>
+    <string name="profile_w76_history_error">Не удалось загрузить сохранённые результаты.</string>
+    <string name="profile_w76_history_empty_title">Нет недавних результатов</string>
+    <string name="profile_w76_history_empty_body">В этом кратком списке проверяются 30 недавно обновлённых проектов. Откройте проекты, чтобы посмотреть всю библиотеку.</string>
+    <string name="profile_w76_open_library">Открыть проекты</string>
+    <string name="profile_w76_result_image">Сохранённый результат: %1$s</string>
+    <string name="profile_w76_retry">Повторить</string>
+    <string name="profile_w76_history_ready">Сохранено на этом устройстве</string>
+    <string name="profile_w76_history_loading_title">Ищем сохранённые результаты</string>
+    <string name="profile_w76_history_error_title">Результаты недоступны</string>
+    <string name="profile_w76_history_error_body">Повторите попытку или откройте проекты, чтобы посмотреть сохранённые работы.</string>
+    <string name="profile_w76_library_title">Ваши проекты</string>
+    <string name="profile_w76_library_body">Просматривайте все сохранённые фото товаров и проекты.</string>
+    <string name="profile_w76_date_now">Только что</string>
+    <string name="profile_w76_date_today">Сегодня</string>
+    <plurals name="profile_w76_date_minutes_ago">
+        <item quantity="one">%1$d мин. назад</item>
+        <item quantity="few">%1$d мин. назад</item>
+        <item quantity="many">%1$d мин. назад</item>
+        <item quantity="other">%1$d мин. назад</item>
+    </plurals>
+    <plurals name="profile_w76_date_hours_ago">
+        <item quantity="one">%1$d ч назад</item>
+        <item quantity="few">%1$d ч назад</item>
+        <item quantity="many">%1$d ч назад</item>
+        <item quantity="other">%1$d ч назад</item>
+    </plurals>
+    <plurals name="profile_w76_date_days_ago">
+        <item quantity="one">%1$d день назад</item>
+        <item quantity="few">%1$d дня назад</item>
+        <item quantity="many">%1$d дней назад</item>
+        <item quantity="other">%1$d дня назад</item>
+    </plurals>
+</resources>

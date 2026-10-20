@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="w3_preview_failed">Не удалось показать фото. Выберите другое или попробуйте открыть его снова.</string>
+    <string name="w3_selected_ready">Фото выбрано · личная копия готова</string>
+    <string name="w3_selected_photo">Выбранное фото</string>
+    <string name="w3_import_copying">Сохраняем личную копию фото…</string>
+    <string name="w3_selected">Выбрано</string>
+    <string name="w3_tap_select">Нажмите для выбора</string>
+    <string name="w3_change_photo">Выбрать другое фото</string>
+    <string name="w3_swipe_back">Смахните фото влево для возврата или нажмите «Назад» вверху.</string>
+    <string name="w3_composing">Готовим предпросмотр карточки…</string>
+    <string name="w3_choose_manually">Выбрать категорию вручную</string>
+    <string name="w3_confirm_card">Создать карточку</string>
+    <string name="w3_choose_available_scene">Выберите доступный фон ниже или оставьте исходное фото.</string>
+    <string name="w3_original_size">Исходное фото · %1$d × %2$d пикс.</string>
+    <string name="w3_result_size">Предпросмотр карточки · %1$d × %2$d пикс.</string>
+    <string name="w3_original">Исходное фото</string>
+    <string name="w3_card_preview">Предпросмотр карточки</string>
+    <string name="w3_scene_no_preview">Нет предпросмотра сцены</string>
+    <string name="w3_scene_unavailable">Сцена не загружена</string>
+    <string name="w3_scene_solid">Однотонный фон %1$d</string>
+    <string name="w3_scene_gradient">Мягкий градиент %1$d</string>
+    <string name="w3_scene_studio">Студийная сцена %1$d</string>
+    <string name="w3_scene_generated">ИИ-сцена %1$d</string>
+    <string name="w3_category_fashion">Одежда и аксессуары</string>
+    <string name="w3_category_beauty">Красота и уход</string>
+    <string name="w3_category_food">Еда и напитки</string>
+    <string name="w3_category_home">Дом и инструменты</string>
+    <string name="w3_category_more">Электроника, хобби и другое</string>
+    <string name="w3_home_start">Начните с фото товара</string>
+    <string name="w3_home_continue">Продолжите с вашим фото</string>
+    <string name="w3_home_steps">Выберите фото, проверьте категорию и фон, затем создайте карточку.</string>
+    <string name="w3_home_open_card">Открыть карточку объявления</string>
+    <string name="w3_more_tools">Другие инструменты и задачи</string>
+    <string name="w3_hide_tools">Скрыть дополнительные инструменты</string>
+    <string name="w3_tools_note">Дополнительные инструменты. Перед запуском ИИ проверьте стоимость в кредитах.</string>
+</resources>

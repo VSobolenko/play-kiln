@@ -81,11 +81,17 @@ class PlayBillingController(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     /** The purchase currently waiting on the Play UI; completed by the update listener. */
-    private var awaitingPurchase: CompletableDeferred<PlayKilnResult<Entitlements>>? = null
+    private var awaitingPurchase: CompletableDeferred<PlayKilnResult<PurchaseResolution>>? = null
+    private var awaitingProduct: ProductId? = null
+    private var awaitingIntent: PurchaseIntent? = null
 
     private val purchaseUpdateListener = PurchasesUpdatedListener { result, purchases ->
         val deferred = awaitingPurchase
+        val product = awaitingProduct
+        val intent = awaitingIntent
         awaitingPurchase = null
+        awaitingProduct = null
+        awaitingIntent = null
 
         when (result.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
@@ -94,16 +100,26 @@ class PlayBillingController(
                 // entitlements, instead of racing them.
                 val confirmed = purchases.orEmpty()
                 scope.launch {
-                    applyPurchases(confirmed)
-                    deferred?.complete(PlayKilnResult.Success(mutableEntitlements.value))
+                    val settlement = applyPurchases(confirmed, product, intent)
+                    if (product != null) {
+                        deferred?.complete(PlayKilnResult.Success(settlement.resolutionFor(product)))
+                    } else {
+                        deferred?.complete(
+                            PlayKilnResult.Failure(PlayKilnResult.Reason.NOT_AVAILABLE)
+                        )
+                    }
                 }
             }
 
-            BillingClient.BillingResponseCode.USER_CANCELED ->
+            BillingClient.BillingResponseCode.USER_CANCELED -> {
+                intent?.let { store.clearPendingPurchaseIntent(it.intentId) }
                 deferred?.complete(PlayKilnResult.Failure(PlayKilnResult.Reason.UNKNOWN))
+            }
 
-            else ->
+            else -> {
+                intent?.let { store.clearPendingPurchaseIntent(it.intentId) }
                 deferred?.complete(PlayKilnResult.Failure(PlayKilnResult.Reason.NETWORK))
+            }
         }
     }
 
@@ -162,7 +178,26 @@ class PlayBillingController(
         return PlayKilnResult.Success(mutableEntitlements.value)
     }
 
-    override suspend fun purchase(product: ProductId): PlayKilnResult<Entitlements> {
+    override suspend fun purchase(product: ProductId): PlayKilnResult<Entitlements> =
+        when (val result = launchPurchase(product, intent = null)) {
+            is PlayKilnResult.Failure -> result
+            is PlayKilnResult.Success -> PlayKilnResult.Success(result.value.entitlements)
+        }
+
+    override suspend fun purchase(
+        product: ProductId,
+        intent: PurchaseIntent,
+    ): PlayKilnResult<PurchaseResolution> {
+        if (authority == null) {
+            return PlayKilnResult.Failure(PlayKilnResult.Reason.NOT_CONFIGURED)
+        }
+        return launchPurchase(product, intent)
+    }
+
+    private suspend fun launchPurchase(
+        product: ProductId,
+        intent: PurchaseIntent?,
+    ): PlayKilnResult<PurchaseResolution> {
         if (!client.isReady) {
             return PlayKilnResult.Failure(PlayKilnResult.Reason.NOT_AVAILABLE)
         }
@@ -174,28 +209,36 @@ class PlayBillingController(
         val details = queryProductDetails(product)
             ?: return PlayKilnResult.Failure(PlayKilnResult.Reason.NOT_CONFIGURED)
 
-        val deferred = CompletableDeferred<PlayKilnResult<Entitlements>>()
-        awaitingPurchase = deferred
+        if (intent != null && !store.savePendingPurchaseIntent(product, intent)) {
+            return PlayKilnResult.Failure(PlayKilnResult.Reason.NOT_CONFIGURED)
+        }
 
-        val params = BillingFlowParams.newBuilder()
-            .setProductDetailsParamsList(
-                listOf(
-                    BillingFlowParams.ProductDetailsParams.newBuilder()
-                        .setProductDetails(details)
-                        .build()
-                )
-            )
-            .build()
+        val purchaseDeferred = CompletableDeferred<PlayKilnResult<PurchaseResolution>>()
+        awaitingPurchase = purchaseDeferred
+        awaitingProduct = product
+        awaitingIntent = intent
+
+        val params = BillingFlowParamsFactory.create(
+            productDetails = listOf(
+                BillingFlowParams.ProductDetailsParams.newBuilder()
+                    .setProductDetails(details)
+                    .build()
+            ),
+            intent = intent,
+        )
 
         val launch = client.launchBillingFlow(activity, params)
         if (launch.responseCode != BillingClient.BillingResponseCode.OK) {
             awaitingPurchase = null
+            awaitingProduct = null
+            awaitingIntent = null
+            intent?.let { store.clearPendingPurchaseIntent(it.intentId) }
             return PlayKilnResult.Failure(PlayKilnResult.Reason.UNKNOWN)
         }
 
         // The outcome arrives through the update listener, which is also why entitlements never
         // change on a failure: only a confirmed purchase reaches applyPurchases().
-        return withTimeoutOrNull(PURCHASE_TIMEOUT_MS) { deferred.await() }
+        return withTimeoutOrNull(PURCHASE_TIMEOUT_MS) { purchaseDeferred.await() }
             ?: PlayKilnResult.Failure(PlayKilnResult.Reason.NETWORK)
     }
 
@@ -356,12 +399,29 @@ class PlayBillingController(
      * consumable instead of consuming it — live in testable code.
      */
     private suspend fun applyPurchases(purchases: List<Purchase>) {
+        applyPurchases(purchases, purchaseProduct = null, purchaseIntent = null)
+    }
+
+    private suspend fun applyPurchases(
+        purchases: List<Purchase>,
+        purchaseProduct: ProductId?,
+        purchaseIntent: PurchaseIntent?,
+    ): Settlement {
+        val pending = store.loadPendingPurchaseIntent()
         val records = purchases.map { purchase ->
+            val attachedIntent = when {
+                purchaseIntent != null &&
+                    purchaseProduct != null &&
+                    purchaseProduct.value in purchase.products -> purchaseIntent
+                pending != null && pending.product.value in purchase.products -> pending.intent
+                else -> null
+            }
             PurchaseRecord(
                 token = purchase.purchaseToken,
                 productIds = purchase.products,
                 state = purchase.purchaseState.toPurchaseState(),
                 acknowledged = purchase.isAcknowledged,
+                intentId = attachedIntent?.intentId,
             )
         }
 
@@ -369,8 +429,17 @@ class PlayBillingController(
         mutableEntitlements.value = settlement.entitlements
         mutableWallet.value = settlement.wallet
 
+        if (pending != null && settlement.outcomes.any { outcome ->
+                (outcome is PurchaseOutcome.Granted && outcome.product == pending.product) ||
+                    (outcome is PurchaseOutcome.CreditedPack && outcome.product == pending.product)
+            }
+        ) {
+            store.clearPendingPurchaseIntent(pending.intent.intentId)
+        }
+
         settlement.acknowledge.forEach { token -> acknowledge(token) }
         settlement.consume.forEach { token -> consume(token) }
+        return settlement
     }
 
     /** Consuming is what makes a consumable purchasable again; it also implies acknowledgement. */

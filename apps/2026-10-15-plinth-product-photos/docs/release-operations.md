@@ -396,7 +396,7 @@ only. Never put one in a release, a doc, a test fixture or a log.
 | `RECOVERY_PEPPER` | Existing `wallet.recovery_hash` values no longer match, so old recovery codes stop working for users who wrote one down. | Rotate only with the owner's decision; announce that recovery codes must be regenerated in-app. |
 | `BILLING_BINDING_SECRET` | In-flight purchase intents carry account/profile hashes computed with the old secret and will fail confirmation. Completed purchases are unaffected. | Drain `purchase_intent WHERE used_at IS NULL` (or wait out its lifetime), then rotate and restart. |
 | `PURCHASE_TOKEN_KEK` | Rows in `purchase.state='PLAY_FINALIZING'` become undecryptable, so their finalization can never retry. | Confirm `SELECT count(*) FROM purchase WHERE state='PLAY_FINALIZING'` is 0, then rotate and restart. |
-| `FAL_KEY` | Provider calls fail until the new key is in place; credits are refunded on failure by the ledger. | Rotate at the provider, replace, restart, run one real job with the owner's spending authorization. |
+| `FAL_KEY` | Provider calls fail until the new key is in place; credits are refunded on failure by the ledger. | Run `/opt/plinth-product-photos/deploy/rotate-provider-key.sh <debug\|prod>`, then one real job with the owner's spending authorization. |
 | `PLAY_SERVICE_ACCOUNT_JSON` | Purchase verification and RTDN identity checks fail closed (503), so nobody is charged. | Replace with a new key file path/JSON, restart, confirm a purchase intent can be created. |
 
 Every rotation ends with the same proof:
@@ -409,6 +409,45 @@ curl -fsS https://pikupo.com/plinth/health
 `check-separation.sh` compares `JWT_SECRET`, `RECOVERY_PEPPER`, `BILLING_BINDING_SECRET` and
 `PURCHASE_TOKEN_KEK` between prod and debug by hash prefix and fails if they are shared. Run it after
 any rotation.
+
+### FAL_KEY provider-key rotation
+
+Run `/opt/plinth-product-photos/deploy/rotate-provider-key.sh <debug|prod>`. The new key is typed twice
+at a no-echo prompt, or read from a file the owner already keeps outside git with
+`--key-file <path>`; it is never passed as an argument, so a key never reaches the process list or the
+shell history. Two preconditions are enforced before anything is written: the value must look like a
+provider key (`<id>:<secret>`, 32–200 characters, no whitespace or quotes), and its fingerprint must
+differ from the *other* service's key — a shared key is the defect the run exists to remove, so it is a
+hard refusal, not a warning.
+
+`--dry-run` performs every check and prints what it would do, writing and restarting nothing.
+
+The write is atomic and reversible: the current env file is copied to `server[-debug].env.bak-<UTC>`
+(mode 600), the replacement is built in a temporary file in the same directory, and a redacted diff
+must show that the `FAL_KEY=` line is the only difference before it is installed. The service is then
+restarted and must answer both `/health` and `/v1/config`; if either fails, the backup is restored and
+the service restarted again, so a rotation that breaks the service leaves the previous key in place.
+
+The rotator takes the same `flock` as `release.sh` for its duration. Note that the lock *file* is
+ordinary and stays on disk after a deploy — what matters is whether a live process holds the lock, so
+the rotator asks `flock -n`, not "does the path exist".
+
+The proof is `/opt/plinth-product-photos/deploy/check-separation.sh --pair prod,debug` reporting `S4`
+as `differs`. That proves the two services no longer share a credential; it does **not** prove the new
+key is valid at the provider, because no auth-free endpoint distinguishes a good key from a bad one.
+Only one real job does — run it with the owner's spending authorization, and watch for a
+`PROVIDER`/`401` entry in `journalctl -u <unit>` before declaring the rotation complete.
+
+A queue status request is not a valid probe: `GET https://queue.fal.run/.../requests/<uuid>` answers
+`404 Request not found` for a valid key, a bogus key and no key at all (measured 2026-10-19), so it
+distinguishes nothing.
+
+### The provider key lives outside the repository
+
+The owner keeps the production provider key in `.kiln/prod.key_fal` — inside the project, under the
+gitignored `.kiln/` tree, never committed and never echoed. `--key-file` points the rotator at it. After
+a rotation, delete any transient copy from the host (`shred -u`) rather than leaving one in `/root`.
+
 
 ---
 

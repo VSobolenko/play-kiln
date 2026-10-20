@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="slide_kit_title" translatable="true">Slide kit</string>
+    <string name="slide_kit_empty" translatable="true">Choose an item and a saved series background to begin.</string>
+    <string name="slide_kit_template_picker" translatable="true">Template</string>
+    <string name="slide_kit_template_samples">Layout samples with your photos. Swipe to browse; tap to apply. Sample text is not exported.</string>
+    <string name="slide_kit_template_selected">Selected template</string>
+    <string name="slide_kit_template_not_selected">Tap to apply template</string>
+    <string name="slide_kit_template_preview_error">Layout sample unavailable: %1$s</string>
+    <string name="slide_kit_add_slide" translatable="true">Add slide</string>
+    <string name="slide_kit_slide_label" translatable="true">Slide %1$d · %2$s</string>
+    <string name="slide_kit_render_export" translatable="true">Render and export series</string>
+    <string name="slide_kit_apply_look_info" translatable="true">This series uses one saved style and the same background asset on every slide.</string>
+    <string name="slide_kit_empty_text_slots" translatable="true">This template has no text fields.</string>
+    <string name="slide_kit_characters" translatable="true">%1$d characters</string>
+    <string name="slide_kit_character_limit" translatable="true">%1$d / %2$d characters</string>
+    <string name="slide_kit_rules_not_read" translatable="true">This marketplace\'s rules for slide text were not read.</string>
+    <string name="slide_kit_matcher_unavailable" translatable="true">The prohibited-text list cannot be checked in this language. Rendering is blocked.</string>
+    <string name="slide_kit_category_unavailable" translatable="true">No matcher is implemented for these rule categories: %1$s. Rendering is blocked.</string>
+    <string name="slide_kit_finding" translatable="true">%1$s · %2$s (%3$s): “%4$s”</string>
+    <string name="slide_kit_preview" translatable="true">Series preview</string>
+    <string name="slide_kit_rendering" translatable="true">Rendering the slide series…</string>
+    <string name="slide_kit_marketplace" translatable="true">Marketplace: %1$s</string>
+    <string name="slide_kit_contrast" translatable="true">Text contrast: %1$.2f:1 (minimum %2$.1f:1)</string>
+    <string name="slide_kit_text_does_not_fit" translatable="true">Text does not fit its template plate. Shorten it or choose another template.</string>
+    <string name="slide_kit_render_error" translatable="true">The slide series could not be rendered: %1$s</string>
+    <string name="slide_kit_asset_error" translatable="true">Slide templates could not be loaded: %1$s</string>
+    <string name="slide_kit_template_hero" translatable="true">Hero</string>
+    <string name="slide_kit_template_spec3" translatable="true">Three specifications</string>
+    <string name="slide_kit_template_size" translatable="true">Size</string>
+    <string name="slide_kit_template_detail" translatable="true">Detail</string>
+    <string name="slide_kit_template_kit" translatable="true">Included parts</string>
+    <string name="slide_kit_template_use" translatable="true">In use</string>
+    <string name="slide_kit_template_variants" translatable="true">Variants</string>
+    <string name="slide_kit_template_clean" translatable="true">Clean item only</string>
+    <string name="slide_kit_slot_title" translatable="true">Title</string>
+    <string name="slide_kit_slot_spec_1" translatable="true">Specification 1</string>
+    <string name="slide_kit_slot_spec_2" translatable="true">Specification 2</string>
+    <string name="slide_kit_slot_spec_3" translatable="true">Specification 3</string>
+    <string name="slide_kit_slot_badge" translatable="true">Badge</string>
+    <string name="slide_kit_slot_caption" translatable="true">Caption</string>
+</resources>

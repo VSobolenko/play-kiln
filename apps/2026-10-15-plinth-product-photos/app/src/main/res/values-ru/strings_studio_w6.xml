@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="w6_studio_one_balance">Доступно для всех инструментов: %1$d кредитов</string>
+    <string name="w6_studio_top_up">Пополнить баланс</string>
+    <string name="w6_studio_credit_explanation">Кредиты оплачивают обработку на сервере, а не фиксированное число фото. Они списываются только за полученный результат.</string>
+    <string name="w6_studio_delivery_charge">Это предварительный расчёт, а не списание. Кредиты списываются только за полученный результат.</string>
+    <string name="w6_studio_confirm">Продолжить с этим инструментом</string>
+    <string name="w6_studio_cancel">Вернуться к выбору</string>
+    <string name="w6_studio_series_help">Выберите вид и число вариантов. Ниже показана общая стоимость и то, как изменится единый баланс.</string>
+    <string name="w6_studio_purpose_relight">Изменить освещение, чтобы подчеркнуть товар.</string>
+    <string name="w6_studio_purpose_expand">Добавить пространство вокруг фото для более широкого кадра.</string>
+    <string name="w6_studio_purpose_erase">Убрать выбранный лишний объект с фотографии.</string>
+    <string name="w6_studio_purpose_upscale_2k">Увеличить разрешение до 2K для более крупной карточки.</string>
+    <string name="w6_studio_purpose_upscale_4k">Увеличить разрешение до 4K для более крупной карточки.</string>
+    <string name="w6_studio_purpose_recolour">Показать товар в другом цвете.</string>
+    <string name="w6_studio_purpose_ghost">Показать одежду без манекена.</string>
+    <string name="w6_studio_purpose_model">Показать одежду на сгенерированной модели.</string>
+    <string name="w6_studio_purpose_series">Создать несколько вариантов одной фотографии товара.</string>
+</resources>

@@ -80,11 +80,38 @@ class FakeBillingController(
         return PlayKilnResult.Success(mutableEntitlements.value)
     }
 
-    override suspend fun purchase(product: ProductId): PlayKilnResult<Entitlements> {
+    override suspend fun purchase(product: ProductId): PlayKilnResult<Entitlements> =
+        when (val result = purchaseWithIntent(product, intent = null)) {
+            is PlayKilnResult.Failure -> result
+            is PlayKilnResult.Success -> PlayKilnResult.Success(result.value.entitlements)
+        }
+
+    override suspend fun purchase(
+        product: ProductId,
+        intent: PurchaseIntent,
+    ): PlayKilnResult<PurchaseResolution> =
+        purchaseWithIntent(product, intent)
+
+    private suspend fun purchaseWithIntent(
+        product: ProductId,
+        intent: PurchaseIntent?,
+    ): PlayKilnResult<PurchaseResolution> {
         recorded += "purchase"
 
+        if (intent != null) {
+            if (authority == null) {
+                return PlayKilnResult.Failure(PlayKilnResult.Reason.NOT_CONFIGURED)
+            }
+            if (!store.savePendingPurchaseIntent(product, intent)) {
+                return PlayKilnResult.Failure(PlayKilnResult.Reason.NOT_CONFIGURED)
+            }
+        }
+
         val scripted = remainingOutcomes[product]?.removeFirstOrNull()
-        if (scripted is PlayKilnResult.Failure) return scripted
+        if (scripted is PlayKilnResult.Failure) {
+            intent?.let { store.clearPendingPurchaseIntent(it.intentId) }
+            return scripted
+        }
 
         // A synthetic token makes the fake exercise the real token-based idempotency path.
         purchaseCounter += 1
@@ -92,13 +119,22 @@ class FakeBillingController(
             token = "fake-token-$purchaseCounter",
             productIds = listOf(product.value),
             state = PurchaseState.PURCHASED,
+            intentId = intent?.intentId,
         )
 
         val settlement = ledger.settle(listOf(record), connectedCatalog)
         mutableEntitlements.value = settlement.entitlements
         mutableWallet.value = settlement.wallet
 
-        return PlayKilnResult.Success(mutableEntitlements.value)
+        if (intent != null && settlement.outcomes.any { outcome ->
+                (outcome is PurchaseOutcome.Granted && outcome.product == product) ||
+                    (outcome is PurchaseOutcome.CreditedPack && outcome.product == product)
+            }
+        ) {
+            store.clearPendingPurchaseIntent(intent.intentId)
+        }
+
+        return PlayKilnResult.Success(settlement.resolutionFor(product))
     }
 
     override suspend fun acknowledgePendingPurchases(): PlayKilnResult<Unit> {

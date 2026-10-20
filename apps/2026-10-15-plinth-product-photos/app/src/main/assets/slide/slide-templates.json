@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "templates": [
+    { "id": "hero", "layout": "item-centre-title-top", "slots": ["TITLE", "BADGE"] },
+    { "id": "spec3", "layout": "item-left-three-spec-plates-right", "slots": ["TITLE", "SPEC_1", "SPEC_2", "SPEC_3"] },
+    { "id": "size", "layout": "item-dimension-lines", "slots": ["TITLE", "SPEC_1", "SPEC_2"] },
+    { "id": "detail", "layout": "zoomed-item-caption", "slots": ["CAPTION"] },
+    { "id": "kit", "layout": "included-parts-grid", "slots": ["TITLE", "CAPTION"] },
+    { "id": "use", "layout": "item-on-saved-scene", "slots": ["CAPTION"] },
+    { "id": "variants", "layout": "item-variant-chips", "slots": ["TITLE", "SPEC_1"] },
+    { "id": "clean", "layout": "item-only", "slots": [] }
+  ]
+}

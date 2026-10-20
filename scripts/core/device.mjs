@@ -364,6 +364,57 @@ export function deviceFixtures() {
     const cases = []
 
     cases.push([
+      'RULE server runtime state and compiled output are not build inputs',
+      () => {
+        const dir = freshDir('server-runtime-output')
+        const before = releaseSourceDigest(dir)
+        for (const relative of [
+          ['server', 'data', 'server.sqlite-wal'],
+          ['server', 'data', 'server.sqlite-shm'],
+          ['server', 'data', 'server.sqlite'],
+          ['server', 'data', 'results', 'photo.png'],
+          ['server', 'dist', 'index.js']
+        ]) {
+          const file = path.join(dir, ...relative)
+          mkdirSync(path.dirname(file), { recursive: true })
+          writeFileSync(file, 'created runtime or compiled bytes\n')
+          expectEqual(releaseSourceDigest(dir).digest, before.digest, `${relative.join('/')} creation`)
+          writeFileSync(file, 'rewritten runtime or compiled bytes\n')
+          const after = releaseSourceDigest(dir)
+          expectEqual(after.digest, before.digest, `${relative.join('/')} rewrite`)
+          expectEqual(after.files, before.files, `${relative.join('/')} input count`)
+        }
+      }
+    ])
+
+    cases.push([
+      'RULE server source remains a build input and exclusions are slot-relative directory paths',
+      () => {
+        const dir = freshDir('server-source-inputs')
+        for (const relative of [
+          ['server', 'src', 'index.ts'],
+          ['server', 'package.json'],
+          ['server', 'tsconfig.json'],
+          ['server', 'test', 'index.test.ts'],
+          ['app', 'src', 'server', 'data', 'input.json'],
+          ['app', 'src', 'server', 'dist', 'input.json'],
+          ['server', 'database', 'input.json'],
+          ['server', 'distribution', 'input.json']
+        ]) {
+          const file = path.join(dir, ...relative)
+          mkdirSync(path.dirname(file), { recursive: true })
+          writeFileSync(file, 'original source bytes\n')
+          const before = releaseSourceDigest(dir).digest
+          writeFileSync(file, 'edited source bytes\n')
+          expectTrue(
+            releaseSourceDigest(dir).digest !== before,
+            `${relative.join('/')} edit did not change the digest`
+          )
+        }
+      }
+    ])
+
+    cases.push([
       'RULE record present, artifact absent — a well-formed record PASSes and the cross-check is named as not run',
       () => {
         const dir = freshDir('valid-no-apk')

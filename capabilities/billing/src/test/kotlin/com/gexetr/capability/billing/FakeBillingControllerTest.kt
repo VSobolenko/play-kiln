@@ -53,6 +53,34 @@ class FakeBillingControllerTest {
     }
 
     @Test
+    fun `intent purchase reports observed rather than granted when authority rejects`() = runTest {
+        val rejected = object : PurchaseAuthority {
+            override suspend fun confirmPurchase(purchaseToken: String, product: ProductId) =
+                PlayKilnResult.Failure(PlayKilnResult.Reason.NOT_CONFIGURED)
+
+            override suspend fun confirmPurchase(
+                purchaseToken: String,
+                product: ProductId,
+                intentId: String,
+            ) = PlayKilnResult.Failure(PlayKilnResult.Reason.POLICY_BLOCKED)
+
+            override suspend fun confirmSpend(unit: String, amount: Long) =
+                PlayKilnResult.Success(Unit)
+        }
+        val fake = FakeBillingController(authority = rejected)
+        fake.connect(BillingCatalog(inAppProducts = listOf(product)))
+
+        val result = fake.purchase(
+            product,
+            PurchaseIntent("intent-rejected", "account-hash", "profile-hash"),
+        )
+
+        val resolution = (result as PlayKilnResult.Success<PurchaseResolution>).value
+        assertEquals(PurchaseResolutionState.PURCHASE_OBSERVED, resolution.state)
+        assertFalse(fake.entitlements.value.owns(product.key()))
+    }
+
+    @Test
     fun `a consumable purchase credits the wallet and never becomes an entitlement`() = runTest {
         val pack = ProductId("tokens_100")
         val fake = FakeBillingController()

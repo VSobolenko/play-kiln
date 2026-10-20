@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "slug": "placard-menu-price-cards",
+  "archetype": "purchase_led_repeat_sales",
+  "priceUsd": 14.99,
+  "payingUser": "The owner-operator of a small local business with no designer and no design budget - a cafe, food truck, market stall, deli, salon, barber, nail studio, gym, personal trainer, tutor, florist or repair shop - who needs a menu, a price card, a table tent or a window sign with the prices they actually charge, on the phone they already hold.",
+  "paidUnit": "A pack of credits, where one brand set costs 2 credits (one generated background at $0.050 plus one absorbed recognition at $0.010) and becomes five print and display artefacts because the typesetting happens free on the device. Starter $14.99 buys 5 sets, Studio $34.99 buys 15, Workshop $79.99 buys 40; a one-time $19.99 unlock removes the print-export limit and the brand-kit limit and costs nothing to serve.",
+  "momentOfPayment": "At the first server-cost operation after the free starter grant of 10 credits (5 sets, $0.30 per device to serve) is spent - the moment the owner wants a background generated for the list they have just laid out - with the set's price shown before the tap; and again at the first export past the free limit, where the one-time unlock is offered beside the packs and never in front of the first card.",
+  "distinctnessSentence": "One typed price list becomes five print and display artefacts - menu, price card, table tent, window sign and story post - from one generated background, with every price typeset on the phone from the shop's own data instead of drawn by a model, and exported as a print page with no watermark.",
+  "day1RevenuePath": "A shop that installs installs to print today's card, not to browse: it imports the CSV or photographs the old card, spends the 5 free sets, and hits the first paid background inside the first session - so day 1 collects a pack price from a user whose need arrived with them, and the measured warm-up is that the app is opened when a price changes or the season does.",
+  "evidenceRef": "docs/ideation/2026-10-16-ecosystem-smb-marketing.md#3-demand-evidence-labelled",
+  "capabilitiesRequired": [
+    "billing"
+  ],
+  "capabilitiesMustStayDisabled": [
+    "ads"
+  ],
+  "killCriteria": {
+    "windowDays": 90,
+    "minInstalls": 1500,
+    "minRevenueUsd": 250
+  },
+  "unitEconomics": {
+    "netFactor": 0.8081766,
+    "netFactorFormula": "(1 - 0.01 fraud) * (1 - 0.15 billing) * (1 - 0.02 refund) * (1 - 0.02 fx) = 0.99 * 0.85 * 0.98 * 0.98",
+    "requiredMultipleK": 3.0933833,
+    "requiredMultipleFormula": "1 / [0.8081766 * (1 - 0.60)] = 1 / 0.32327064",
+    "costFloorPerSetUsd": 0.1856,
+    "costPerSetUsd": 0.06,
+    "costPerSetBreakdown": [
+      {
+        "op": "O-07",
+        "model": "fal-ai/flux/dev",
+        "job": "generate the background the card is typeset on",
+        "credits": 2,
+        "providerCostUsd": 0.05
+      },
+      {
+        "op": "O-01",
+        "model": "fal-ai/any-llm/vision",
+        "job": "read the photographed dish or the old price card on import",
+        "credits": 0,
+        "providerCostUsd": 0.01
+      },
+      {
+        "op": "on-device",
+        "job": "typeset the item names, prices, QR code and grid",
+        "credits": 0,
+        "providerCostUsd": 0
+      }
+    ],
+    "costPerSetSource": "docs/research/2026-10-16-money-ecosystem-ranking.md#1 (O-01 $0.010 at 0 credits, O-07 $0.050 at 2 credits) and #4 C3",
+    "divisorSource": "docs/monetization-strategy.md#2.2 (:165-183 the formula, :204-212 the assumptions); fee sensitivity at 25-30% raises K to 3.5058-3.7562",
+    "ratioCheck": "Studio pack: $34.99 / 15 sets = $2.3327 per set; $2.3327 / $0.060 = 38.9x, against a required floor of K = 3.09x"
+  },
+  "packs": [
+    {
+      "sku": "starter_5_sets",
+      "priceUsd": 14.99,
+      "sets": 5,
+      "grossNetAfterPlayUsd": 12.11,
+      "modelCostUsd": 0.3,
+      "netPerSaleUsd": 11.81,
+      "salesPerMonthFor1000Usd": 85
+    },
+    {
+      "sku": "studio_15_sets",
+      "priceUsd": 34.99,
+      "sets": 15,
+      "grossNetAfterPlayUsd": 28.28,
+      "modelCostUsd": 0.9,
+      "netPerSaleUsd": 27.38,
+      "salesPerMonthFor1000Usd": 37
+    },
+    {
+      "sku": "workshop_40_sets",
+      "priceUsd": 79.99,
+      "sets": 40,
+      "grossNetAfterPlayUsd": 64.65,
+      "modelCostUsd": 2.4,
+      "netPerSaleUsd": 62.25,
+      "salesPerMonthFor1000Usd": 16
+    },
+    {
+      "sku": "print_and_brand_unlock",
+      "priceUsd": 19.99,
+      "nonConsumable": true,
+      "grossNetAfterPlayUsd": 16.16,
+      "modelCostUsd": 0,
+      "netPerSaleUsd": 16.16,
+      "salesPerMonthFor1000Usd": 62
+    }
+  ],
+  "freeTierCost": {
+    "starterGrantCreditsPerDevice": 10,
+    "setsPerDevice": 5,
+    "providerCostPerDeviceUsd": 0.3,
+    "starterBudgetUsdPerDay": 10,
+    "globalSpendCapUsdPerDay": 25,
+    "source": "docs/research/2026-10-16-money-ecosystem-ranking.md#1.1 and #2 (config.ts:73-74, purchases.ts)"
+  },
+  "rejectedArchetypes": [
+    {
+      "archetype": "purchase_led_single_unlock",
+      "revenueReason": "One price against a recurring per-use cost: a shop printing 40 sets a month costs 40 * $0.060 = $2.40 every month while a $19.99 unlock nets $16.16 once, and a 400-set month for a small chain costs $24.00 - the unlock turns negative in its first month and stays there."
+    },
+    {
+      "archetype": "ads_led_utility",
+      "revenueReason": "A rewarded-centric app earns about $0.05 per DAU per day, so 1000 DAU is $1500/month, while the free tier this job needs - one set per user per day - costs 1000 * $0.060 = $1800/month: the free tier costs $300/month more than the ads earn before any other cost, and at the cheaper background-only set ($0.050) it breaks exactly even at zero margin."
+    },
+    {
+      "archetype": "purchase_only_no_ads",
+      "revenueReason": "A Play Console price with no discovery lever (docs/monetization-strategy.md#4), and it cannot fund a per-use provider cost any better than the single unlock can."
+    },
+    {
+      "archetype": "subscription",
+      "revenueReason": "Banned by the owner (2026-10-01), absent from ARCHETYPES and machine-refused by parseEconomics with no exemption path; not weighed."
+    }
+  ],
+  "assumptionsUnverified": [
+    "No conversion rate is measured anywhere for this shelf: the only figure the factory holds (about 1-3% for a one-time in-app purchase) is labelled UNVERIFIED in docs/monetization-strategy.md#4, so the sales-per-month column is a division of the target, not a forecast.",
+    "The pack ladder ($14.99 / $34.99 / $79.99 / $19.99) is this role's proposal, not a market price: every enriched competitor card on the price-card shelf printed free with in-app purchases, so no competitor's Android price anchors it.",
+    "The effective Play fee tier for this account is unverified; at 25-30% the net factor falls to 0.7130970-0.6655572 and K rises to 3.5058-3.7562, which raises the per-set floor to $0.21035-$0.22537. The Studio pack's $2.3327 per set still clears it, but the ladder has less room.",
+    "The provider costs are the factory's own registry values, not a live fal read taken today: the decider is re-reading each endpoint's model page, which docs/research/2026-10-16-generation-capability-inventory.md lists under what is still missing.",
+    "Whether small-business owners will install a phone app for print work at all is the kill criterion and is unmeasured until this slot's own store/outcomes.json reading exists.",
+    "The generation registry, adapter, routes and server are slot-local rather than a published capability, and the background operation (O-07) is enabled in the registry but has never been reachable from a shipped UI, so its end-to-end readiness is unverified until it is driven once.",
+    "Whether an image model actually mangles prices was not tested in this session (no generation was run, because the server's provider key is not set for a recon run): the decider is one authenticated call to the flux endpoint with a prompt containing 7.90 and 12.50, and the design holds either way because the measured complaint is lost price data rather than model spelling.",
+    "Whether a print shop accepts the exported PDF as a print-ready imposition (page size, bleed, colour space) is unverified: no print shop was consulted, and the promise is a print page rather than a printer's imposition.",
+    "Every demand reading here came from one signed-out Play session on one storefront with a display cap of roughly 30 cards, and relevance order is not size order, so a larger incumbent can sit below the cut.",
+    "The name Placard was not trademark-searched and no Play title search was run: the decider is a Play search for the exact title plus a class-9 search of TMview, USPTO, EUIPO and WIPO."
+  ],
+  "notes": [
+    "Capability pairing: purchase_led_repeat_sales requires the billing capability to be enabled, and ads must stay disabled - an ad-led version of this app loses money by construction (see rejectedArchetypes).",
+    "The one structural fact that makes this plan cheap: one generated background feeds five deliverables, because the layout and typesetting work happens on the device for free. That is why the price-to-cost ratio is 38.9x rather than the 3.3x a credit-priced recipe runs at.",
+    "A server is required and its cost is stated rather than discovered: the generated background is a provider call with a server-only key, so the factory's existing generation server (server-authoritative credits, Play-confirmed purchases, two-phase reserve/settle/release, $25/day spend cap, release-on-failure) is the shape, and its cost is the $0.060 per set above."
+  ]
+}

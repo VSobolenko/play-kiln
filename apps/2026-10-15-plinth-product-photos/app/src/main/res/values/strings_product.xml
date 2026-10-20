@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_product_credit_model" translatable="true">Credits pay for provider-powered processing. You get 10 starter credits per device; one-time credit packs add more. A separate one-time Plinth Unlock removes the free export watermark and five-item batch limit, but does not include processing credits. There is no subscription. The app shows the price and credit cost before you confirm.</string>
+    <string name="about_product_provenance" translatable="true">The app distinguishes original pixels, manually adjusted images, AI-enhanced images, and images with generated backgrounds. AI-generated results are labelled and can be reported in the app. Plinth does not claim C2PA Content Credentials.</string>
+    <string name="about_product_rights" translatable="true">You confirm that you have the rights to the photos you use.</string>
+    <string name="about_product_version" translatable="true">Plinth AI: Product Photos · version %1$s (%2$d)</string>
+    <string name="settings_product_privacy_title" translatable="true">Privacy policy</string>
+    <string name="settings_product_privacy_summary" translatable="true">Read what data Plinth handles and how long it is kept.</string>
+    <string name="settings_product_delete_title" translatable="true">Delete my data</string>
+    <string name="settings_product_delete_summary" translatable="true">Email Plinth to request deletion of data linked to this installation.</string>
+    <string name="settings_product_delete_subject" translatable="true">Plinth data deletion request</string>
+    <string name="settings_product_delete_body" translatable="true">I request deletion of the data associated with my Plinth installation. Please tell me what information you need to identify and verify my request.</string>
+    <string name="settings_product_review_summary" translatable="true">Share feedback or feature requests in your Google Play review.</string>
+    <string name="product_support_email" translatable="false">v.sobolenko.vs@gmail.com</string>
+    <string name="privacy_policy_url" translatable="false">https://telegra.ph/Plinth-Product-Photos--privacy-policy-10-15</string>
+</resources>

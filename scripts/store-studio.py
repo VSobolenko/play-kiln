@@ -35,7 +35,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
 # The mark's construction grid, stroke scale and primitives live in the design system, and the
 # measurements that decide whether the rendered mark is a designed mark live beside it. Both are
@@ -666,20 +666,105 @@ def device_frame(source: Image.Image, outer_height: int, *, radius: int, bezel: 
     return device
 
 
-def render_screenshot(size: tuple[int, int], shot: dict, source: Image.Image) -> Image.Image:
-    """A composed marketing image: branded field, benefit-led headline, real screen."""
+def _art_cover(plate: Image.Image, size: tuple[int, int],
+               top_trim: float = 0.0) -> Image.Image:
+    """Cover-crop a generated plate to the canvas, keeping its aspect ratio and its centre.
+
+    `top_trim` removes a fraction of the plate's top before the cover crop, which zooms the
+    remaining field and lifts its subject up the canvas. A generated product plate centres its
+    object, and the device frame stands from about a third of the way down: without the lift the
+    object is exactly the part the screen hides, and the photograph would be a lit background
+    nobody can identify. Trimming the empty top is what puts the product in the band above it.
+    """
+    width, height = size
+    source = plate.convert("RGB")
+    if top_trim > 0:
+        trim = min(round(source.height * top_trim), source.height - 1)
+        source = source.crop((0, trim, source.width, source.height))
+    scale = max(width / source.width, height / source.height)
+    resized = source.resize((max(width, round(source.width * scale)),
+                             max(height, round(source.height * scale))),
+                            Image.Resampling.LANCZOS)
+    left = (resized.width - width) // 2
+    top = (resized.height - height) // 2
+    return resized.crop((left, top, left + width, top + height))
+
+
+def _scrim(size: tuple[int, int], height_ratio: float, top_alpha: int, bottom_alpha: int) -> Image.Image:
+    """A vertical ink veil: opaque at the top, fading out below `height_ratio`.
+
+    Text over photography needs a field to sit on or the headline fights the image. This is that
+    field, and it is why an art plate can carry a caption at all.
+    """
+    width, height = size
+    veil = Image.new("RGBA", size, (0, 0, 0, 0))
+    stop = max(1, round(height * height_ratio))
+    for y in range(stop):
+        t = y / stop
+        alpha = round(top_alpha + (bottom_alpha - top_alpha) * t)
+        if alpha <= 0:
+            continue
+        ImageDraw.Draw(veil).line((0, y, width, y), fill=INK + (alpha,))
+    return veil
+
+
+def render_screenshot(size: tuple[int, int], shot: dict, source: Image.Image,
+                      art: Image.Image | None = None) -> Image.Image:
+    """A composed marketing image: art plate, benefit-led headline, real screen.
+
+    Two compositions live here and they share everything but the field. With an art plate the
+    frame is a photograph of an object under studio light, faded into the slot's ink, with the
+    real screen standing on it — the shape every serious photo app ships. Without one the field
+    falls back to the drawn gradient, so a slot with no plates still renders a legal pack.
+    """
     width, height = size
     scale = height / 1920
-    image = diagonal_gradient(size, INK, INK_SOFT, 116).convert("RGBA")
-    image = Image.alpha_composite(image, glow(size, (width * 0.5, height * 0.80),
-                                              max(width, height) * 0.58, CYAN_DEEP, 74))
-    image = Image.alpha_composite(image, glow(size, (width * 0.06, height * 0.06),
-                                              max(width, height) * 0.36, AMBER_DEEP, 58))
-    image = Image.alpha_composite(image, blueprint_grid(size, round(58 * scale), 12))
 
-    draw = ImageDraw.Draw(image)
+    if art is None:
+        image = diagonal_gradient(size, INK, INK_SOFT, 116).convert("RGBA")
+        image = Image.alpha_composite(image, glow(size, (width * 0.5, height * 0.80),
+                                                  max(width, height) * 0.58, CYAN_DEEP, 74))
+        image = Image.alpha_composite(image, glow(size, (width * 0.06, height * 0.06),
+                                                  max(width, height) * 0.36, AMBER_DEEP, 58))
+        image = Image.alpha_composite(image, blueprint_grid(size, round(58 * scale), 12))
+    else:
+        image = _art_cover(art, size, ART_TOP_TRIM).convert("RGBA")
+        # The photograph is the frame's colour, so it is graded bright and left almost unfiltered:
+        # a veil heavy enough to make the headline easy turns the plate into a dark texture nobody
+        # can identify, and a listing whose six frames are all mud reads as one dim image. Contrast
+        # is bought with a gradient under the copy, not with a wash over the whole field.
+        image = ImageEnhance.Color(image.convert("RGB")).enhance(ART_SATURATION).convert("RGBA")
+        image = ImageEnhance.Brightness(image).enhance(ART_BRIGHTNESS)
+        image = Image.alpha_composite(image, Image.new("RGBA", size, INK + (ART_VEIL,)))
+        # Text field: dense at the very top, gone before the subject's body, so the headline sits on
+        # a gradient rather than on a slab.
+        image = Image.alpha_composite(image, _scrim(size, ART_TEXT_STOP, ART_TEXT_ALPHA, 0))
+        base_from = round(height * ART_BASE_FROM)
+        base = Image.new("RGBA", size, (0, 0, 0, 0))
+        span = max(1, height - base_from)
+        for index in range(span):
+            y = base_from + index
+            t = index / span
+            # Ease-in so the transition hides behind the device rather than banding above it.
+            alpha = round(255 * (t ** ART_BASE_POWER))
+            ImageDraw.Draw(base).line((0, y, width, y), fill=INK + (alpha,))
+        image = Image.alpha_composite(image, base)
+        image = Image.alpha_composite(image, glow(size, (width * 0.08, height * 0.05),
+                                                  max(width, height) * 0.42, AMBER, 34))
+        image = Image.alpha_composite(image, blueprint_grid(size, round(64 * scale), 9))
+
     margin = round(84 * scale)
     cursor = round(96 * scale)
+
+    # All copy is drawn on its own layer so it can carry a shadow without punching alpha holes in
+    # the art below it.
+    text_layer = Image.new("RGBA", size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(text_layer)
+    shadow_offset = max(2, round(4 * scale))
+
+    def draw_text(xy, text, face, fill, shadow_alpha=120):
+        draw.text((xy[0], xy[1] + shadow_offset), text, font=face, fill=(0, 0, 0, shadow_alpha))
+        draw.text(xy, text, font=face, fill=fill)
 
     kicker_face = font(round(27 * scale), bold=True)
     if shot.get("kicker"):
@@ -689,37 +774,56 @@ def render_screenshot(size: tuple[int, int], shot: dict, source: Image.Image) ->
                     kicker_face, AMBER, round(5 * scale))
         cursor += round(58 * scale)
 
-    headline_face = font(round(72 * scale), bold=True)
+    headline_face = font(round(78 * scale), bold=True)
     for line in wrap(draw, shot.get("headline", ""), headline_face, width - 2 * margin)[:2]:
-        draw.text((margin, cursor), line, font=headline_face, fill=PAPER)
+        draw_text((margin, cursor), line, headline_face, PAPER, shadow_alpha=150)
         cursor += round(86 * scale)
 
     body_face = font(round(32 * scale))
     cursor += round(10 * scale)
-    for line in wrap(draw, shot.get("body", ""), body_face, width - 2 * margin)[:2]:
-        draw.text((margin, cursor), line, font=body_face, fill=MUTED)
+    body_lines = wrap(draw, shot.get("body", ""), body_face, width - 2 * margin)[:2]
+    for line in body_lines:
+        draw_text((margin, cursor), line, body_face, PAPER + (200,), shadow_alpha=110)
         cursor += round(45 * scale)
+    image = Image.alpha_composite(image, text_layer)
 
     bezel = max(10, round(17 * scale))
     radius = round(52 * scale)
-    available = height - cursor - round(52 * scale) - round(56 * scale)
-    outer_width = 0
-    outer_height = available
     aspect = source.width / source.height
-    if (available - 2 * bezel) * aspect + 2 * bezel > width - 2 * margin:
-        # Tall, narrow targets (tablets) can leave the device too wide; fit it to the margins.
-        outer_width = width - 2 * margin
-        outer_height = round((outer_width - 2 * bezel) / aspect) + 2 * bezel
+    if art is None:
+        available = height - cursor - round(52 * scale) - round(56 * scale)
+        outer_height = available
+        if (available - 2 * bezel) * aspect + 2 * bezel > width - 2 * margin:
+            # Tall, narrow targets (tablets) can leave the device too wide; fit it to the margins.
+            outer_width = width - 2 * margin
+            outer_height = round((outer_width - 2 * bezel) / aspect) + 2 * bezel
+        y = cursor + round(52 * scale)
+    else:
+        # Over art the device is pinned to a fixed top line so the photograph keeps a band of
+        # its subject above it, and the headline block never collides with the bezel. It is then
+        # allowed to run past the bottom edge: a device that has to fit inside the canvas is a
+        # device sized by the poster rather than by the screen, and the app's own type ends up too
+        # small to read at the size the store actually shows these images.
+        device_top = max(cursor + round(32 * scale), round(height * 0.360))
+        outer_height = (height - device_top - round(36 * scale)
+                        + round(height * ART_BOTTOM_BLEED))
+        max_width = width - round(margin * 1.2)
+        if (outer_height - 2 * bezel) * aspect + 2 * bezel > max_width:
+            outer_width = max_width
+            outer_height = round((outer_width - 2 * bezel) / aspect) + 2 * bezel
+        y = device_top
     device = device_frame(source, outer_height, radius=radius, bezel=bezel)
     x = (width - device.width) // 2
-    y = cursor + round(52 * scale)
 
     shadow = Image.new("RGBA", size, (0, 0, 0, 0))
     ImageDraw.Draw(shadow).rounded_rectangle(
-        (x + round(10 * scale), y + round(16 * scale),
-         x + device.width + round(10 * scale), y + device.height + round(16 * scale)),
-        radius=radius, fill=(0, 0, 0, 140))
-    image = Image.alpha_composite(image, shadow.filter(ImageFilter.GaussianBlur(round(24 * scale))))
+        (x + round(10 * scale), y + round(18 * scale),
+         x + device.width + round(10 * scale), y + device.height + round(18 * scale)),
+        radius=radius, fill=(0, 0, 0, 165))
+    image = Image.alpha_composite(image, shadow.filter(ImageFilter.GaussianBlur(round(28 * scale))))
+    if y + device.height > height:
+        # The device bleeds off the bottom; composite only the part the canvas can hold.
+        device = device.crop((0, 0, device.width, height - y))
     image.alpha_composite(device, (x, y))
     return image.convert("RGB")
 
@@ -877,6 +981,65 @@ def load_shots(store: Path) -> list[dict]:
         return []
     journey = json.loads(journey_path.read_text(encoding="utf-8"))
     return journey.get("shots", [])[:6]
+
+
+# The generated plates a slot can place behind its screenshots, in the order the six phone shots
+# consume them. A slot opts in by writing the files under `store/art/`; a slot with no plates keeps
+# the drawn field, because an absent photograph is not a failure and a stand-in texture would be a
+# picture of nothing. Each name is a subject, not a colour: the shot order in `journey.json` decides
+# which product stands behind which claim.
+ART_PLATES = (
+    "hero-vase",
+    "hero-sneaker",
+    "hero-perfume",
+    "hero-candle",
+    "hero-bag",
+    "scene-studio",
+)
+
+# How much of a generated plate's empty top is trimmed before the cover crop, and how far the
+# device frame is allowed to run past the bottom edge of the canvas. Both exist for the same
+# reason: a product plate centres its object and a device that must fit on the canvas ends up
+# showing the app too small to read. The trim lifts the object into the band above the screen,
+# the bleed buys the screen the height that would otherwise be spent on margin.
+ART_TOP_TRIM = 0.10
+ART_BOTTOM_BLEED = 0.10
+
+# How the art plate is graded before the copy is drawn on it. These are the numbers that decide
+# whether the six frames look like photographs or like a dark background with a phone on it: the
+# veil is deliberately light, the text gradient is short and dense at the top, and the fade to the
+# slot's graphite starts low enough that the subject keeps its body. A brighter, more saturated
+# plate is also what makes six shots look like six pictures instead of one repeated field.
+ART_SATURATION = 1.14
+ART_BRIGHTNESS = 1.06
+ART_VEIL = 16
+ART_TEXT_STOP = 0.38
+ART_TEXT_ALPHA = 182
+ART_BASE_FROM = 0.62
+ART_BASE_POWER = 2.0
+
+
+def load_art_plates(store: Path) -> list[Image.Image]:
+    """Load whichever generated plates this slot carries, in the declared order.
+
+    A plate that exists but cannot be decoded is fatal rather than skipped: the pack would then
+    mix one run's art with another's, and nothing downstream measures the photograph's identity.
+    """
+    plates: list[Image.Image] = []
+    for name in ART_PLATES:
+        path = store / "art" / f"{name}.png"
+        if not path.is_file():
+            continue
+        try:
+            with Image.open(path) as source:
+                plates.append(source.convert("RGB").copy())
+        except OSError as error:
+            raise SystemExit(
+                f"BLOCKED: art plate {path} exists but cannot be read ({error}). Delete it or "
+                "regenerate it; composing a screenshot set around a broken plate would ship a "
+                "pack whose background is not the one that was reviewed."
+            ) from error
+    return plates
 
 
 def assert_capture_is_plausible(path: Path, image: Image.Image) -> None:
@@ -1084,13 +1247,15 @@ def render_slot(slot: Path, *, preview_circle: bool = False, identity_only: bool
         renders.append((target, feature_render, "1024x500"))
     if not identity_only:
         shots_rendered: list[tuple[str, object, str]] = []
+        art_plates = load_art_plates(store)
         for kind, (count, dimensions) in SCREEN_TARGETS.items():
             for index in range(1, count + 1):
                 source = sources[(index - 1) % len(sources)]
                 item = composed_items[(index - 1) % len(composed_items)] if composed_items else {
                     "headline": "", "body": "", "kicker": ""}
+                art = art_plates[(index - 1) % len(art_plates)] if art_plates else None
                 shots_rendered.append(
-                    (f"{kind}-{index:02d}.png", render_screenshot(dimensions, item, source),
+                    (f"{kind}-{index:02d}.png", render_screenshot(dimensions, item, source, art),
                      f"{dimensions[0]}x{dimensions[1]}")
                 )
         for locale in locales:

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="studio_tools_title" translatable="true">Инструменты студии</string>
+    <string name="studio_tools_heading" translatable="true">Инструменты для этой фотографии товара</string>
+    <string name="studio_catalogue_notice" translatable="true">В каталоге показана доступность по конфигурации; он не утверждает, что инструмент работает.</string>
+    <string name="studio_s2_notice" translatable="true">Улучшенные инструменты недоступны, пока не измерены пороговые значения точности (S2).</string>
+    <string name="studio_balance" translatable="true">Баланс кредитов: %1$d</string>
+    <string name="studio_cost_and_balance" translatable="true">Стоимость: %1$d кредитов · сейчас доступно: %2$d</string>
+    <string name="studio_cost_balance_after" translatable="true">Стоимость: %1$d кредитов · сейчас доступно: %2$d · после получения: %3$d</string>
+    <string name="studio_series_cost_after" translatable="true">Общий резерв: %1$d кредитов · вариантов: %2$d, за каждый: %3$d · сейчас доступно: %4$d · после получения всех: %5$d</string>
+    <string name="studio_series_cost_insufficient" translatable="true">Общий резерв: %1$d кредитов · вариантов: %2$d, за каждый: %3$d · сейчас доступно: %4$d</string>
+    <string name="studio_insufficient_credits" translatable="true">Дефицит кредитов: %1$d · баланс: %2$d</string>
+    <string name="studio_operation_available" translatable="true">Доступно</string>
+    <string name="studio_operation_unavailable" translatable="true">Недоступно</string>
+    <string name="studio_operation_select" translatable="true">Выбрать</string>
+    <string name="studio_open_wallet" translatable="true">Открыть кошелёк</string>
+    <string name="studio_provenance_original" translatable="true">Происхождение результата: исходные пиксели</string>
+    <string name="studio_provenance_adjusted" translatable="true">Происхождение результата: изменено вручную</string>
+    <string name="studio_provenance_composite" translatable="true">Происхождение результата: товар не изменён · фон сгенерирован</string>
+    <string name="studio_provenance_enhanced" translatable="true">Происхождение результата: ENHANCED</string>
+    <string name="studio_provenance_inherited" translatable="true">Происхождение результата: унаследовано от результата операции</string>
+    <string name="studio_reason_original_only" translatable="true">Эта торговая площадка запрещает редактирование; разрешены только предусмотренные действия с исходной фотографией.</string>
+    <string name="studio_reason_s2" translatable="true">Недоступно: пороговые значения точности не измерены (S2).</string>
+    <string name="studio_reason_operation_disabled" translatable="true">Эта операция отключена в текущей конфигурации.</string>
+    <string name="studio_reason_server_disabled" translatable="true">Эта серверная операция не включена в конфигурации сервера.</string>
+    <string name="studio_reason_background" translatable="true">Правила фона этой торговой площадки не разрешают операцию.</string>
+    <string name="studio_reason_white_main" translatable="true">Сгенерированный или улучшенный результат недоступен для основного фото на белом фоне.</string>
+    <string name="studio_reason_real_photo" translatable="true">Основное фото должно оставаться настоящей фотографией.</string>
+    <string name="studio_reason_slide_overlay" translatable="true">Этот пресет не разрешает накладки для слайдов.</string>
+    <string name="studio_reason_ghost_route" translatable="true">Проверенный маршрут поставщика для манекена-призрака не найден.</string>
+    <string name="studio_reason_virtual_model" translatable="true">Виртуальная модель отключена до указанной проверки безопасности (S6).</string>
+    <string name="studio_reason_series_variant" translatable="true">В серию можно добавить только варианты перекраски или виртуальной модели.</string>
+    <string name="studio_reason_preset_required" translatable="true">Выберите пресет торговой площадки, чтобы проверить правила этой операции.</string>
+    <string name="studio_series_options" translatable="true">Предварительная стоимость серии</string>
+    <string name="studio_series_recolour" translatable="true">Варианты перекраски</string>
+    <string name="studio_series_virtual_model" translatable="true">Варианты с виртуальной моделью</string>
+    <string name="studio_series_selected" translatable="true">Выбрано</string>
+    <string name="studio_series_choose" translatable="true">Выбрать</string>
+    <string name="studio_series_decrease" translatable="true">Меньше</string>
+    <string name="studio_series_increase" translatable="true">Больше</string>
+    <string name="studio_series_variant_count" translatable="true">Количество вариантов: %1$d</string>
+    <string name="studio_series_progress" translatable="true">Ход серии</string>
+    <string name="studio_series_not_started" translatable="true">Серия ещё не запущена.</string>
+    <string name="studio_series_delivered_count" translatable="true">Доставлено вариантов: %1$d из %2$d</string>
+    <string name="studio_series_ledger_movements" translatable="true">Кредиты — резерв: %1$d, списано: %2$d, возвращено: %3$d</string>
+    <string name="studio_series_running" translatable="true">Выполняется</string>
+    <string name="studio_series_complete" translatable="true">Завершено</string>
+    <string name="studio_operation_recognise" translatable="true">Распознать товар</string>
+    <string name="studio_operation_cut_out" translatable="true">Вырезать</string>
+    <string name="studio_operation_refine_mask" translatable="true">Уточнить маску</string>
+    <string name="studio_operation_compose_original" translatable="true">Собрать карточку (оригинал)</string>
+    <string name="studio_operation_shadow_margin_fill" translatable="true">Тень, поля и заполнение</string>
+    <string name="studio_operation_local_background" translatable="true">Однотонный, градиентный или процедурный фон</string>
+    <string name="studio_operation_generated_scene" translatable="true">Сгенерированный фон сцены</string>
+    <string name="studio_operation_relight" translatable="true">Изменить свет</string>
+    <string name="studio_operation_expand_canvas" translatable="true">Расширить холст</string>
+    <string name="studio_operation_recolour" translatable="true">Перекрасить</string>
+    <string name="studio_operation_upscale" translatable="true">Увеличить разрешение</string>
+    <string name="studio_operation_erase_region" translatable="true">Удалить область</string>
+    <string name="studio_operation_ghost_mannequin" translatable="true">Манекен-призрак</string>
+    <string name="studio_operation_virtual_model" translatable="true">Виртуальная модель</string>
+    <string name="studio_operation_listing_text" translatable="true">Текст объявления</string>
+    <string name="studio_operation_series" translatable="true">Серия</string>
+    <string name="studio_operation_slide_render" translatable="true">Создать слайд</string>
+    <string name="studio_operation_export_pack" translatable="true">Экспортировать набор</string>
+    <string name="studio_live_purpose_scene" translatable="true">Создайте окружение по своему описанию.</string>
+</resources>

@@ -1,0 +1,6 @@
+<resources>
+    <string name="batch_selection_summary">Выбрано фотографий: %1$d из %2$d</string>
+    <string name="batch_select_all">Выбрать все</string>
+    <string name="batch_clear_selection">Снять выделение</string>
+    <string name="batch_select_photo">Выбрать фотографию %1$s</string>
+</resources>

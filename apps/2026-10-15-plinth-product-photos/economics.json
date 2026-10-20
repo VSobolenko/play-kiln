@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_repeat_sales",
+  "payingUser": "A marketplace seller (Wildberries, Ozon, Avito, Vinted, eBay, Etsy, Depop, Amazon and others) who photographs their own goods on a phone and needs cards that meet each marketplace's image rules, in bulk and in one saved style.",
+  "paidUnit": "A pack of server-cost credits (90, 230 or 600) spent on cut-outs, generated scenes, recognition-driven auto-cards, listing text and the optional enhanced studio operations; plus one non-consumable unlock that removes the watermark and the free batch limit. Credits are charged only for results that are delivered.",
+  "momentOfPayment": "At the first operation that needs the server after the 10 starter credits are spent (the app shows the cost before every paid action), and at the first batch larger than the free limit, where the unlock is offered next to the credit packs.",
+  "distinctnessSentence": "Plinth keeps the item's own pixels untouched in Original mode and styles everything around it, checks every image against the rules of the chosen marketplace, and sets a whole batch and an infographic series in one saved look with seller-chosen text typeset on the device, which the marketplace editors and the generic AI photo apps do not do together.",
+  "day1RevenuePath": "Starter credits end after the first card or two; the next card, a batch, or a generated scene opens the pack and unlock purchase screen with store-provided prices; the server confirms the purchase token with the Google Play Developer API and credits the wallet once.",
+  "priceUsd": 7.29,
+  "evidenceRef": "docs/research/2026-10-12-seller-platform-evidence.md#money",
+  "killCriteria": {
+    "windowDays": 90,
+    "minInstalls": 1000,
+    "minRevenueUsd": 200
+  },
+  "capabilities": {
+    "required": [
+      "billing"
+    ],
+    "deliberatelyNotEnabled": [
+      "ads"
+    ],
+    "note": "Billing sells consumable credit packs and one non-consumable unlock; ads are not used because the audience is doing commerce work and the images are the seller's own goods."
+  },
+  "serverRequired": true,
+  "serverNote": "A server the factory writes (Node, Fastify, SQLite) on the owner's VPS holds the wallet ledger, confirms purchases, calls the model provider with a key that never reaches the client, runs the fidelity guard, stores reports and deletes data on request. Its fixed cost is the owner's existing VPS and domain; the variable cost is the provider's price per call, capped by a global daily limit and an emergency switch.",
+  "permissions": [
+    "INTERNET: server operations and purchase confirmation; without it only the local editor, the linter and the coach work",
+    "CAMERA: the shoot coach; without it the user imports photos through the photo picker, which needs no permission",
+    "POST_NOTIFICATIONS: the batch-finished reminder; without it the user sees progress when the app is open"
+  ],
+  "priceLadder": {
+    "currency": "USD",
+    "starterPack": {
+      "credits": 90,
+      "priceUsd": 7.29
+    },
+    "studioPack": {
+      "credits": 230,
+      "priceUsd": 18.49
+    },
+    "proPack": {
+      "credits": 600,
+      "priceUsd": 47.99
+    },
+    "unlock": {
+      "priceUsd": 28.99
+    },
+    "starterCreditsPerDevice": 10,
+    "principle": "The market's price minus a couple of percent (owner's instruction); every figure is a hypothesis re-read at spike S5 and decided by the owner at checkpoint 1.",
+    "unitArithmetic": "Net per sale is 0.80 of the price: starter pack 7.29 x 0.80 = 5.83. Provider ceiling 0.025 per credit: 90 x 0.025 = 2.25 cost, margin 5.83 - 2.25 = 3.58. Price per credit 7.29 / 90 = 0.081; 0.081 / 0.025 = 3.24, at or above the 3.09 floor of docs/monetization-strategy.md section 3.7."
+  },
+  "archetypesRejected": [
+    {
+      "archetype": "purchase_led_single_unlock",
+      "revenueReason": "A one-time price against a recurring per-use provider cost is an unbounded loss on a heavy seller; the unlock here exists only for the watermark and the free batch limit."
+    },
+    {
+      "archetype": "ads_led_utility",
+      "revenueReason": "The audience does commerce work and the output is the seller's commercial imagery, where an ad beside it damages trust, and ad income per active seller is far below the 0.08 per credit the packs earn (inferred, not measured)."
+    },
+    {
+      "archetype": "purchase_only_no_ads",
+      "revenueReason": "It has the same shape as the single unlock and cannot fund a per-use provider cost."
+    }
+  ],
+  "buildEstimateAgentHours": "Estimate only, for the owner's information and never a criterion: several hundred agent-hours across server, client, assets and verification; not measured.",
+  "assumptionsUnverified": [
+    "Sellers adopt a mobile app for this job instead of the marketplace's own editor; decided by the install and revenue readings of the kill criteria.",
+    "The net factor 0.80 per sale and the 3.09 price-to-cost floor are read from docs/monetization-strategy.md and must be re-read by the money owner at spike S5.",
+    "The provider's real price per call for each enhanced operation; one cut-out endpoint is measured, the rest are fixed by spike S2.",
+    "A seller pays 28.99 once for the unlock plus credits at the market's going rate; the competitor prices are monthly, this app sells consumables."
+  ]
+}

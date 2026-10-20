@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cutout_editor_title">Правка краёв вырезания</string>
+    <string name="cutout_editor_brush_size">Диаметр кисти: %1$d%% меньшей стороны фото</string>
+    <string name="cutout_editor_remove">Убрать из выделения</string>
+    <string name="cutout_editor_restore">Вернуть в выделение</string>
+    <string name="cutout_editor_selection_explanation">«Выбрать всё» оставляет каждый пиксель фото, включая фон. «Сбросить выбор» возвращает исходную маску вырезания.</string>
+    <string name="cutout_editor_mode_remove">УДАЛИТЬ</string>
+    <string name="cutout_editor_mode_restore">ВОССТАНОВИТЬ</string>
+    <string name="cutout_editor_drag_hint">Проведите по фото, чтобы уточнить маску</string>
+    <string name="cutout_editor_done">Завершить правку</string>
+    <string name="editor_back_to_photo">Вернуться к фото</string>
+    <string name="editor_save_card">Сохранить</string>
+    <string name="editor_saving">Сохранение…</string>
+    <string name="editor_saved_return">Сохранено — к фото</string>
+    <string name="editor_retry_save">Повторить сохранение</string>
+    <string name="editor_save_failed">Карточка не сохранена. Убедитесь, что фото и проект доступны, и попробуйте ещё раз.</string>
+    <string name="editor_exit_title">Выйти из редактора?</string>
+    <string name="editor_exit_message">Есть несохранённые изменения. Сохраните их, отмените или продолжите редактирование.</string>
+    <string name="editor_save_and_return">Сохранить и вернуться</string>
+    <string name="editor_discard">Отменить изменения</string>
+    <string name="editor_keep_editing">Продолжить редактирование</string>
+    <string name="editor_background_none">Без фона</string>
+    <string name="editor_custom_color">Свой цвет</string>
+    <string name="editor_recent_colors">Недавние свои цвета</string>
+    <string name="editor_recent_custom_color">Недавний цвет %1$s</string>
+    <string name="editor_custom_color_title">Выберите свой цвет</string>
+    <string name="editor_color_preview">Предпросмотр карточки</string>
+    <string name="editor_color_hue">Тон: %1$d°</string>
+    <string name="editor_color_saturation">Насыщенность: %1$d%%</string>
+    <string name="editor_color_brightness">Яркость: %1$d%%</string>
+    <string name="editor_apply">Применить</string>
+    <string name="editor_cancel">Отмена</string>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="card_loading">Opening your photo…</string>
+    <string name="card_composing">Creating your product card…</string>
+    <string name="card_failed">Could not create your card</string>
+    <string name="card_title">Product card</string>
+    <string name="card_try_again">Try creating the card again</string>
+    <string name="card_source_ready">Your photo · ready to create a product card</string>
+    <string name="card_result_ready">Your product card</string>
+    <string name="card_inspect">Zoom image</string>
+    <string name="card_close_inspection">Close inspection</string>
+    <string name="card_save_png">Save image</string>
+    <string name="card_not_saved">Ready to save. Save image lets you choose where the file goes.</string>
+    <string name="card_saving">Saving to the location you chose…</string>
+    <string name="card_saving_action">Saving…</string>
+    <string name="card_saved">Saved to %1$s.</string>
+    <string name="card_saved_location_unknown">Saved, but Android did not provide the selected location.</string>
+    <string name="card_destination_downloads">Downloads</string>
+    <string name="card_destination_internal_storage">Internal storage</string>
+    <string name="card_destination_external_storage">External storage</string>
+    <string name="card_done">Done</string>
+    <string name="card_save_error">Could not save the image. Try again or choose another location.</string>
+    <string name="card_export_guidance">Marketplace rules have not been checked for this image.</string>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="w30_workspace_summary">Groups: %1$d · Photos: %2$d · Unassigned: %3$d</string>
+    <string name="w30_workspace_hint">Organize product views by SKU. Check the photos, then open details to move a view or confirm a suggestion.</string>
+    <string name="w30_naming_title">Batch naming</string>
+    <string name="w30_edit_naming">Edit naming rules</string>
+    <string name="w30_hide_naming">Hide naming rules</string>
+    <string name="w30_sku_base">Product / SKU base</string>
+    <string name="w30_naming_base">Base for new SKUs: %1$s</string>
+    <string name="w30_regroup_hint">Regroup rebuilds all groups from matching SKUs and names unmatched photos using this base. Manual group placement may change.</string>
+    <string name="w30_photo_count">Included photos: %1$d</string>
+    <string name="w30_ungrouped">Unassigned photos: %1$d</string>
+    <string name="w30_ungrouped_hint">Open photo details to move into a group, or regroup the batch using naming rules.</string>
+    <string name="w30_empty_group">No photos yet. Open a photo’s details and move it into this group.</string>
+    <string name="w30_edit_group">Edit group SKU</string>
+    <string name="w30_close_rename">Close SKU editor</string>
+    <string name="w30_rename_pattern">Renumbering uses the current naming rule: %1$s</string>
+    <string name="w30_photo_details">Photo details and actions</string>
+    <string name="w30_hide_details">Hide photo details</string>
+    <string name="w30_save_category">Save category</string>
+    <string name="w30_no_move_target">Create another group to move this photo.</string>
+    <string name="w30_photo_description">Product photo: %1$s</string>
+    <string name="w30_preview_unavailable">Preview unavailable</string>
+</resources>

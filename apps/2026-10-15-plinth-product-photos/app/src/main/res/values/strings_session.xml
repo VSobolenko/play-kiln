@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="session_title">Connect your wallet</string>
+    <string name="session_connecting">Verifying this installation with Google Play and connecting your wallet…</string>
+    <string name="session_configuration">Wallet verification is not configured for this build or server. Install the latest Google Play version. If this continues, contact support in the Play listing. No credits have been spent.</string>
+    <string name="session_integrity">Google Play could not verify this installation. Check your connection, update Google Play Store, and install or open Plinth through Google Play, then retry. No credits have been spent.</string>
+    <string name="session_network">Your wallet could not connect. Check your internet connection and retry. No credits have been spent.</string>
+    <string name="session_network_debug">Wallet unavailable: cannot reach the remote debug API (pikupo.com/plinth-debug). Check internet and retry. You can browse without a wallet. No credits have been spent.</string>
+    <string name="session_browse_without_wallet">Browse without wallet</string>
+    <string name="session_server">The wallet service could not complete verification. Retry shortly. If this continues, contact support in the Play listing. No credits have been spent.</string>
+    <string name="session_storage">Your wallet connection could not be saved on this device. Free some device storage and retry. No credits have been spent.</string>
+    <string name="session_retry">Retry connection</string>
+    <string name="session_link_failed">The privacy policy could not open. Install a browser and try again.</string>
+    <string name="service_maintenance">Paused for maintenance. Nothing was charged.</string>
+    <string name="service_maintenance_detail">New work is paused. Your wallet and existing results remain available.</string>
+    <string name="service_daily_cap">Daily limit reached.</string>
+    <string name="service_daily_cap_detail">New work will be available again tomorrow. Nothing was charged.</string>
+    <string name="service_retry">Retry</string>
+    <string name="service_retry_countdown">Retry in %1$d s</string><string name="service_dismiss">Dismiss</string>
+    <string name="service_closed">Plinth is closed.</string><string name="service_closed_detail">Existing results can still be collected and your wallet is intact.</string>
+    <string name="service_open_results">Open results</string><string name="service_open_wallet">Open wallet</string>
+    <string name="service_update_required">Update required</string><string name="service_update_detail">Update to version %1$s or later before starting new work.</string><string name="service_open_play">Open Google Play</string>
+</resources>

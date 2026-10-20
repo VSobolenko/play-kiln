@@ -13,6 +13,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 import { expectEqual, expectTrue, fail, guard, pass, playAssets, ROOT, unverified } from './lib.mjs'
 import {
+  EXCLUDED_DIRECTORY_PATH_REASONS,
   EXCLUDED_FILE_REASONS,
   EXCLUSION_CRITERION,
   EXCLUSION_REASONS
@@ -31,7 +32,7 @@ import { PLACEHOLDER_HOSTS } from '../lib/in-app-policy.mjs'
  * the one that matters most — the sentence is printed to a human deciding whether an approval covers
  * a file, so a reason missing from it is an exclusion nobody was told about.
  *
- * @param {Map<string, string>} fileReasons every excluded name -> the reason key it cites
+ * @param {Map<string, string>} fileReasons every excluded file name or directory path -> its reason key
  * @param {Record<string, string>} reasons the closed set of reason keys -> the sentence each carries
  * @param {string} criterion the human-readable sentence built from the set
  */
@@ -69,12 +70,13 @@ export function exclusionVocabularyProblems(fileReasons, reasons, criterion) {
 export function checkApprovalExclusions() {
   return guard('harness.approvalExclusions', () => {
     const problems = exclusionVocabularyProblems(
-      EXCLUDED_FILE_REASONS,
+      new Map([...EXCLUDED_FILE_REASONS, ...EXCLUDED_DIRECTORY_PATH_REASONS]),
       EXCLUSION_REASONS,
       EXCLUSION_CRITERION
     )
     const detail =
-      `${EXCLUDED_FILE_REASONS.size} excluded name(s) across ${Object.keys(EXCLUSION_REASONS).length} reason(s), ` +
+      `${EXCLUDED_FILE_REASONS.size} excluded file name(s) and ${EXCLUDED_DIRECTORY_PATH_REASONS.size} slot-relative directory path(s) ` +
+      `across ${Object.keys(EXCLUSION_REASONS).length} reason(s), ` +
       'each reason used and named in the criterion'
     return problems.length > 0 ? fail('harness.approvalExclusions', problems.join('; ')) : pass('harness.approvalExclusions', detail)
   })
@@ -138,6 +140,14 @@ export function harnessFixtures() {
       add(
         'a name citing an undefined reason fails',
         exclusionVocabularyProblems(new Map([...fileReasons, ['x', 'no-such-reason']]), reasons, criterion).length === 1
+      )
+      add(
+        'a slot-relative directory path citing an undefined reason fails',
+        exclusionVocabularyProblems(
+          new Map([...fileReasons, ['server/data', 'no-such-reason']]),
+          reasons,
+          criterion
+        ).length === 1
       )
       add(
         'a defined but unused reason fails twice, for being unused and for being unnamed in the criterion',

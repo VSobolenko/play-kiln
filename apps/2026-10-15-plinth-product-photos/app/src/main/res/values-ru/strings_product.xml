@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about_product_credit_model" translatable="true">Кредиты оплачивают обработку через внешние сервисы. На устройстве доступны 10 стартовых кредитов; разовые пакеты пополняют баланс. Отдельная разовая покупка Plinth Unlock убирает водяной знак при бесплатном экспорте и ограничение в пять товаров в пакетной обработке, но не включает кредиты на обработку. Подписки нет. До подтверждения покупки приложение показывает цену и стоимость в кредитах.</string>
+    <string name="about_product_provenance" translatable="true">Приложение различает исходные пиксели, изображения с ручной правкой, обработанные ИИ и изображения с созданным фоном. Результаты генерации ИИ отмечены; на них можно пожаловаться прямо в приложении. Plinth не заявляет поддержку C2PA Content Credentials.</string>
+    <string name="about_product_rights" translatable="true">Вы подтверждаете, что имеете право использовать выбранные фотографии.</string>
+    <string name="about_product_version" translatable="true">Plinth AI: фото товаров · версия %1$s (%2$d)</string>
+    <string name="settings_product_privacy_title" translatable="true">Политика конфиденциальности</string>
+    <string name="settings_product_privacy_summary" translatable="true">Узнайте, какие данные обрабатывает Plinth и как долго они хранятся.</string>
+    <string name="settings_product_delete_title" translatable="true">Удалить мои данные</string>
+    <string name="settings_product_delete_summary" translatable="true">Напишите в Plinth, чтобы запросить удаление данных, связанных с этой установкой.</string>
+    <string name="settings_product_delete_subject" translatable="true">Запрос на удаление данных Plinth</string>
+    <string name="settings_product_delete_body" translatable="true">Прошу удалить данные, связанные с моей установкой Plinth. Сообщите, какая информация нужна для поиска данных и подтверждения запроса.</string>
+    <string name="settings_product_review_summary" translatable="true">Оставьте отзыв о приложении или предложите новую функцию в Google Play.</string>
+</resources>

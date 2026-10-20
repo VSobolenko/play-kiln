@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="export_title">Export</string>
+    <string name="export_back">Back</string>
+    <string name="export_intro">Prepare product photos and marketplace profiles to see export packs here.</string>
+    <string name="export_empty">No marketplace packs are ready to export.</string>
+    <string name="export_ready_label">READY TO DELIVER</string>
+    <string name="export_ready_title">Your seller handoff is ready</string>
+    <string name="export_ready_summary">Destinations: %1$d · Export images: %2$d</string>
+    <string name="export_ready_formats">Formats: %1$s</string>
+    <string name="export_destinations_header">Marketplace destinations</string>
+    <string name="export_pack_summary">Files: %1$d · ZIP included</string>
+    <string name="export_rules_source">Preset rules read on %1$s · %2$s</string>
+    <string name="export_manifest_title">Processing record</string>
+    <string name="export_manifest_note">The manifest lists only rules you explicitly overrode, with each rule ID and its measured value.</string>
+    <string name="export_file_summary">%1$d × %2$d · %3$s · %4$s · %5$d bytes</string>
+    <string name="export_quality_percent">quality %1$d%%</string>
+    <string name="export_quality_lossless">lossless</string>
+    <string name="export_share_title">Share product photo</string>
+    <string name="export_share">Share</string>
+    <string name="export_save_gallery">Save to gallery</string>
+    <string name="export_save_file">Save a copy</string>
+    <string name="export_save_zip">Save marketplace ZIP</string>
+    <string name="export_save_all_zips">Save all marketplace packs</string>
+    <string name="export_provenance_original">Original pixels</string>
+    <string name="export_provenance_manual">Manually adjusted</string>
+    <string name="export_provenance_composite">Generated background composite</string>
+    <string name="export_provenance_trained">Enhanced with a trained model</string>
+    <string name="export_provenance_algorithmic">Algorithmically enhanced</string>
+    <string name="export_saved">Export saved.</string>
+    <string name="export_delivery_failed">Could not deliver this export. Check the destination and try again.</string>
+</resources>

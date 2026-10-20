@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cutout_editor_title">Edit cut-out edges</string>
+    <string name="cutout_editor_brush_size">Brush diameter: %1$d%% of the shorter image side</string>
+    <string name="cutout_editor_remove">Remove from selection</string>
+    <string name="cutout_editor_restore">Restore to selection</string>
+    <string name="cutout_editor_selection_explanation">Select all keeps every photo pixel, including the background. Reset selection restores the mask first shown for this cut-out.</string>
+    <string name="cutout_editor_mode_remove">REMOVE</string>
+    <string name="cutout_editor_mode_restore">RESTORE</string>
+    <string name="cutout_editor_drag_hint">Drag on the photo to refine the mask</string>
+    <string name="cutout_editor_done">Done editing</string>
+    <string name="editor_back_to_photo">Back to photo</string>
+    <string name="editor_save_card">Save</string>
+    <string name="editor_saving">Saving…</string>
+    <string name="editor_saved_return">Saved — return to photo</string>
+    <string name="editor_retry_save">Try saving again</string>
+    <string name="editor_save_failed">Card was not saved. Check that the photo and project are still available, then try again.</string>
+    <string name="editor_exit_title">Leave the editor?</string>
+    <string name="editor_exit_message">You have unsaved changes. Save them, discard them, or keep editing.</string>
+    <string name="editor_save_and_return">Save and return</string>
+    <string name="editor_discard">Discard</string>
+    <string name="editor_keep_editing">Keep editing</string>
+    <string name="editor_background_none">No background</string>
+    <string name="editor_custom_color">Custom colour</string>
+    <string name="editor_recent_colors">Recent custom colours</string>
+    <string name="editor_recent_custom_color">Recent colour %1$s</string>
+    <string name="editor_custom_color_title">Choose a custom colour</string>
+    <string name="editor_color_preview">Live card preview</string>
+    <string name="editor_color_hue">Hue: %1$d°</string>
+    <string name="editor_color_saturation">Saturation: %1$d%%</string>
+    <string name="editor_color_brightness">Brightness: %1$d%%</string>
+    <string name="editor_apply">Apply</string>
+    <string name="editor_cancel">Cancel</string>
+</resources>

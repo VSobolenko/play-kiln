@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_flow_title">Add a product photo</string>
+    <string name="create_flow_heading">Add a product photo</string>
+    <string name="create_flow_choose_photo">Choose product photo</string>
+    <string name="create_flow_continue_to_studio">Back to my tools</string>
+    <string name="create_flow_photo_ready">Selected photo · ready for Studio</string>
+    <string name="create_flow_photo_selected">Selected</string>
+    <string name="create_flow_photo_tap_select">Tap to use this photo</string>
+</resources>

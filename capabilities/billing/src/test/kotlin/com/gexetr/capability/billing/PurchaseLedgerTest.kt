@@ -3,6 +3,7 @@ package com.gexetr.capability.billing
 import com.gexetr.capability.core.PlayKilnResult
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -25,12 +26,18 @@ class PurchaseLedgerTest {
         subscriptions = listOf(subscription),
     )
 
-    private fun purchased(token: String, product: ProductId, acknowledged: Boolean = false) =
+    private fun purchased(
+        token: String,
+        product: ProductId,
+        acknowledged: Boolean = false,
+        intentId: String? = null,
+    ) =
         PurchaseRecord(
             token = token,
             productIds = listOf(product.value),
             state = PurchaseState.PURCHASED,
             acknowledged = acknowledged,
+            intentId = intentId,
         )
 
     @Test
@@ -56,6 +63,62 @@ class PurchaseLedgerTest {
         assertTrue(settlement.entitlements.owns(unlock.key()))
         assertEquals(listOf("t2"), settlement.acknowledge)
         assertTrue(settlement.consume.isEmpty())
+    }
+
+    @Test
+    fun `an intent-bound entitlement is observed but not granted when authority rejects`() = runTest {
+        val authority = IntentAwareAuthority(
+            confirmation = PlayKilnResult.Failure(PlayKilnResult.Reason.POLICY_BLOCKED),
+        )
+        val ledger = PurchaseLedger(InMemoryBillingStateStore(), authority)
+
+        val settlement = ledger.settle(
+            listOf(purchased("server-rejected", unlock, intentId = "intent-rejected")),
+            catalog,
+        )
+
+        assertFalse(settlement.entitlements.owns(unlock.key()))
+        assertTrue(settlement.acknowledge.isEmpty())
+        assertEquals(
+            listOf(PurchaseOutcome.UnconfirmedEntitlement(unlock)),
+            settlement.outcomes,
+        )
+        assertEquals(listOf("intent-rejected"), authority.confirmedIntentIds)
+    }
+
+    @Test
+    fun `an intent-bound entitlement grants and acknowledges once after authority confirms`() = runTest {
+        val authority = IntentAwareAuthority(confirmation = PlayKilnResult.Success(Unit))
+        val store = InMemoryBillingStateStore()
+        val ledger = PurchaseLedger(store, authority)
+        val record = purchased("server-confirmed", unlock, intentId = "intent-confirmed")
+
+        val confirmed = ledger.settle(listOf(record), catalog)
+        val replay = ledger.settle(listOf(record), catalog)
+
+        assertTrue(confirmed.entitlements.owns(unlock.key()))
+        assertEquals(listOf("server-confirmed"), confirmed.acknowledge)
+        assertTrue(replay.acknowledge.isEmpty())
+        assertEquals(confirmed.entitlements, replay.entitlements)
+        assertEquals(listOf("intent-confirmed"), authority.confirmedIntentIds)
+        assertEquals(
+            listOf(PurchaseOutcome.AlreadySettled("server-confirmed", unlock)),
+            replay.outcomes,
+        )
+    }
+
+    @Test
+    fun `an entitlement without an intent keeps the legacy local path`() = runTest {
+        val authority = IntentAwareAuthority(
+            confirmation = PlayKilnResult.Failure(PlayKilnResult.Reason.POLICY_BLOCKED),
+        )
+        val ledger = PurchaseLedger(InMemoryBillingStateStore(), authority)
+
+        val settlement = ledger.settle(listOf(purchased("legacy", unlock)), catalog)
+
+        assertTrue(settlement.entitlements.owns(unlock.key()))
+        assertEquals(listOf("legacy"), settlement.acknowledge)
+        assertTrue(authority.confirmedIntentIds.isEmpty())
     }
 
     @Test
@@ -216,6 +279,26 @@ private class ScriptedAuthority(private val confirmations: List<Boolean>) : Purc
         } else {
             PlayKilnResult.Failure(PlayKilnResult.Reason.NETWORK)
         }
+    }
+
+    override suspend fun confirmSpend(unit: String, amount: Long) = PlayKilnResult.Success(Unit)
+}
+
+private class IntentAwareAuthority(
+    private val confirmation: PlayKilnResult<Unit>,
+) : PurchaseAuthority {
+    val confirmedIntentIds = mutableListOf<String>()
+
+    override suspend fun confirmPurchase(purchaseToken: String, product: ProductId) =
+        PlayKilnResult.Failure(PlayKilnResult.Reason.NOT_CONFIGURED)
+
+    override suspend fun confirmPurchase(
+        purchaseToken: String,
+        product: ProductId,
+        intentId: String,
+    ): PlayKilnResult<Unit> {
+        confirmedIntentIds += intentId
+        return confirmation
     }
 
     override suspend fun confirmSpend(unit: String, amount: Long) = PlayKilnResult.Success(Unit)

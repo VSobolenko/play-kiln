@@ -1,0 +1,16 @@
+<resources>
+    <string name="linter_check_and_fix">Проверить и исправить фото для площадок</string>
+    <string name="linter_marketplace_rule">%1$s · правило %2$s</string>
+    <string name="linter_violated_limit">Нарушенный предел: %1$s</string>
+    <string name="linter_repaired">Исправлено и проверено повторно</string>
+    <string name="linter_seller_change">Нужно изменение продавца; это нарушение не исправлено</string>
+    <string name="linter_cost_before_run">Увеличение разрешения стоит %1$d кредитов; платная операция не запускалась</string>
+    <string name="linter_manual_action">Для этого изменения нужен исходник или редактор; нарушение не отмечено как исправленное</string>
+    <string name="linter_cannot_edit">Это правило нельзя выполнить редактированием изображения; попытки изменить его не было</string>
+    <string name="linter_credit_cost_unavailable">Стоимость в кредитах неизвестна; платная операция не запускалась</string>
+    <string name="linter_check_failed">Не удалось завершить проверку правил; экспортируемые изображения не изменены</string>
+    <string name="linter_no_findings">В измеренных данных этого экспортируемого изображения нарушений нет</string>
+    <string name="linter_preset_unavailable">Исходный пресет для этого экспорта недоступен</string>
+    <string name="linter_image_unreadable">Не удалось декодировать экспортируемое изображение; оно не изменено</string>
+    <string name="linter_repair_failed">После исправления повторная проверка правил не пройдена; экспортируемое изображение оставлено без изменений</string>
+</resources>

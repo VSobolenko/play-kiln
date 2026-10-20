@@ -299,3 +299,46 @@ The promise list, its jobCoverage and its depth families are in
   transformation, not a blanket Enhanced label.
 - RESULT: policy audit findings and source ledger are preserved in
   `.kiln/scratch/plinth-m0-s6/report.md`; no declaration, endpoint or policy status was changed.
+
+### M0 disposition — what is closed, what is still open
+
+| Spike | State | Consequence carried into the build |
+|---|---|---|
+| S0 host/TLS | CLOSED | Use the certificate-backed `pikupo.com` host behind a dedicated path route; a truthful app health handler is added at task 4.7. No domain/TLS question for the owner. |
+| S1 cut-out | CLOSED | Server-only cut-out at 1 credit; **no** free/offline cut-out claim. Reference route `fal-ai/bria/background/remove`, no prompt ($0.018/success). |
+| S2 fidelity | OPEN | No paid fidelity calls; guard thresholds are not measured. All Enhanced operations stay disabled until the thresholds exist. |
+| S3 vision/OCR | OPEN (inconclusive) | No labelled corpus and no supported O-01/O-15 route price. Category stays editable; scale/SKU stay seller-confirmed suggestions; no measured-accuracy claim. |
+| S4 walking skeleton | NOT STARTED | Sequenced after the server exists (task 4.7), not before the scaffold. |
+| S5 prices/presets | CLOSED as a read | Price ladder carried as **hypotheses**; Ozon/Avito/eBay/Etsy/Depop/Amazon/Mercari rules stay secondary/unread, so task 5.4 cannot complete the queue-1 presets. |
+| S6 policy | CLOSED as a read | O-14 virtual model stays disabled; photos are collected under Play's off-device definition; IPTC URIs recorded; no C2PA claim. |
+
+### Checkpoint 1 — owner decision
+
+- **Presented:** the price ladder ($7.29 / 90 credits, $18.49 / 230, $47.99 / 600, $28.99 non-consumable
+  unlock), kill criteria (90 days, 1 000 installs, $200), the derived name (*Plinth: Product Photos*),
+  the 15-promise contract, and the M0 spike results including the two open spikes (S2, S3).
+- **Owner's words (2026-10-15):** «Теперь приступай к реализации всего приложения. … Тестовый телефон
+  тебе подключен. … Ты только оркестратор над копилотом. … будь внимательней. Другие чаты проработали
+  спецификацию.»
+- **Decision:** approved to implement. The plan, name, promise list, kill criteria and the price ladder
+  as **hypotheses** are approved; the two open spikes are known and do not block the scaffold, the server
+  or M1. The S2 fidelity benchmark and the S3 accuracy measurement remain open and are named in the
+  handoff rather than silently dropped.
+
+### Owner decisions during implementation — 2026-10-15
+
+Two decisions the server cannot be built without. Both recorded here because the annex leaves them open (S1
+names the provider cost; S0 names the host but no route) and neither is the builder's to take.
+
+- **Cut-out provider — the owner's own words:** «ключ дал, он уже лежит тут: `.kiln\secrets\fal.key`». So the
+  S1 reference route stands: server-only cut-out against `fal-ai/bria/background/remove`, no prompt,
+  $0.018/success, 1 credit to the seller. The key is a **server-side** secret: it is read from the server's
+  environment, it is never in the client and never in a file under `app/src/main/`, and it is never printed
+  into a transcript, a prompt or a log. `.kiln/` is gitignored, so the key does not enter history.
+  **Not measured here:** whether the key is valid or funded; the first real inference call is the decider
+  (spike S4), and its result belongs in `.kiln/scratch/`, never in a committed file.
+- **Deployment — authorised.** The owner authorised deploying the Plinth service to the VPS measured in S0
+  (`78.111.89.46`, host `main`, Caddy active) as a **dedicated path route on `pikupo.com`**, preserving the
+  existing site, with a truthful health handler for this service rather than the site's SPA fallback. The
+  authorization was given by selecting that option in the implementation session rather than typed as a
+  sentence, and it is recorded as such rather than dressed as prose he wrote.

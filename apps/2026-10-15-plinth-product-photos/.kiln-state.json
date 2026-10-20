@@ -1,0 +1,17 @@
+{
+  "slug": "plinth-product-photos",
+  "applicationId": "com.gexetr.plinthproductphotos",
+  "appName": "Plinth: Product Photos",
+  "idea": "Turn a seller's own product photos into per-marketplace listing cards: server cut-out, original-pixel composition, marketplace rule linter, export with provenance.",
+  "createdAt": "2026-10-15T16:03:40.968Z",
+  "scaffoldVersion": "android-compose-v1",
+  "status": "scaffolded",
+  "economics": {
+    "archetype": "purchase_led_repeat_sales",
+    "priceUsd": 7.29
+  },
+  "differentiators": {
+    "promises": 15,
+    "core": 7
+  }
+}

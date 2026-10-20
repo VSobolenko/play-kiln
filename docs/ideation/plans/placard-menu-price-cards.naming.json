@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "title": "Placard: Menu Price Cards",
+  "slug": "placard-menu-price-cards",
+  "applicationId": "com.gexetr.placardmenupricecards",
+  "archetype": "carrier_job_noun",
+  "audience": "The owner-operator of a small local business with no designer: the cafe or food truck writing a menu board, the market stall or deli writing a price card, the salon, barber or nail studio with a service price list, the gym or personal trainer with a rate card, the tutor with a lesson price list, the florist or repair shop with a counter card. One person, one phone, and a piece of paper, card or window that a customer reads.",
+  "rationale": "Placard is the real word for the sign a shop puts on a wall, on the counter or in the window, so the carrier names the artefact the app makes rather than decorating it, and it is a word an owner would recognise while remaining ownable - no card on the price card maker shelf uses it and it is not a category term anyone searches for. The job noun after the separator is what the owner types: menu and price cards, the two artefacts the shelf's own titles compete for as Price List Maker and Menu Maker. The field was scored across five archetypes and the bare descriptive phrase was included twice as the negative control so the derivation eliminated something: Menu Price Cards (66) and Price Card Maker (62) both lose to every candidate that carries a name, which is the measured reason the leader com.menu.maker at 1M+ installs owns that head term and a new app entering on the same phrase would be invisible at the one query it was named for.",
+  "collisionCheck": "Measured within the shelf: node scripts/scan-titles.mjs over the price card maker, menu maker and flyer maker shelves printed 98 title lines (30 visible on the price card shelf, 18 of them on the job), and a search of that output for Placard, Chalkline, Counter Card, Priceboard, Slate and Tackup returned zero matches, so no card on this shelf is a near-duplicate of the chosen name. Measured across this same run: the two sibling proposals dated 2026-10-16 chose Roomlumen (consumer-personal) and Warp: Print Mockups (marketplace-sellers), and a search of all three proposal documents for Placard returns hits only in this one, so no two recipes of this run share a carrier. That is a shelf and run reading and it is not a store-wide or legal search: the decider is a Play search for the exact title and a class-9 search of TMview, USPTO, EUIPO and WIPO for Placard, and until those are run this field is UNVERIFIED.",
+  "localisationCheck": "en-US 'Placard: Menu Price Cards' is 25 of Play's 30 characters (5 of slack) and ru-RU 'Placard: Меню и ценники' is 23 of 30 (7 of slack), so neither locale is close to the cap and neither truncates in the console field. Both strings are hand-written rather than machine-translated, and the Russian keeps the carrier untranslated beside the native job noun because a literal translation of placard is not the word a Russian shop owner uses for a menu board. A real risk remains and is stated rather than eliminated: whether a Russian-speaking owner discovers an English carrier is unmeasured, and the fix if it does not is another candidate from the same field, never a lower bar.",
+  "searchPhrases": [
+    "price card maker",
+    "menu maker for small business",
+    "price list maker",
+    "menu price cards"
+  ],
+  "localizedTitles": {
+    "en": "Placard: Menu Price Cards",
+    "en-US": "Placard: Menu Price Cards",
+    "ru": "Placard: Меню и ценники",
+    "ru-RU": "Placard: Меню и ценники"
+  },
+  "candidates": [
+    {
+      "name": "Placard: Menu Price Cards",
+      "archetype": "carrier_job_noun",
+      "score": 84,
+      "why": "The recommended default shape for a small utility: an ownable carrier plus the real job noun after a separator. Placard is the actual word for the counter or window sign this app produces, it is one syllable and pass-the-radio-test spellable, no shelf card uses it, and the job noun is what a shop owner types. Costs 1 point on distinctness because the job noun is a category phrase, and nothing is lost on localisation because the carrier transfers while the job noun is native in each locale."
+    },
+    {
+      "name": "Chalkline",
+      "archetype": "coined",
+      "score": 78,
+      "why": "Compact, ownable and it evokes a chalkboard menu without being any shop's word, and it survives every locale. It loses 6 points on discoverability: it names no job noun, so every install would have to be bought rather than found, and a listener who hears it may write Chalk Line or Chalkline depending on the day."
+    },
+    {
+      "name": "Counter Card",
+      "archetype": "compound",
+      "score": 74,
+      "why": "Says exactly where the artefact lives and reads as a real thing at a till. It loses because counter also reads as the verb to count, so in a search result for a price app the phrase can be parsed the wrong way, and because it names one of the five artefacts rather than the job that produces all five."
+    },
+    {
+      "name": "Priceboard",
+      "archetype": "compound",
+      "score": 71,
+      "why": "Instantly legible and short, and it is closer to a real artefact than most compounds. It loses on ownability: it is a category phrase (price board) with the space removed, so it competes for a head term the shelf's leaders already hold and cannot be defended or trademarked with any confidence."
+    },
+    {
+      "name": "Tackup",
+      "archetype": "coined",
+      "score": 70,
+      "why": "Distinctive, short and quick to type, and it says something about putting a sign on a wall. It loses because it says nothing about prices, menus or printing, so it fails the one thing a carrier must not do - carry no information about the job - and it is a made-up word a listener will ask to have spelled."
+    },
+    {
+      "name": "Slate: Price Cards",
+      "archetype": "evocative",
+      "score": 69,
+      "why": "Strong imagery for a chalkboard or a stone counter, and the job noun is present. It loses on collision risk that no score dimension can pay back: Slate is a long-established magazine brand and a common brand word in unrelated categories, and a name whose first task is to survive a trademark search should not start behind that."
+    },
+    {
+      "name": "Menu Price Cards",
+      "archetype": "descriptive",
+      "score": 66,
+      "why": "NEGATIVE CONTROL: the bare job phrase with no carrier. It loses to every candidate that carries a name because the shelf's 1M+ install leader (com.menu.maker, Menu Maker, Price List Maker, 4.9 stars) and its 500K+ neighbour already compete for exactly this head term, so this app would be unsearchable at the one query it was named for and would carry nothing a user could prefer."
+    },
+    {
+      "name": "Price Card Maker",
+      "archetype": "descriptive",
+      "score": 62,
+      "why": "NEGATIVE CONTROL: the bare category phrase, included so the field eliminated a real temptation rather than a straw man. Three of the shelf's own titles use it (Price List Maker - Fast & Easy at 100K+, Price List Maker at 50K+ and 2.3 stars, Price List Maker Pro), which is precisely the evidence that it is a head term competitors own and not a name this app could hold."
+    }
+  ],
+  "rejected": [
+    {
+      "name": "Menu Price Cards",
+      "reason": "The bare job phrase with no carrier: it competes for the head term held by com.menu.maker at 1M+ installs and 4.9 stars, gives a user nothing to prefer, and leaves no brand that can compound, so it is refused by the pure-descriptive rule rather than by taste."
+    },
+    {
+      "name": "Price Card Maker",
+      "reason": "The bare category phrase the shelf's own cards already use in three titles (Price List Maker - Fast & Easy, Price List Maker, Price List Maker Pro): naming this app the same thing as the incumbents makes it unsearchable at its own query and is the pattern Play's Metadata policy treats as keyword spam rather than a name."
+    },
+    {
+      "name": "Slate: Price Cards",
+      "reason": "Collides with a long-established media brand in a way no other dimension pays for, and a name whose first job is to survive a class-9 trademark search should not begin with a known collision; the score is 69, below the 70 floor, so it is eliminated by the rule rather than argued for."
+    },
+    {
+      "name": "Priceboard",
+      "reason": "A category phrase with the space removed: it cannot be owned, it competes for a head term the shelf's leaders hold, and the search query it would win is one the leaders already answer with more installs and more reviews."
+    },
+    {
+      "name": "Tackup",
+      "reason": "Carries no information about prices, menus or printing, so it fails discoverability entirely and would make every install a bought one; it also needs a pronunciation or spelling guide, which the radio test forbids."
+    },
+    {
+      "name": "Chalkline",
+      "reason": "The runner-up at 78 and the strongest of the carriers, rejected only against the chosen name: it names no job noun, so it loses 6 points of discoverability, and this shelf's users type what they want (price card, menu) rather than browsing a brand they have never heard of."
+    }
+  ],
+  "evidence": "docs/ideation/2026-10-16-ecosystem-smb-marketing.md#7-the-name-derived-rather-than-invented",
+  "scoringNote": "Scores are this recon's arithmetic over the seven weighted dimensions of docs/app-naming.md, not a market measurement. The negative controls were scored last so the field had already eliminated something before they were written down, and the shelf evidence behind the two descriptive rejections is the title scan of 2026-10-16.",
+  "slugDerivation": "title -> slug by lowercasing, dropping the separator and joining the words with dashes: Placard: Menu Price Cards -> placard-menu-price-cards, which is also what scripts/lib/namespaces.mjs turns into com.gexetr.placardmenupricecards."
+}

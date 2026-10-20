@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_studio_eyebrow">Product photo studio</string>
+    <string name="home_hero_title">Your product photo</string>
+    <string name="home_hero_promise">Turn one product photo into a listing-ready image.</string>
+    <string name="home_import_photo">Choose a photo</string>
+    <string name="home_hero_quiet_hint">Camera, gallery, or files — you choose.</string>
+    <string name="home_change_photo">Change photo</string>
+    <string name="home_preview_label">Selected product photo</string>
+    <string name="home_preview_empty">No photo selected</string>
+    <string name="home_preview_hint">Choose a photo to get started.</string>
+    <string name="home_preview_original">Your original photo</string>
+    <string name="home_continue_title">Recent photos</string>
+    <string name="home_continue_action">Open product photo</string>
+    <string name="home_toolbox_title">Tools</string>
+    <string name="home_tool_accessibility_description">%1$s. %2$s. %3$s</string>
+    <string name="home_toolbox_note">Each card shows its credit cost.</string>
+    <string name="home_tool_price">Credits per result: %1$d</string>
+    <string name="home_included_tool">Included in your toolbox</string>
+    <string name="home_cutout_description">Remove the background from your product.</string>
+    <string name="home_listing_card_title">Listing card</string>
+    <string name="home_listing_card_description">Your photo on a clean layout with title and price</string>
+    <string name="home_scene_description">Generate a new setting for your product photo.</string>
+    <string name="home_tool_scene_title">Generate a background</string>
+    <string name="home_relight_description">Adjust the light and shadows in your photo.</string>
+    <string name="home_expand_description">Extend the photo to a square canvas.</string>
+    <string name="home_recolour_description">Change the product colour.</string>
+    <string name="home_model_description">Preview a garment on a model.</string>
+    <string name="home_workflow_title">More tools and exports</string>
+    <string name="home_auto_card_description">Turn your latest photo into a marketplace-ready card.</string>
+    <string name="home_slide_kit_description">Give a product series a consistent background and layout.</string>
+    <string name="home_listing_description">Write listing text in six languages, separately from image tools.</string>
+    <string name="home_coach_description">Get guidance for a clearer product shot before editing.</string>
+    <string name="home_library_description">Find, organise and work on products in bulk.</string>
+    <string name="home_export_description">Check marketplace rules and prepare your export pack.</string>
+    <string name="home_review_quote">Review quote before generation</string>
+    <string name="home_slide_price">Local layout · AI scene priced separately</string>
+    <string name="home_on_device">On-device workflow</string>
+    <string name="home_load_failed">Your recent work could not be loaded. Your photos have not been changed.</string>
+    <string name="home_load_retry_hint">Try loading your home again.</string>
+    <string name="home_thumbnail_failed">Photo preview unavailable. Open the item to review it.</string>
+    <plurals name="home_cost_chip">
+        <item quantity="one">%1$d credit</item>
+        <item quantity="other">%1$d credits</item>
+    </plurals>
+    <plurals name="home_tool_count">
+        <item quantity="one">%1$d tool ready</item>
+        <item quantity="other">%1$d tools ready</item>
+    </plurals>
+    <string name="home_listing_text_separate">Listing text (separate)</string>
+    <string name="home_slide_kit_separate">Slide kit (separate)</string>
+    <string name="home_marketplace_card_separate">Make a listing card</string>
+    <string name="home_workflow_more">More tools and exports</string>
+</resources>

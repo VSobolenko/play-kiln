@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="card_loading">Открываем фото…</string>
+    <string name="card_composing">Создаём карточку товара…</string>
+    <string name="card_failed">Не удалось создать карточку</string>
+    <string name="card_title">Карточка товара</string>
+    <string name="card_try_again">Повторить создание карточки</string>
+    <string name="card_source_ready">Ваше фото · можно создать карточку товара</string>
+    <string name="card_result_ready">Ваша карточка товара</string>
+    <string name="card_inspect">Увеличить изображение</string>
+    <string name="card_close_inspection">Закрыть просмотр</string>
+    <string name="card_save_png">Сохранить изображение</string>
+    <string name="card_not_saved">Можно сохранить. Кнопка «Сохранить изображение» позволит выбрать место.</string>
+    <string name="card_saving">Сохраняем в выбранное вами место…</string>
+    <string name="card_saving_action">Сохраняем…</string>
+    <string name="card_saved">Сохранено в: %1$s.</string>
+    <string name="card_saved_location_unknown">Файл сохранён, но Android не сообщил выбранное место.</string>
+    <string name="card_destination_downloads">Загрузки</string>
+    <string name="card_destination_internal_storage">Внутренняя память</string>
+    <string name="card_destination_external_storage">Внешний накопитель</string>
+    <string name="card_done">Готово</string>
+    <string name="card_save_error">Не удалось сохранить изображение. Повторите попытку или выберите другое место.</string>
+    <string name="card_export_guidance">Правила площадки для этого изображения не проверены.</string>
+</resources>

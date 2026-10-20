@@ -1,0 +1,27 @@
+<resources>
+    <string name="provenance_original_label">Исходные пиксели</string>
+    <string name="provenance_manual_label">Обработано вручную</string>
+    <string name="provenance_composite_label">Товар не изменён · фон сгенерирован</string>
+    <string name="provenance_enhanced_label">Улучшено с помощью ИИ</string>
+    <string name="provenance_guard_summary">Итог проверки: %1$s</string>
+    <string name="provenance_retention_notice">Фотографии отправляются на сервер Plinth и поставщику обработки только для запущенных вами операций. Загрузки хранятся на нашем сервере не более 1 часа, а результаты — не более 24 часов. Заметки к жалобам хранятся до удаления ваших данных командой DELETE /data. Срок хранения у поставщика обработки не зависит от нас.</string>
+    <string name="report_action">Пожаловаться на результат</string>
+    <string name="report_recorded_action">Жалоба отправлена</string>
+    <string name="report_title">Пожаловаться на результат</string>
+    <string name="report_output_context">Операция: %1$s · Результат: %2$s</string>
+    <string name="report_reason_offensive">Оскорбительный контент</string>
+    <string name="report_reason_wrong_product">Не тот товар</string>
+    <string name="report_reason_unsafe">Опасный контент</string>
+    <string name="report_reason_rights">Нарушение прав</string>
+    <string name="report_reason_other">Другое</string>
+    <string name="report_note_label">Комментарий (необязательно)</string>
+    <string name="report_note_counter">%1$d / %2$d</string>
+    <string name="report_output_stays_local">Результат остаётся на этом устройстве. Отправляются только ссылка на задание, причина и комментарий, если он указан.</string>
+    <string name="report_receipt">Жалоба №%1$d · %2$s</string>
+    <string name="report_readback_unavailable">Жалоба зарегистрирована, но не удалось загрузить её актуальный статус рассмотрения.</string>
+    <string name="report_network_failure">Не удалось подтвердить, зарегистрирована ли жалоба. Жалобы не ставятся в очередь и не отправляются повторно автоматически; повторная отправка может создать дубликат.</string>
+    <string name="report_unknown_failure">Не удалось подтвердить, что жалоба зарегистрирована. Проверьте сообщение и повторите попытку.</string>
+    <string name="report_submit">Отправить жалобу</string>
+    <string name="report_done">Готово</string>
+    <string name="report_cancel">Отмена</string>
+</resources>

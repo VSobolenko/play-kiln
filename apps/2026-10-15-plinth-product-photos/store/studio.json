@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "_comment": "Plinth is a gallery plinth under soft top light: the item is the exhibit and everything around it is styled. The mark, palette, headlines, kickers and feature copy are the slot's identity declaration.",
+  "_mark": "Lightfold: a print standing on a lit plinth. The bright paper print overlaps its plinth's lit amber cap, which overlaps a darker amber-deep body, so the three read as one glyph under one light. Original slot-owned geometry, not a font character or library glyph. Every shape is a rounded plate or a disc because the icon gate measures each role's medial width: a faceted polygon tapers to nothing at its corners and is refused as a 2px stroke. LIGHTFOLD in scripts/lib/icon_design.py, the launcher layers and the in-app brand glyph share the same four paths on the 108dp grid.",
+  "_palette": "Cool graphite and paper frame a muted teal action color, a deeper teal lane and a soft mist container. Pine provides quiet emphasis so product photos, not chrome, lead the colour. Error reds are semantic; product-photo backdrop choices remain separate from UI identity. PlinthPalette in Color.kt uses exactly this identity set.",
+  "_claim_bounds": "The app preserves item pixels in Original mode, styles backgrounds around the item, checks marketplace rules, applies a saved look across batches and slide series, lets sellers set text, and exports marketplace packs. It shows cost before paid actions; it does not claim that generated imagery is original photography.",
+  "_headlines": "Six short, truthful lines for the screenshot journey over the Studio screen: the seller's own photo, the priced tool grid, the background and lighting tools, the composition tools, the wider export entry and the one-credit cut-out. Every line describes a tool entry point with its cost shown; none claims a generated result.",
+  "mark": "mark-plinth",
+  "palette": {
+    "ink": "#111816",
+    "ink_soft": "#1A2420",
+    "ink_lift": "#2B3631",
+    "amber": "#63B7AA",
+    "amber_deep": "#346E63",
+    "amber_pale": "#D9EDE7",
+    "accent_deep": "#21463D",
+    "paper": "#F4F7F2",
+    "muted": "#4E5B54",
+    "bezel": "#070C09",
+    "bezel_rim": "#98A49C",
+    "lane": "#4E9F92",
+    "spark": "#5A5AD7",
+    "glow": "#E9654B",
+    "error": "#B3261E",
+    "error_deep": "#8C1D18",
+    "error_pale": "#F9DEDC"
+  },
+  "headlines": [
+    "Start from your own photo",
+    "Six tools, priced up front",
+    "Backgrounds and lighting",
+    "Canvas and colour",
+    "More tools and exports",
+    "Cut out for one credit"
+  ],
+  "kickers": [
+    "ORIGINAL PHOTO",
+    "COST SHOWN FIRST",
+    "STYLED SCENE",
+    "COMPOSITION",
+    "EXPORT PACK",
+    "ONE CREDIT"
+  ],
+  "featureTagline": "Keep the item's pixels. Style everything around it.",
+  "featurePill": "ORIGINAL PIXELS | COST SHOWN FIRST"
+}

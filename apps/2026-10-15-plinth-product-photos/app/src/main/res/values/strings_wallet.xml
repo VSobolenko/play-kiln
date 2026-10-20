@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wallet_title" translatable="true">Credit wallet</string>
+    <string name="wallet_back" translatable="true">Back</string>
+    <string name="wallet_balance" translatable="true">%1$d credits</string>
+    <string name="wallet_balance_unavailable" translatable="true">Balance unavailable</string>
+    <string name="wallet_balance_heading" translatable="true">Your balance</string>
+    <string name="wallet_reserved" translatable="true">%1$d credits reserved by active jobs</string>
+    <string name="wallet_offline" translatable="true">Offline · saved projects and local tools are available</string>
+    <string name="wallet_refresh" translatable="true">Refresh balance</string>
+    <string name="wallet_refund_debt" translatable="true">Refund debt: %1$d credits</string>
+    <string name="wallet_unlock_active" translatable="true">Unlocked · no watermark · batches over 5</string>
+    <string name="wallet_free_limits" translatable="true">Free · watermark · batches up to 5</string>
+    <string name="wallet_pack_starter" translatable="true">Starter</string>
+    <string name="wallet_pack_studio" translatable="true">Studio</string>
+    <string name="wallet_pack_pro" translatable="true">Pro</string>
+    <string name="wallet_choose_pack" translatable="true">Choose a credit pack</string>
+    <string name="wallet_best_value" translatable="true">Best value</string>
+    <string name="wallet_pack_too_small" translatable="true">Not enough for one background removal</string>
+    <string name="wallet_pack_price_per_use" translatable="true">About %1$s per background removal</string>
+    <string name="wallet_pack_accessibility" translatable="true">%1$s, %2$d %3$s, %4$s, %5$s</string>
+    <string name="wallet_pack_best_accessibility" translatable="true">%1$s, %2$d %3$s, %4$s, %5$s, best value</string>
+    <string name="wallet_cta_buy" translatable="true">Buy %1$d credits · %2$s</string>
+    <string name="wallet_cta_retry" translatable="true">Retry · %1$d credits · %2$s</string>
+    <string name="wallet_cta_purchases_unavailable" translatable="true">Purchases unavailable · %1$d credits</string>
+    <string name="wallet_cta_price_unavailable" translatable="true">Price unavailable · %1$d credits</string>
+    <string name="wallet_purchase_trust" translatable="true">Google Play handles payment; confirm the final price in its purchase dialog.</string>
+    <string name="wallet_unlock_purchase" translatable="true">Unlock · %1$s</string>
+    <string name="wallet_unlock" translatable="true">Permanent unlock</string>
+    <string name="wallet_play_price" translatable="true">Google Play price: %1$s</string>
+    <string name="wallet_price_unavailable" translatable="true">Store price unavailable</string>
+    <string name="wallet_buy" translatable="true">Add</string>
+    <string name="wallet_restore" translatable="true">Restore purchases</string>
+    <string name="wallet_recovery_code_label" translatable="true">Recovery code</string>
+    <string name="wallet_recover" translatable="true">Restore wallet with code</string>
+    <string name="wallet_failed_not_charged" translatable="true">Not charged.</string>
+    <string name="wallet_purchase_pending" translatable="true">Payment pending · credits unavailable</string>
+    <string name="wallet_purchase_confirming" translatable="true">Confirming purchase</string>
+    <string name="wallet_purchase_unconfirmed" translatable="true">Purchase not confirmed</string>
+    <string name="wallet_purchase_success" translatable="true">Purchase confirmed</string>
+    <string name="wallet_purchase_unavailable" translatable="true">Purchases unavailable</string>
+    <string name="wallet_history_title" translatable="true">Recent wallet activity</string>
+    <string name="wallet_history_entry" translatable="true">%1$s · %2$d credits</string>
+    <string name="wallet_empty_history" translatable="true">No wallet activity yet.</string>
+    <string name="wallet_jobs_title" translatable="true">Recent jobs</string>
+    <string name="wallet_job_released" translatable="true">This job failed or was cancelled. No charge was made; %1$d credits were returned.</string>
+    <string name="wallet_job_settled" translatable="true">Your result was delivered. %1$d credits were charged.</string>
+    <string name="wallet_job_receipt_pending" translatable="true">Your result is waiting for delivery confirmation. You have not been charged.</string>
+    <string name="wallet_job_release_unconfirmed" translatable="true">This job ended, but its credit refund is still being confirmed.</string>
+    <string name="wallet_job_history_unavailable" translatable="true">Only the currently saved job can be checked; completed job history is not available yet.</string>
+    <string name="wallet_recovery_help" translatable="true">Credit balance is restored with your recovery code. Keep it somewhere safe.</string>
+    <string name="wallet_recovery_success" translatable="true">Wallet recovered</string>
+    <string name="wallet_recovery_failed" translatable="true">Could not recover wallet</string>
+    <string name="wallet_restore_success" translatable="true">Purchases restored</string>
+    <string name="wallet_restore_failure" translatable="true">Could not restore purchases</string>
+    <string name="wallet_job_status_unavailable" translatable="true">The latest job status could not be checked.</string>
+    <plurals name="wallet_balance_uses">
+        <item quantity="one">Your balance covers %1$d background removal</item>
+        <item quantity="other">Your balance covers %1$d background removals</item>
+    </plurals>
+    <plurals name="wallet_pack_uses">
+        <item quantity="one">Enough for %1$d background removal</item>
+        <item quantity="other">Enough for %1$d background removals</item>
+    </plurals>
+    <plurals name="wallet_pack_credit_cost">
+        <item quantity="one">%1$d credit per background removal</item>
+        <item quantity="other">%1$d credits per background removal</item>
+    </plurals>
+    <plurals name="wallet_credit_unit">
+        <item quantity="one">credit</item>
+        <item quantity="other">credits</item>
+    </plurals>
+    <string name="import_batch_limit_free" translatable="true">Free: up to %1$d photos at once. Unlock in Wallet to import more.</string>
+    <string name="import_batch_limit_unlocked" translatable="true">Unlocked: up to %1$d photos at once.</string>
+    <string name="import_batch_truncated" translatable="true">Only the first %1$d photos were kept, the free limit. Unlock in Wallet for more.</string>
+</resources>

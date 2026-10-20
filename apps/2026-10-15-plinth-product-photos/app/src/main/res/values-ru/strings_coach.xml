@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="coach_title" translatable="true">Помощник съёмки</string>
+    <string name="coach_intro" translatable="true">Сделайте чёткий снимок товара целиком. Подсказки работают на устройстве.</string>
+    <string name="coach_camera_permission_explanation" translatable="true">Доступ к камере позволит снимать товары здесь. Если вы откажете, можно выбрать готовый снимок.</string>
+    <string name="coach_camera_denied_title" translatable="true">Доступ к камере отклонён</string>
+    <string name="coach_camera_denied_body" translatable="true">Предпросмотр камеры недоступен. Выберите снимок из галереи.</string>
+    <string name="coach_no_camera_title" translatable="true">Камера недоступна</string>
+    <string name="coach_no_camera_body" translatable="true">Вы всё ещё можете выбрать готовый снимок из галереи.</string>
+    <string name="coach_camera_unavailable" translatable="true">Не удалось запустить камеру. Выберите снимок или откройте помощник ещё раз.</string>
+    <string name="coach_open_picker" translatable="true">Выбрать снимок</string>
+    <string name="coach_open_camera" translatable="true">Запросить доступ к камере</string>
+    <string name="coach_back" translatable="true">Назад</string>
+    <string name="coach_marketplace" translatable="true">Торговая площадка</string>
+    <string name="coach_marketplace_label" translatable="true">%1$s: %2$s</string>
+    <string name="coach_main_guidance" translatable="true">Покажите товар целиком на простом, не отвлекающем фоне.</string>
+    <string name="coach_background_white" translatable="true">Для главного снимка используйте чисто-белый фон.</string>
+    <string name="coach_background_neutral" translatable="true">Выберите чистый нейтральный фон, который не отвлекает от товара.</string>
+    <string name="coach_background_neutral_only" translatable="true">Используйте нейтральный фон; цветные фоны запрещены.</string>
+    <string name="coach_main_packaging" translatable="true">Покажите товар без упаковки.</string>
+    <string name="coach_main_no_text" translatable="true">Не добавляйте текст на главный снимок.</string>
+    <string name="coach_main_text_penalty" translatable="true">Текст на главном снимке может ухудшить его размещение.</string>
+    <string name="coach_main_no_marks" translatable="true">Не используйте водяные знаки, логотипы, декоративные рамки и рекламную графику.</string>
+    <string name="coach_category" translatable="true">Тип товара</string>
+    <string name="coach_category_clothing" translatable="true">Одежда</string>
+    <string name="coach_category_shoes" translatable="true">Обувь</string>
+    <string name="coach_category_jewellery" translatable="true">Украшения</string>
+    <string name="coach_category_electronics" translatable="true">Электроника</string>
+    <string name="coach_category_other" translatable="true">Другое</string>
+    <string name="coach_shot_progress" translatable="true">Готово снимков: %1$d из %2$d</string>
+    <string name="coach_shot_current" translatable="true">Следующий снимок: %1$s</string>
+    <string name="coach_shot_front" translatable="true">Спереди</string>
+    <string name="coach_shot_back" translatable="true">Сзади</string>
+    <string name="coach_shot_label" translatable="true">Ярлык или этикетка</string>
+    <string name="coach_shot_flaw" translatable="true">Крупный план дефекта</string>
+    <string name="coach_shot_measurement" translatable="true">Размер с линейкой</string>
+    <string name="coach_shot_side" translatable="true">Сбоку</string>
+    <string name="coach_shot_sole" translatable="true">Подошва</string>
+    <string name="coach_shot_clasp" translatable="true">Застёжка</string>
+    <string name="coach_shot_mark" translatable="true">Клеймо производителя</string>
+    <string name="coach_shot_ports" translatable="true">Разъёмы и порты</string>
+    <string name="coach_shot_done" translatable="true">Готово</string>
+    <string name="coach_shot_skipped" translatable="true">Пропущено</string>
+    <string name="coach_skip_shot" translatable="true">Пропустить этот снимок</string>
+    <string name="coach_all_shots_done" translatable="true">Список снимков готов. При необходимости можно сделать ещё один.</string>
+    <string name="coach_level_good" translatable="true">Ровно</string>
+    <string name="coach_level_tilted" translatable="true">Наклоняйте телефон, пока уровень не выровняется</string>
+    <string name="coach_level_unavailable" translatable="true">Датчик уровня недоступен; ориентируйтесь по рамке</string>
+    <string name="coach_frame_hint" translatable="true">Поместите товар целиком внутрь рамки</string>
+    <string name="coach_capture" translatable="true">Снять фото</string>
+    <string name="coach_review_title" translatable="true">Проверьте снимок</string>
+    <string name="coach_quality_sharpness" translatable="true">Резкость</string>
+    <string name="coach_quality_exposure" translatable="true">Экспозиция</string>
+    <string name="coach_quality_fill" translatable="true">Заполнение кадра</string>
+    <string name="coach_quality_aspect" translatable="true">Соотношение сторон</string>
+    <string name="coach_quality_pass" translatable="true">Соответствует доступному правилу</string>
+    <string name="coach_quality_attention" translatable="true">Стоит проверить ещё раз</string>
+    <string name="coach_quality_unverified_sharpness" translatable="true">Нет измерения резкости на устройстве или проверенного порога, поэтому результат не подтверждён.</string>
+    <string name="coach_quality_unverified_exposure" translatable="true">Нет измерения экспозиции или проверенного порога, поэтому результат не подтверждён.</string>
+    <string name="coach_quality_sharpness_measurement_missing" translatable="true">Резкость на устройстве не измерялась.</string>
+    <string name="coach_quality_sharpness_threshold_missing" translatable="true">Проверенный порог резкости не задан.</string>
+    <string name="coach_quality_exposure_measurement_missing" translatable="true">Экспозиция на устройстве не измерялась.</string>
+    <string name="coach_quality_exposure_threshold_missing" translatable="true">Проверенный порог экспозиции не задан.</string>
+    <string name="coach_quality_unverified_fill" translatable="true">Контур товара не измеряется; для проверки заполнения нужна граница объекта.</string>
+    <string name="coach_quality_no_fill_rule" translatable="true">Для этой площадки минимальное заполнение кадра не задано.</string>
+    <string name="coach_quality_unverified_aspect" translatable="true">Не удалось прочитать соотношение сторон в правилах площадки.</string>
+    <string name="coach_quality_no_aspect_rule" translatable="true">Для этой площадки соотношение сторон не задано.</string>
+    <string name="coach_remedy_sharpness" translatable="true">Держите телефон неподвижно и коснитесь товара для фокусировки.</string>
+    <string name="coach_remedy_exposure" translatable="true">Выберите равномерное освещение без бликов и глубоких теней.</string>
+    <string name="coach_remedy_fill" translatable="true">Подойдите ближе, не обрезая товар по краям кадра.</string>
+    <string name="coach_remedy_aspect" translatable="true">Расположите товар в соответствии с рамкой площадки.</string>
+    <string name="coach_use_photo" translatable="true">Использовать снимок</string>
+    <string name="coach_shoot_again" translatable="true">Переснять</string>
+    <string name="coach_import_failed" translatable="true">Не удалось открыть этот снимок. Выберите другой или попробуйте ещё раз.</string>
+    <string name="coach_capture_failed" translatable="true">Не удалось сделать снимок. Проверьте камеру и попробуйте ещё раз.</string>
+    <string name="coach_saving" translatable="true">Сохраняем снимок…</string>
+    <string name="coach_camera_photo_name" translatable="true">Снимок с камеры</string>
+    <string name="coach_reference_note" translatable="true">Снимок ярлыка или измерения помечен как справочный и не попадёт в экспорт.</string>
+    <string name="coach_reference_short">Справочный снимок · не для экспорта</string>
+    <string name="coach_show_shots">Список снимков и пропуск</string>
+    <string name="coach_hide_shots">Скрыть список снимков</string>
+    <string name="coach_setup_label">%1$s · тип товара и правила фото</string>
+    <string name="coach_hint_label">Приблизьте камеру, чтобы ярлык или клеймо читались</string>
+    <string name="coach_hint_measurement">Оставьте в кадре линейку и измеряемые края</string>
+    <string name="coach_hint_detail">Снимите деталь крупно; коснитесь для фокуса</string>
+    <string name="coach_review_manual">Проверьте фокус, свет и края товара сами. Не все параметры измерены.</string>
+    <string name="coach_show_checks">Почему такой результат? Показать проверки</string>
+    <string name="coach_hide_checks">Скрыть подробности проверок</string>
+    <string name="coach_check_no_rule">Нет правила площадки</string>
+    <string name="coach_check_adjust">Исправьте</string>
+    <string name="coach_check_manual">Проверьте сами</string>
+    <string name="coach_check_matches">По правилу</string>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shell_studio">Студия</string>
+    <string name="shell_library">Библиотека</string>
+    <string name="shell_profile">Профиль</string>
+    <string name="shell_profile_settings">Настройки</string>
+    <string name="shell_batch">Пакет</string>
+    <string name="shell_batch_choose_project">Выберите проект для пакетной обработки</string>
+    <string name="shell_create_label">+ Фото</string>
+    <string name="shell_more">Ещё</string>
+    <string name="shell_create">Добавить фото товара</string>
+    <string name="shell_balance_count">Кредиты · %1$d</string>
+    <string name="shell_balance_get_credits">Пополнить кредиты</string>
+    <string name="shell_balance_purpose">%1$s. Открывает кошелёк для пополнения.</string>
+    <string name="shell_credits_explanation">Кредиты нужны для серверных инструментов: генерации сцен и удаления фона. Стоимость указана у каждого инструмента. Пополнить баланс можно в кошельке.</string>
+    <string name="shell_credits_open_wallet">Открыть кошелёк</string>
+    <string name="shell_credits_dismiss">Понятно</string>
+    <string name="shell_more_wallet">Кошелёк кредитов</string>
+    <string name="shell_more_wallet_summary">Проверить баланс кредитов и купить пакеты для генерации, удаления фона и других серверных инструментов.</string>
+    <string name="shell_more_settings_summary">Язык, оформление и параметры новых изображений.</string>
+    <string name="shell_more_about_summary">Информация о приложении и конфиденциальности.</string>
+    <string name="shell_more_support">Помощь и поддержка</string>
+    <string name="shell_more_support_summary">Контакты поддержки и помощь в настройках.</string>
+</resources>

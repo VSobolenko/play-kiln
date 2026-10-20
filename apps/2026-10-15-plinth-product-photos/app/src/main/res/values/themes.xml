@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      The platform theme must be an AppCompat theme. MainActivity is an AppCompatActivity — the host
+      the in-app per-app language picker needs, because `AppCompatDelegate.setApplicationLocales` only
+      takes effect there — and an AppCompatActivity throws at startup unless its activity theme is an
+      AppCompat one.
+
+      It deliberately does NOT parent from `Theme.Material3.DayNight.NoActionBar` or
+      `Theme.MaterialComponents.*`: those styles live in the Material Components *View* library, which
+      a Compose-only app does not bundle.
+
+      `DayNight` resolves light and dark itself, so there is no values-night/themes.xml — a second,
+      non-AppCompat parent in the -night configuration would crash the activity in dark mode.
+
+      Edge-to-edge plus transparent system bars are applied by enableEdgeToEdge() in MainActivity.
+      In-app styling always comes from the slot-owned PlinthPalette in PlayKilnTheme.
+    -->
+    <style name="Theme.PlayKilnSlot" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowBackground">@color/playkiln_window_background</item>
+    </style>
+</resources>

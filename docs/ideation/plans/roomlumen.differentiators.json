@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "slot": "roomlumen",
+  "reconRef": "docs/ideation/2026-10-16-ecosystem-consumer-personal.md#promise-contract",
+  "jobCoverage": {
+    "before": { "claimId": "bring-your-own-room" },
+    "during": { "claimId": "one-change-only" },
+    "after": { "claimId": "handoff-the-chosen-render" }
+  },
+  "claims": [
+    {
+      "id": "bring-your-own-room",
+      "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "data_in",
+      "promise": "The user brings the room they actually live in in through the Android Photo Picker, the camera or a saved document, and the app reads the photo's orientation so the room arrives upright, so every render starts from the real room rather than from a template library or a stock interior.",
+      "comparison": {
+        "incumbent": "com.sictec.infotech.design.sense",
+        "limitation": "Its 3.1-star 100K+ listing is measured carrying a one-star review saying the original photo was turned sideways, so the rendering came back of a completely different room; the orientation of the user's own photo is not handled.",
+        "source": "docs/ideation/2026-10-16-ecosystem-consumer-personal.md#what-the-shelfs-own-users-complain-about-the-wedge-measured"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-consumer-personal.md#what-the-shelfs-own-users-complain-about-the-wedge-measured",
+        "finding": "A one-star review on com.sictec.infotech.design.sense reads that the original photo was turned sideways, making the rendering have a completely different room, and it is one of 14 critical reviews sampled across the interior design ai query."
+      },
+      "status": "deferred",
+      "deferredReason": "The Photo Picker, camera-intent and document intake paths, the EXIF orientation correction and the pre-upload downscale do not exist until the slot is built.",
+      "plannedProof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/roomlumen/ui/intake/RoomIntake.kt",
+        "symbol": "PickVisualMedia",
+        "why": "An intent, not a delivery, and it is a separate field for a reason: a `proof` is refused while a promise is deferred (`scripts/lib/slot-differentiators.mjs:576-581`, a stale proof reads as delivery). This records the artifact and the family token the builder must prove the data_in handoff with, so the handoff cannot be dropped silently, and `PickVisualMedia` is the token `.cursor/rules/app-depth.mdc` names for data_in."
+      }
+    },
+    {
+      "id": "one-change-only",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "The user changes exactly one thing at a time on their own room, the wall colour or the floor or one piece of furniture or one object removed, and everything else in the photograph is held as it is, so the result is a variant of the room they have rather than a new room generated from the description.",
+      "comparison": {
+        "incumbent": "com.sictec.infotech.design.sense",
+        "limitation": "Its 3.1-star 100K+ listing is measured with a two-star review from an interior designer saying the app needs to ask which doors, windows and openings are to be changed, because that is thirty percent of the renovations they do; the user cannot choose what changes and what is kept.",
+        "source": "docs/ideation/2026-10-16-ecosystem-consumer-personal.md#what-the-shelfs-own-users-complain-about-the-wedge-measured"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-consumer-personal.md#what-the-shelfs-own-users-complain-about-the-wedge-measured",
+        "finding": "Two of 14 critical reviews sampled on the interior design ai query name steerability directly: one asks for control over which openings are changed, and another on com.wonder.idealhouse.app says attempting to customise anything about the initial image was a complete waste of time because it does not understand simple requests."
+      },
+      "status": "deferred",
+      "deferredReason": "The one-variable control surface, the instruction-edit call and the composition that holds the rest of the photograph are unbuilt."
+    },
+    {
+      "id": "light-you-can-steer",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "The light is a control of its own: the user asks for the same room and the same change at a different time of day or with a warmer lamp, and the render is relit rather than regenerated, so the user can see whether the room works in the evening before buying the lamp.",
+      "comparison": {
+        "incumbent": "interior.home.design.ai",
+        "limitation": "The 10M+ leader and the other five enriched leaders of this shelf declare in-app purchases but none of them sells a relight pass, so a user who wants to know how a room looks under different light has to pay for a whole new room render and accept a new room.",
+        "source": "docs/ideation/2026-10-16-ecosystem-consumer-personal.md#incumbents-as-evidence-rather-than-as-a-warning-list"
+      },
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/research/2026-10-16-generation-capability-inventory.md#1-the-priced-operations",
+        "finding": "The relight operation is priced and enabled at five credits and 104858 microdollars, while no enriched incumbent on this shelf sells a relight; the inference is that the control is unserved rather than refused by anyone's arithmetic, and it rests on the absence of such a product in the six enriched listings, which is weaker evidence than a measured complaint."
+      },
+      "status": "deferred",
+      "deferredReason": "The relight call, its five-credit cost disclosure and the side-by-side comparison of the same room under two lights are unbuilt."
+    },
+    {
+      "id": "keep-the-versions",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "durability",
+      "promise": "Every version the user kept stays on the phone with its own label and its own change, so a burst of twenty attempts is a record of decisions rather than twenty transient images, and a kill, a low-memory restart or a reboot does not take the version the user liked with it.",
+      "comparison": {
+        "incumbent": "com.wonder.idealhouse.app",
+        "limitation": "Its 3.8-star 100K+ listing is measured with a one-star review saying the initial generated image was fine and that customising anything about it was a waste of time, which is a shelf where the user has many attempts and nothing to keep them as decisions.",
+        "source": "docs/ideation/2026-10-16-ecosystem-consumer-personal.md#what-the-shelfs-own-users-complain-about-the-wedge-measured"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-consumer-personal.md#what-the-shelfs-own-users-complain-about-the-wedge-measured",
+        "finding": "A one-star review on the 10M+ leader interior.home.design.ai reads that the user paid for the trial specifically to use the room visualisation and tried around twenty different photos from different rooms and different angles, which is the iteration volume a labelled local version history exists to serve."
+      },
+      "status": "deferred",
+      "deferredReason": "The local version store, its labels, the crash-safe write path and the restore path are unbuilt.",
+      "plannedProof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/roomlumen/data/VersionStore.kt",
+        "symbol": "SavedStateHandle",
+        "why": "Forward declaration only, because a `proof` cannot exist at status deferred. The durability family's tokens are `dataExtractionRules`, `fullBackupContent`, `UndoState`, `undo`, `rememberSaveable` and `SavedStateHandle`; the store is where the kept version has to survive a kill and a reboot, and the backup rules in the slot's `res/xml/` are the second half the builder is expected to prove."
+      }
+    },
+    {
+      "id": "handoff-the-chosen-render",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "The version the user chose leaves the phone usable: shared straight into a message or a chat through the Android share sheet with no watermark, or saved at full resolution to a folder of the user's own choosing through the system document picker, so the picture can go to a partner, a painter or a buyer.",
+      "comparison": {
+        "incumbent": "com.icandesignapp.all",
+        "limitation": "Across 14 critical reviews sampled on the interior design ai query the export is not what is complained about and the price is: six of fourteen are paywall complaints, so on this shelf the result is held by the charge rather than by the export path, which means the one-time unlock beside consumable credits is the honest shape and not a watermark trick.",
+        "source": "docs/ideation/2026-10-16-ecosystem-consumer-personal.md#what-the-shelfs-own-users-complain-about-the-wedge-measured"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-consumer-personal.md#what-the-shelfs-own-users-complain-about-the-wedge-measured",
+        "finding": "The measured shelf reading is that 43 percent of the critical reviews behind the interior design ai query and 54 percent behind home design ai are paywall complaints, and two further critical reviews are value complaints about a charge after install, so the handoff is where the shelf's monetization either respects the user or exploits them."
+      },
+      "status": "deferred",
+      "deferredReason": "The share sheet path with its FileProvider, the document-picker save path, the full-resolution export and the watermark rule are unbuilt.",
+      "plannedProof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/roomlumen/export/RenderShare.kt",
+        "symbol": "ACTION_SEND",
+        "why": "Forward declaration only, because a `proof` cannot exist at status deferred. This is the shape carrying the `data_out` half of the connective floor, and both of the family's tokens the builder is expected to have in this artifact are named here: `ACTION_SEND` for the share sheet and `FileProvider` for the `content://` URI it has to hand out, with `ACTION_CREATE_DOCUMENT` as the second door in the save path."
+      }
+    },
+    {
+      "id": "no-renewing-charge",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "trust",
+      "promise": "Nothing about this app renews: the user buys a pack of renders or a one-time unlock, the credit cost of each render is shown before the render, six starter credits are given per device so the first change is free, and there is no trial that can bill, so the room is never held behind a charge the user did not intend to keep paying.",
+      "comparison": {
+        "incumbent": "ai.home.room.designer",
+        "limitation": "Its 4.2-star 100K+ listing is measured with a one-star review saying the user did a three-day free trial, cancelled it in time, and is still billed every two weeks for 10.99 dollars, which is the recurring shape this shelf monetizes with and the shape a plan of ours cannot express at all.",
+        "source": "docs/ideation/2026-10-16-ecosystem-consumer-personal.md#what-the-shelfs-own-users-complain-about-the-wedge-measured"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-consumer-personal.md#what-the-shelfs-own-users-complain-about-the-wedge-measured",
+        "finding": "Seven of 13 critical reviews behind the home design ai query and six of 14 behind interior design ai are paywall, price or subscription complaints, and the quoted amounts include 10.99 dollars every two weeks and a weekly charge paid in rupees."
+      },
+      "status": "deferred",
+      "deferredReason": "The Play Billing surface, the credit-cost disclosure before every action, the one-time unlock product and the absence of any trial product do not exist until the slot is built."
+    },
+    {
+      "id": "find-a-past-version",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "find",
+      "promise": "A user with several rooms and dozens of kept versions finds one again by room, by change or by name from a search field, so the version that finally worked is reusable when the next decision comes.",
+      "comparison": {
+        "incumbent": "com.autodesk.homestyler",
+        "limitation": "Its 3.3-star 10M+ listing is measured with reviews about not getting through a full design because the app keeps messing up, and its shelf's leaders return a whole regenerated room per attempt rather than a labelled variant, so nothing accumulated is findable again.",
+        "source": "docs/ideation/2026-10-16-ecosystem-consumer-personal.md#what-the-shelfs-own-users-complain-about-the-wedge-measured"
+      },
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/ideation/2026-10-16-ecosystem-consumer-personal.md#what-the-shelfs-own-users-complain-about-the-wedge-measured",
+        "finding": "It follows from the version-history promise plus the measured iteration volume: the user who tried twenty photos and many angles has a set that is only useful if it is findable, and no enriched leader on this shelf exposes a version history at all."
+      },
+      "status": "deferred",
+      "deferredReason": "The local index over versions, the search field and the room grouping are unbuilt.",
+      "plannedProof": {
+        "type": "code",
+        "ref": "app/src/main/java/com/gexetr/roomlumen/ui/library/VersionSearch.kt",
+        "symbol": "SearchBar",
+        "why": "Forward declaration only, because a `proof` cannot exist at status deferred. `SearchBar` is one of the `find` family's tokens; the other, `searchQuery`, is the query state this field is expected to be driven by."
+      }
+    }
+  ]
+}

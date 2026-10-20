@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "authoredMarks": [
+    {
+      "id": "mark-plinth",
+      "revision": "lightfold-1",
+      "authoredBy": "Copilot worker plinth-r-icon",
+      "authoredAt": "2026-10-16",
+      "origin": "Original polygon construction for this slot; no library artwork, font glyph or traced source.",
+      "description": "Floating three-facet exhibit over an ascending folded plinth, with open channels preserved in monochrome.",
+      "files": [
+        "app/src/main/res/drawable/ic_launcher_foreground.xml",
+        "app/src/main/res/drawable/ic_launcher_background.xml",
+        "app/src/main/res/drawable/ic_launcher_monochrome.xml"
+      ],
+      "regenerationNote": "The mark-plinth primitive registry now matches the Lightfold launcher paths and palette roles. Phase-2 store rendering remains unverified until its release-gated renderer is run."
+    }
+  ],
+  "sets": [
+    {
+      "library": "Lucide",
+      "version": "0.468.0",
+      "spdx": "ISC",
+      "sourceUrl": "https://github.com/lucide-icons/lucide/tree/0.468.0",
+      "licenceFile": "icons/LICENSES/ISC.txt",
+      "attribution": null,
+      "fetchedAt": "2026-10-15",
+      "fetchedBy": "agent",
+      "icons": [
+        {
+          "name": "arrow-left",
+          "file": "app/src/main/res/drawable/ic_lucide_arrow_left.xml",
+          "sha256": "8a631757dcf7d6d80c63d006323fc062deadbfed18fcb2763b5b3028be6d53ec",
+          "sourcePath": "icons/arrow-left.svg"
+        },
+        {
+          "name": "x",
+          "file": "app/src/main/res/drawable/ic_lucide_x.xml",
+          "sha256": "c34f7a1403aa7d74b6d667c16ae9770885b91f4eda0c37c957bf63d2b111e73e",
+          "sourcePath": "icons/x.svg"
+        },
+        {
+          "name": "plus",
+          "file": "app/src/main/res/drawable/ic_lucide_plus.xml",
+          "sha256": "18d15817528cb2a4e7b8306ab82052a173514810800ca53a47fe018f07f139b6",
+          "sourcePath": "icons/plus.svg"
+        },
+        {
+          "name": "trash-2",
+          "file": "app/src/main/res/drawable/ic_lucide_trash_2.xml",
+          "sha256": "9632cbdc047619c8e69d2760e18f64b8ac37255897113d3813a2bdab9a29bdb5",
+          "sourcePath": "icons/trash-2.svg"
+        },
+        {
+          "name": "share-2",
+          "file": "app/src/main/res/drawable/ic_lucide_share_2.xml",
+          "sha256": "c4374b2c61c3ca0574b92c3edd7dca8824938807826be5a586ca0ccce33cf306",
+          "sourcePath": "icons/share-2.svg"
+        },
+        {
+          "name": "file",
+          "file": "app/src/main/res/drawable/ic_lucide_file.xml",
+          "sha256": "83de97caa685ad6019b779a8bb144546f13d1f0c5277bdc456fe4b1da648e446",
+          "sourcePath": "icons/file.svg"
+        },
+        {
+          "name": "download",
+          "file": "app/src/main/res/drawable/ic_lucide_download.xml",
+          "sha256": "4d67ae2bcce7e032c6a435c7c6adce0cab3db67f7797cbe0f8663e9d32e5be4c",
+          "sourcePath": "icons/download.svg"
+        },
+        {
+          "name": "settings",
+          "file": "app/src/main/res/drawable/ic_lucide_settings.xml",
+          "sha256": "f10ff3a174861f31246bab84ee42b830118dfd82eabc83f919d04a3808145e63",
+          "sourcePath": "icons/settings.svg"
+        },
+        {
+          "name": "search",
+          "file": "app/src/main/res/drawable/ic_lucide_search.xml",
+          "sha256": "eb8a1e736d08aadde5eb200105be346bf3e543e523451ddb6950b1d9812e3025",
+          "sourcePath": "icons/search.svg"
+        },
+        {
+          "name": "list-filter",
+          "file": "app/src/main/res/drawable/ic_lucide_list_filter.xml",
+          "sha256": "d1881b44451b0a3e301a0e5677b4b2dd80d9acd55230bd2cf619c98d27f3680f",
+          "sourcePath": "icons/list-filter.svg"
+        },
+        {
+          "name": "check",
+          "file": "app/src/main/res/drawable/ic_lucide_check.xml",
+          "sha256": "d1247176889b7a9adb666738e7f09624d646529892f9dc47e6dbcc21ef1cd0fe",
+          "sourcePath": "icons/check.svg"
+        },
+        {
+          "name": "triangle-alert",
+          "file": "app/src/main/res/drawable/ic_lucide_triangle_alert.xml",
+          "sha256": "9c28f0eeefde511c8abcfa366742e2ddd41da2ee391a7c1d004f9f058ad2a38d",
+          "sourcePath": "icons/triangle-alert.svg"
+        },
+        {
+          "name": "refresh-cw",
+          "file": "app/src/main/res/drawable/ic_lucide_refresh_cw.xml",
+          "sha256": "2e4032469fadbdb689f0227413cb7c094873c8198689c9ac728b82bbb385c593",
+          "sourcePath": "icons/refresh-cw.svg"
+        },
+        {
+          "name": "camera",
+          "file": "app/src/main/res/drawable/ic_lucide_camera.xml",
+          "sha256": "a22658dca479f9afbeb41b27952198c7ad2fa3ec3a5b980d52abe727b38ca67a",
+          "sourcePath": "icons/camera.svg"
+        },
+        {
+          "name": "image",
+          "file": "app/src/main/res/drawable/ic_lucide_image.xml",
+          "sha256": "54e723fb14e166626f10ab855544b583b82627f25314313c8b08603a6efe188f",
+          "sourcePath": "icons/image.svg"
+        },
+        {
+          "name": "chevron-right",
+          "file": "app/src/main/res/drawable/ic_lucide_chevron_right.xml",
+          "sha256": "51327c6f62396cf0712716c96f2f540c01864043dd07c6a34f9e427b134aad93",
+          "sourcePath": "icons/chevron-right.svg"
+        },
+        {
+          "name": "info",
+          "file": "app/src/main/res/drawable/ic_lucide_info.xml",
+          "sha256": "0fa23b9ca3ed9cf3ed9eea84ccbe8caaa8395752d3977a0362f511cd1355c1eb",
+          "sourcePath": "icons/info.svg"
+        },
+        {
+          "name": "user",
+          "file": "app/src/main/res/drawable/ic_lucide_user.xml",
+          "sha256": "85a6f7fdbf91983fc6b80f055c1d3e792cca80338805c90aae15ec2ef77b6a5c",
+          "sourcePath": "icons/user.svg"
+        },
+        {
+          "name": "wallet",
+          "file": "app/src/main/res/drawable/ic_lucide_wallet.xml",
+          "sha256": "10e26a017b5d730881bfdd93a7cd032be58d00944b0175158cbd9badb03f5387",
+          "sourcePath": "icons/lucide-0.468.0/wallet.svg"
+        },
+        {
+          "name": "folder",
+          "file": "app/src/main/res/drawable/ic_lucide_folder.xml",
+          "sha256": "22b2aaea3661d76b4309fead9f96a9b3234a3b5c1ba2cfddcccb435c0b143dc6",
+          "sourcePath": "icons/lucide-0.468.0/folder.svg"
+        },
+        {
+          "name": "external-link",
+          "file": "app/src/main/res/drawable/ic_lucide_external_link.xml",
+          "sha256": "e5c02a7e15600a5c86937fd1034f429ccf0440e872e0b92cb898542de806a642",
+          "sourcePath": "icons/external-link.svg"
+        }
+      ]
+    }
+  ]
+}

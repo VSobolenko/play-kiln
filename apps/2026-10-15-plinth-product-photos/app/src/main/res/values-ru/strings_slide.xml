@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="slide_kit_title" translatable="true">Набор слайдов</string>
+    <string name="slide_kit_empty" translatable="true">Выберите товар и сохранённый фон серии, чтобы начать.</string>
+    <string name="slide_kit_template_picker" translatable="true">Шаблон</string>
+    <string name="slide_kit_template_samples">Примеры макетов с вашими фото. Листайте и нажмите, чтобы применить. Текст примеров не экспортируется.</string>
+    <string name="slide_kit_template_selected">Выбранный шаблон</string>
+    <string name="slide_kit_template_not_selected">Нажмите, чтобы применить шаблон</string>
+    <string name="slide_kit_template_preview_error">Пример макета недоступен: %1$s</string>
+    <string name="slide_kit_add_slide" translatable="true">Добавить слайд</string>
+    <string name="slide_kit_slide_label" translatable="true">Слайд %1$d · %2$s</string>
+    <string name="slide_kit_render_export" translatable="true">Собрать и экспортировать серию</string>
+    <string name="slide_kit_apply_look_info" translatable="true">Во всех слайдах серии используются один сохранённый стиль и один и тот же файл фона.</string>
+    <string name="slide_kit_empty_text_slots" translatable="true">В этом шаблоне нет текстовых полей.</string>
+    <string name="slide_kit_characters" translatable="true">%1$d знаков</string>
+    <string name="slide_kit_character_limit" translatable="true">%1$d / %2$d знаков</string>
+    <string name="slide_kit_rules_not_read" translatable="true">Правила этой площадки для текста на слайдах не изучены.</string>
+    <string name="slide_kit_matcher_unavailable" translatable="true">Список запрещённых фраз нельзя проверить на этом языке. Сборка заблокирована.</string>
+    <string name="slide_kit_category_unavailable" translatable="true">Для категорий правил нет проверок: %1$s. Сборка заблокирована.</string>
+    <string name="slide_kit_finding" translatable="true">%1$s · %2$s (%3$s): «%4$s»</string>
+    <string name="slide_kit_preview" translatable="true">Предпросмотр серии</string>
+    <string name="slide_kit_rendering" translatable="true">Сборка серии слайдов…</string>
+    <string name="slide_kit_marketplace" translatable="true">Площадка: %1$s</string>
+    <string name="slide_kit_contrast" translatable="true">Контраст текста: %1$.2f:1 (минимум %2$.1f:1)</string>
+    <string name="slide_kit_text_does_not_fit" translatable="true">Текст не помещается на плашке шаблона. Сократите его или выберите другой шаблон.</string>
+    <string name="slide_kit_render_error" translatable="true">Не удалось собрать серию слайдов: %1$s</string>
+    <string name="slide_kit_asset_error" translatable="true">Не удалось загрузить шаблоны слайдов: %1$s</string>
+    <string name="slide_kit_template_hero" translatable="true">Главный</string>
+    <string name="slide_kit_template_spec3" translatable="true">Три свойства</string>
+    <string name="slide_kit_template_size" translatable="true">Размер</string>
+    <string name="slide_kit_template_detail" translatable="true">Деталь</string>
+    <string name="slide_kit_template_kit" translatable="true">Комплектация</string>
+    <string name="slide_kit_template_use" translatable="true">В использовании</string>
+    <string name="slide_kit_template_variants" translatable="true">Варианты</string>
+    <string name="slide_kit_template_clean" translatable="true">Только товар</string>
+    <string name="slide_kit_slot_title" translatable="true">Заголовок</string>
+    <string name="slide_kit_slot_spec_1" translatable="true">Свойство 1</string>
+    <string name="slide_kit_slot_spec_2" translatable="true">Свойство 2</string>
+    <string name="slide_kit_slot_spec_3" translatable="true">Свойство 3</string>
+    <string name="slide_kit_slot_badge" translatable="true">Метка</string>
+    <string name="slide_kit_slot_caption" translatable="true">Подпись</string>
+</resources>

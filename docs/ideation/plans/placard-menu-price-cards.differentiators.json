@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "slot": "placard-menu-price-cards",
+  "reconRef": "docs/ideation/2026-10-16-ecosystem-smb-marketing.md#3-demand-evidence-labelled",
+  "connectiveFloorPlan": "The floor is satisfied at slot level by print-ready-export-no-watermark (data_out, proof artifact must contain PdfDocument or ACTION_SEND or FileProvider or ACTION_CREATE_DOCUMENT), with two more connective claims behind it - bring-the-list-the-shop-already-has and the-shops-own-dish-on-the-card (data_in, PickVisualMedia or ACTION_IMAGE_CAPTURE), find-a-list-or-a-price-row (find), list-survives-a-new-phone (durability) and dated-price-refresh-nudge (reminder). Every row starts deferred, so no proof is present yet; each deferredReason names the artifact and the token the row will be proved by.",
+  "comparisonsNote": "A comparison names the incumbent a promise is a difference from, with the limitation that incumbent carries and where that was read. Its truth is recon's business and a human reads it; no sampled review names DPI, bleed or print colour, and that absence is recorded in the proposal rather than hidden here.",
+  "jobCoverage": {
+    "before": {
+      "claimId": "bring-the-list-the-shop-already-has"
+    },
+    "during": {
+      "claimId": "one-list-becomes-five-print-pieces"
+    },
+    "after": {
+      "claimId": "print-ready-export-no-watermark"
+    }
+  },
+  "claims": [
+    {
+      "id": "bring-the-list-the-shop-already-has",
+      "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "data_in",
+      "promise": "The list the shop already keeps arrives on the phone as editable rows - a CSV or spreadsheet opened through the system picker, a block pasted from a message, or a photograph of the old card - so nothing is retyped from scratch.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-smb-marketing.md#3.2-the-pocket-named",
+        "finding": "com.zakasoft.pricelist is rated 1.7 stars with 50K+ installs, and 2 of its 3 sampled reviews ask how to use the same entered items and prices on a second phone; com.micrasol.pricelistmaker is 2.3 stars with 50K+ installs and a 1-star review says the entered price amounts are not retained within each product category (scan-complaints.mjs --query 'price card maker', 2026-10-16)."
+      },
+      "status": "deferred",
+      "deferredReason": "Nothing is built yet. This row will be proved by a code proof on app/src/main/java/com/gexetr/placardmenupricecards/import/ListImport.kt containing ACTION_OPEN_DOCUMENT (and PickVisualMedia for the photographed card), asserted by an instrumented test that imports a 12-row CSV and reads the 12 rows back.",
+      "comparison": {
+        "incumbent": "com.zakasoft.pricelist (Price List, 1.7 stars, 50K+ installs)",
+        "limitation": "Two of its three sampled reviews ask how to get the same entered items and prices onto a second phone; nothing in its sampled criticism describes taking the shop's existing list in at all.",
+        "source": "docs/research/2026-10-16-market-scans.md#price-card-maker and the scan-complaints.mjs pocket for 'price card maker' (2026-10-16)"
+      }
+    },
+    {
+      "id": "one-list-becomes-five-print-pieces",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "One price list becomes five artefacts in the same look - the menu, the price card, the table tent, the window sign and a story-size post - from a single generated background rather than five separate jobs.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-smb-marketing.md#3.1-the-shelf-measured-this-session",
+        "finding": "The price card maker shelf is mixed with 30 cards seen, 14 of 30 rated and 5 weak; its missing-feature class is 3 of 14 critical reviews and its install leader com.oaklagcs.mypricelist (3.6 stars, 500K+ installs) carries 2 missing-feature findings in 2 critical reviews - 'Great concept, but needs some work' and a request to show the product cost on the list page (scan-market.mjs and scan-complaints.mjs, 2026-10-16)."
+      },
+      "status": "deferred",
+      "deferredReason": "Nothing is built yet. This row will be proved by a code proof on app/src/main/java/com/gexetr/placardmenupricecards/format/FormatStrip.kt declaring the five format definitions (menu, price card, table tent, window sign, story post) that share one LayoutSpec, asserted by a unit test that renders all five from one seeded list."
+    },
+    {
+      "id": "prices-are-typeset-not-drawn",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "Every price on every artefact is typed data typeset on the device from the shop's own rows, never drawn by an image model, so what the customer reads at the counter is what the owner entered.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-smb-marketing.md#3.3-what-the-pockets-own-users-complain-about",
+        "finding": "Accuracy is 3 of 14 critical reviews in the price card pocket (21%), including com.micrasol.pricelistmaker's 'the entered price amounts are not being retained within each product category' (2.3 stars, 50K+ installs), and com.pricelistmaker at 4.1 stars with 100K+ installs carries accuracy and paywall findings in 3 critical reviews (scan-complaints.mjs --query 'price card maker', 2026-10-16)."
+      },
+      "status": "deferred",
+      "deferredReason": "Nothing is built yet. This row will be proved by a code proof on app/src/main/java/com/gexetr/placardmenupricecards/type/PriceRow.kt where the price is drawn from the parsed row value, asserted by a unit test that a list containing 7.90 renders the glyphs 7.90 and that no text-drawing path accepts a provider image as input."
+    },
+    {
+      "id": "print-ready-export-no-watermark",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "The finished set leaves the phone as a print page at the size the owner chose plus a share image for the shop's own channel - a PDF written with PdfDocument, a FileProvider URI shared through ACTION_SEND, and a save-to-folder path through ACTION_CREATE_DOCUMENT - with no watermark, no subscription and no trial gate in front of it.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-smb-marketing.md#3.2-the-pocket-named",
+        "finding": "Paywall is 4 of 14 critical reviews (29%) in the price card pocket, and the 1M+ install leader com.menu.maker (4.9 stars) is reviewed 'you can't even save high quality image without paying'; com.pricelistmaker at 100K+ installs is reviewed 'the import/export functionality for Excel files is completely unreliable' (scan-complaints.mjs, 2026-10-16)."
+      },
+      "status": "deferred",
+      "deferredReason": "Nothing is built yet. This row will be proved by a code proof on app/src/main/java/com/gexetr/placardmenupricecards/export/PdfExport.kt containing PdfDocument whose output is shared through ACTION_SEND with a FileProvider URI, plus app/src/main/AndroidManifest.xml declaring the FileProvider authority, asserted by an instrumented test that writes a page to the cache dir and reads back a file whose size is greater than zero.",
+      "comparison": {
+        "incumbent": "com.menu.maker (Menu Maker, Price List Maker, 4.9 stars, 1M+ installs)",
+        "limitation": "Reviewed as 'it should not be free, just spamming to pay money, not even a chance to test it nor a way to watch ads to use' and 'you can't even save high quality image without paying' - the export itself is the paywall.",
+        "source": "docs/research/2026-10-16-market-scans.md#menu-maker and the scan-complaints.mjs pocket for 'menu maker' (2026-10-16)"
+      }
+    },
+    {
+      "id": "the-shops-own-dish-on-the-card",
+      "weight": "supporting",
+      "jobStage": "before",
+      "depthFamily": "data_in",
+      "promise": "The owner photographs a plate, a shelf or a stall with the camera, or picks a photo they already have, and that item sits on the card cut out and placed by the app rather than re-photographed in a studio.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-smb-marketing.md#3.3-what-the-pockets-own-users-complain-about",
+        "finding": "The price card pocket's broken class is 5 of 14 critical reviews (36%) and missing-feature is 3 of 14 (21%); the on-job picture failure with real installs is com.postermaker.flyermaker.tools (4.3 stars, 500K+) reviewed 'the older version had an add picture feature that no longer works. it was better when you could add pics from your phone' (scan-complaints.mjs --query 'price card maker' and --query 'flyer maker', 2026-10-16)."
+      },
+      "status": "deferred",
+      "deferredReason": "Nothing is built yet. This row will be proved by a code proof on app/src/main/java/com/gexetr/placardmenupricecards/import/DishCapture.kt containing ActivityResultContracts.TakePicture and ACTION_IMAGE_CAPTURE with the CAMERA permission requested, asserted by an instrumented test that a captured bitmap reaches the layout as an image layer."
+    },
+    {
+      "id": "shop-brand-kit-set-once",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "fit",
+      "promise": "The shop's colours, font and mark are set once and every later set inherits them, so the tenth price card looks like the first without re-choosing anything.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-smb-marketing.md#2-the-typography-wedge-tested-rather-than-assumed",
+        "finding": "The strongest measured typography complaint in the whole sample is a paid user of com.desygner.menus (4.6 stars, 500K+ installs) writing 'I've had a lot of issues with the fonts not working correctly after I'm paying for it' - a 500K+ incumbent that breaks the shop's own look rather than offering to remember it (scan-complaints.mjs --query 'menu maker', 2026-10-16)."
+      },
+      "status": "deferred",
+      "deferredReason": "Nothing is built yet. This row will be proved by a code proof on app/src/main/java/com/gexetr/placardmenupricecards/type/BrandKit.kt whose fields (ink, surface, accent, font, mark) are read by every format template, asserted by a unit test that renders two different formats from one kit and compares the resolved colour values."
+    },
+    {
+      "id": "find-a-list-or-a-price-row",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "find",
+      "promise": "A search field over the shop's own catalogue finds a row or a past set by name, so a list too long to scroll on a phone is still usable at the counter.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-smb-marketing.md#3.2-the-pocket-named",
+        "finding": "A com.micrasol.pricelistmaker reviewer (2.3 stars, 50K+ installs) describes the actual use as keeping track of 'inventory for my specific, unique items that I sell', and com.skepticlabwk96.pricesnap (4.2 stars, 10K+) is reviewed 'modern mode hides product sell price kindly correct it' - a long list with no way to find a row (scan-complaints.mjs, 2026-10-16)."
+      },
+      "status": "deferred",
+      "deferredReason": "Nothing is built yet. This row will be proved by a code proof on app/src/main/java/com/gexetr/placardmenupricecards/type/ListSearch.kt exposing a searchQuery over the row list, asserted by a unit test that filters a 200-row list to the rows whose name contains the query."
+    },
+    {
+      "id": "list-survives-a-new-phone",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "durability",
+      "promise": "The price list and the brand kit survive a reinstall, a cleared cache and a new phone, through the app's own backup and device-transfer rules, so the shop never re-enters its prices.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-smb-marketing.md#3.2-the-pocket-named",
+        "finding": "2 of the 6 weakest rated cards in the pocket are complained about for the data not following the owner - the two-phones question at com.zakasoft.pricelist (1.7 stars, 50K+) and the lost price amounts at com.micrasol.pricelistmaker (2.3 stars, 50K+) - and the pocket's accuracy class is 3 of 14 critical reviews (scan-complaints.mjs, 2026-10-16)."
+      },
+      "status": "deferred",
+      "deferredReason": "Nothing is built yet. This row will be proved by a resource proof on app/src/main/res/xml/data_extraction_rules.xml and app/src/main/res/xml/backup_rules.xml, asserted by a check that both files are referenced from app/src/main/AndroidManifest.xml and that the list store appears in the cloud-backup include set."
+    },
+    {
+      "id": "dated-price-refresh-nudge",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "reminder",
+      "promise": "The owner can put a date on a set, and on that date an opt-in notification tells them the card on the wall is out of date, with one tap back into the set it belongs to.",
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/ideation/2026-10-16-ecosystem-smb-marketing.md#3.3-what-the-pockets-own-users-complain-about",
+        "finding": "INFERRED from two labelled facts: accuracy is 3 of 14 critical reviews in the pocket, and missing-feature is another 3 of 14 - so a list that goes stale and a job that stops are both measured complaints, while no sampled review asks for a notification (scan-complaints.mjs, 2026-10-16). This row is the weakest in the contract and is marked as such."
+      },
+      "status": "deferred",
+      "deferredReason": "Nothing is built yet. This row will be proved by a code proof on app/src/main/java/com/gexetr/placardmenupricecards/remind/RefreshWorker.kt using WorkManager plus NotificationChannel, asserted by an instrumented test that a scheduled nudge posts a notification carrying the set's id."
+    }
+  ]
+}

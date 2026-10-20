@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_repeat_sales",
+  "payingUser": "A householder or renter redecorating or deciding whether to redecorate, and a homeowner staging a room to sell: one person with the room already in their hand as a phone photo, who wants to see one change before spending money on paint, flooring or a piece of furniture, and who is not going to buy a weekly subscription for a decision they make a few times a year.",
+  "paidUnit": "Consumable render credits, which fund the instruction-edit pass and the optional relight pass that each kept version costs the factory to serve, plus one non-consumable HD export unlock that removes the watermark and the free-version limit and buys nothing that costs the factory anything.",
+  "priceUsd": 12.99,
+  "momentOfPayment": "At the first server-cost operation after the free starter grant of six credits is spent, with the credit cost of the render shown before the tap and the versions those credits buy; and again at the first export beyond the free limit, where the one-time unlock is offered beside the packs rather than in front of the first render, so nobody is asked for money before seeing their own room changed once.",
+  "distinctnessSentence": "Roomlumen changes one thing at a time and keeps the user's actual room, the same walls, the same furniture, the same camera angle and the same light, and sells the change per render instead of per week, where the shelf's measured leaders regenerate the whole room and get it wrong, let the user steer almost nothing, and hold the result behind a recurring charge whose free trial has billed users on the 10M+ leader.",
+  "evidenceRef": "docs/ideation/2026-10-16-ecosystem-consumer-personal.md#revenue-arithmetic-with-the-division-shown",
+  "day1RevenuePath": "The user photographs their room with the Photo Picker or the camera, spends the free starter credits watching one wall change while everything else in the room stays exactly as it is, buys the Starter pack the moment that render is worth keeping or sharing, and returns with a pack for each later room, season or decision because the job is iterative by nature.",
+  "killCriteria": {
+    "windowDays": 90,
+    "minInstalls": 2000,
+    "minRevenueUsd": 300
+  },
+  "assumptionsUnverified": [
+    "That a consumer will pay a consumable pack for room-control renders on Android instead of the weekly charge this shelf's measured incumbents bill, which no install, price or conversion reading on this shelf establishes; the anchor is a review quote, not a checkout screen.",
+    "That the effective Play fee tier for this account stays at fifteen percent, because at twenty-five to thirty percent the floor rises to 0.0876459 to 0.0939055 dollars per credit, above the Starter and Studio pack prices proposed in the proposal document.",
+    "That the recorded provider costs still match live fal prices, because every recorded costMicroUsd is the factory's own value rather than a page read taken today; the decider is re-reading each endpoint's own model page.",
+    "That the purchase signal measured under the interior design ai query is not an artefact of that phrasing, which is the single claim the whole proposal rests on and which the enrich command in the proposal document's closing section decides.",
+    "That a single-variable edit reads as a change to the user's own room rather than as a pasted filter, which is a rendering judgement and not a measured market fact.",
+    "That the relight pass is worth five credits to a consumer, because no enriched leader on this shelf sells a relight at all and therefore no price for it has been observed on this shelf."
+  ]
+}

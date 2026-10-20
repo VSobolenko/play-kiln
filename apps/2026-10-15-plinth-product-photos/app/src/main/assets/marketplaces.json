@@ -1,0 +1,329 @@
+{
+  "schemaVersion": 1,
+  "seededAt": "2026-10-12",
+  "doc": "Seed data for app/src/main/assets/marketplaces.json. Every number carries its source in `sources`. status 'secondary' means a third-party page quoting the marketplace; the builder must try a first-party read (spike S5) and may only raise a status, never invent a number. status 'unread' entries have no rules and MUST NOT appear in the app.",
+  "textCategories": [
+    "price_discount",
+    "contacts_links",
+    "qr_code",
+    "evaluative_claim",
+    "review_reward",
+    "sold_count",
+    "call_to_action",
+    "delivery_returns",
+    "third_party_logo",
+    "watermark"
+  ],
+  "localeDefaults": {
+    "en": ["ebay", "etsy", "vinted", "depop", "amazon", "shopify"],
+    "ru": ["wb", "ozon", "avito", "etsy", "ebay"],
+    "de": ["vinted", "ebay", "etsy", "amazon", "shopify"],
+    "fr": ["vinted", "etsy", "ebay", "amazon", "shopify"],
+    "es": ["vinted", "ebay", "etsy", "amazon", "shopify"],
+    "pt-BR": ["amazon", "shopify", "etsy", "ebay"]
+  },
+  "marketplaces": [
+    {
+      "id": "wb",
+      "name": "Wildberries",
+      "regions": ["RU", "BY", "KZ"],
+      "defaultLocale": "ru-RU",
+      "queue": 1,
+      "editPolicy": "free",
+      "status": "secondary",
+      "verifiedAt": "2026-10-12",
+      "sources": [
+        { "title": "Фото товаров: правила, рекомендации и частые ошибки", "url": "https://seller.wildberries.ru/instructions/ru/am/material/item-photo-rules-recommendations-and-common-mistakes", "site": "seller.wildberries.ru", "printedDate": "fetched 2026-10-14", "label": "ON RECORD (vendor)", "firstParty": true, "quotes": "minimum 700x900; main photo shows the product without packaging; background must not distract" },
+        { "title": "Фото для целевой аудитории: как настроить разные главные фото", "url": "https://seller.wildberries.ru/instructions/ru/kz/material/two-main-photos-on-the-product-card-kz", "site": "seller.wildberries.ru", "printedDate": "fetched 2026-10-14", "label": "ON RECORD (vendor)", "firstParty": true, "quotes": "minimum 700x933; must show the same product as the main photo" }
+      ],
+      "image": {
+        "formats": ["jpg", "png", "webp"],
+        "maxBytes": 10485760,
+        "minWidth": 700,
+        "minHeight": 933,
+        "minHeightAlternative": { "value": 900, "note": "A second WB help article states 700x900; the app uses the larger" },
+        "minJpegQuality": 65,
+        "maxCount": 30,
+        "aspect": null,
+        "recommended": { "w": 900, "h": 1200, "basis": "derived by the cited blog, not a WB rule" },
+        "apiMaxBytes": 33554432
+      },
+      "main": {
+        "backgroundPolicy": "neutral",
+        "backgroundNote": "neutral, clean, even, contrasting the item; no 'white' requirement; gradients discouraged",
+        "forbidPackaging": true,
+        "itemMustBeFullyVisible": true,
+        "textOnMain": "penalised-by-size",
+        "forbidWatermark": true,
+        "forbidLogoTagsPromoMarks": true
+      },
+      "text": {
+        "prohibited": ["price_discount", "contacts_links", "qr_code", "evaluative_claim", "review_reward", "sold_count", "call_to_action", "third_party_logo", "watermark"],
+        "contrastMin": { "small": 4.5, "large": 3.0 },
+        "avoidColourPairs": ["green-red", "green-brown", "green-cyan", "green-black", "green-grey", "lightgreen-yellow", "blue-violet", "greyblue"]
+      },
+      "listing": { "titleMax": 60, "descriptionStandard": 2000, "descriptionMin": 1000, "descriptionMax": 5000, "descriptionNote": "depends on category; shown in the seller cabinet" },
+      "notes": [
+        "WB gives 72 hours to fix a rejected photo before blocking the card (secondary).",
+        "A batch API upload that exceeds a limit answers success while keeping the old photos (secondary); the export pack must stay within the cabinet limits."
+      ]
+    },
+    {
+      "id": "ozon",
+      "name": "Ozon",
+      "regions": ["RU", "BY", "KZ"],
+      "defaultLocale": "ru-RU",
+      "queue": 1,
+      "editPolicy": "free",
+      "status": "secondary",
+      "verifiedAt": "2026-10-12",
+      "sources": [
+        { "title": "Требования к медиа", "url": "https://docs.ozon.ru/global/products/requirements/media", "site": "docs.ozon.ru", "printedDate": "first-party re-read required by S5", "label": "UNVERIFIED until S5", "firstParty": true, "quotes": "URL recorded; exact current rules must be read at S5 before status can become first-party" },
+        { "title": "Требования к фото на Ozon 2026", "url": "https://progon.pro/blog/ozon-photo-requirements", "site": "progon.pro", "printedDate": "fetched 2026-10-14", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "3:4; 900x1200 recommendation; supported formats and marketplace guidance" }
+      ],
+      "rejectedSources": [
+        { "title": "Требования Ozon к фону на фотографиях товаров — инструкция для продавцов", "reason": "states 1:1 / 1000x1000 / white RGB 255, contradicts the help-quoting source, no help-centre quotations; treated as unreliable" }
+      ],
+      "image": {
+        "formats": ["jpg", "jpeg", "png", "heic", "webp"],
+        "maxBytes": 10485760,
+        "minWidth": 200,
+        "minHeight": 200,
+        "maxSide": 7680,
+        "maxCount": 30,
+        "aspect": "3:4",
+        "recommended": { "w": 900, "h": 1200, "basis": "Ozon help as quoted" }
+      },
+      "main": {
+        "backgroundPolicy": "neutral",
+        "textOnMain": "infographic-allowed-except-select",
+        "selectPlatformNoInfographicMain": true,
+        "selectPlatformNote": "Ozon Select: no infographic on the main photo from 2026-08-03 (secondary)",
+        "forbidWatermark": "conditional"
+      },
+      "text": {
+        "prohibited": ["price_discount", "contacts_links", "qr_code", "call_to_action", "delivery_returns", "third_party_logo"],
+        "contactException": "only a number starting with 8-800 is allowed (secondary)",
+        "contrastMin": null
+      },
+      "listing": { "titleMax": null, "descriptionMax": null, "note": "unread" },
+      "notes": ["The 3:4 default and 1:1 only for Ozon Fresh food come from a competitor-authored source (WildCard) and the help-quoting page; first-party read required (S5) before the preset is shown without a 'verify' badge."]
+    },
+    {
+      "id": "avito",
+      "name": "Avito",
+      "regions": ["RU"],
+      "defaultLocale": "ru-RU",
+      "queue": 1,
+      "editPolicy": "free",
+      "status": "secondary",
+      "verifiedAt": "2026-10-12",
+      "sources": [
+        { "title": "Как эффективно продать на Avito", "url": "https://severgazbank.ru/upload/iblock/1d3/3pno1qis04ftzolpq1q327tbtmos7oc0/SGB_new_look_12_24pgs_web.pdf", "site": "severgazbank.ru", "printedDate": "fetched 2026-10-14", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "JPG/JPEG/PNG/GIF; up to 25 MB; up to ten photos; remaining rules require S5 first-party read" }
+      ],
+      "image": {
+        "formats": ["jpg", "jpeg", "png", "gif"],
+        "maxBytes": 26214400,
+        "maxBytesMobileWeb": 16777216,
+        "maxLongSide": 1920,
+        "maxLongSideNote": "source says 1920x1080 and recommends 4:3; the cited blog's safe reading is longest side <= 1920, landscape",
+        "maxCount": 10,
+        "maxCountNote": "goods and services; 20 for motorcycles/water transport, 40 for cars and property",
+        "aspect": null,
+        "recommended": { "w": 1920, "h": 1440, "basis": "4:3 landscape at the 1920 ceiling" }
+      },
+      "main": {
+        "backgroundPolicy": "neutral-only",
+        "backgroundNote": "coloured frames and coloured backgrounds are forbidden",
+        "textOnMain": "forbidden-categories-only",
+        "logoMaxShare": 0.1,
+        "logoMaxShareNote": "10 % of the photo by default, up to 50 % in some categories",
+        "watermark": "transparent-only"
+      },
+      "text": {
+        "prohibited": ["price_discount", "contacts_links", "qr_code", "third_party_logo", "call_to_action"],
+        "contrastMin": null
+      },
+      "listing": { "titleMax": null, "descriptionMax": null, "note": "unread" },
+      "notes": ["Avito may reorder photos and cut out contacts, logos and discount text itself; the original cannot be recovered after its edit."]
+    },
+    {
+      "id": "vinted",
+      "name": "Vinted",
+      "regions": ["GB", "FR", "DE", "ES", "PT", "PL", "LT", "NL", "BE", "IT", "CZ"],
+      "defaultLocale": "en-GB",
+      "queue": 1,
+      "editPolicy": "original-only",
+      "status": "secondary",
+      "verifiedAt": "2026-10-12",
+      "sources": [
+        { "title": "What photos you should upload", "url": "https://www.vinted.co.uk/help/48-what-photos-should-i-add", "site": "vinted.co.uk", "printedDate": "fetched 2026-10-14", "label": "ON RECORD (vendor)", "firstParty": true, "quotes": "up to 20 informative photos; privacy and quality guidance; Catalogue Rules editing restriction must be re-read at S5" },
+        { "title": "Product Image Requirements for Every Major Marketplace", "url": "https://mochify.app/guides/product-image-requirements-marketplace-guide", "site": "mochify.app", "printedDate": "2026-10-01", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "up to 20 photos; vertical 3:4 guidance without documented specs" }
+      ],
+      "image": {
+        "formats": ["jpg", "png"],
+        "formatsNote": "not documented by Vinted; assumed",
+        "maxCount": 20,
+        "aspect": null,
+        "recommended": { "w": 900, "h": 1200, "basis": "third-party estimate, labelled" }
+      },
+      "main": { "backgroundPolicy": "any", "textOnMain": "n/a-original-only", "originalOnlyAllowed": ["crop", "rotate", "exposure", "white-balance"] },
+      "text": { "prohibited": ["watermark"], "contrastMin": null },
+      "listing": { "titleMax": null, "descriptionMax": null, "note": "unread" },
+      "notes": ["Cut-out, background replacement, generated and Enhanced operations are disabled for this preset; the app says why."]
+    },
+    {
+      "id": "ebay",
+      "name": "eBay",
+      "regions": ["US", "GB", "DE", "FR", "ES", "IT", "AU", "CA"],
+      "defaultLocale": "en-US",
+      "queue": 1,
+      "editPolicy": "free",
+      "status": "secondary",
+      "verifiedAt": "2026-10-12",
+      "sources": [
+        { "title": "Adding pictures to your listings", "url": "https://www.ebay.com/help/selling/listings/pictures-videos/picture-requirements?id=4148", "site": "ebay.com", "printedDate": "fetched 2026-10-14", "label": "ON RECORD (vendor)", "firstParty": true, "quotes": "up to 24; 12 MB; minimum 500x500; about 1600x1600 recommended; formats and editing guidance" }
+      ],
+      "image": {
+        "formats": ["jpg", "png", "gif", "bmp", "tiff", "avif", "heic", "webp"],
+        "formatsNote": "non-JPEG formats other than GIF/PNG are converted to JPEG on upload",
+        "maxBytes": 12582912,
+        "minLongSide": 500,
+        "maxSidesSum": 15000,
+        "maxCount": 24,
+        "aspect": null,
+        "recommended": { "w": 1600, "h": 1600, "basis": "community guidance, a recommendation" }
+      },
+      "main": { "backgroundPolicy": "neutral", "textOnMain": "forbidden", "forbidBorders": true, "forbidWatermark": true, "forbidMarketingGraphics": true },
+      "text": { "prohibited": ["price_discount", "call_to_action", "watermark"], "contrastMin": null },
+      "listing": { "titleMax": null, "descriptionMax": null, "note": "unread" },
+      "notes": []
+    },
+    {
+      "id": "etsy",
+      "name": "Etsy",
+      "regions": ["US", "GB", "DE", "FR", "ES", "CA", "AU"],
+      "defaultLocale": "en-US",
+      "queue": 1,
+      "editPolicy": "free",
+      "status": "secondary",
+      "verifiedAt": "2026-10-12",
+      "sources": [
+        { "title": "Requirements and Best Practices for Images in Your Etsy Shop", "url": "https://help.etsy.com/hc/en-gb/articles/115015663347-Requirements-and-Best-Practices-for-Images-in-Your-Etsy-Shop?segment=selling", "site": "help.etsy.com", "printedDate": "fetched 2026-10-14", "label": "ON RECORD (vendor)", "firstParty": true, "quotes": "2000px recommended; first image at least 635px; supported formats; transparent PNG appears black" }
+      ],
+      "image": {
+        "formats": ["jpg", "png", "gif"],
+        "minWidth": 635,
+        "minHeight": 635,
+        "minNote": "for the first photo in search; below it the listing may rank lower",
+        "maxCount": 10,
+        "aspect": null,
+        "recommended": { "w": 2000, "h": 2000, "basis": "Etsy: 2000 px or more for priority placement chance" },
+        "noTransparentPng": true,
+        "uploadWarningBytes": 1048576
+      },
+      "main": { "backgroundPolicy": "any", "textOnMain": "not-stated" },
+      "text": { "prohibited": [], "contrastMin": null },
+      "listing": { "titleMax": null, "descriptionMax": null, "note": "unread" },
+      "notes": ["Transparent areas render black on Etsy; flatten before export."]
+    },
+    {
+      "id": "depop",
+      "name": "Depop",
+      "regions": ["GB", "US", "IT", "AU"],
+      "defaultLocale": "en-GB",
+      "queue": 2,
+      "editPolicy": "free",
+      "status": "secondary",
+      "verifiedAt": "2026-10-12",
+      "sources": [
+        { "title": "Product Image Requirements for Every Major Marketplace", "url": "https://mochify.app/guides/product-image-requirements-marketplace-guide", "site": "mochify.app", "printedDate": "2026-10-01", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "Depop seller video: upload square 1:1 and show the full item; other numbers are third-party" }
+      ],
+      "image": {
+        "formats": ["jpg", "png"],
+        "formatsNote": "assumed from third-party guides",
+        "minWidth": 640,
+        "minHeight": 640,
+        "maxBytes": 15728640,
+        "maxCount": 4,
+        "maxCountNote": "third-party; verify in the Depop app",
+        "aspect": "1:1",
+        "recommended": { "w": 1080, "h": 1080, "basis": "third-party" }
+      },
+      "main": { "backgroundPolicy": "any", "textOnMain": "not-stated" },
+      "text": { "prohibited": [], "contrastMin": null },
+      "listing": { "titleMax": null, "descriptionMax": null, "note": "unread" },
+      "notes": ["Non-square images are reported to be cropped to square for the cover (third-party)."]
+    },
+    {
+      "id": "amazon",
+      "name": "Amazon",
+      "regions": ["US", "GB", "DE", "FR", "ES", "IT", "CA", "BR"],
+      "defaultLocale": "en-US",
+      "queue": 2,
+      "editPolicy": "free",
+      "status": "secondary",
+      "verifiedAt": "2026-10-12",
+      "sources": [
+        { "title": "Product Image Requirements for Every Major Marketplace", "url": "https://mochify.app/guides/product-image-requirements-marketplace-guide", "site": "mochify.app", "printedDate": "2026-10-01", "label": "ON RECORD (secondary)", "firstParty": false, "quotes": "Amazon Seller Central image requirements checked 2026-06" }
+      ],
+      "image": {
+        "formats": ["jpg", "tiff", "png", "gif"],
+        "minLongSide": 500,
+        "zoomLongSide": 1000,
+        "maxLongSide": 10000,
+        "recommendedCount": 6,
+        "aspect": null,
+        "recommended": { "w": 2000, "h": 2000, "basis": "third-party sweet spot 1600-2000" }
+      },
+      "main": {
+        "backgroundPolicy": "white-255",
+        "minFillRatio": 0.85,
+        "forbidText": true,
+        "forbidLogosBordersColourBlocksInsets": true,
+        "mustBeRealPhotograph": true,
+        "mustShowProductOnlyOutsidePackaging": true
+      },
+      "text": { "prohibited": ["third_party_logo", "watermark", "price_discount"], "contrastMin": null },
+      "listing": { "titleMax": null, "descriptionMax": null, "note": "unread" },
+      "notes": ["Main image must be a real photograph of the product; the Original mode with a white background is the only mode that satisfies this by construction. Enhanced results are not offered for the main slot."]
+    },
+    {
+      "id": "shopify",
+      "name": "Shopify",
+      "regions": ["GLOBAL"],
+      "defaultLocale": "en-US",
+      "queue": 2,
+      "editPolicy": "free",
+      "status": "secondary",
+      "verifiedAt": "2026-10-12",
+      "sources": [
+        { "title": "Product media types", "url": "https://help.shopify.com/en/manual/products/product-media/product-media-types", "site": "help.shopify.com", "printedDate": "fetched 2026-10-14", "label": "ON RECORD (vendor)", "firstParty": true, "quotes": "up to 5000x5000 or 25 MP; under 20 MB; 2048x2048 usually displays best; accepted formats" }
+      ],
+      "image": {
+        "formats": ["jpg", "png", "webp", "heic", "gif", "tiff", "bmp"],
+        "maxBytes": 20971520,
+        "maxWidth": 5000,
+        "maxHeight": 5000,
+        "aspect": null,
+        "recommended": { "w": 2048, "h": 2048, "basis": "Shopify: usually displays best" }
+      },
+      "main": { "backgroundPolicy": "any", "textOnMain": "not-stated" },
+      "text": { "prohibited": [], "contrastMin": null },
+      "listing": { "titleMax": null, "descriptionMax": null, "note": "n/a" },
+      "notes": ["Theme decides cropping; the preset only keeps the item centred with margin."]
+    }
+  ],
+  "unreadStubs": [
+    { "id": "poshmark", "queue": 1, "status": "unread" },
+    { "id": "mercari", "queue": 1, "status": "unread" },
+    { "id": "mercado-libre", "queue": 2, "status": "unread" },
+    { "id": "shopee", "queue": 2, "status": "unread" },
+    { "id": "wallapop", "queue": 2, "status": "unread" },
+    { "id": "leboncoin", "queue": 2, "status": "unread" },
+    { "id": "kleinanzeigen", "queue": 2, "status": "unread" },
+    { "id": "facebook-marketplace", "queue": 2, "status": "unread" },
+    { "id": "yandex-market", "queue": 2, "status": "unread" },
+    { "id": "merchant-center", "queue": 2, "status": "unread" }
+  ]
+}

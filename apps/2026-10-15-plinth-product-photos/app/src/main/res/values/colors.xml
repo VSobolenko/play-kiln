@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand accents and the pre-Compose window background follow PlinthPalette in Color.kt. -->
+    <color name="playkiln_seed">#21463D</color>
+    <color name="playkiln_seed_dark">#4E9F92</color>
+
+    <!-- Window background shown before Compose draws its first frame. It is the light scheme's own
+         `background` role, PlinthPalette.Paper, so the window never flashes a colour the theme
+         does not paint. -->
+    <color name="playkiln_window_background">#F4F7F2</color>
+</resources>

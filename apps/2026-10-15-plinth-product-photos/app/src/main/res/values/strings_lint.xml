@@ -1,0 +1,16 @@
+<resources>
+    <string name="linter_check_and_fix">Check and fix marketplace images</string>
+    <string name="linter_marketplace_rule">%1$s · rule %2$s</string>
+    <string name="linter_violated_limit">Violated limit: %1$s</string>
+    <string name="linter_repaired">Applied and rechecked</string>
+    <string name="linter_seller_change">Seller change required; this finding is not fixed</string>
+    <string name="linter_cost_before_run">Upscale costs %1$d credits; no paid operation has run</string>
+    <string name="linter_manual_action">This edit needs its source or editor; it has not been marked fixed</string>
+    <string name="linter_cannot_edit">This rule cannot be satisfied by editing this image; no edit was attempted</string>
+    <string name="linter_credit_cost_unavailable">Credit cost is unavailable; no paid operation has run</string>
+    <string name="linter_check_failed">The marketplace check could not complete; the exported images were kept unchanged</string>
+    <string name="linter_no_findings">No findings in the facts measured for this exported image</string>
+    <string name="linter_preset_unavailable">The sourced preset for this export is unavailable</string>
+    <string name="linter_image_unreadable">The exported image could not be decoded, so it was not changed</string>
+    <string name="linter_repair_failed">The repair did not pass a fresh marketplace check; the exported image was kept unchanged</string>
+</resources>

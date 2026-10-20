@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "title": "Roomlumen: AI Room Design",
+  "slug": "roomlumen",
+  "applicationId": "com.gexetr.roomlumen",
+  "archetype": "compound",
+  "localizedTitles": {
+    "en-US": "Roomlumen: AI Room Design",
+    "ru-RU": "Roomlumen: Дизайн комнат"
+  },
+  "searchPhrases": [
+    "ai room design",
+    "interior design ai",
+    "home design ai"
+  ],
+  "chosen": {
+    "name": "Roomlumen: AI Room Design",
+    "archetype": "compound",
+    "carrier": "Roomlumen",
+    "jobNoun": "AI Room Design",
+    "score": 81.0,
+    "dimensions": {
+      "jobFit": 4.0,
+      "searchability": 4.5,
+      "distinctiveness": 4.0,
+      "radioTest": 3.5,
+      "uniqueness": 4.0,
+      "lengthFit": 5.0,
+      "localeSurvival": 3.5
+    },
+    "titles": [
+      { "locale": "en-US", "title": "Roomlumen: AI Room Design", "length": 25, "slack": 5 },
+      { "locale": "ru-RU", "title": "Roomlumen: Дизайн комнат", "length": 24, "slack": 6 }
+    ]
+  },
+  "candidates": [
+    {
+      "name": "Roomlumen: AI Room Design",
+      "archetype": "compound",
+      "score": 81.0,
+      "why": "The chosen candidate. Room is the subject of the job and lumen is the unit of light, so the carrier is made of the wedge's own two halves rather than decorating it, and AI Room Design is a phrase measured as a real Play query on this shelf. It is the highest-scoring candidate that survives the rejection list.",
+      "dimensions": {
+        "jobFit": 4.0,
+        "searchability": 4.5,
+        "distinctiveness": 4.0,
+        "radioTest": 3.5,
+        "uniqueness": 4.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 3.5
+      }
+    },
+    {
+      "name": "Svetlo: AI Room Design",
+      "archetype": "borrowed_foreign_word",
+      "score": 76.5,
+      "why": "Leads on distinctiveness, because nothing like it stands in this shelf's titles, and it means light in a locale the factory ships; but heard once by someone who does not know Slavic orthography it has more than one plausible rendering, which is a rejection-list item and puts its radio dimension below the floor, so it is eliminated by a hard check rather than by its score.",
+      "dimensions": {
+        "jobFit": 3.5,
+        "searchability": 3.5,
+        "distinctiveness": 4.5,
+        "radioTest": 2.0,
+        "uniqueness": 4.5,
+        "lengthFit": 5.0,
+        "localeSurvival": 4.5
+      }
+    },
+    {
+      "name": "Keeplight: AI Room Design",
+      "archetype": "coined",
+      "score": 75.0,
+      "why": "Coinage that states the wedge directly, keep the room and change the light, and it sits comfortably inside the character cap; it loses because its Play collision check was not run in this session, so its uniqueness score is a guess where the chosen candidate's is a measurement.",
+      "dimensions": {
+        "jobFit": 3.5,
+        "searchability": 4.0,
+        "distinctiveness": 4.0,
+        "radioTest": 4.0,
+        "uniqueness": 3.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 3.0
+      }
+    },
+    {
+      "name": "Roomlume: AI Room Design",
+      "archetype": "compound",
+      "score": 73.5,
+      "why": "A compound of the same two ideas with one syllable fewer, which makes the title shorter but truncates lumen into lume: the missing letter is invisible when the name is heard, so a listener may type the longer form of our own name, and its Play search surfaced the Roomly, Roombie, Roomellow and Roomlify cluster.",
+      "dimensions": {
+        "jobFit": 3.5,
+        "searchability": 4.5,
+        "distinctiveness": 3.0,
+        "radioTest": 3.0,
+        "uniqueness": 4.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 3.0
+      }
+    },
+    {
+      "name": "Onewall: AI Room Design",
+      "archetype": "evocative",
+      "score": 73.0,
+      "why": "Evokes changing one wall, which is the wedge, and it passes the radio test well; it collides with a live app, OneWall Communities at com.venn.onewall, and the same search surfaced One Wall Street and One4Wall, so its uniqueness dimension sits below the floor and the field has to be regenerated rather than defended.",
+      "dimensions": {
+        "jobFit": 3.5,
+        "searchability": 4.5,
+        "distinctiveness": 3.5,
+        "radioTest": 4.5,
+        "uniqueness": 1.5,
+        "lengthFit": 5.0,
+        "localeSurvival": 3.5
+      }
+    },
+    {
+      "name": "AI Interior Design",
+      "archetype": "descriptive",
+      "score": 64.0,
+      "why": "The negative control: the bare category head term that the shelf's 10M+ and 50M+ leaders already own, and the kind of title this factory once shipped for a utility. It scores at the top on searchability and radio test and at the bottom on distinctiveness and uniqueness, and it loses to every serious candidate, which is what a negative control is for.",
+      "dimensions": {
+        "jobFit": 3.0,
+        "searchability": 5.0,
+        "distinctiveness": 1.0,
+        "radioTest": 5.0,
+        "uniqueness": 1.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 3.0
+      }
+    }
+  ],
+  "rejected": [
+    {
+      "name": "Svetlo: AI Room Design",
+      "reason": "Eliminated by the rejection list rather than by its score: heard once by a listener who has not seen it, a Slavic word carries more than one plausible spelling for an English-speaking user, which is the rejection-list item about a name that needs a pronunciation guide or has more than one plausible spelling."
+    },
+    {
+      "name": "Roomlume: AI Room Design",
+      "reason": "Lost on the radio test and on distinctiveness together: the truncation of lumen to lume is audible in no way at all, so a listener types the longer form of our own name, and the exact string sits inside a measured cluster of Room-prefixed AI room apps."
+    },
+    {
+      "name": "Onewall: AI Room Design",
+      "reason": "A measured collision, not a taste judgement: a Play search for the string surfaced OneWall Communities at com.venn.onewall, One Wall Street and One4Wall, so the name is not ours to take and its uniqueness dimension fell below the required floor."
+    },
+    {
+      "name": "Keeplight: AI Room Design",
+      "reason": "Rejected on process rather than on art: its collision check was not run in this session, so choosing it would have meant shipping the factory's strongest ranking field on an unmeasured word, while the chosen name carries a measured Play reading."
+    },
+    {
+      "name": "AI Interior Design",
+      "reason": "The negative control and the category defect this factory has already paid for once: it is the bare head term every incumbent above already ranks for, and a title that names the category gives a user no reason to prefer this app over a 10M-install leader."
+    }
+  ],
+  "collisions": {
+    "playSearch": "MEASURED on 2026-10-16, re-run in the session that wrote this record: node scripts/scan-titles.mjs --concurrency 1 --query roomlumen --query roomlight --query lumenroom, output at .kiln/scratch/recon-2026-10-16/scan-titles-naming.md. roomlumen returned verdict=dead-zone with 30 visible cards and 0 of them carrying the token; roomlight returned verdict=fortress over 20 visible cards and surfaced Lightroom Photo & Video Editor (com.adobe.lrmobile, 4.5) and Photoroom: AI Photo Editor (com.photoroom.app, 4.7); lumenroom returned verdict=fortress over 8 visible cards, surfacing Lightroom, Photoroom and Lumen Loom (com.zmhtb.rgdx202). An earlier reading of the same three queries in the same session reported 8 visible cards for roomlumen rather than 30, and this file records the fresh number; the discrepancy is a visible-card count on a live result page, which varies between loads, and the token reading -- 0 cards carrying roomlumen -- was identical in both. Stated rather than left for a reader to find: roomlumen is an unclaimed exact string, but the word lumen it is built from is NOT unclaimed, because the same result page carries Strong Lumen (com.stronglumen.mlc), Lumenate: Explore & Relax (com.lumenate.lumenateaa, 4.5), Lux Light Meter - Lumen (com.spiderlingz.lumen) and Lumen Loom. The sensor's dead-zone word describes the share of cards matching a relevance regex on that page, not the market for the job, which is measured separately and is large. This is a Play search reading only: it is NOT trademark clearance, and no register was queried in this session.",
+    "rejectedStrings": "MEASURED on 2026-10-16, output at .kiln/scratch/recon-2026-10-16/scan-titles-naming-rejected.md: sunroom returned verdict=candidate with 5 of 30 cards on-token and surfaced Sunroom Designer Plus (uk.co.rpssoftware.sunroom.hippoflow, 3.0) plus Ecco Sunroom Designer (uk.co.rpssoftware.sunroom.ecco), the same developer twice; afterglow returned verdict=mixed and surfaced Afterglow: Mobile MMORPG (now.shadow.afterglow, 3.0) and Afterglow: Wellness Companion (com.afterglow.guidanceApp); onewall returned verdict=candidate and surfaced OneWall Communities (com.venn.onewall), One Wall Street (com.onewallstreet.app) and One4Wall (one4studio.wallpaper.one4wall, 4.4). All three were eliminated on that reading, which is why none of them is the chosen name."
+  },
+  "audience": "A householder or renter redecorating or deciding whether to redecorate, and a homeowner staging a room to sell: someone who already has the room in their hand as a phone photo and wants to see one change before spending money on paint, flooring or furniture.",
+  "rationale": "A carrier plus the real two-to-three-word job noun is the recommended shape for a small focused tool, and this one is built from the job's own parts: room is what is kept and lumen is the unit of the light that the wedge turns into a control, while AI Room Design is a phrase measured as a real Play query on this shelf. The chosen name is the highest-scoring candidate that survives the rejection list, which eliminated a higher-scoring borrowed word for its radio test and a same-shaped compound for its audibility.",
+  "collisionCheck": "MEASURED, partially. A Play title search for the exact carrier and its near neighbours was run on 2026-10-16 with scripts/scan-titles.mjs, both readings on disk: .kiln/scratch/recon-2026-10-16/scan-titles-naming.md (roomlumen, roomlight, lumenroom) and .kiln/scratch/recon-2026-10-16/scan-titles-naming-rejected.md (sunroom, afterglow, onewall). The exact string roomlumen returned 0 apps carrying it; roomlight, lumenroom, sunroom, afterglow and onewall were each rejected on what the same search surfaced. UNVERIFIED: no trademark register was queried, so this is a search reading and not clearance, and a clean Play search is not legal clearance.",
+  "localisationCheck": "Twenty-five characters in en-US and twenty-four in ru-RU, both inside Play's thirty-character cap with five and six characters of slack, and neither string is a machine translation. The carrier stays Latin in both locales, as the methodology allows for a compound carrier whose parts are recognisable words. Whether a Russian-speaking user reads a Latin carrier as the brand rather than as a word to translate is unmeasured and needs a native review before the listing is written.",
+  "evidence": "docs/ideation/2026-10-16-ecosystem-consumer-personal.md#the-name-derived-rather-than-invented"
+}

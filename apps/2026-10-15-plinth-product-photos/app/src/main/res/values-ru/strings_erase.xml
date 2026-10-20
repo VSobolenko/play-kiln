@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cutout_erase_open">Стереть часть фото</string>
+    <string name="cutout_erase_title">Стереть часть фото</string>
+    <string name="cutout_erase_explain">Закрасьте то, что нужно убрать. Красная область будет стёрта и заполнена. Всё за её пределами останется без изменений.</string>
+    <string name="cutout_erase_region_marked">Красная область будет стёрта. Остальное не изменится.</string>
+    <string name="cutout_erase_region_empty">Область не отмечена. Ничего не будет стёрто.</string>
+    <string name="cutout_erase_paint">Отметить</string>
+    <string name="cutout_erase_unpaint">Снять отметку</string>
+    <string name="cutout_erase_undo">Отменить</string>
+    <string name="cutout_erase_redo">Повторить</string>
+    <string name="cutout_erase_clear">Очистить</string>
+    <string name="cutout_erase_action">Стереть отмеченное</string>
+    <plurals name="cutout_erase_action_cost">
+        <item quantity="one">Стереть отмеченное · %1$d кредит</item>
+        <item quantity="few">Стереть отмеченное · %1$d кредита</item>
+        <item quantity="many">Стереть отмеченное · %1$d кредитов</item>
+        <item quantity="other">Стереть отмеченное · %1$d кредита</item>
+    </plurals>
+    <string name="cutout_erase_mask_empty">Сначала отметьте область для стирания. Ничего не отправлено, кредиты не списаны.</string>
+    <string name="cutout_erase_verify_failed">Результат изменил части фото, которые вы не отмечали, поэтому он не сохранён. Попробуйте ещё раз.</string>
+    <string name="cutout_erase_done">Готово. Фото сохранено как новое, оригинал не изменён.</string>
+    <string name="cutout_erase_saved_name">%1$s (стёрто)</string>
+    <string name="cutout_erase_default_name">Фото товара</string>
+</resources>

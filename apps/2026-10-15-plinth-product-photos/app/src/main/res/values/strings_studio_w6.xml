@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="w6_studio_one_balance">Available for all tools: %1$d credits</string>
+    <string name="w6_studio_top_up">Top up balance</string>
+    <string name="w6_studio_credit_explanation">Credits pay for processing on the server, not a fixed number of photos. You are only charged when a result is delivered.</string>
+    <string name="w6_studio_delivery_charge">This is a preview, not a charge. Credits are charged only for a delivered result.</string>
+    <string name="w6_studio_confirm">Continue with this tool</string>
+    <string name="w6_studio_cancel">Keep choosing</string>
+    <string name="w6_studio_series_help">Choose the kind of variation and how many you need. Review the total against your shared balance below.</string>
+    <string name="w6_studio_purpose_relight">Change the lighting to bring out the product.</string>
+    <string name="w6_studio_purpose_expand">Add space around the photo for a wider composition.</string>
+    <string name="w6_studio_purpose_erase">Remove a selected distraction from the photo.</string>
+    <string name="w6_studio_purpose_upscale_2k">Increase image resolution to 2K for a larger card.</string>
+    <string name="w6_studio_purpose_upscale_4k">Increase image resolution to 4K for a larger card.</string>
+    <string name="w6_studio_purpose_recolour">Preview the product in another colour.</string>
+    <string name="w6_studio_purpose_ghost">Present the garment without its mannequin.</string>
+    <string name="w6_studio_purpose_model">Show the garment on a generated model.</string>
+    <string name="w6_studio_purpose_series">Create several variations of the same product photo.</string>
+</resources>

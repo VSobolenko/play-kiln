@@ -24,8 +24,8 @@ This module states the vocabulary that was missing:
 * ``MIN_FEATURE`` - the smallest stroke or counter, in canvas fractions, that must survive a 48dp
   render. 16px at 512 is 1.5px at 48dp, the floor at which a launcher cell still shows a line
   rather than a grey smear.
-* five primitives - ``ring``, ``bar``, ``plate``, ``disc``, ``stroke`` - declared once in canonical
-  fractions and rendered twice: as pixels (``render_mark``) and as Android vector path data
+* six primitives - ``ring``, ``bar``, ``plate``, ``disc``, ``stroke``, ``polygon`` - declared once in
+  canonical fractions and rendered twice: as pixels (``render_mark``) and as Android vector path data
   (``mark_layers``). The two renderers are separate implementations on purpose, and
   ``scripts/test-icon-design.py`` measures their agreement rather than trusting it, because a store
   icon and a launcher icon that drifted apart is exactly the defect this replaces.
@@ -225,6 +225,7 @@ def field_overlays(present_roles: Iterable[str] | None = None) -> tuple[dict, ..
 #   {"kind": "plate",  "role", "center", "size", "radius", "corners"} filled rounded rect
 #   {"kind": "disc",   "role", "center", "radius"}                    filled circle
 #   {"kind": "stroke", "role", "points", "weight"}                    stroked polyline
+#   {"kind": "polygon","role", "points"}                              filled polygon
 # --------------------------------------------------------------------------------------
 
 
@@ -248,6 +249,11 @@ def disc(role: str, center: tuple[float, float], radius: float) -> dict:
 
 def stroke(role: str, points: Sequence[tuple[float, float]], weight: str) -> dict:
     return {"kind": "stroke", "role": role, "points": tuple(points), "weight": weight}
+
+
+def polygon(role: str, points: Sequence[tuple[float, float]]) -> dict:
+    """A filled polygon whose vertices are canonical canvas fractions."""
+    return {"kind": "polygon", "role": role, "points": tuple(points)}
 
 
 # --------------------------------------------------------------------------------------
@@ -461,6 +467,32 @@ LUMINTRA: tuple[dict, ...] = (
     disc("paper", _LUMINTRA_STAR, _LUMINTRA_STAR_R),
 )
 
+# Lightfold: a print standing on a lit plinth - the exhibit, its lit top plane and its shaded front.
+#
+# Every shape here is a `plate` (a filled rounded rectangle) or a `disc`, and that is a measured
+# decision rather than a stylistic one. The gate's stroke sensor reads a shape's medial axis, so a
+# filled polygon tapers to nothing at each corner and a 53-degree vertex alone reports a 2px stroke;
+# the first faceted version of this mark failed `thinnest_stroke_px`, `smallest_counter_px` and
+# `min_feature_at_48dp_px` on exactly those tapers, and it shipped a silhouette split into two
+# disconnected pieces because the object floated above the slab. A rounded rectangle with a radius
+# at most half its height has no taper at all: its medial axis is a plain segment, so its measured
+# width is its own height - 28dp for the print, 8dp for the cap and the body, 13dp for the disc.
+#
+# The three masses are not decoration. `optical_offset_px` measures the silhouette centroid against
+# the canvas centre, and an object on a base sits high by construction; the plinth is therefore a
+# full 8dp cap plus an 8dp body, whose weight below the centre balances the print above it, leaving
+# the offset at 8.9px against a 10.24px tolerance.
+#
+# The bounding box is x 36..72, y 33..75, centred on (54,54) to the unit, and the outermost ink is
+# (72,75) at 27.7dp of the 31dp circle keyline. The print overlaps the cap by 1dp and the cap its
+# body by 1dp, so the three read as one glyph rather than three floating bars.
+LIGHTFOLD: tuple[dict, ...] = (
+    plate("amber_deep", (dp(54), dp(71)), (dp(34), dp(8)), dp(4)),
+    plate("amber", (dp(54), dp(64)), (dp(36), dp(8)), dp(4)),
+    plate("paper", (dp(54), dp(47)), (dp(24), dp(28)), dp(7)),
+    disc("amber_deep", (dp(54), dp(46)), dp(6.5)),
+)
+
 MARK_REGISTRY: dict[str, dict] = {
     "pipe": {"primitives": PIPE, "keyline": "circle",
              "note": "a pipe cross-section measured across its bore"},
@@ -476,6 +508,8 @@ MARK_REGISTRY: dict[str, dict] = {
     "mark-lumintra": {"primitives": LUMINTRA, "keyline": "circle",
                       "note": "a light on its arc over the horizon: horizon, broken arc, ember "
                               "body and one star"},
+    "mark-plinth": {"primitives": LIGHTFOLD, "keyline": "circle",
+                    "note": "Lightfold: a print standing on a lit plinth, in four material tones"},
 }
 DEFAULT_MARK = "pipe"
 
@@ -584,6 +618,10 @@ def primitive_extent(primitive: dict) -> tuple[float, float, float, float]:
         xs = [x for x, _ in primitive["points"]]
         ys = [y for _, y in primitive["points"]]
         return (min(xs) - half, min(ys) - half, max(xs) + half, max(ys) + half)
+    if kind == "polygon":
+        xs = [x for x, _ in primitive["points"]]
+        ys = [y for _, y in primitive["points"]]
+        return (min(xs), min(ys), max(xs), max(ys))
     raise SystemExit(f"BLOCKED: unknown icon primitive kind {kind!r}")
 
 
@@ -615,6 +653,9 @@ def primitive_reach(primitive: dict, anchor: tuple[float, float]) -> float:
     if kind == "stroke":
         half = stroke_weight(primitive["weight"]) / 2
         return max(math.hypot(x - anchor[0], y - anchor[1]) + half for x, y in primitive["points"])
+    if kind == "polygon":
+        return max(math.hypot(x - anchor[0], y - anchor[1])
+                   for x, y in primitive["points"])
     raise SystemExit(f"BLOCKED: unknown icon primitive kind {kind!r}")
 
 
@@ -861,6 +902,9 @@ def render_mark(canvas: int, mark: str | None = None,
             for subpath in _stroke_outline(
                     [(x * scale, y * scale) for x, y in primitive["points"]], half):
                 draw.polygon(subpath, fill=colour)
+        elif kind == "polygon":
+            draw.polygon([(x * scale, y * scale) for x, y in primitive["points"]],
+                         fill=colour)
         else:
             raise SystemExit(f"BLOCKED: unknown icon primitive kind {kind!r}")
     if supersample > 1:
@@ -915,6 +959,26 @@ def _circle_path(cx: float, cy: float, radius: float) -> str:
     return (f"M{cx - radius:.2f},{cy:.2f}"
             f"a{radius:.2f},{radius:.2f} 0 1,0 {radius * 2:.2f},0"
             f"a{radius:.2f},{radius:.2f} 0 1,0 {-radius * 2:.2f},0Z")
+
+
+def _polygon_path_data(points: Sequence[tuple[float, float]]) -> str:
+    """A closed polygon path, using compact axis-aligned commands where possible."""
+    def coordinate(value: float) -> str:
+        nearest = round(value)
+        return str(nearest) if abs(value - nearest) < 1e-9 else f"{value:.12g}"
+
+    x, y = points[0]
+    command = [f"M{coordinate(x)},{coordinate(y)}"]
+    for index, (next_x, next_y) in enumerate(points[1:]):
+        if index == 0 or (next_x != x and next_y != y):
+            command.append(f"L{coordinate(next_x)},{coordinate(next_y)}")
+        elif next_x == x:
+            command.append(f"V{coordinate(next_y)}")
+        else:
+            command.append(f"H{coordinate(next_x)}")
+        x, y = next_x, next_y
+    command.append("Z")
+    return "".join(command)
 
 
 def mark_layers(mark: str | None = None,
@@ -972,6 +1036,10 @@ def mark_layers(mark: str | None = None,
                 for subpath in _stroke_outline(points, half)
             )
             layers.append({"role": primitive["role"], "fill_type": "nonZero", "data": data})
+        elif kind == "polygon":
+            points = [(px(x), py(y)) for x, y in primitive["points"]]
+            layers.append({"role": primitive["role"], "fill_type": "nonZero",
+                           "data": _polygon_path_data(points)})
         else:
             raise SystemExit(f"BLOCKED: unknown icon primitive kind {kind!r}")
     return layers

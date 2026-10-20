@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="w30_workspace_summary">Группы: %1$d · Фото: %2$d · Без группы: %3$d</string>
+    <string name="w30_workspace_hint">Объединяйте ракурсы товара по SKU. Просмотрите фото, затем откройте подробности, чтобы перенести ракурс или подтвердить предложение.</string>
+    <string name="w30_naming_title">Имена для всей партии</string>
+    <string name="w30_edit_naming">Изменить правила именования</string>
+    <string name="w30_hide_naming">Скрыть правила именования</string>
+    <string name="w30_sku_base">Товар / основа SKU</string>
+    <string name="w30_naming_base">Основа для новых SKU: %1$s</string>
+    <string name="w30_regroup_hint">Группировка пересоздаёт все группы по подходящим SKU и назначает остальным фото имена с этой основой. Распределение вручную может измениться.</string>
+    <string name="w30_photo_count">Фото в группе: %1$d</string>
+    <string name="w30_ungrouped">Фото без группы: %1$d</string>
+    <string name="w30_ungrouped_hint">Откройте подробности фото для переноса в группу или сгруппируйте всю партию по правилам именования.</string>
+    <string name="w30_empty_group">Пока нет фото. Откройте подробности нужного фото и перенесите его в эту группу.</string>
+    <string name="w30_edit_group">Изменить SKU группы</string>
+    <string name="w30_close_rename">Закрыть редактор SKU</string>
+    <string name="w30_rename_pattern">Перенумерация использует текущее правило: %1$s</string>
+    <string name="w30_photo_details">Подробности и действия с фото</string>
+    <string name="w30_hide_details">Скрыть подробности фото</string>
+    <string name="w30_save_category">Сохранить категорию</string>
+    <string name="w30_no_move_target">Создайте ещё одну группу для переноса этого фото.</string>
+    <string name="w30_photo_description">Фото товара: %1$s</string>
+    <string name="w30_preview_unavailable">Превью недоступно</string>
+</resources>

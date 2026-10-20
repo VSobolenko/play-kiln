@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_flow_title">Добавить фото товара</string>
+    <string name="create_flow_heading">Добавьте фото товара</string>
+    <string name="create_flow_choose_photo">Выбрать фото товара</string>
+    <string name="create_flow_continue_to_studio">К моим инструментам</string>
+    <string name="create_flow_photo_ready">Фото выбрано · готово для Студии</string>
+    <string name="create_flow_photo_selected">Выбрано</string>
+    <string name="create_flow_photo_tap_select">Нажмите, чтобы выбрать это фото</string>
+</resources>

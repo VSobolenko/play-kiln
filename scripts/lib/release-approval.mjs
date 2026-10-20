@@ -116,23 +116,21 @@ const EXCLUDED_ROOT_DIRECTORY_NAMES = new Set(['store', 'dist', 'captures', '.ki
  * and voided every recorded approval the moment it was checked on another one — a guarantee bought
  * with a gate that cannot be relied on — and deleting the two entries would have kept a sentence
  * true that was never the rule. So the criterion is no longer prose to be re-derived: it *is* the
- * closed set `EXCLUSION_REASONS`, `EXCLUDED_FILE_REASONS` maps every excluded name to one of them,
+ * closed set `EXCLUSION_REASONS`, `EXCLUDED_FILE_REASONS` and
+ * `EXCLUDED_DIRECTORY_PATH_REASONS` map each excluded file name or slot-relative directory path to one,
  * and `EXCLUSION_CRITERION` is built from the set, so the sentence and the reasons the list uses
- * cannot drift apart. `scripts/selftest.mjs` used to fail a name whose reason is not in the set, a
- * reason no name uses, and a criterion that does not name every reason — the checks that would have
- * caught the contradiction above. That suite went with the meta-runner chain on 2026-09-30 and those
- * three assertions have **no successor**: they are recorded as a finding in
- * `openspec/changes/reduce-factory-to-core/deletions.md` §7, because the set is now unguarded and a
- * reader must not take this paragraph for a check that runs.
+ * cannot drift apart. `harness.approvalExclusions` in `scripts/core/harness.mjs` checks both maps:
+ * a name or path whose reason is not in the set, a reason no entry uses, and a criterion that does
+ * not name every reason all fail.
  *
- * A name list is still the mechanism: a rule keyed on `.gitignore` would exempt whatever a slot
+ * Explicit name and path lists are still the mechanism: a rule keyed on `.gitignore` would exempt whatever a slot
  * happens to ignore next, and this list is the one place the exemption is decided. What changed is
  * that an entry now has to name *which reason* it is exempt for, and the reasons are about different
  * things — so a future reader adding a name argues against the reason, not against the list.
  */
 export const EXCLUSION_REASONS = {
   'machine-local':
-    "it is the machine's own configuration rather than the app's source, so its bytes differ between two machines that build the same revision (the SDK root, the path to the upload key, the slot's secrets), and hashing it would give one revision one digest per machine and leave a recorded approval unusable on the machine that did not record it. What it can change is not what the owner approved: the app's source is, and both `sign-release.mjs` and `prepare-release.mjs` read this configuration after approval — `prepare-release.mjs` verifies the built APK's certificate against the configured upload certificate and records `signing.fingerprint` in `dist/release-manifest.json`, so the signature is asserted against the artifact rather than against a file in the digest",
+    "it is the machine's own configuration or live runtime state rather than the app's source, so its bytes differ between two machines that build the same revision (the SDK root, the path to the upload key, the slot's secrets, the backend's database and generated results), and runtime state changes while a process runs. Hashing it would give one revision one digest per machine or runtime write and leave a recorded approval unusable without a source edit. What it can change is not what the owner approved: the app's source is, and both `sign-release.mjs` and `prepare-release.mjs` read this configuration after approval — `prepare-release.mjs` verifies the built APK's certificate against the configured upload certificate and records `signing.fingerprint` in `dist/release-manifest.json`, so the signature is asserted against the artifact rather than against a file in the digest",
   'not-read-by-the-build':
     'no task of the build opens it, so it cannot change the compiled bytes or what signs them; the factory scripts that do read it decide a plan or render a document, and those run outside Gradle',
   'the-record-itself':
@@ -142,7 +140,13 @@ export const EXCLUSION_REASONS = {
 export const EXCLUSION_CRITERION =
   'an entry may be excluded only for one of ' +
   `${Object.keys(EXCLUSION_REASONS).map((reason) => `\`${reason}\``).join(', ')}; each is stated in ` +
-  '`EXCLUSION_REASONS` (`scripts/lib/release-approval.mjs`) and every excluded name carries one'
+  '`EXCLUSION_REASONS` (`scripts/lib/release-approval.mjs`) and every excluded file name or slot-relative directory path carries one'
+
+/** Exact slot-relative directory paths; neither nested source packages nor shared trees match. */
+export const EXCLUDED_DIRECTORY_PATH_REASONS = new Map([
+  ['server/data', 'machine-local'],
+  ['server/dist', 'not-read-by-the-build']
+])
 
 /** Which reason each excluded name is excluded for: the list, keyed by name. */
 export const EXCLUDED_FILE_REASONS = new Map([
@@ -227,7 +231,7 @@ function isExcludedFile(name) {
  * and hashing through one would make the digest depend on something the approval does not
  * name.
  */
-function collectBuildInputs(root) {
+function collectBuildInputs(root, { isSlot = false } = {}) {
   const found = []
   const walk = (current, relative, depth) => {
     let entries
@@ -242,6 +246,7 @@ function collectBuildInputs(root) {
       if (entry.isDirectory()) {
         if (EXCLUDED_DIRECTORY_NAMES.has(entry.name)) continue
         if (depth === 0 && EXCLUDED_ROOT_DIRECTORY_NAMES.has(entry.name)) continue
+        if (isSlot && EXCLUDED_DIRECTORY_PATH_REASONS.has(entryRelative)) continue
         walk(path.join(current, entry.name), entryRelative, depth + 1)
       } else if (entry.isFile()) {
         if (isExcludedFile(entry.name)) continue
@@ -290,7 +295,7 @@ export function releaseSourceDigest(slotDir, { root = ROOT } = {}) {
     absorbFile(hash, label, key, absoluteFile)
     files += 1
   }
-  for (const relative of collectBuildInputs(absoluteSlot)) {
+  for (const relative of collectBuildInputs(absoluteSlot, { isSlot: true })) {
     scope('slot', path.join(absoluteSlot, relative), relative)
   }
   const shared = path.join(root, SHARED_BUILD_TREE)

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark-mode window background; see values/colors.xml. It is the dark scheme's own `background`
+         role, PlinthPalette.Ink, so the window and the theme paint the same colour. -->
+    <color name="playkiln_window_background">#111816</color>
+</resources>

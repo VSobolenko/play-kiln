@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_repeat_sales",
+  "payingUser": "A print-on-demand, merch or digital-download seller on Etsy, eBay, Depop, Vinted, Amazon Merch or a Shopify store: one person with a folder of finished flat designs who must produce a listing image of each design on a real product, on a phone or tablet, without Photoshop and without a monthly web subscription.",
+  "paidUnit": "Consumable mockup credits, which fund the generated scene and the relight that each finished mockup costs the factory to serve, plus one non-consumable unlock that removes the watermark and the free batch limit.",
+  "priceUsd": 14.99,
+  "momentOfPayment": "At the first server-cost operation after the free starter grant is spent, with the credit cost shown before the tap and the scenes the credits buy; and again at the first batch larger than the free limit, where the one-time unlock is offered beside the packs rather than in front of the first mockup.",
+  "distinctnessSentence": "Warp maps a seller's own flat design file onto a product's real print area with fabric-aware warp, creases and scene lighting, and exports the listing images watermark-free on a one-time unlock, where the shelf's own leaders are measured shrinking the design into a template rectangle, holding the saved image behind a subscription, and calling an auto-renewing charge a free trial.",
+  "evidenceRef": "docs/ideation/2026-10-16-ecosystem-marketplace-sellers.md#5-revenue-arithmetic-with-the-division-shown",
+  "day1RevenuePath": "A seller imports one design for free, sees it warped onto the product's true print area, buys a Starter or Studio credit pack the moment the first generated scene is worth exporting, and returns for a pack on every later design drop.",
+  "killCriteria": { "windowDays": 90, "minInstalls": 1000, "minRevenueUsd": 200 },
+  "assumptionsUnverified": [
+    "That a print-on-demand seller will pay for a one-time unlock and consumable credits on Android instead of a recurring web tool, which no install or conversion reading on this shelf establishes.",
+    "That the effective Play fee tier for this account stays at fifteen percent, because at twenty-five to thirty percent the floor rises to 0.0876459 to 0.0939055 dollars per credit, above every pack price proposed here.",
+    "That the recorded provider costs in the money plan still match fal prices on 2026-10-16, which only a fresh pricing read of each endpoint would settle.",
+    "That a device-side warp mesh per product reads as printed rather than pasted, which is a rendering judgement and not a measured market fact."
+  ]
+}

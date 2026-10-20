@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "slot": "warp-print-mockups",
+  "reconRef": "docs/ideation/2026-10-16-ecosystem-marketplace-sellers.md#promise-contract",
+  "jobCoverage": {
+    "before": { "claimId": "bring-your-design" },
+    "during": { "claimId": "true-print-area-wrap" },
+    "after": { "claimId": "watermark-free-listing-export" }
+  },
+  "claims": [
+    {
+      "id": "bring-your-design",
+      "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "data_in",
+      "promise": "A seller brings the flat artwork the shop already sells in through the system document picker, the Photo Picker or the clipboard, so the mockup starts from the design that is actually listed instead of from a template library.",
+      "comparison": {
+        "incumbent": "com.mockup.generator",
+        "limitation": "Its 100K+ listing's cheap tier is measured complaining that the free options are so limited in what can be applied that there is no case to pay; the shelf's leaders start from templates rather than from the seller's own file.",
+        "source": "docs/ideation/2026-10-16-ecosystem-marketplace-sellers.md#33-what-the-shelfs-own-users-complain-about-the-wedge-measured"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-marketplace-sellers.md#33-what-the-shelfs-own-users-complain-about-the-wedge-measured",
+        "finding": "Of 18 reviews sampled across the 6 weakest mockup incumbents, 11 are critical and 2 of those are missing-feature complaints, one of them a 100K+ app whose 1 star review says the free options are so limited in what can be applied that there is no case to pay."
+      },
+      "status": "deferred",
+      "deferredReason": "The document picker, Photo Picker and clipboard intake, and the design-file validation they need, do not exist until the slot is built."
+    },
+    {
+      "id": "true-print-area-wrap",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "The design is mapped onto the product's real print area at true scale with fabric-aware warp, creases and shading, so a small chest print or a full-front print lands where the garment maker prints it instead of being shrunk to fit a template rectangle.",
+      "comparison": {
+        "incumbent": "com.accordion.mockup",
+        "limitation": "Its 500K+ listing is measured with a two star review saying the templates have a smaller size when fitting a design in them, especially on tshirts, so the print area is a rectangle rather than the garment's own.",
+        "source": "docs/ideation/2026-10-16-ecosystem-marketplace-sellers.md#33-what-the-shelfs-own-users-complain-about-the-wedge-measured"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-marketplace-sellers.md#33-what-the-shelfs-own-users-complain-about-the-wedge-measured",
+        "finding": "The shelf's 500K+ leader, Mockitup at 4.3 stars and 3541 reviews, carries a 2 star review that says the templates have a smaller size when fitting a design in them especially on tshirts, which is the print-area defect this promise exists to fix at 500K+ scale."
+      },
+      "status": "deferred",
+      "deferredReason": "The product and print-area template set, the warp mesh, and the crease and shadow compositor are unbuilt."
+    },
+    {
+      "id": "watermark-free-listing-export",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "The seller exports the finished mockup set at the marketplace's own sizes, plus the listing text, through the Android share sheet or a save-to-folder document, with no watermark, so the images go straight into the Etsy or eBay listing.",
+      "comparison": {
+        "incumbent": "in.blinkstore.mocky.twa",
+        "limitation": "The shelf's 100K+ leader is a web wrapper whose own critical sample says the image cannot be saved, and 2 of 11 sampled critical reviews across the shelf are value complaints about a watermark held behind a subscription.",
+        "source": "docs/ideation/2026-10-16-ecosystem-marketplace-sellers.md#33-what-the-shelfs-own-users-complain-about-the-wedge-measured"
+      },
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-marketplace-sellers.md#33-what-the-shelfs-own-users-complain-about-the-wedge-measured",
+        "finding": "Of 11 critical reviews sampled across the 6 weakest mockup incumbents, 2 are value complaints and the shelf's own 100K+ and 3.2 star leader carries a 2 star review reading cant save the image, so the export is the stage the shelf most visibly fails."
+      },
+      "status": "deferred",
+      "deferredReason": "The marketplace-size export pack, the FileProvider share path and the ACTION_CREATE_DOCUMENT save path do not exist until the slot is built."
+    },
+    {
+      "id": "batch-the-whole-drop",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "bulk",
+      "promise": "One saved scene style is applied across a whole design drop in a single batch, so a seller who finishes ten designs at once produces ten consistent mockup sets without repeating the scene, the product and the lighting for every design.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-marketplace-sellers.md#33-what-the-shelfs-own-users-complain-about-the-wedge-measured",
+        "finding": "The trigger for this job is a design drop rather than a single item, and 4 of the 6 weakest mockup incumbents list in-app purchases while the 500K+ leader also declares ads, which is the shape of a per-item meter that a whole-drop batch has to beat."
+      },
+      "status": "deferred",
+      "deferredReason": "The saved-style model, the batch runner and the multi-select surface are unbuilt."
+    },
+    {
+      "id": "one-time-unlock-no-trial-trap",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "trust",
+      "promise": "The paid tool is a one-time unlock beside consumable credits, with the credit cost shown before the action and no auto-renewing free trial, so a seller's listing is never held behind a renewal they did not intend to buy.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-marketplace-sellers.md#33-what-the-shelfs-own-users-complain-about-the-wedge-measured",
+        "finding": "Paywall complaints are 6 of 11 critical reviews sampled, 55 percent, including a 1 star review on the 500K+ leader reading that the 3 day free trial is not free but 19.99, and a 2 star review on a 100K+ app saying it demands a subscription and watermarks the upload."
+      },
+      "status": "deferred",
+      "deferredReason": "The Play Billing surface, the one-time unlock product and the credit-cost disclosure do not exist until the slot is built."
+    },
+    {
+      "id": "find-past-mockups",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "find",
+      "promise": "The seller finds a past design or mockup set by name, product or marketplace from a search field, so a shop with hundreds of listings can reuse the exact card that already worked instead of rebuilding it.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/ideation/2026-10-16-ecosystem-marketplace-sellers.md#33-what-the-shelfs-own-users-complain-about-the-wedge-measured",
+        "finding": "2 of 11 critical reviews sampled are missing-feature complaints about what cannot be applied or found again, which is the reuse path a seller with a large catalogue needs and the shelf's template libraries do not provide."
+      },
+      "status": "deferred",
+      "deferredReason": "The local catalogue, its index and the search surface are unbuilt."
+    },
+    {
+      "id": "studio-look-not-lost",
+      "weight": "supporting",
+      "jobStage": "after",
+      "depthFamily": "durability",
+      "promise": "A saved scene style and an in-progress batch survive a process kill, a low-memory restart and a device reboot, so a long mockup run over a design drop is not lost when the phone closes the app.",
+      "evidence": {
+        "strength": "INFERRED",
+        "source": "docs/ideation/2026-10-16-ecosystem-marketplace-sellers.md#33-what-the-shelfs-own-users-complain-about-the-wedge-measured",
+        "finding": "It follows from the batch promise and from the shelf's own state complaints: a 2 star review says the app loses the step it was on, and a 1 star review says paid access stopped working on day 3, so an interrupted or paused batch is a measured failure mode in this job."
+      },
+      "status": "deferred",
+      "deferredReason": "The persisted batch state, the saved style store and the resumable job surface are unbuilt."
+    }
+  ]
+}

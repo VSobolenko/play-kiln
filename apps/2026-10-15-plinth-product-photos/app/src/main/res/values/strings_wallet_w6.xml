@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wallet_one_balance">One balance · all tools</string>
+    <string name="wallet_top_up">Top up</string>
+    <string name="wallet_credit_explanation">Credits pay for processing on the server, not a fixed number of photos. You are only charged when a result is delivered.</string>
+    <string name="wallet_topup_title">Add credits</string>
+    <string name="wallet_topup_pack">Add %1$d credits</string>
+    <string name="wallet_pack_help">Buy a pack, then spend its credits on scene generation, background removal and other server tools. Each tool shows its credit cost.</string>
+    <string name="wallet_topup_balance_preview">Available now: %1$d · after confirmed top-up: %2$d credits</string>
+    <string name="wallet_unlock_balance_preview">Available now: %1$d credits · the unlock does not spend or add credits</string>
+    <string name="wallet_buy_at_price">%1$s · %2$s</string>
+    <string name="wallet_unlock_title">One-time export upgrade</string>
+    <string name="wallet_unlock_help">Remove the watermark and batch limit with one purchase.</string>
+    <string name="wallet_recovery_title">Restore access with code</string>
+    <string name="wallet_credits_label">credits</string>
+    <string name="wallet_restore_section">Restore purchases and access</string>
+    <string name="wallet_shortfall_title">Not enough credits</string>
+    <string name="wallet_shortfall_body">This tool costs %1$d credits. You have %2$d.</string>
+    <string name="wallet_shortfall_action">Add credits</string>
+    <string name="wallet_shortfall_dismiss">Not now</string>
+</resources>

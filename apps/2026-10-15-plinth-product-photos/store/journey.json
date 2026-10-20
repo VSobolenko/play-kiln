@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "locale": "en-US",
+  "_comment": "Six phone frames walk the Studio screen of the signed release build: the hero and its two quick-start cards, the six priced tools, the background and lighting tools, the composition tools, the wider export entry, and back to the top. Every frame is a tool entry point with its credit cost shown; no photo is imported, no paid operation is started and no generated result is claimed.",
+  "_preconditions": [
+    "Use a portrait phone with an English (en-US) device language. The capture runner clears app data and disables enabled keyboards before launch.",
+    "The first step dismisses the wallet banner's 'Browse without wallet' action, because the capture runs on a side-loaded build that Play Integrity cannot recognise; the studio itself is fully browsable in that state and no credit is spent.",
+    "This journey stays on Studio: no sample image is bundled or selected, no paid operation or purchase is started, and the final frame scrolls back to the top of the same screen.",
+    "The swipe coordinates are adb shell input swipe steps on the 1080x2340 portrait viewport, replayed on the A40 (SM-A405FM) before this journey was recorded."
+  ],
+  "supportedStepTypes": {
+    "tap": { "x": 540, "y": 1200 },
+    "swipe": { "x1": 540, "y1": 1300, "x2": 540, "y2": 600, "durationMs": 600 },
+    "wait": { "ms": 750 },
+    "text": { "value": "example text" },
+    "clear": { "count": 40 },
+    "back": {}
+  },
+  "shots": [
+    {
+      "name": "shot-01",
+      "title": "One photo in, a listing image out",
+      "kicker": "START HERE",
+      "body": "Studio opens on a single call to action: choose the seller's own product photo. Nothing is pre-loaded and no result is claimed; the frame shows the entry point the whole studio is built around.",
+      "expect": [
+        {
+          "value": "Turn one product photo into a listing-ready image.",
+          "field": { "label": "^Turn one product photo into a listing-ready image\\.$" }
+        },
+        {
+          "value": "Choose a photo",
+          "field": { "label": "^Choose a photo$" }
+        }
+      ],
+      "steps": [
+        { "type": "wait", "ms": 3000 },
+        { "type": "tap", "x": 715, "y": 2075 },
+        { "type": "wait", "ms": 2000 }
+      ]
+    },
+    {
+      "name": "shot-02",
+      "title": "Six tools, priced up front",
+      "kicker": "COST SHOWN FIRST",
+      "body": "Every tool in the Studio states its credit cost on the card before the seller starts it. The first two are free or one credit, and the grid does not claim that an operation has run.",
+      "expect": [
+        {
+          "value": "6 tools ready",
+          "field": { "label": "^6 tools ready$" }
+        },
+        {
+          "value": "Each card shows its credit cost.",
+          "field": { "label": "^Each card shows its credit cost\\.$" }
+        },
+        {
+          "value": "Cut out",
+          "field": { "label": "^Cut out$" }
+        }
+      ],
+      "steps": [
+        { "type": "swipe", "x1": 540, "y1": 1300, "x2": 540, "y2": 600, "durationMs": 600 }
+      ]
+    },
+    {
+      "name": "shot-03",
+      "title": "Backgrounds and lighting",
+      "kicker": "STYLED SCENE",
+      "body": "Background generation and lighting are separate tools with their own prices. Both cards describe what the tool does to the photo's surroundings and state five credits each before the action.",
+      "expect": [
+        {
+          "value": "Generate a background",
+          "field": { "label": "^Generate a background$" }
+        },
+        {
+          "value": "Change the lighting",
+          "field": { "label": "^Change the lighting$" }
+        }
+      ],
+      "steps": [
+        { "type": "swipe", "x1": 540, "y1": 1300, "x2": 540, "y2": 600, "durationMs": 600 }
+      ]
+    },
+    {
+      "name": "shot-04",
+      "title": "Canvas and colour",
+      "kicker": "COMPOSITION",
+      "body": "The composition tools add space around the product for a wider frame and recolour the product itself. Each is a two-credit entry with its cost printed on the card.",
+      "expect": [
+        {
+          "value": "Expand canvas",
+          "field": { "label": "^Expand canvas$" }
+        },
+        {
+          "value": "Recolour",
+          "field": { "label": "^Recolour$" }
+        },
+        {
+          "value": "2 credits",
+          "field": { "label": "^2 credits$" }
+        }
+      ],
+      "steps": [
+        { "type": "swipe", "x1": 540, "y1": 1300, "x2": 540, "y2": 600, "durationMs": 600 }
+      ]
+    },
+    {
+      "name": "shot-05",
+      "title": "More tools and exports",
+      "kicker": "EXPORT PACK",
+      "body": "Below the six tools sits the entry to the wider tool set and the export path. The slide kit is offered as a separate app rather than bundled with this one.",
+      "expect": [
+        {
+          "value": "More tools and exports",
+          "field": { "label": "^More tools and exports$" }
+        },
+        {
+          "value": "Slide kit (separate)",
+          "field": { "label": "^Slide kit \\(separate\\)$" }
+        }
+      ],
+      "steps": [
+        { "type": "swipe", "x1": 540, "y1": 1300, "x2": 540, "y2": 600, "durationMs": 600 }
+      ]
+    },
+    {
+      "name": "shot-06",
+      "title": "Two ways in",
+      "kicker": "QUICK START",
+      "body": "Scrolled back to the top, the quick-start rail offers the cut-out and the free listing card side by side. Neither is a finished edit; both are one tap from the seller's own photo.",
+      "expect": [
+        {
+          "value": "CUT OUT",
+          "field": { "label": "^CUT OUT$" }
+        },
+        {
+          "value": "LISTING CARD",
+          "field": { "label": "^LISTING CARD$" }
+        }
+      ],
+      "steps": [
+        { "type": "swipe", "x1": 540, "y1": 600, "x2": 540, "y2": 1300, "durationMs": 600 },
+        { "type": "swipe", "x1": 540, "y1": 600, "x2": 540, "y2": 1300, "durationMs": 600 },
+        { "type": "swipe", "x1": 540, "y1": 600, "x2": 540, "y2": 1300, "durationMs": 600 },
+        { "type": "swipe", "x1": 540, "y1": 600, "x2": 540, "y2": 1300, "durationMs": 600 },
+        { "type": "swipe", "x1": 540, "y1": 600, "x2": 540, "y2": 1300, "durationMs": 600 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="library_browser_projects">Your projects</string>
+    <string name="library_browser_outputs_hint">Projects hold your source photos and edits. Open one to continue working or export outputs.</string>
+    <string name="library_browser_project">Project</string>
+    <string name="library_browser_filters">Filters</string>
+    <string name="library_browser_filters_active">Filters · active</string>
+    <string name="library_browser_select">Select projects</string>
+    <string name="library_browser_select_loaded">Toggle loaded projects</string>
+    <string name="library_browser_done">Done</string>
+    <string name="library_browser_cancel">Cancel</string>
+    <string name="library_browser_retry">Try again</string>
+    <string name="library_browser_dismiss">Dismiss results</string>
+    <string name="library_browser_results">Batch results</string>
+    <string name="library_browser_loading">Loading projects…</string>
+    <string name="library_browser_empty_hint">Use Create in the navigation to import a product photo. Your saved projects will appear here.</string>
+    <string name="library_browser_preview_loading">Loading preview…</string>
+    <string name="library_browser_preview_unavailable">Preview unavailable</string>
+    <string name="library_browser_updated">Updated %1$s</string>
+    <string name="library_search_clear">Clear search</string>
+    <plurals name="library_count_projects">
+        <item quantity="one">%1$d project</item>
+        <item quantity="other">%1$d projects</item>
+    </plurals>
+    <string name="library_count_more">%1$d+ projects</string>
+    <string name="library_count_sorted">%1$s · Newest first</string>
+    <string name="library_density_compact">Compact</string>
+    <string name="library_density_comfortable">Large previews</string>
+    <string name="library_selection_exit">Exit selection</string>
+    <string name="library_marketplace_confirm">Apply</string>
+    <string name="library_results_summary">%1$d completed · %2$d failed</string>
+    <string name="library_browser_delete_confirm">Permanently delete the selected projects (%1$d)? This cannot be undone.</string>
+</resources>

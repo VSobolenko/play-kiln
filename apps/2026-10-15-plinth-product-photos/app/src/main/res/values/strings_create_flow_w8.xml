@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="w8_retry_preview">Retry preview</string>
+    <string name="w8_preparation_failed">The card preview could not be prepared. Retry here or choose another photo.</string>
+    <string name="w8_change_source">Go back to choose another photo</string>
+    <string name="w8_quote_loading">Loading the AI recognition quote and your balance…</string>
+    <string name="w8_recognition_quote">AI recognition: %1$d credits · Balance: %2$d credits</string>
+    <string name="w8_quote_unavailable">The recognition quote or balance is unavailable. Refresh or choose a category manually.</string>
+    <string name="w8_recognition_disabled">AI recognition is temporarily unavailable. You can choose the category manually.</string>
+    <string name="w8_insufficient_credits">Your balance does not cover this quote. You can choose the category manually.</string>
+    <string name="w8_recognize_product">Recognize product with AI</string>
+    <string name="w8_refresh_quote">Refresh quote and balance</string>
+</resources>

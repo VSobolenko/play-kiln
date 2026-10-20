@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="report_no_session">Подключитесь к серверу, чтобы пожаловаться на результат.</string>
+    <string name="report_output_cutout_fallback">Маска вырезания</string>
+</resources>

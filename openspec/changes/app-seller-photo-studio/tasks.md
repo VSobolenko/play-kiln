@@ -21,13 +21,14 @@ UNVERIFIED values are `annex/M-spikes-and-reads.md`. Name/slug decided: `plinth-
 
 ## 2. Spikes M0 (measure before building; scratch only) — `annex/M-spikes-and-reads.md`
 
-- [ ] 2.1 S0 Read the VPS: Caddy configuration, hostnames, certificates, disk, free RAM, SSH access path for deployment; record the findings and verify a hostname with a valid TLS certificate answers `GET /health` over HTTPS, or raise the single owner question through `AskQuestion`.
-- [ ] 2.2 S1 cut-out benchmark: about 30 hard photos through the on-device candidate and the server cut-out; verify a table of results with 100% crops and the interior-RGB invariant check exists under `.kiln/scratch/`, and record the decision (free local path or not) in the evidence document. Pass numbers: annex M §S1.
+- [x] 2.1 S0 Read the VPS: Caddy configuration, hostnames, certificates, disk, free RAM, SSH access path for deployment; record the findings and verify a hostname with a valid TLS certificate answers `GET /health` over HTTPS, or raise the single owner question through `AskQuestion`.
+- [x] 2.2 S1 cut-out benchmark: about 30 hard photos through the on-device candidate and the server cut-out; verify a table of results with 100% crops and the interior-RGB invariant check exists under `.kiln/scratch/`, and record the decision (free local path or not) in the evidence document. Pass numbers: annex M §S1.
 - [ ] 2.3 S2 fidelity benchmark: the same photos through each Enhanced candidate; measure colour difference, structural similarity and label-text comparison inside the source mask; verify thresholds for the guard are recorded with the numbers that set them (annex E §Guard).
 - [ ] 2.4 S3 vision benchmark: about 50 items across categories for category accuracy and scale, SKU and ruler reading, with cost per call; verify accuracy figures are recorded.
 - [ ] 2.5 S4 walking skeleton: one request from the phone over HTTPS to the server, one purchase-token verification against the store interface, one ledger debit and one model call; verify with a request log on the server and a screenshot from the phone, and no key present in any client file (`node scripts/check-client-secrets.mjs` on the skeleton).
-- [ ] 2.6 S5 re-read prices and first-party marketplace pages: Photoroom, Pixelcut, provider model pages, Ozon/Avito/eBay/Etsy/Depop/Amazon/Shopify help, then Poshmark/Mercari; verify each price and raised preset has a source and a read date in the evidence document, then fix pack prices with the money-owner role (annex J, annex B).
-- [ ] 2.7 S6 policy read by `play-auditor`: AI-generated content, Data safety for photos sent to a server and to a processing provider, IPTC DigitalSourceType URIs, C2PA read-only, virtual-model verdict; verify the auditor's written findings are saved in the slot docs (annex H).
+- [x] 2.6 S5 re-read prices and first-party marketplace pages: Photoroom, Pixelcut, provider model pages, Ozon/Avito/eBay/Etsy/Depop/Amazon/Shopify help, then Poshmark/Mercari; verify each price and raised preset has a source and a read date in the evidence document, then fix pack prices with the money-owner role (annex J, annex B).
+- [x] 2.7 S6 policy read by `play-auditor` (findings at `.kiln/scratch/plinth-m0-s6/report.md`, folded
+  into the evidence document; they move into the slot docs at task 3.3): AI-generated content, Data safety for photos sent to a server and to a processing provider, IPTC DigitalSourceType URIs, C2PA read-only, virtual-model verdict; verify the auditor's written findings are saved in the slot docs (annex H).
 
 ## 3. Checkpoint 1 and scaffold
 

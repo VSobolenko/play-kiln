@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "serial": "R58MB3SGZVL",
+  "model": "SM-A405FM",
+  "androidRelease": "11",
+  "androidSdk": 30,
+  "recordedAt": "2026-10-20T18:12:00Z",
+  "testedAt": "2026-10-20T18:12:00Z",
+  "artifact": "app/build/outputs/apk/debug/app-debug.apk",
+  "artifactSha256": "257c93846222dcb9e363116dcdb5039616a6e28af0c00267f6c7a5cf50e7f4ae",
+  "apkSha256": "257c93846222dcb9e363116dcdb5039616a6e28af0c00267f6c7a5cf50e7f4ae",
+  "buildDigest": "d23fac35a8f79ffee34b50125af66fca8a7921707655512946809d553c4bf093",
+  "scope": "Install, launch, and the three surfaces this revision is handed over for — Studio, the redesigned credit wallet, and the Library empty state — driven on the A40 named by the device-testing rule. Photo import, generation, cutout, export and a real Google Play purchase are not re-driven here and are not claimed for this revision.",
+  "observations": [
+    "Install: `adb -s R58MB3SGZVL install -r app/build/outputs/apk/debug/app-debug.apk` printed `Success`, and `adb -s R58MB3SGZVL shell sha256sum` over the installed `/data/app/~~4WpRPyaSpeal4r1YUp12sg==/com.gexetr.plinthproductphotos.debug-arSUkhD-9LOKfzmte4Fj8w==/base.apk` reads 257c9384…f4ae, the same value PowerShell `Get-FileHash -Algorithm SHA256` reads for the built APK. Every reading below is therefore about the revision named by buildDigest d23fac35…f093.",
+    "Launch (`am start -n com.gexetr.plinthproductphotos.debug/com.gexetr.plinthproductphotos.MainActivity`) lands on Studio: the hierarchy reads the header `Studio` at [174,144]-[655,221], the credits chip `Credits · 10` (content description `Credits · 10. Opens Wallet to top up.`) at [685,110]-[1044,254], the hero line `Turn one product photo into a listing-ready image.` at [162,440]-[918,717], the `Choose a photo` button at [162,750]-[918,894], the quick-start rail `CUT OUT` / `LISTING CARD` at y 1575-1617, and the tools header `TOOLS`, `6 tools ready`, `Each card shows its credit cost.` at y 1683-1828. No crash and no empty state.",
+    "The bottom rail is intact at this revision: five items on a 1080x2340 screen — Studio [18,1986]-[226,2110] (selected), Library [226,1986]-[435,2110], + Photo [435,1986]-[644,2110], Profile [644,1986]-[853,2110], More [853,1986]-[1062,2110] — with each label reported and no zero-bounds control on the rail. Screenshot kept under `.kiln/scratch/studio-approved.png`.",
+    "Tapping the credits chip at (865,182) opens the redesigned Wallet: the hierarchy reads `Credit wallet` at [228,144]-[936,221], `Your balance`, `10`, `credits`, `Your balance covers 10 background removals`, `Choose a credit pack`, the `Starter` card with `90` `credits`, `Store price unavailable`, `Enough for 90 background removals`, `1 credit per background removal`, the second `Studio` card (`230`), the sticky action `Price unavailable · 90 credits` at y 1707-1767 and the line `Google Play handles payment; confirm the final price in its purchase dialog.` at y 1845-1932. `Store price unavailable` is expected on a side-loaded debug build with no Play Billing products configured for it; no purchase was attempted. Screenshot kept under `.kiln/scratch/wallet-approved.png`.",
+    "Tapping Library at (330,2040) opens the Library empty state: header `Library` at [174,144]-[655,221], the same `Credits · 10` chip, `Batch`, the `Search SKU or text` field at [204,506]-[629,578], the `Your projects` header with the `Compact` toggle, `Select projects` at [84,824]-[372,884], and `No saved projects yet.` at [120,1151]-[608,1208] above its hint at [120,1244]-[960,1413]. No control is reported with zero bounds and nothing is clipped by the rail. Screenshot kept under `.kiln/scratch/library-approved.png`.",
+    "A copy defect was observed and deliberately NOT fixed in this revision: the Library empty-state hint reads `Use Create in the navigation to import a product photo.…` while the navigation control has been named `+ Photo` since the shell rewrite. Editing app source would lapse the recorded release approval and invalidate the uploaded bundle, so the fix is scheduled for the next revision (`0.1.2`) rather than slipped into the approved one.",
+    "Not driven on this revision, and therefore not claimed: a photo import through the `+ Photo` / `Add a photo` path, background and cutout generation (a paid provider call), the marketplace export pack, the library grid with saved projects, and an actual Google Play purchase. The preceding record was written against a different build digest, so nothing from it is carried over as evidence about this one."
+  ]
+}

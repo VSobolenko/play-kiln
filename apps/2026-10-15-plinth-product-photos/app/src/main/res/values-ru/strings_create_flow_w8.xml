@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="w8_retry_preview">Повторить предпросмотр</string>
+    <string name="w8_preparation_failed">Не удалось подготовить предпросмотр карточки. Повторите попытку здесь или выберите другое фото.</string>
+    <string name="w8_change_source">Вернуться к выбору другого фото</string>
+    <string name="w8_quote_loading">Загружаем стоимость ИИ-распознавания и ваш баланс…</string>
+    <string name="w8_recognition_quote">ИИ-распознавание: %1$d кредитов · Баланс: %2$d кредитов</string>
+    <string name="w8_quote_unavailable">Стоимость распознавания или баланс недоступны. Обновите их или выберите категорию вручную.</string>
+    <string name="w8_recognition_disabled">ИИ-распознавание временно недоступно. Категорию можно выбрать вручную.</string>
+    <string name="w8_insufficient_credits">На балансе недостаточно кредитов. Категорию можно выбрать вручную.</string>
+    <string name="w8_recognize_product">Распознать товар с ИИ</string>
+    <string name="w8_refresh_quote">Обновить стоимость и баланс</string>
+</resources>

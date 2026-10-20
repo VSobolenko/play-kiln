@@ -1,0 +1,10 @@
+<resources>
+    <string name="photo_source_title">Add a photo</string>
+    <string name="photo_source_camera">Camera</string>
+    <string name="photo_source_camera_description">Take a new product photo</string>
+    <string name="photo_source_gallery">Gallery</string>
+    <string name="photo_source_gallery_description">Choose photos from your gallery</string>
+    <string name="photo_source_files">Files</string>
+    <string name="photo_source_files_description">Browse image files on this device</string>
+    <string name="photo_source_camera_permission_denied">Camera permission was denied. Choose another source or allow camera access.</string>
+</resources>

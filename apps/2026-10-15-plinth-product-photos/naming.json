@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "slot": "plinth-product-photos",
+  "title": "Plinth AI: Product Photos",
+  "archetype": "carrier_job_noun",
+  "candidates": [
+    {
+      "name": "Plinth AI: Product Photos",
+      "archetype": "carrier_job_noun",
+      "score": 78,
+      "why": "The owner locked AI into the title on 2026-10-17; Plinth remains the short carrier and Product Photos keeps the seller's job explicit."
+    },
+    {
+      "name": "Plinth: Product Photos",
+      "archetype": "carrier_job_noun",
+      "score": 78,
+      "why": "One short carrier that no Play title among 30 visible cards uses, plus the two words a seller types; the plinth image (the item is the exhibit) is honest to the promise that the item stays untouched."
+    },
+    {
+      "name": "Vitrine: Product Photos",
+      "archetype": "metaphorical",
+      "score": 66,
+      "why": "The shop-window image is apt, but Vitrine Shop and Vitrine Furniture are on the shelf and the word reads as a furniture store."
+    },
+    {
+      "name": "Stagely: Product Photos",
+      "archetype": "coined",
+      "score": 58,
+      "why": "Stagely is an exact existing title and Stager AI Home Virtual Staging owns the stem, so it loses on uniqueness and suggests home staging."
+    },
+    {
+      "name": "Shelfie: Product Photos",
+      "archetype": "compound",
+      "score": 61,
+      "why": "Five apps are titled Shelfie, so the carrier cannot be owned."
+    },
+    {
+      "name": "Lotshot: Product Photos",
+      "archetype": "compound",
+      "score": 55,
+      "why": "No exact title exists but it reads as auction-lot photography, narrower than the whole selling job."
+    },
+    {
+      "name": "Product Photo Editor",
+      "archetype": "descriptive",
+      "score": 31,
+      "why": "Negative control: the bare category phrase the incumbents own, unsearchable and unbrandable, and Editor is a generic category noun."
+    }
+  ],
+  "rejected": [
+    {
+      "name": "Vitrine: Product Photos",
+      "reason": "Collides with Vitrine Shop and Vitrine Furniture on Google Play and reads as a furniture store."
+    },
+    {
+      "name": "Shelfie: Product Photos",
+      "reason": "Five existing Play apps carry the exact title Shelfie."
+    },
+    {
+      "name": "Stagely: Product Photos",
+      "reason": "An exact title exists and the stem belongs to a home staging app."
+    }
+  ],
+  "slug": "plinth-product-photos",
+  "applicationId": "com.gexetr.plinthproductphotos",
+  "searchPhrases": [
+    "product photos",
+    "background remover for product photos",
+    "marketplace listing photos",
+    "фото товаров для маркетплейса"
+  ],
+  "audience": "Marketplace sellers who photograph their own goods on a phone and publish to Wildberries, Ozon, Avito, Vinted, eBay, Etsy, Depop, Amazon or Shopify, in English, Russian, German, French, Spanish and Brazilian Portuguese.",
+  "rationale": "Owner locked “Plinth AI: Product Photos” on 2026-10-17; Plinth remains the gallery-block metaphor and Product Photos keeps the seller's job explicit.",
+  "collisionCheck": "Play search on 2026-10-12 for plinth product photos found no title containing Plinth among 30 visible cards; the candidates Vitrine, Stagely and Shelfie collided and were rejected. A clean Play result is not trademark clearance and no trademark register was queried.",
+  "localisationCheck": "The owner locked the AI-bearing title and localized titles on 2026-10-17; all six titles fit the 30-character Play cap. Non-English wording has not been independently reviewed by native speakers.",
+  "evidence": "docs/research/2026-10-12-seller-platform-evidence.md#naming",
+  "localizedTitles": {
+    "ru-RU": "Plinth AI: фото товаров",
+    "de-DE": "Plinth AI: Produktfotos",
+    "fr-FR": "Plinth AI: photo produit",
+    "es-ES": "Plinth AI: foto de producto",
+    "pt-BR": "Plinth AI: foto de produto"
+  }
+}

@@ -99,6 +99,18 @@
       "killedAt": "2026-10-10T12:00:40.257Z",
       "killReason": "Owner 2026-10-10: полный провал; спецификация закрывается; проект не удалять; больше никто ничего не делает. Потратили больше всего денег и крутейшие модели — не оправдал. Релиз не утверждается.",
       "killVerdict": "NO-DATA"
+    },
+    {
+      "id": "plinth-product-photos",
+      "dir": "apps/2026-10-15-plinth-product-photos",
+      "name": "Plinth: Product Photos",
+      "applicationId": "com.gexetr.plinthproductphotos",
+      "idea": "Turn a seller's own product photos into per-marketplace listing cards: server cut-out, original-pixel composition, marketplace rule linter, export with provenance.",
+      "archetype": "purchase_led_repeat_sales",
+      "promises": 15,
+      "status": "building",
+      "createdAt": "2026-10-15T16:03:40.968Z",
+      "updatedAt": "2026-10-16T00:26:00.000Z"
     }
   ]
 }

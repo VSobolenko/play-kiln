@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="export_title">Экспорт</string>
+    <string name="export_back">Назад</string>
+    <string name="export_intro">Подготовьте фотографии товаров и профили площадок, чтобы увидеть наборы для экспорта.</string>
+    <string name="export_empty">Нет готовых наборов для экспорта.</string>
+    <string name="export_ready_label">ГОТОВО К ПЕРЕДАЧЕ</string>
+    <string name="export_ready_title">Наборы товаров готовы</string>
+    <string name="export_ready_summary">Площадок: %1$d · Изображений для экспорта: %2$d</string>
+    <string name="export_ready_formats">Форматы: %1$s</string>
+    <string name="export_destinations_header">Торговые площадки</string>
+    <string name="export_pack_summary">Файлов: %1$d · ZIP в комплекте</string>
+    <string name="export_rules_source">Правила профиля прочитаны %1$s · %2$s</string>
+    <string name="export_manifest_title">Сведения об обработке</string>
+    <string name="export_manifest_note">В манифесте перечислены только явно переопределённые правила, с идентификатором правила и измеренным значением.</string>
+    <string name="export_file_summary">%1$d × %2$d · %3$s · %4$s · %5$d Б</string>
+    <string name="export_quality_percent">качество %1$d%%</string>
+    <string name="export_quality_lossless">без потерь</string>
+    <string name="export_share_title">Поделиться фото товара</string>
+    <string name="export_share">Поделиться</string>
+    <string name="export_save_gallery">Сохранить в галерею</string>
+    <string name="export_save_file">Сохранить копию</string>
+    <string name="export_save_zip">Сохранить ZIP площадки</string>
+    <string name="export_save_all_zips">Сохранить наборы всех площадок</string>
+    <string name="export_provenance_original">Исходные пиксели</string>
+    <string name="export_provenance_manual">Изменено вручную</string>
+    <string name="export_provenance_composite">Композит с фоном, созданным моделью</string>
+    <string name="export_provenance_trained">Улучшено обученной моделью</string>
+    <string name="export_provenance_algorithmic">Алгоритмически улучшено</string>
+    <string name="export_saved">Экспорт сохранён.</string>
+    <string name="export_delivery_failed">Не удалось передать экспорт. Проверьте место сохранения и повторите попытку.</string>
+</resources>

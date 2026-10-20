@@ -1,0 +1,27 @@
+<resources>
+    <string name="provenance_original_label">Original pixels</string>
+    <string name="provenance_manual_label">Manually adjusted</string>
+    <string name="provenance_composite_label">Item untouched · background generated</string>
+    <string name="provenance_enhanced_label">AI-enhanced</string>
+    <string name="provenance_guard_summary">Guard summary: %1$s</string>
+    <string name="provenance_retention_notice">Photos are sent to Plinth’s server and processing provider only for operations you start. Uploads are kept on our server for up to 1 hour and results for up to 24 hours. Report notes are kept until you delete your data with DELETE /data. The provider’s own retention is outside our control.</string>
+    <string name="report_action">Report this result</string>
+    <string name="report_recorded_action">Report recorded</string>
+    <string name="report_title">Report a result</string>
+    <string name="report_output_context">Operation: %1$s · Output: %2$s</string>
+    <string name="report_reason_offensive">Offensive content</string>
+    <string name="report_reason_wrong_product">Wrong product</string>
+    <string name="report_reason_unsafe">Unsafe content</string>
+    <string name="report_reason_rights">Rights complaint</string>
+    <string name="report_reason_other">Other</string>
+    <string name="report_note_label">Optional note</string>
+    <string name="report_note_counter">%1$d / %2$d</string>
+    <string name="report_output_stays_local">The output stays on this device. Only its job reference, your reason and optional note are sent.</string>
+    <string name="report_receipt">Report #%1$d · %2$s</string>
+    <string name="report_readback_unavailable">The report was recorded, but its latest review state could not be loaded.</string>
+    <string name="report_network_failure">Could not confirm whether the report was recorded. Reports are not queued or retried automatically; sending it again may create a duplicate.</string>
+    <string name="report_unknown_failure">Could not confirm that the report was recorded. Review the message and try again.</string>
+    <string name="report_submit">Submit report</string>
+    <string name="report_done">Done</string>
+    <string name="report_cancel">Cancel</string>
+</resources>

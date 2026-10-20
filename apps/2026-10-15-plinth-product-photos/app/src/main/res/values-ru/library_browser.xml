@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="library_browser_projects">Ваши проекты</string>
+    <string name="library_browser_outputs_hint">В проектах хранятся исходные фото и правки. Откройте проект, чтобы продолжить работу или экспортировать результаты.</string>
+    <string name="library_browser_project">Проект</string>
+    <string name="library_browser_filters">Фильтры</string>
+    <string name="library_browser_filters_active">Фильтры · активны</string>
+    <string name="library_browser_select">Выбрать проекты</string>
+    <string name="library_browser_select_loaded">Переключить выбор загруженных</string>
+    <string name="library_browser_done">Готово</string>
+    <string name="library_browser_cancel">Отмена</string>
+    <string name="library_browser_retry">Повторить</string>
+    <string name="library_browser_dismiss">Скрыть результаты</string>
+    <string name="library_browser_results">Результаты операций</string>
+    <string name="library_browser_loading">Загружаем проекты…</string>
+    <string name="library_browser_empty_hint">Нажмите «Создать» в навигации, чтобы импортировать фото товара. Сохранённые проекты появятся здесь.</string>
+    <string name="library_browser_preview_loading">Загружаем превью…</string>
+    <string name="library_browser_preview_unavailable">Превью недоступно</string>
+    <string name="library_browser_updated">Обновлён: %1$s</string>
+    <string name="library_search_clear">Очистить поиск</string>
+    <plurals name="library_count_projects">
+        <item quantity="one">%1$d проект</item>
+        <item quantity="few">%1$d проекта</item>
+        <item quantity="many">%1$d проектов</item>
+        <item quantity="other">%1$d проекта</item>
+    </plurals>
+    <string name="library_count_more">%1$d+ проектов</string>
+    <string name="library_count_sorted">%1$s · сначала новые</string>
+    <string name="library_density_compact">Компактно</string>
+    <string name="library_density_comfortable">Крупно</string>
+    <string name="library_selection_exit">Выйти из выбора</string>
+    <string name="library_marketplace_confirm">Применить</string>
+    <string name="library_results_summary">Выполнено: %1$d · с ошибкой: %2$d</string>
+    <string name="library_browser_delete_confirm">Удалить выбранные проекты навсегда (%1$d)? Это действие нельзя отменить.</string>
+</resources>
