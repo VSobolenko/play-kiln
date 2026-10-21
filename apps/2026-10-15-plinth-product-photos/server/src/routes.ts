@@ -129,6 +129,9 @@ export async function registerRoutes(app: FastifyInstance, options: RoutesOption
     const dailyCapReached = dailyCost(db) >= config.dailySpendCapMicroUsd;
     return {
       ops: operationConfig(config, serviceState !== 'ok' || dailyCapReached),
+      // Names this deployment. The separation audit compares the two public
+      // prefixes through this field; without it both answered identically.
+      environment: config.environmentName,
       starterCredits: 0,
       killSwitch: serviceState !== 'ok',
       minAppVersion: config.minAppVersion,
@@ -234,6 +237,10 @@ export async function registerRoutes(app: FastifyInstance, options: RoutesOption
           code.startsWith('INTEGRITY_PACKAGE_') || code.startsWith('INTEGRITY_VERSION_') ||
           code.startsWith('INTEGRITY_CERTIFICATE_') || code.startsWith('INTEGRITY_APP_') ||
           code.startsWith('INTEGRITY_LICENSE_')) {
+        // The client receives one generic code, but the operator needs to know which
+        // claim failed: on 2026-10-21 three session attempts answered 400 and the log
+        // named none of them, which cost a diagnosis cycle that a single line answers.
+        request.log.warn({ requestId: request.id, integrityCode: code }, 'integrity claim rejected');
         return replyError(reply, code === 'INTEGRITY_CHALLENGE_REPLAYED' ? 409 : 400,
           'INTEGRITY_INVALID', 'The Play Integrity response could not be verified.');
       }

@@ -35,7 +35,8 @@ export interface DeviceRecall {
 
 export type IntegrityConfig = {
   packageName: string;
-  versionCode: string;
+  /** Every build Play may attest. Membership, not equality: a staged rollout serves two. */
+  versionCodes: readonly string[];
   certificateSha256: string;
   starterCredits: number;
   starterDailyBudgetMicroUsd?: number;
@@ -127,14 +128,25 @@ export async function createIntegritySession(
   const payload = await verifier.decode(input.integrityToken, config.packageName);
   if (payload.requestHash !== sessionRequestHash(input)) throw new Error('INTEGRITY_REQUEST_HASH_MISMATCH');
   if (payload.packageName !== config.packageName) throw new Error('INTEGRITY_PACKAGE_MISMATCH');
-  if (payload.versionCode !== config.versionCode) throw new Error('INTEGRITY_VERSION_MISMATCH');
-  if (!payload.certificateSha256?.some((value) => {
+  if (payload.versionCode === undefined || !config.versionCodes.includes(payload.versionCode)) {
+    // The message names the accepted list, so the fix is visible in the log rather
+    // than inferred: a release adds its code to PLAY_VERSION_CODES.
+    throw new Error(`INTEGRITY_VERSION_MISMATCH: attested ${payload.versionCode ?? 'none'}, ` +
+      `accepted ${config.versionCodes.join(',') || 'none'}`);
+  }
+  const observedCerts = (payload.certificateSha256 ?? []).map((value) => {
     // Google's wire format is base64url; configuration uses Play Console's SHA-256 hex.
     const normalized = /^[A-Fa-f0-9]{64}$/.test(value) ? value :
       /^[A-Za-z0-9_-]{43}=?$/.test(value) ? Buffer.from(value, 'base64url').toString('hex') : '';
-    return normalized.toUpperCase() === config.certificateSha256.toUpperCase();
-  })) {
-    throw new Error('INTEGRITY_CERTIFICATE_MISMATCH');
+    return normalized.toUpperCase();
+  });
+  if (!observedCerts.includes(config.certificateSha256.toUpperCase())) {
+    // The observed digests and verdicts are public Play values, and naming them is the
+    // difference between "certificate mismatch" and knowing which claim to fix.
+    throw new Error(`INTEGRITY_CERTIFICATE_MISMATCH: recognized=${payload.appRecognitionVerdict ?? 'none'}, ` +
+      `licensed=${payload.appLicensingVerdict ?? 'none'}, ` +
+      `observed=[${observedCerts.map((value) => value || 'unparsable').join(',') || 'none'}], ` +
+      `expected=${config.certificateSha256.toUpperCase()}`);
   }
   if (payload.appRecognitionVerdict && payload.appRecognitionVerdict !== 'PLAY_RECOGNIZED' &&
       payload.appRecognitionVerdict !== 'UNEVALUATED') {

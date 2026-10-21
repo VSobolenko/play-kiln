@@ -71,9 +71,10 @@
     "ConfigResponse": {
       "type": "object",
       "required": ["ops", "starterCredits", "killSwitch", "minAppVersion", "dailyCapReached",
-        "serviceState", "notice"],
+        "serviceState", "notice", "environment"],
       "properties": {
         "ops": { "type": "object", "additionalProperties": { "$ref": "#/definitions/OperationConfig" } },
+        "environment": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,31}$" },
         "starterCredits": { "type": "integer", "minimum": 0 },
         "killSwitch": { "type": "boolean" },
         "minAppVersion": { "type": "string" },

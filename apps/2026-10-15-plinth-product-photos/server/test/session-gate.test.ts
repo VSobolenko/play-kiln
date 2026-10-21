@@ -79,7 +79,7 @@ describe('session gate', () => {
   });
 
   describe('Play Device Recall transport and grant', () => {
-    const identity = { packageName: 'com.gexetr.plinthproductphotos', versionCode: '1',
+    const identity = { packageName: 'com.gexetr.plinthproductphotos', versionCodes: ['1'],
       certificateSha256: 'A'.repeat(64), starterCredits: 10, starterDailyBudgetMicroUsd: 10_000_000 };
     const privateKey = generateKeyPairSync('rsa', { modulusLength: 2048 }).privateKey
       .export({ type: 'pkcs8', format: 'pem' }).toString();

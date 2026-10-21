@@ -9,10 +9,10 @@ export const devIntegrityBanner =
   'no device/license verification; challenge/hash/replay/expiry and starter budget remain enforced. NOT FOR PRODUCTION. ***';
 
 export function sessionIntegrityConfig(config: ServerConfig): IntegrityConfig | null {
-  const versionCode = config.devIntegrity ? 'LOCAL' : config.playVersionCode;
+  const versionCodes = config.devIntegrity ? ['LOCAL'] : [...config.playVersionCodes];
   const certificateSha256 = config.devIntegrity ? '0'.repeat(64) : config.playSigningCertSha256;
-  if (!versionCode || !certificateSha256) return null;
-  return { packageName: config.playPackageName, versionCode, certificateSha256,
+  if (versionCodes.length === 0 || !certificateSha256) return null;
+  return { packageName: config.playPackageName, versionCodes, certificateSha256,
     starterCredits: config.starterCredits, starterDailyBudgetMicroUsd: config.starterDailyBudgetMicroUsd };
 }
 
@@ -20,18 +20,33 @@ export class StarterDeviceRecall implements DeviceRecall {
   constructor(
     private readonly write: (token: string) => Promise<void>,
     private readonly warn: Warn,
+    /**
+     * Grant when Play returned no `bitFirst` at all. Only the *absent* value is
+     * forgiven: `bitFirst: true` still means this device already claimed, and a
+     * failed write still withholds the grant unless this flag is on.
+     */
+    private readonly allowUnevaluated = false,
   ) {}
 
   async claimStarter(input: SessionInput, payload: IntegrityPayload): Promise<boolean | null> {
-    if (payload.recallBitFirst !== false) {
-      if (payload.recallBitFirst === undefined) this.warn('Device Recall unavailable/unevaluated: no starter grant.');
-      return payload.recallBitFirst === true ? false : null;
+    if (payload.recallBitFirst === true) return false;
+    const unevaluated = payload.recallBitFirst === undefined;
+    if (unevaluated && !this.allowUnevaluated) {
+      this.warn('Device Recall unavailable/unevaluated: no starter grant.');
+      return null;
     }
     try {
       await this.write(input.integrityToken);
+      if (unevaluated) {
+        this.warn('Device Recall unevaluated; starter grant allowed by STARTER_ALLOW_WITHOUT_RECALL.');
+      }
       return true;
     } catch {
       // Do not log provider errors: they may contain the bearer token or request body.
+      if (unevaluated && this.allowUnevaluated) {
+        this.warn('Device Recall write failed; starter grant allowed by STARTER_ALLOW_WITHOUT_RECALL.');
+        return true;
+      }
       this.warn('Device Recall write failed: no starter grant.');
       return null;
     }
@@ -45,7 +60,8 @@ export class PlayRecallIntegrityVerifier implements IntegrityVerifier {
   private readonly account: { client_email: string; private_key: string };
   private accessToken: { value: string; expiresAt: number } | undefined;
 
-  constructor(accountJson: string, private readonly packageName: string, warn: Warn) {
+  constructor(accountJson: string, private readonly packageName: string, warn: Warn,
+    allowUnevaluatedRecall = false) {
     let parsed: unknown;
     try {
       parsed = JSON.parse(accountJson);
@@ -58,7 +74,7 @@ export class PlayRecallIntegrityVerifier implements IntegrityVerifier {
     this.account = { client_email: parsed['client_email'], private_key: parsed['private_key'] };
     this.recall = new StarterDeviceRecall(async (integrityToken) => {
       await this.api('/deviceRecall:write', { integrityToken, newValues: { bitFirst: true } });
-    }, warn);
+    }, warn, allowUnevaluatedRecall);
   }
 
   async decode(token: string, packageName: string): Promise<IntegrityPayload> {
@@ -143,7 +159,7 @@ export function createSessionIntegrityVerifier(config: ServerConfig, warn: Warn)
       async decode(token) {
         if (!/^dev:[A-Za-z0-9_-]{43}$/.test(token)) throw new Error('INTEGRITY_REQUEST_HASH_MISMATCH');
         return {
-          requestHash: token.slice(4), packageName: identity.packageName, versionCode: identity.versionCode,
+          requestHash: token.slice(4), packageName: identity.packageName, versionCode: identity.versionCodes[0],
           certificateSha256: [identity.certificateSha256], appRecognitionVerdict: 'PLAY_RECOGNIZED',
           appLicensingVerdict: 'LICENSED', deviceRecognitionVerdicts: ['MEETS_DEVICE_INTEGRITY'],
           recallBitFirst: false,
@@ -152,7 +168,8 @@ export function createSessionIntegrityVerifier(config: ServerConfig, warn: Warn)
     };
   }
   return config.playServiceAccountJson && identity
-    ? new PlayRecallIntegrityVerifier(config.playServiceAccountJson, config.playPackageName, warn)
+    ? new PlayRecallIntegrityVerifier(config.playServiceAccountJson, config.playPackageName, warn,
+      config.starterWithoutRecall)
     : null;
 }
 

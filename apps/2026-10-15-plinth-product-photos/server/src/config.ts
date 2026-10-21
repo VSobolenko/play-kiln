@@ -40,6 +40,34 @@ function positiveMicroUsd(env: NodeJS.ProcessEnv, name: string, fallbackUsd: num
   return Math.round(value * 1_000_000);
 }
 
+/**
+ * The version codes Play may attest, from `PLAY_VERSION_CODES` (comma-separated)
+ * or the single-value `PLAY_VERSION_CODE` kept for older deployments.
+ *
+ * An empty result disables the session route rather than accepting anything:
+ * `sessionIntegrityConfig` returns null on an empty list, so a missing setting
+ * fails closed instead of attesting every build.
+ */
+function parseVersionCodes(env: NodeJS.ProcessEnv): string[] {  const listed = (env.PLAY_VERSION_CODES ?? '').split(',').map((value) => value.trim()).filter(Boolean);
+  const single = (env.PLAY_VERSION_CODE ?? '').trim();
+  const codes = listed.length > 0 ? listed : single ? [single] : [];
+  for (const code of codes) {
+    if (!/^[0-9]{1,10}$/.test(code)) {
+      throw new Error(`PLAY_VERSION_CODES must be comma-separated integers, got '${code}'`);
+    }
+  }
+  return [...new Set(codes)];
+}
+
+/** The deployment's own name, reported by `/v1/config`; see `environmentName` on the config. */
+function environmentName(env: NodeJS.ProcessEnv): string {
+  const value = (env.PLINTH_ENVIRONMENT ?? 'production').trim();
+  if (!/^[a-z][a-z0-9-]{0,31}$/.test(value)) {
+    throw new Error(`PLINTH_ENVIRONMENT must match [a-z][a-z0-9-]{0,31}, got '${value}'`);
+  }
+  return value;
+}
+
 export interface ServerConfig {
   jwtSecret: string;
   falKey?: string;
@@ -50,6 +78,21 @@ export interface ServerConfig {
   dailySpendCapMicroUsd: number;
   starterDailyBudgetMicroUsd: number;
   starterCredits: number;
+  /**
+   * `true` grants the starter credits when Play's core verdicts and device
+   * integrity pass but Device Recall returned no value — the state that shipped
+   * with 0 free credits on 2026-10-21 because Device Recall is not enabled in
+   * Play Console yet. The daily starter budget and the one-grant-per-install
+   * rule still bound the liability; what is lost is only reinstall resistance.
+   */
+  starterWithoutRecall: boolean;
+  /**
+   * A short name for this deployment (`production`, `debug`, `staging`). It is
+   * reported in `/v1/config` so the public prefixes can be told apart by what
+   * they answer: before this existed, prod and debug returned byte-identical
+   * config payloads and the separation audit's S8c leg could not pass.
+   */
+  environmentName: string;
   devIntegrity?: boolean;
   minAppVersion: string;
   /** Present -> the service is in `maintenance`: new paid work is refused, reads stay open. */
@@ -59,7 +102,12 @@ export interface ServerConfig {
   /** Fastify's `trustProxy`: `loopback` by default, because nginx is the only trusted hop. */
   trustProxy: boolean | string;
   playPackageName: string;
-  playVersionCode?: string;
+  /**
+   * Every version code the server will attest. A release adds one entry; it must
+   * not replace the previous one, because a staged rollout leaves users on the
+   * older build and they would otherwise be refused with a valid Play install.
+   */
+  playVersionCodes: readonly string[];
   playSigningCertSha256?: string;
   playServiceAccountJson?: string;
   billingBindingSecret?: string;
@@ -109,13 +157,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
     dailySpendCapMicroUsd: positiveMicroUsd(env, 'DAILY_SPEND_CAP_USD', 25),
     starterDailyBudgetMicroUsd: positiveMicroUsd(env, 'STARTER_DAILY_BUDGET_USD', 10),
     starterCredits: positiveInteger(env, 'STARTER_CREDITS', 10),
+    starterWithoutRecall: env.STARTER_ALLOW_WITHOUT_RECALL === '1',
+    environmentName: environmentName(env),
     devIntegrity: env.PLINTH_DEV_INTEGRITY === '1',
     minAppVersion: env.MIN_APP_VERSION || '0',
     killSwitchFile: resolve(cwd, env.KILL_SWITCH_FILE || 'KILL_SWITCH'),
     serviceClosedFile: resolve(cwd, env.SERVICE_CLOSED_FILE || 'SERVICE_CLOSED'),
     trustProxy: trustProxySetting(env),
     playPackageName: env.PLAY_PACKAGE_NAME || 'com.gexetr.plinthproductphotos',
-    playVersionCode: env.PLAY_VERSION_CODE || undefined,
+    playVersionCodes: parseVersionCodes(env),
     playSigningCertSha256: env.PLAY_SIGNING_CERT_SHA256?.replaceAll(':', '').toUpperCase() || undefined,
     playServiceAccountJson: env.PLAY_SERVICE_ACCOUNT_JSON || undefined,
     billingBindingSecret: env.BILLING_BINDING_SECRET || undefined,
