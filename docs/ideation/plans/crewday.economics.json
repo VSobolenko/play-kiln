@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A solo general contractor, foreman or small-crew lead who writes a site daily report every working day and hates yearly construction-software subscriptions.",
+  "paidUnit": "One-time unlock of unlimited multi-site daily logs with captioned photos and PDF/share export, with no ads and no renewal.",
+  "priceUsd": 14.99,
+  "momentOfPayment": "After the user finishes a free first-site daily report draft and taps Share or Export PDF — the moment the finished handoff would leave the phone.",
+  "distinctnessSentence": "Crewday keeps an offline multi-site daily log with captioned photos per entry and a one-tap PDF/share handoff under a single unlock, instead of trapping the same job behind a yearly subscription or an enterprise construction suite.",
+  "evidenceRef": "docs/research/2026-10-21-construction-daily-report-shelf.md",
+  "day1RevenuePath": "The listing targets the measured construction daily report query where Snappii apps show 50K+ installs with ads and IAP and Raken shows 100K+ with IAP; the first paid export of a multi-site captioned report is the visible unlock moment for $14.99.",
+  "killCriteria": {
+    "windowDays": 60,
+    "minInstalls": 400,
+    "minRevenueUsd": 200
+  },
+  "assumptionsUnverified": [
+    "Willingness to pay $14.99 one-time is inferred from $40/year subscription complaints and from IAP badges on 50K+/100K+ incumbents, not from this account's conversion data.",
+    "Enterprise suites (Raken, PlanRadar, Contractor Foreman) may absorb some discovery for the same query even when the product target is the weak mid-tier and solo users.",
+    "No trademark-register search has cleared the Crewday mark in class 9.",
+    "On-device PDF quality with many photos must be proven on mid-range phones; the market scan does not measure export performance."
+  ]
+}

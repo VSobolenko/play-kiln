@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "_comment": "Coverkit visual identity: near-neutral night field, electric cyan accent, soft paper. Declared before UI styling; Color.kt must match hex for hex.",
+  "_mark": "mark-coverkit is its own landscape cover frame (dark bezel, paper canvas, cyan title bar, accent disc) — not an alias of mark-plinth/LIGHTFOLD.",
+  "_palette": "Near-neutral ink fields (C≤12) so cyan accent competes; amber role is electric cyan #2DE2E6; paper #EEF2F5.",
+  "mark": "mark-coverkit",
+  "palette": {
+    "ink": "#12161A",
+    "ink_soft": "#1E2830",
+    "ink_lift": "#3A424A",
+    "amber": "#2DE2E6",
+    "amber_deep": "#045C60",
+    "amber_pale": "#A8F4F6",
+    "accent_deep": "#1A4A5C",
+    "paper": "#EEF2F5",
+    "muted": "#6B7C8A",
+    "bezel": "#000000",
+    "bezel_rim": "#7A9BB0"
+  },
+  "headlines": [
+    "Pick a network size",
+    "Template or blank photo",
+    "Text stickers and crop",
+    "Callout stickers",
+    "Save drafts and reopen",
+    "Brand kit offline"
+  ],
+  "kickers": [
+    "DESTINATIONS",
+    "TEMPLATES",
+    "EDITOR",
+    "STICKERS",
+    "PROJECTS",
+    "BRAND"
+  ],
+  "featureTagline": "Design once offline. Export sharp covers for YouTube, Instagram, TikTok and WhatsApp — bought once.",
+  "featurePill": "OFFLINE  ·  ONE-TIME UNLOCK"
+}

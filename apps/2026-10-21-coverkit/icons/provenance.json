@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "sets": [
+    {
+      "library": "Tabler Icons",
+      "version": "v3.48.0",
+      "spdx": "MIT",
+      "sourceUrl": "https://github.com/tabler/tabler-icons/releases/tag/v3.48.0",
+      "licenceFile": "icons/LICENSES/MIT.txt",
+      "attribution": null,
+      "fetchedAt": "2026-10-21",
+      "fetchedBy": "agent",
+      "icons": [
+        {
+          "name": "arrow-left",
+          "file": "app/src/main/res/drawable/ic_arrow_left.xml",
+          "sha256": "b9dcc6c6fa0ee13afd2cca2e7d3ce6fe6311ffaa5780c6b822114a217b7b00ef",
+          "sourcePath": "icons/outline/arrow-left.svg",
+          "attribution": null
+        },
+        {
+          "name": "share",
+          "file": "app/src/main/res/drawable/ic_share.xml",
+          "sha256": "e5f7ad85464186395939ab25177677d2968d0bd2fa587157c3bfd46fd66b8d1d",
+          "sourcePath": "icons/outline/share.svg",
+          "attribution": null
+        },
+        {
+          "name": "download",
+          "file": "app/src/main/res/drawable/ic_download.xml",
+          "sha256": "488f8d67bc24457b2e34348757b5b054ea96de7ac3c09bfcd78d466c598c3ef0",
+          "sourcePath": "icons/outline/download.svg",
+          "attribution": null
+        },
+        {
+          "name": "photo",
+          "file": "app/src/main/res/drawable/ic_photo.xml",
+          "sha256": "dbf523aca9a8aa84d1fdf33c79b1732ddf37ea7d8927ac06db6e52d9b7e56479",
+          "sourcePath": "icons/outline/photo.svg",
+          "attribution": null
+        },
+        {
+          "name": "layers-intersect",
+          "file": "app/src/main/res/drawable/ic_layers.xml",
+          "sha256": "2ebe1f27780e16069cdde76164abbcc1289d84d362c97a392aba8014e7851342",
+          "sourcePath": "icons/outline/layers-intersect.svg",
+          "attribution": null
+        },
+        {
+          "name": "layout-grid",
+          "file": "app/src/main/res/drawable/ic_layout_grid.xml",
+          "sha256": "14fdb554629ae8244bfa059bd65375e2638cdf2668a4e792bece50e0022e9816",
+          "sourcePath": "icons/outline/layout-grid.svg",
+          "attribution": null
+        },
+        {
+          "name": "settings",
+          "file": "app/src/main/res/drawable/ic_settings.xml",
+          "sha256": "cc7293db168004bd4e7da49f8a6382c7680eb47209c154b03f7652b0407834da",
+          "sourcePath": "icons/outline/settings.svg",
+          "attribution": null
+        },
+        {
+          "name": "trash",
+          "file": "app/src/main/res/drawable/ic_trash.xml",
+          "sha256": "c705f17c4f60e3b5f2f09bd83020ee823b9d0f470d5e2dc86c487cfe3d9f0ce9",
+          "sourcePath": "icons/outline/trash.svg",
+          "attribution": null
+        },
+        {
+          "name": "plus",
+          "file": "app/src/main/res/drawable/ic_plus.xml",
+          "sha256": "cd928ede00e5168bed97750c0cf12f94d8e98d659e6c21f3588113b94bf967c3",
+          "sourcePath": "icons/outline/plus.svg",
+          "attribution": null
+        },
+        {
+          "name": "typography",
+          "file": "app/src/main/res/drawable/ic_text.xml",
+          "sha256": "696804976d934353140f84b7763929b8cf660ab28e23e63d125627f6b0b2acba",
+          "sourcePath": "icons/outline/typography.svg",
+          "attribution": null
+        },
+        {
+          "name": "sticker",
+          "file": "app/src/main/res/drawable/ic_sticker.xml",
+          "sha256": "af3d8e3133f7bddaa63673eccc24aa73108c75124fc8550c4392b5e800220949",
+          "sourcePath": "icons/outline/sticker.svg",
+          "attribution": null
+        },
+        {
+          "name": "x",
+          "file": "app/src/main/res/drawable/ic_close.xml",
+          "sha256": "f99f592d26cbe73d7f3b53f54089bb46d253eed48734904104e15cfb0fc17805",
+          "sourcePath": "icons/outline/x.svg",
+          "attribution": null
+        },
+        {
+          "name": "folder",
+          "file": "app/src/main/res/drawable/ic_folder.xml",
+          "sha256": "4d01be5f8cc93c5b6d2a36f37bd69b46aaf830b96e8ad7ad0d22cb5b4d1e8585",
+          "sourcePath": "icons/outline/folder.svg",
+          "attribution": null
+        },
+        {
+          "name": "palette",
+          "file": "app/src/main/res/drawable/ic_palette.xml",
+          "sha256": "82ea95073a999f2f762a84f7d0a6e420ae6bf96e74f02eced02c121a371e7432",
+          "sourcePath": "icons/outline/palette.svg",
+          "attribution": null
+        },
+        {
+          "name": "file-export",
+          "file": "app/src/main/res/drawable/ic_export.xml",
+          "sha256": "5995bdeeb7b2e1e3b0aaf886a2b912dd5c619b1e265d6cab52401495d7897534",
+          "sourcePath": "icons/outline/file-export.svg",
+          "attribution": null
+        },
+        {
+          "name": "device-floppy",
+          "file": "app/src/main/res/drawable/ic_save.xml",
+          "sha256": "05530eb91a2d865a210e8b07e0a96ccf4f9b89968dc732ac56cad6a716ea4e1a",
+          "sourcePath": "icons/outline/device-floppy.svg",
+          "attribution": null
+        },
+        {
+          "name": "info-circle",
+          "file": "app/src/main/res/drawable/ic_info_circle.xml",
+          "sha256": "c42f0d6dd13bde58441658c17401851949d652bdfca34746954a95118ebe854f",
+          "sourcePath": "icons/outline/info-circle.svg",
+          "attribution": null
+        },
+        {
+          "name": "crop",
+          "file": "app/src/main/res/drawable/ic_crop.xml",
+          "sha256": "62ea820cb7cda4f0e6e72cd393d00a0d30f05ad5df371d9bcfa1794342f566e3",
+          "sourcePath": "icons/outline/crop.svg",
+          "attribution": null
+        }
+      ]
+    }
+  ]
+}

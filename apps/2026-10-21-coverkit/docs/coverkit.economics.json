@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "archetype": "purchase_led_single_unlock",
+  "payingUser": "A creator or small brand who posts on YouTube, Instagram, TikTok and WhatsApp and needs matching covers and posts without redesigning the same idea in four apps.",
+  "paidUnit": "One-time unlock of the full platform size pack, brand kit, sharp multi-export and watermark-free saves, with no renewal and no AI credit meter.",
+  "priceUsd": 9.99,
+  "momentOfPayment": "When the user exports a multi-platform pack or removes the watermark after finishing a free single-size draft.",
+  "distinctnessSentence": "Coverkit designs once under an offline brand kit and exports a sharp, native-resolution pack for YouTube, Instagram, TikTok and WhatsApp sizes in one action, instead of trapping save behind a subscription or forcing a separate project per network.",
+  "evidenceRef": "docs/research/2026-10-21-social-cover-studio-shelf.md",
+  "day1RevenuePath": "Listing ranks on thumbnail / story / social post queries where 5M–10M+ apps already show ads+IAP; the first multi-size export or watermark-free save opens the $9.99 unlock.",
+  "killCriteria": {
+    "windowDays": 60,
+    "minInstalls": 2000,
+    "minRevenueUsd": 300
+  },
+  "assumptionsUnverified": [
+    "Creators will install a focused cover studio instead of staying inside Canva; kill criteria decide.",
+    "$9.99 one-time converts against free+ads thumbnail apps; price may need a retune after first readings.",
+    "Template volume must feel rich enough without an AI generator; a thin template set would fail retention.",
+    "No trademark-register search has cleared Coverkit in class 9."
+  ]
+}

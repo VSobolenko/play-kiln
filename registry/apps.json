@@ -111,6 +111,18 @@
       "status": "building",
       "createdAt": "2026-10-15T16:03:40.968Z",
       "updatedAt": "2026-10-16T00:26:00.000Z"
+    },
+    {
+      "id": "coverkit",
+      "dir": "apps/2026-10-21-coverkit",
+      "name": "Coverkit: Social Studio",
+      "applicationId": "com.gexetr.coverkit",
+      "idea": "Offline multi-network social cover studio: design once, export sharp PNG packs for YouTube Instagram TikTok WhatsApp, one-time unlock, no AI keys.",
+      "archetype": "purchase_led_single_unlock",
+      "promises": 4,
+      "status": "scaffolded",
+      "createdAt": "2026-10-21T18:24:57.369Z",
+      "updatedAt": "2026-10-21T18:24:57.369Z"
     }
   ]
 }

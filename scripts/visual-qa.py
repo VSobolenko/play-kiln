@@ -68,6 +68,12 @@ contrast_ratio = colours.contrast_ratio
 hex_of = colours.hex_of
 parse_hex = colours.parse_hex
 
+# The headline point size `store-studio.render_screenshot` draws the copy at, mirrored here because
+# the geometry this module predicts is the studio's own: at 72pt a two-word headline wraps to one
+# line where the studio's 78pt wraps it to two, which shifted the predicted device box by a line and
+# reported a real capture as `RESIDUAL_NEEDS_EXPLANATION` (Coverkit, `tablet-10-02`, 2026-10-22).
+SCREENSHOT_HEADLINE_PT = 78
+
 
 # ----------------------------------------------------------------------------- helpers
 
@@ -490,7 +496,7 @@ def predict_geometry(studio, item: dict, size: tuple[int, int], raw: Image.Image
     if item.get("kicker"):
         # the amber tick is drawn at cursor+5..cursor+9 and the kicker text at margin+42
         cursor += round(58 * scale)
-    headline_face = studio.font(round(72 * scale), bold=True)
+    headline_face = studio.font(round(SCREENSHOT_HEADLINE_PT * scale), bold=True)
     headline_lines = studio.wrap(scratch, item.get("headline", ""), headline_face, width - 2 * margin)[:2]
     cursor += round(86 * scale) * len(headline_lines)
     cursor += round(10 * scale)
@@ -884,7 +890,7 @@ def section_composition(kit, studio, slot: Path, out: dict) -> dict:
         cursor = round(96 * scale)
         if item["kicker"]:
             cursor += round(58 * scale)
-        head_face = studio.font(round(72 * scale), bold=True)
+        head_face = studio.font(round(SCREENSHOT_HEADLINE_PT * scale), bold=True)
         for line in studio.wrap(edraw, item["headline"], head_face, width - 2 * margin)[:2]:
             edraw.text((margin, cursor), line, font=head_face, fill=255)
             cursor += round(86 * scale)

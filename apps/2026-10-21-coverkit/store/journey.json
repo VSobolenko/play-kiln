@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "locale": "en-US",
+  "_comment": "Six-shot Coverkit journey — product screens only, no Unlock/$9.99 paywall. Coordinates measured on Samsung Galaxy A40 (SM-A405FM) serial R58MB3SGZVL, 1080×2340 @ 480dpi, from the release APK via uiautomator dump under .kiln/scratch/device-coverkit/. Titles match store/studio.json headlines verbatim. Shot-03: Bold headline opens the editor rail directly (Export/Photo/Text/Stickers visible within 500ms); do NOT send Back after the tap — that pops the editor and leaves Templates (media-capture failure). Text sheet only appears if Text is tapped later.",
+  "_device": "R58MB3SGZVL SM-A405FM 1080x2340 480dpi",
+  "shots": [
+    {
+      "name": "shot-01",
+      "title": "Pick a network size",
+      "body": "Home destinations: YouTube, Instagram, TikTok and WhatsApp sizes with Projects chrome.",
+      "expect": [
+        { "value": "Coverkit", "field": { "label": "^Coverkit$" } },
+        { "value": "YouTube thumbnail", "field": { "label": "^YouTube thumbnail$" } },
+        { "value": "Projects", "field": { "label": "^Projects$" } }
+      ],
+      "steps": [
+        { "type": "wait", "ms": 4000 }
+      ]
+    },
+    {
+      "name": "shot-02",
+      "title": "Template or blank photo",
+      "body": "YouTube thumbnail template grid with Bold headline and Blank with Photo.",
+      "expect": [
+        { "value": "Bold headline", "field": { "label": "^Bold headline$" } },
+        { "value": "Blank with Photo", "field": { "label": "^Blank with Photo$" } }
+      ],
+      "steps": [
+        { "type": "tap", "x": 270, "y": 757 },
+        { "type": "wait", "ms": 2000 }
+      ]
+    },
+    {
+      "name": "shot-03",
+      "title": "Text stickers and crop",
+      "body": "Editor canvas with template text; primary rail Export, Photo, Text, Stickers.",
+      "expect": [
+        { "value": "Export", "field": { "label": "^Export$" } },
+        { "value": "Photo", "field": { "label": "^Photo$" } },
+        { "value": "Text", "field": { "label": "^Text$" } },
+        { "value": "Stickers", "field": { "label": "^Stickers$" } }
+      ],
+      "steps": [
+        { "type": "tap", "x": 692, "y": 1168 },
+        { "type": "wait", "ms": 2500 }
+      ]
+    },
+    {
+      "name": "shot-04",
+      "title": "Callout stickers",
+      "body": "Stickers sheet open — Arrow, Ribbon, Burst chips — not another empty editor wait.",
+      "expect": [
+        { "value": "Stickers", "field": { "label": "Stickers" } },
+        { "value": "Arrow", "field": { "label": "^Arrow$" } },
+        { "value": "Ribbon", "field": { "label": "^Ribbon$" } },
+        { "value": "Burst", "field": { "label": "^Burst$" } }
+      ],
+      "steps": [
+        { "type": "tap", "x": 451, "y": 2064 },
+        { "type": "wait", "ms": 2000 }
+      ]
+    },
+    {
+      "name": "shot-05",
+      "title": "Save drafts and reopen",
+      "body": "Projects list with a saved draft card — no More/Duplicate dialog overlay.",
+      "expect": [
+        { "value": "Projects", "field": { "label": "^Projects$" } },
+        { "value": "Bold headline", "field": { "label": "^Bold headline$" } },
+        { "value": "YouTube thumbnail", "field": { "label": "^YouTube thumbnail$" } }
+      ],
+      "steps": [
+        { "type": "back" },
+        { "type": "wait", "ms": 800 },
+        { "type": "tap", "x": 1035, "y": 182 },
+        { "type": "wait", "ms": 3000 },
+        { "type": "back" },
+        { "type": "wait", "ms": 1500 },
+        { "type": "back" },
+        { "type": "wait", "ms": 1500 },
+        { "type": "tap", "x": 196, "y": 2061 },
+        { "type": "wait", "ms": 1500 }
+      ]
+    },
+    {
+      "name": "shot-06",
+      "title": "Brand kit offline",
+      "body": "Brand kit — Logo, Colours, Headline style. Sizes opens the paywall on free builds, so Brand is the sixth product screen.",
+      "expect": [
+        { "value": "Brand", "field": { "label": "^Brand$" } },
+        { "value": "Logo", "field": { "label": "^Logo$" } },
+        { "value": "Colours", "field": { "label": "^Colours$" } },
+        { "value": "Headline style", "field": { "label": "^Headline style$" } }
+      ],
+      "steps": [
+        { "type": "back" },
+        { "type": "wait", "ms": 1000 },
+        { "type": "tap", "x": 540, "y": 2061 },
+        { "type": "wait", "ms": 1500 }
+      ]
+    }
+  ]
+}

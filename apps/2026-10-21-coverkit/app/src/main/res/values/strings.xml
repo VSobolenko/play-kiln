@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">Coverkit: Social Studio</string>
+    <string name="app_idea" translatable="true">Offline multi-network social cover studio: design once, export sharp PNG packs for YouTube Instagram TikTok WhatsApp, one-time unlock, no AI keys.</string>
+    <string name="home_about_action" translatable="true">About</string>
+    <string name="home_intro" translatable="true">Pick a network size to start a cover.</string>
+    <string name="home_idea_label" translatable="true">The idea</string>
+    <string name="home_pick_section" translatable="true">Choose a section to open it here.</string>
+    <string name="home_primary_action" translatable="true">Try the starter action</string>
+    <string name="home_primary_action_again" translatable="true">Run it again</string>
+    <string name="home_status_ready" translatable="true">Ready when you are</string>
+    <string name="home_status_complete" translatable="true">Starter action complete</string>
+    <string name="home_snackbar_completed" translatable="true">Starter action completed.</string>
+    <string name="home_snackbar_already_completed" translatable="true">The starter action is already complete.</string>
+    <string name="about_title" translatable="true">About this app</string>
+    <string name="about_back" translatable="true">Back</string>
+    <string name="about_body" translatable="true">%1$s designs social covers offline. Pick a network size, start from a template or photo, edit text and stickers, then export a sharp PNG — unlock once for watermark-free packs.</string>
+    <string name="about_privacy_note" translatable="true">Covers stay on your device. Purchases go through Google Play. No account and no AI keys.</string>
+    <string name="about_privacy_policy" translatable="true">Privacy policy</string>
+    <!-- Filled after publish-privacy; must stay translatable=false -->
+    <string name="about_privacy_url" translatable="false">https://telegra.ph/Coverkit-Social-Studio--privacy-policy-10-21</string>
+
+    <string name="action_back" translatable="true">Back</string>
+    <string name="action_cancel" translatable="true">Cancel</string>
+    <string name="action_dismiss" translatable="true">Dismiss</string>
+
+    <string name="destinations_title" translatable="true">Destinations</string>
+    <string name="dest_yt_thumb" translatable="true">YouTube thumbnail</string>
+    <string name="dest_yt_shorts" translatable="true">YouTube Shorts</string>
+    <string name="dest_ig_post" translatable="true">Instagram post</string>
+    <string name="dest_ig_story" translatable="true">Instagram story</string>
+    <string name="dest_tiktok_cover" translatable="true">TikTok cover</string>
+    <string name="dest_wa_status" translatable="true">WhatsApp status</string>
+    <string name="dest_fb_cover" translatable="true">Facebook cover</string>
+    <string name="dest_x_header" translatable="true">X header</string>
+    <string name="dest_linkedin_banner" translatable="true">LinkedIn banner</string>
+    <string name="dest_pinterest_pin" translatable="true">Pinterest Pin</string>
+    <string name="dest_size_format" translatable="true">%1$d × %2$d</string>
+
+    <string name="nav_templates" translatable="true">Templates</string>
+    <string name="nav_photo" translatable="true">Photo</string>
+    <string name="nav_text" translatable="true">Text</string>
+    <string name="nav_stickers" translatable="true">Stickers</string>
+    <string name="nav_crop" translatable="true">Crop</string>
+    <string name="nav_layers" translatable="true">Layers</string>
+    <string name="nav_safe_zone" translatable="true">Safe zone</string>
+    <string name="nav_safe_zone_on" translatable="true">Safe zone on</string>
+    <string name="nav_export" translatable="true">Export</string>
+    <string name="nav_share" translatable="true">Share</string>
+    <string name="nav_save" translatable="true">Save</string>
+    <string name="nav_brand" translatable="true">Brand</string>
+    <string name="nav_sizes" translatable="true">Sizes</string>
+    <string name="nav_projects" translatable="true">Projects</string>
+
+    <string name="templates_title_for" translatable="true">Templates · %1$s</string>
+    <string name="template_blank_photo" translatable="true">Blank with Photo</string>
+    <string name="template_headline" translatable="true">Headline</string>
+    <string name="template_bold" translatable="true">Bold callout</string>
+    <string name="template_pro_frame" translatable="true">Pro frame</string>
+    <string name="template_locked" translatable="true">Unlock required</string>
+
+    <string name="editor_title" translatable="true">Editor</string>
+    <string name="editor_default_text" translatable="true">Your text</string>
+    <string name="editor_sticker_glyph" translatable="true">▶</string>
+    <string name="editor_shared" translatable="true">Ready to share</string>
+    <string name="editor_saved" translatable="true">Saved to gallery</string>
+    <string name="editor_draft_saved" translatable="true">Draft saved</string>
+    <string name="layers_move_up" translatable="true">Up</string>
+    <string name="layers_delete" translatable="true">Delete</string>
+
+    <string name="projects_empty_title" translatable="true">Your covers will live here</string>
+    <string name="projects_empty" translatable="true">Projects are your drafts. Templates always stay on Home — deleting a project never deletes a template.</string>
+    <string name="projects_step_1" translatable="true">1. Pick a size on Home</string>
+    <string name="projects_step_2" translatable="true">2. Choose a template</string>
+    <string name="projects_step_3" translatable="true">3. It appears here as a draft you can reopen</string>
+    <string name="projects_empty_cta" translatable="true">Go to Home to make your first cover</string>
+    <string name="projects_actions_hint" translatable="true">Choose what to do with this cover.</string>
+    <string name="projects_more" translatable="true">More</string>
+    <string name="projects_open" translatable="true">Open</string>
+    <string name="projects_duplicate" translatable="true">Duplicate</string>
+    <string name="projects_delete" translatable="true">Delete</string>
+    <string name="brand_hero" translatable="true">Logo, colours, type — once</string>
+    <string name="brand_intro" translatable="true">Like Unfold: set your logo and a few brand colours. New covers can pull these in so you are not retyping every time.</string>
+    <string name="brand_logo_header" translatable="true">Logo</string>
+    <string name="brand_pick_logo" translatable="true">Tap to choose your logo</string>
+    <string name="brand_logo_set" translatable="true">Logo set</string>
+    <string name="brand_clear_logo" translatable="true">Remove logo</string>
+    <string name="brand_colors_header" translatable="true">Colours</string>
+    <string name="brand_colors_hint" translatable="true">Pick up to %1$d colours. Tap one again to remove it.</string>
+    <string name="brand_font_primary" translatable="true">Headline style</string>
+    <string name="brand_font_secondary" translatable="true">Body style</string>
+    <string name="brand_font_sans" translatable="true">Sans</string>
+    <string name="brand_font_bold_sans" translatable="true">Bold Sans</string>
+    <string name="brand_font_display" translatable="true">Display</string>
+    <string name="brand_font_rounded" translatable="true">Rounded</string>
+    <string name="brand_font_serif" translatable="true">Serif</string>
+    <string name="brand_font_mono" translatable="true">Mono</string>
+    <string name="brand_save" translatable="true">Save Brand</string>
+
+    <string name="unlock_title" translatable="true">Unlock Coverkit</string>
+    <string name="unlock_body" translatable="true">One-time unlock: watermark-free Export, Sizes pack, full templates and Brand kit. Draft Save stays free.</string>
+    <string name="unlock_bullet_watermark" translatable="true">Watermark-free sharp PNG export</string>
+    <string name="unlock_bullet_sizes" translatable="true">Multi-network Sizes pack from one design</string>
+    <string name="unlock_bullet_templates" translatable="true">Full template set and Brand kit</string>
+    <string name="unlock_price" translatable="true">$9.99</string>
+    <string name="unlock_price_note" translatable="true">One-time purchase. No subscription.</string>
+    <string name="unlock_price_label" translatable="true">Price</string>
+    <string name="unlock_action" translatable="true">Unlock</string>
+    <string name="unlock_restore" translatable="true">Restore purchase</string>
+    <string name="unlock_busy" translatable="true">Talking to Google Play…</string>
+    <string name="unlock_failed" translatable="true">Purchase did not complete. Try again or restore.</string>
+    <string name="unlock_unavailable" translatable="true">Billing is unavailable on this device.</string>
+    <string name="unlock_unlocked" translatable="true">Unlocked</string>
+    <string name="unlock_owned_body" translatable="true">You own Coverkit unlock on this Play account.</string>
+
+    <string name="settings_title" translatable="true">Settings</string>
+    <string name="settings_back" translatable="true">Back</string>
+    <string name="settings_studio_header" translatable="true">Studio</string>
+    <string name="settings_studio_supporting" translatable="true">Free Save keeps a small watermark. Unlock once for clean PNG packs and every network size from one design.</string>
+    <string name="settings_appearance_header" translatable="true">Look</string>
+    <string name="settings_theme_supporting" translatable="true">Choose how the app looks.</string>
+    <string name="settings_theme_system" translatable="true">Follow system</string>
+    <string name="settings_theme_light" translatable="true">Light</string>
+    <string name="settings_theme_dark" translatable="true">Dark</string>
+    <string name="settings_dynamic_color_title" translatable="true">Use wallpaper colours</string>
+    <string name="settings_dynamic_color_supported" translatable="true">Build the palette from the device wallpaper.</string>
+    <string name="settings_dynamic_color_unsupported" translatable="true">Not available on this version of Android.</string>
+    <string name="settings_language_header" translatable="true">Language</string>
+    <string name="settings_language_title" translatable="true">App language</string>
+    <string name="settings_language_summary" translatable="true">Choose the language this app uses.</string>
+    <string name="settings_language_system" translatable="true">System default</string>
+    <string name="settings_behaviour_header" translatable="true">Studio feel</string>
+    <string name="settings_haptics_title" translatable="true">Vibration feedback</string>
+    <string name="settings_haptics_summary" translatable="true">Light tap when you pick a cover size.</string>
+    <string name="settings_purchase_header" translatable="true">Purchase</string>
+    <string name="settings_restore_summary" translatable="true">Re-check Google Play for your unlock.</string>
+    <string name="settings_unlock_summary" translatable="true">One-time unlock details and buy.</string>
+    <string name="settings_about_header" translatable="true">About</string>
+    <string name="settings_rate_title" translatable="true">Rate app</string>
+    <string name="settings_rate_summary" translatable="true">Tell others how this app works for you.</string>
+    <string name="editor_size_item" translatable="true">%1$s · %2$s</string>
+    <string name="editor_brush" translatable="true">Brush</string>
+    <string name="editor_eraser" translatable="true">Eraser</string>
+    <string name="editor_color_white" translatable="true">White</string>
+    <string name="editor_color_black" translatable="true">Black</string>
+    <string name="editor_color_cyan" translatable="true">Cyan</string>
+    <string name="editor_color_red" translatable="true">Red</string>
+    <string name="action_undo" translatable="true">Undo</string>
+    <string name="action_redo" translatable="true">Redo</string>
+
+    <string name="app_name_short" translatable="true">Coverkit</string>
+
+    <string name="templates_intro" translatable="true">Each template starts a different layout — headline placement, colour and crop. Tap one, then replace the photo and rewrite the text.</string>
+
+    <string name="templates_intro_hint" translatable="true">Same size, different composition. Locked ones unlock with Studio.</string>
+
+    <string name="editor_save_failed" translatable="true">Could not save the cover</string>
+    <string name="editor_hint_tap_text" translatable="true">Tap Text to edit the template words and colour. Drag moves layers; pinch scales.</string>
+    <string name="editor_text_howto" translatable="true">Change the words, pick any colour below, then press Apply — the canvas updates immediately.</string>
+
+    <string name="editor_text_label" translatable="true">Your text</string>
+    <string name="editor_text_apply" translatable="true">Apply</string>
+
+    <string name="editor_sticker_from_photo" translatable="true">Add sticker from gallery</string>
+
+    <string name="editor_sticker_shapes" translatable="true">Shapes</string>
+    <string name="editor_sticker_emoji" translatable="true">Tap an emoji to place it</string>
+
+    <string name="editor_brush_size" translatable="true">Brush size: %1$d</string>
+    <string name="projects_list_header" translatable="true">Your drafts — open to keep editing. Templates are still on Home.</string>
+
+    <string name="projects_from_template" translatable="true">From template · %1$s</string>
+
+    <string name="tpl_yt_thumb_bold" translatable="true">Bold headline</string>
+
+    <string name="tpl_yt_thumb_reaction" translatable="true">Reaction burst</string>
+
+    <string name="tpl_yt_thumb_howto" translatable="true">How-to stripe</string>
+
+    <string name="tpl_yt_thumb_countdown" translatable="true">Countdown card</string>
+
+    <string name="tpl_yt_thumb_review" translatable="true">Review spotlight</string>
+
+    <string name="tpl_yt_thumb_split" translatable="true">Split banner</string>
+
+    <string name="tpl_yt_thumb_cinema" translatable="true">Cinematic reveal</string>
+
+    <string name="tpl_yt_shorts_vertical" translatable="true">Vertical punch</string>
+
+    <string name="tpl_yt_shorts_quicktip" translatable="true">Quick tip stack</string>
+
+    <string name="tpl_yt_shorts_beforeafter" translatable="true">Before and after</string>
+
+    <string name="tpl_yt_shorts_daily" translatable="true">Daily dose</string>
+
+    <string name="tpl_yt_shorts_challenge" translatable="true">Challenge card</string>
+
+    <string name="tpl_yt_shorts_neon" translatable="true">Neon callout</string>
+
+    <string name="tpl_yt_shorts_afterdark" translatable="true">After-dark glow</string>
+
+    <string name="tpl_ig_post_square" translatable="true">Square clean</string>
+
+    <string name="tpl_ig_post_quote" translatable="true">Editorial quote</string>
+
+    <string name="tpl_ig_post_launch" translatable="true">Launch tile</string>
+
+    <string name="tpl_ig_post_minimal" translatable="true">Minimal mark</string>
+
+    <string name="tpl_ig_post_weekend" translatable="true">Weekend colour</string>
+
+    <string name="tpl_ig_post_grid" translatable="true">Grid promo</string>
+
+    <string name="tpl_ig_post_studio" translatable="true">Studio edition</string>
+
+    <string name="tpl_ig_story_story" translatable="true">Story frame</string>
+
+    <string name="tpl_ig_story_morning" translatable="true">Morning note</string>
+
+    <string name="tpl_ig_story_question" translatable="true">Question card</string>
+
+    <string name="tpl_ig_story_newpost" translatable="true">New post alert</string>
+
+    <string name="tpl_ig_story_quote" translatable="true">Mood quote</string>
+
+    <string name="tpl_ig_story_poll" translatable="true">Poll vibe</string>
+
+    <string name="tpl_ig_story_velvet" translatable="true">Velvet night</string>
+
+    <string name="tpl_tiktok_cover_hook" translatable="true">Hook cover</string>
+
+    <string name="tpl_tiktok_cover_recipe" translatable="true">Recipe reveal</string>
+
+    <string name="tpl_tiktok_cover_truth" translatable="true">Truth bomb</string>
+
+    <string name="tpl_tiktok_cover_trend" translatable="true">Trend tracker</string>
+
+    <string name="tpl_tiktok_cover_glowup" translatable="true">Glow-up diary</string>
+
+    <string name="tpl_tiktok_cover_duet" translatable="true">Duet style</string>
+
+    <string name="tpl_tiktok_cover_vip" translatable="true">VIP hook</string>
+
+    <string name="tpl_wa_status_status" translatable="true">Status flash</string>
+
+    <string name="tpl_wa_status_hello" translatable="true">Hello card</string>
+
+    <string name="tpl_wa_status_celebrate" translatable="true">Celebrate today</string>
+
+    <string name="tpl_wa_status_weekend" translatable="true">Weekend plan</string>
+
+    <string name="tpl_wa_status_thankyou" translatable="true">Thank-you note</string>
+
+    <string name="tpl_wa_status_announce" translatable="true">Announce</string>
+
+    <string name="tpl_wa_status_gold" translatable="true">Golden announcement</string>
+
+    <string name="tpl_fb_cover_welcome" translatable="true">Warm welcome</string>
+
+    <string name="tpl_fb_cover_community" translatable="true">Community banner</string>
+
+    <string name="tpl_fb_cover_event" translatable="true">Event ribbon</string>
+
+    <string name="tpl_fb_cover_season" translatable="true">Seasonal refresh</string>
+
+    <string name="tpl_fb_cover_mission" translatable="true">Mission statement</string>
+
+    <string name="tpl_fb_cover_signature" translatable="true">Signature cover</string>
+
+    <string name="tpl_fb_cover_members" translatable="true">Members-only header</string>
+
+    <string name="tpl_x_header_signal" translatable="true">Signal header</string>
+
+    <string name="tpl_x_header_maker" translatable="true">Maker manifesto</string>
+
+    <string name="tpl_x_header_launch" translatable="true">Launch horizon</string>
+
+    <string name="tpl_x_header_dispatch" translatable="true">Daily dispatch</string>
+
+    <string name="tpl_x_header_focus" translatable="true">Focus line</string>
+
+    <string name="tpl_x_header_midnight" translatable="true">Midnight premium</string>
+
+    <string name="tpl_x_header_spectrum" translatable="true">Spectrum premium</string>
+
+    <string name="tpl_linkedin_banner_profile" translatable="true">Professional profile</string>
+
+    <string name="tpl_linkedin_banner_expertise" translatable="true">Expertise line</string>
+
+    <string name="tpl_linkedin_banner_speaker" translatable="true">Speaker banner</string>
+
+    <string name="tpl_linkedin_banner_portfolio" translatable="true">Portfolio statement</string>
+
+    <string name="tpl_linkedin_banner_hiring" translatable="true">Hiring signal</string>
+
+    <string name="tpl_linkedin_banner_executive" translatable="true">Executive polish</string>
+
+    <string name="tpl_linkedin_banner_summit" translatable="true">Summit premium</string>
+
+    <string name="tpl_pinterest_pin_recipe" translatable="true">Recipe pin</string>
+
+    <string name="tpl_pinterest_pin_home" translatable="true">Home refresh</string>
+
+    <string name="tpl_pinterest_pin_style" translatable="true">Style board</string>
+
+    <string name="tpl_pinterest_pin_travel" translatable="true">Travel guide</string>
+
+    <string name="tpl_pinterest_pin_craft" translatable="true">Craft tutorial</string>
+
+    <string name="tpl_pinterest_pin_editorial" translatable="true">Editorial pin</string>
+
+    <string name="tpl_pinterest_pin_luxe" translatable="true">Luxe pin</string>
+    <string name="editor_color_custom" translatable="true">Colour</string>
+
+    <string name="editor_color_hue" translatable="true">Hue</string>
+
+    <string name="editor_color_hex" translatable="true">Hex</string>
+    <string name="editor_sizes_title" translatable="true">Export to other sizes</string>
+
+    <string name="editor_sizes_hint" translatable="true">You already opened one size. Tick more networks to export this design to their pixel sizes too.</string>
+
+    <string name="editor_sizes_short" translatable="true">Sizes</string>
+
+    <string name="editor_edit_existing" translatable="true">Edit text on canvas</string>
+
+    <string name="editor_add_new_text" translatable="true">Add new text</string>
+
+    <string name="editor_text_applied" translatable="true">Text updated</string>
+    <string name="editor_text_stroke" translatable="true">Stroke / border</string>
+    <string name="editor_text_stroke_hint" translatable="true">Outline makes cover text readable on busy photos (InstaSize-style border).</string>
+    <string name="editor_crop_title" translatable="true">Crop</string>
+    <string name="editor_crop_hint" translatable="true">Reframe the background photo to this cover size — like InstaSize fit.</string>
+    <string name="editor_crop_fill" translatable="true">Fill canvas (center crop)</string>
+    <string name="editor_crop_fit" translatable="true">Fit inside (letterbox)</string>
+    <string name="editor_crop_done" translatable="true">Background cropped</string>
+    <string name="editor_layers_title" translatable="true">Layers</string>
+    <string name="editor_layers_empty" translatable="true">No stickers or text layers yet. Add Text or Stickers first.</string>
+    <string name="editor_layers_text" translatable="true">Text · %1$s</string>
+    <string name="editor_layers_image" translatable="true">Sticker / photo</string>
+    <string name="editor_layers_delete" translatable="true">Delete</string>
+    <string name="editor_layers_bring_front" translatable="true">Bring front</string>
+    <string name="editor_callouts" translatable="true">Callouts &amp; frames</string>
+    <string name="editor_callout_arrow" translatable="true">Arrow</string>
+    <string name="editor_callout_ribbon" translatable="true">Ribbon</string>
+    <string name="editor_callout_burst" translatable="true">Burst</string>
+    <string name="editor_callout_frame" translatable="true">Story frame</string>
+    <string name="editor_callout_circle" translatable="true">Circle</string>
+    <string name="editor_sticker_howto" translatable="true">Tap a YouTube-style callout, an emoji, or add a gallery photo as a movable sticker.</string>
+</resources>

@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "slot": "crewday",
+  "reconRef": "docs/ideation/2026-10-21-crewday.md#name-derivation",
+  "title": "Crewday: Site Log",
+  "slug": "crewday",
+  "applicationId": "com.gexetr.crewday",
+  "archetype": "carrier_job_noun",
+  "candidates": [
+    {
+      "name": "Crewday: Site Log",
+      "archetype": "carrier_job_noun",
+      "score": 86,
+      "dimensions": {
+        "jobFit": 4.5,
+        "searchability": 4.0,
+        "distinctiveness": 4.5,
+        "radioTest": 4.5,
+        "uniqueness": 3.5,
+        "lengthFit": 5.0,
+        "localeSurvival": 4.0
+      },
+      "why": "Carrier plus measured job nouns (site, daily log/report) keeps search hooks while the coined half avoids the bare category title."
+    },
+    {
+      "name": "Crewday",
+      "archetype": "coined",
+      "score": 84,
+      "dimensions": {
+        "jobFit": 4.0,
+        "searchability": 3.5,
+        "distinctiveness": 4.5,
+        "radioTest": 5.0,
+        "uniqueness": 3.5,
+        "lengthFit": 5.0,
+        "localeSurvival": 4.0
+      },
+      "why": "Crew + day names the daily crew report without saying Daily Report; two syllables, one spelling, room for a job noun in every declared locale."
+    },
+    {
+      "name": "Daycrew",
+      "archetype": "compound",
+      "score": 76,
+      "dimensions": {
+        "jobFit": 3.5,
+        "searchability": 3.0,
+        "distinctiveness": 4.0,
+        "radioTest": 4.5,
+        "uniqueness": 3.5,
+        "lengthFit": 5.0,
+        "localeSurvival": 4.0
+      },
+      "why": "Same roots as Crewday but reads less like a product name and more like a phrase reversal."
+    },
+    {
+      "name": "Sitefolio Log",
+      "archetype": "compound",
+      "score": 71,
+      "dimensions": {
+        "jobFit": 3.5,
+        "searchability": 3.0,
+        "distinctiveness": 4.0,
+        "radioTest": 4.0,
+        "uniqueness": 3.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 3.5
+      },
+      "why": "Suggests an assembled site document, but echoes another open proposal's -folio pattern and is harder to spell on first hearing."
+    },
+    {
+      "name": "Daily Report",
+      "archetype": "descriptive",
+      "score": 38,
+      "dimensions": {
+        "jobFit": 5.0,
+        "searchability": 5.0,
+        "distinctiveness": 1.0,
+        "radioTest": 5.0,
+        "uniqueness": 1.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 3.0
+      },
+      "why": "Negative control: the bare category phrase already used by Construction Daily Report and Construction Daily Reports App on the measured shelf."
+    }
+  ],
+  "rejected": [
+    {
+      "name": "Daily Report",
+      "reason": "Bare category noun already carried by multiple measured incumbents; spends Play's strongest ranking field on a head term we cannot own."
+    },
+    {
+      "name": "Daycrew",
+      "reason": "Same coinage family as Crewday but weaker job-fit and searchability; Crewday: Site Log keeps the clearer carrier."
+    },
+    {
+      "name": "Sitefolio Log",
+      "reason": "Near-echo of the open Scorefolio naming pattern and a weaker radio test than Crewday."
+    }
+  ],
+  "searchPhrases": [
+    "construction daily report",
+    "site diary construction",
+    "construction daily log"
+  ],
+  "audience": "Solo GCs, foremen and small-crew leads who write a site daily report and need captioned photos plus a PDF they can send to the office.",
+  "rationale": "MEASURED — the shelf titles use Construction Daily Report, Construction Daily Log and Site Diary; Crewday avoids those exact phrases as the head title while Site Log retains the job noun for listing and search.",
+  "collisionCheck": "UNVERIFIED — no trademark-register or dedicated Crewday Play collision screen has been run; this is not clearance.",
+  "localisationCheck": "INFERRED — en-US title \"Crewday: Site Log\" is 16 characters (14 slack under Play's 30); ru-RU \"Crewday: дневник\" is 17 characters with slack; Latin carrier survival in Cyrillic search is unmeasured.",
+  "evidence": "docs/ideation/2026-10-21-crewday.md#name-derivation",
+  "localizedTitles": {
+    "en-US": "Crewday: Site Log",
+    "ru-RU": "Crewday: дневник"
+  },
+  "scoringRubric": {
+    "scale": "0-5 per dimension, weighted",
+    "weights": {
+      "jobFit": 20,
+      "searchability": 15,
+      "distinctiveness": 15,
+      "radioTest": 15,
+      "uniqueness": 15,
+      "lengthFit": 10,
+      "localeSurvival": 10
+    },
+    "floor": "chosen >= 70 with no dimension below 2.5; a hard collision check outranks the score"
+  },
+  "assumptionsUnverified": [
+    "Crewday has not been searched in trademark registers or a dedicated Play collision screen.",
+    "No observed data says a coined carrier outperforms a descriptive Site Diary title for this shelf."
+  ]
+}

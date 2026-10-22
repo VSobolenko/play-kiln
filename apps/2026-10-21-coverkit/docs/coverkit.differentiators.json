@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "slot": "coverkit",
+  "reconRef": "docs/research/2026-10-21-social-cover-studio-shelf.md#competitor-strengths-to-absorb-product-synthesis",
+  "jobCoverage": {
+    "before": { "claimId": "brand-kit-and-platform-pick" },
+    "during": { "claimId": "layered-cover-canvas" },
+    "after": { "claimId": "multi-size-export-pack" }
+  },
+  "claims": [
+    {
+      "id": "brand-kit-and-platform-pick",
+      "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "data_in",
+      "promise": "The creator sets a brand kit (logo, colors, two fonts) once and picks a platform family before editing, so every new cover starts on-brand instead of rebuilding styles from scratch in each network app.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-21-social-cover-studio-shelf.md#money-on-display-enrich",
+        "finding": "Canva (500M+, IAP) owns brand-kit + multi-format expectation; Unfold/Graphionica/StoryArt each show 10M+ on story shelves while YouTube thumbnail makers separately hold 5M–10M+ — creators already hop networks, and no thin mid-tier ships one offline brand kit across those sizes."
+      },
+      "comparison": {
+        "incumbent": "com.covermaker.thumbnail.maker",
+        "limitation": "YouTube-centric; no durable cross-network brand kit for IG/TikTok/WA sizes.",
+        "source": "docs/research/2026-10-21-social-cover-studio-shelf.md#competitor-strengths-to-absorb-product-synthesis"
+      },
+      "status": "deferred",
+      "deferredReason": "No brand-kit store or platform catalog exists; proof requires tests that apply saved colors/fonts/logo to a new project."
+    },
+    {
+      "id": "layered-cover-canvas",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "A real layered canvas (photo, text with stroke, stickers, shapes, safe-zone overlay per platform) edits the cover on-device without an AI key, with projects that reopen after save.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-21-social-cover-studio-shelf.md#shared-complaints-vocabulary-sample",
+        "finding": "Thumbnail Maker for YouTubers (2.1★, 100K+) critical review: saved projects inaccessible and users forced to screenshot; Channel art app (10M+, 4.2★) review: exports become blurry/distorted — the mid-tier fails durability and output quality."
+      },
+      "comparison": {
+        "incumbent": "com.liilab.video_thumbnail_maker",
+        "limitation": "Projects inaccessible after save; users screenshot to keep work.",
+        "source": "docs/research/2026-10-21-social-cover-studio-shelf.md#shared-complaints-vocabulary-sample"
+      },
+      "status": "deferred",
+      "deferredReason": "No canvas or project store exists; proof requires reopen-after-kill tests and layer reorder tests."
+    },
+    {
+      "id": "multi-size-export-pack",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "One finished design exports a sharp native-resolution pack for YouTube (16:9 + Shorts), Instagram (post + story/reel), TikTok cover and WhatsApp status, shareable via the system sheet or saved through SAF — not a single blurry screenshot.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-21-social-cover-studio-shelf.md#shared-complaints-vocabulary-sample",
+        "finding": "Among 8 critical reviews in the YouTube thumbnail pocket sample, paywall was 38% (3/8) and broken 25% (2/8); Channel art verbatim: high-quality uploads become \"blurry\" and \"unprofessional\" after edit; Banner Studio locks save behind subscription."
+      },
+      "comparison": {
+        "incumbent": "com.covermaker.thumbnail.maker",
+        "limitation": "Single-network output and reported soft/blurry exports; save often watermarked or gated.",
+        "source": "docs/research/2026-10-21-social-cover-studio-shelf.md#shared-complaints-vocabulary-sample"
+      },
+      "status": "deferred",
+      "deferredReason": "No multi-render pipeline exists; proof requires export tests asserting pixel dimensions per platform and ACTION_SEND / ACTION_CREATE_DOCUMENT."
+    },
+    {
+      "id": "one-unlock-no-subscription-save",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "trust",
+      "promise": "Save and multi-export unlock once forever — no subscription, and free drafts are not silently stripped of Pro features later.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-21-social-cover-studio-shelf.md#shared-complaints-vocabulary-sample",
+        "finding": "Story pocket: paywall 46% of 13 critical reviews; verbatim Pro-only templates after years of use and paid Pro not activating; thumbnail Banner Studio: subscription required to save and watermark returns."
+      },
+      "status": "deferred",
+      "deferredReason": "No billing SKU exists; proof requires a one-time product, no subscription SKU, and export gated only by that unlock."
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Seed/brand colours for launcher + pre-Compose window; match studio.json paper / cyan. -->
+    <color name="playkiln_seed">#2DE2E6</color>
+    <color name="playkiln_seed_dark">#0F8A8E</color>
+
+    <!-- Light scheme background = studio paper #EEF2F5 -->
+    <color name="playkiln_window_background">#EEF2F5</color>
+</resources>

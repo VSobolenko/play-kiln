@@ -1,0 +1,17 @@
+{
+  "slug": "coverkit",
+  "applicationId": "com.gexetr.coverkit",
+  "appName": "Coverkit: Social Studio",
+  "idea": "Offline multi-network social cover studio: design once, export sharp PNG packs for YouTube Instagram TikTok WhatsApp, one-time unlock, no AI keys.",
+  "createdAt": "2026-10-21T18:24:57.369Z",
+  "scaffoldVersion": "android-compose-v1",
+  "status": "scaffolded",
+  "economics": {
+    "archetype": "purchase_led_single_unlock",
+    "priceUsd": 9.99
+  },
+  "differentiators": {
+    "promises": 4,
+    "core": 3
+  }
+}

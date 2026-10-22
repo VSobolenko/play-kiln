@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "slot": "crewday",
+  "reconRef": "docs/research/2026-10-21-construction-daily-report-shelf.md#complaints-vocabulary",
+  "jobCoverage": {
+    "before": { "claimId": "multi-site-projects" },
+    "during": { "claimId": "captioned-daily-entries" },
+    "after": { "claimId": "pdf-share-handoff" }
+  },
+  "claims": [
+    {
+      "id": "multi-site-projects",
+      "weight": "core",
+      "jobStage": "before",
+      "depthFamily": "data_in",
+      "promise": "The contractor can keep separate daily logs for several active sites and switch between them without dumping every location into one notebook page.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-21-construction-daily-report-shelf.md#complaints-vocabulary",
+        "finding": "My Daily Report App (com.snappii_corp.my_daily_report_app, 50K+, 3.3★) critical review: \"I go to 6 different locations and want to be able to do an activity log for each site\"; printed by node scripts/scan-complaints.mjs --query \"construction daily report\"."
+      },
+      "comparison": {
+        "incumbent": "com.snappii_corp.my_daily_report_app",
+        "limitation": "User reports having to force every site into one page or export each report to phone storage separately.",
+        "source": "docs/research/2026-10-21-construction-daily-report-shelf.md#complaints-vocabulary"
+      },
+      "status": "deferred",
+      "deferredReason": "No project model exists yet; proof requires tests that create two sites and attach dated entries to each without cross-mixing."
+    },
+    {
+      "id": "captioned-daily-entries",
+      "weight": "core",
+      "jobStage": "during",
+      "depthFamily": "core_operation",
+      "promise": "Each daily entry can carry photos with captions and an optional site/location tag written beside the work note, so the report matches what a superintendent expects to read.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-21-construction-daily-report-shelf.md#complaints-vocabulary",
+        "finding": "Same Snappii app, 3★ review: \"you can add photos but not captions… tag the locations for each entry\"; printed by the same scan-complaints run."
+      },
+      "comparison": {
+        "incumbent": "com.snappii_corp.my_daily_report_app",
+        "limitation": "Photos without captions and without per-entry location tags for multi-site work.",
+        "source": "docs/research/2026-10-21-construction-daily-report-shelf.md#complaints-vocabulary"
+      },
+      "status": "deferred",
+      "deferredReason": "No entry editor exists; proof requires UI/unit tests that persist caption text with an image URI on an entry."
+    },
+    {
+      "id": "pdf-share-handoff",
+      "weight": "core",
+      "jobStage": "after",
+      "depthFamily": "data_out",
+      "promise": "The finished daily report leaves the phone as a shareable PDF (or system share sheet) the office, owner or GC can open without installing Crewday.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-21-construction-daily-report-shelf.md#complaints-vocabulary",
+        "finding": "Among 11 critical reviews in the pocket sample, missing-feature was 27% (3/11); the 50K+ Snappii app (3.3★) review says after each report \"it makes you save it to your phone\" and wants \"each document be one daily report\" — the handoff the PDF/share promise finishes."
+      },
+      "comparison": {
+        "incumbent": "com.snappii_corp.my_daily_report_app",
+        "limitation": "Forces per-report save-to-phone friction instead of a single composed daily document handoff.",
+        "source": "docs/research/2026-10-21-construction-daily-report-shelf.md#complaints-vocabulary"
+      },
+      "status": "deferred",
+      "deferredReason": "No PdfDocument / ACTION_SEND path exists; proof requires an export test whose PDF contains site name, notes and captioned photo placeholders."
+    },
+    {
+      "id": "one-unlock-no-subscription",
+      "weight": "supporting",
+      "jobStage": "during",
+      "depthFamily": "trust",
+      "promise": "Unlimited sites and exports after one purchase — no yearly renewal and no ads interrupting a site walk.",
+      "evidence": {
+        "strength": "MEASURED",
+        "source": "docs/research/2026-10-21-construction-daily-report-shelf.md#complaints-vocabulary",
+        "finding": "Pocket complaint profile: paywall 45% of critical reviews; docplan verbatim \"$40/year\" and \"paid for yearly subscription and still… locked all the functions\"; enrich shows ads+IAP on Snappii 50K+ cards."
+      },
+      "status": "deferred",
+      "deferredReason": "No billing product exists; proof requires a one-time Play Billing SKU, no subscription product, and no ads SDK in the release classpath."
+    }
+  ]
+}

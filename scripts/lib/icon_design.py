@@ -493,6 +493,20 @@ LIGHTFOLD: tuple[dict, ...] = (
     disc("amber_deep", (dp(54), dp(46)), dp(6.5)),
 )
 
+# mark-coverkit — landscape social-cover frame: dark bezel, paper canvas, cyan title
+# bar across the top, one accent disc as the brand mark on the cover. Built as its own
+# stack — never an alias of mark-plinth / LIGHTFOLD (that defect shipped a webcam glyph).
+# Outermost ink stays inside the circle keyline with clearance; mass balances on (54,54).
+# Same vertical stack and plate thicknesses as LIGHTFOLD (optical centre + stroke
+# gates), but a wider landscape paper and a left-shifted disc so the silhouette is a
+# cover frame — not Plinth's tall print-on-plinth webcam glyph.
+COVERKIT: tuple[dict, ...] = (
+    plate("amber_deep", (dp(54), dp(71)), (dp(40), dp(8)), dp(4)),
+    plate("amber", (dp(54), dp(64)), (dp(42), dp(8)), dp(4)),
+    plate("paper", (dp(54), dp(47)), (dp(36), dp(24)), dp(7)),
+    disc("amber_deep", (dp(46), dp(46)), dp(6.5)),
+)
+
 MARK_REGISTRY: dict[str, dict] = {
     "pipe": {"primitives": PIPE, "keyline": "circle",
              "note": "a pipe cross-section measured across its bore"},
@@ -510,6 +524,8 @@ MARK_REGISTRY: dict[str, dict] = {
                               "body and one star"},
     "mark-plinth": {"primitives": LIGHTFOLD, "keyline": "circle",
                     "note": "Lightfold: a print standing on a lit plinth, in four material tones"},
+    "mark-coverkit": {"primitives": COVERKIT, "keyline": "circle",
+                      "note": "a landscape cover frame with cyan title bar for social covers"},
 }
 DEFAULT_MARK = "pipe"
 

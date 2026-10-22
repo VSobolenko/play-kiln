@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "appName": "Coverkit: Social Studio",
+  "slug": "coverkit",
+  "applicationId": "com.gexetr.coverkit",
+  "idea": "Offline multi-network social cover studio: design once, export sharp PNG packs for YouTube Instagram TikTok WhatsApp, one-time unlock, no AI keys.",
+  "defaultLocale": "en-US",
+  "category": "PRODUCTIVITY",
+  "tags": [
+    "offline",
+    "design",
+    "social"
+  ],
+  "contactEmail": "v.sobolenko.vs@gmail.com",
+  "privacyPolicyUrl": "https://telegra.ph/Coverkit-Social-Studio--privacy-policy-10-21",
+  "locales": {
+    "en-US": {
+      "title": "Coverkit: Social Studio",
+      "shortDescription": "Design once. Export sharp covers for YouTube, Instagram, TikTok & WhatsApp.",
+      "fullDescription": "Coverkit is an offline social cover studio for creators who post on more than one network.\n\nPick a destination size (YouTube thumbnail or Shorts, Instagram post or story, TikTok cover, WhatsApp status), start from a template or your own photo, edit text and stickers, then export a sharp native-resolution PNG. Unlock once for watermark-free exports and a multi-size pack from the same design — no subscription, no AI keys, no account.\n\nWhat you can do:\n• Choose the exact pixels for each network\n• Edit layers with photo, text, stickers and crop\n• Save drafts and reopen projects after you leave\n• Share or save PNGs through the system sheet\n• Keep a local brand kit (logo, colours, fonts)\n\nData use is disclosed in the Data safety section and the in-app privacy policy.",
+      "screenshotCaptions": [
+        "Pick a network size",
+        "Start from a template",
+        "Edit text and stickers",
+        "Callout stickers",
+        "Save and reopen drafts",
+        "Brand kit offline"
+      ],
+      "featureBullets": [
+        "Exact sizes for YouTube, Instagram, TikTok and WhatsApp",
+        "Sharp PNG export — not a blurry screenshot",
+        "One-time unlock — no subscription to save"
+      ]
+    },
+    "ru-RU": {
+      "title": "Coverkit: студия",
+      "shortDescription": "Один макет — чёткие обложки для YouTube, Instagram, TikTok и WhatsApp.",
+      "fullDescription": "Coverkit — офлайн-студия обложек для авторов, которые постятся в нескольких сетях.\n\nВыберите размер (превью YouTube или Shorts, пост или сторис Instagram, обложка TikTok, статус WhatsApp), начните с шаблона или своего фото, правьте текст и стикеры, экспортируйте чёткий PNG в родном разрешении. Разовая разблокировка убирает водяной знак и открывает пакет размеров из одного макета — без подписки, без ключей ИИ и без аккаунта.\n\nЧто можно делать:\n• Точные пиксели под каждую сеть\n• Слои: фото, текст, стикеры и кадр\n• Черновики с повторным открытием\n• Поделиться или сохранить PNG через систему\n• Локальный бренд-кит (логотип, цвета, шрифты)\n\nОбработка данных описана в разделе Data safety и в политике внутри приложения.",
+      "screenshotCaptions": [
+        "Выберите размер сети",
+        "Начните с шаблона",
+        "Текст и стикеры",
+        "Стикеры-выноски",
+        "Черновики и проекты",
+        "Бренд-кит офлайн"
+      ],
+      "featureBullets": [
+        "Точные размеры YouTube, Instagram, TikTok и WhatsApp",
+        "Чёткий PNG — не размытый скриншот",
+        "Разовая покупка — без подписки на сохранение"
+      ]
+    }
+  },
+  "dataSafety": {
+    "collectsData": true,
+    "reason": "Derived from the enabled capabilities and their bundled SDK declarations.",
+    "dataTypes": [
+      {
+        "type": "Financial info",
+        "purpose": "App functionality",
+        "shared": false,
+        "optional": false,
+        "notes": "Purchase history: product IDs the user bought and their entitlement state. Payment instruments are handled entirely by Google Play and never reach the app."
+      }
+    ],
+    "thirdPartySdks": [
+      {
+        "name": "Google Play Billing Library",
+        "version": "9.1.0",
+        "policyUrl": "https://developer.android.com/google/play/billing"
+      }
+    ],
+    "encryptedInTransit": true,
+    "hasAccountDeletion": false
+  },
+  "permissions": [],
+  "ads": {
+    "containsAds": false,
+    "reason": "Enabled capabilities declare no advertising SDKs."
+  },
+  "contentRating": {
+    "questionnaire": "notes",
+    "targetAudience": ""
+  },
+  "graphicsSource": {
+    "iconGlyph": "cover",
+    "brandColor": "#0E1A24",
+    "accentColor": "#2DE2E6"
+  },
+  "capabilityCompliance": {
+    "enabled": [
+      "billing"
+    ],
+    "requiresConsent": false,
+    "requiresPurchaseAuthority": false,
+    "purchaseAuthority": null
+  }
+}

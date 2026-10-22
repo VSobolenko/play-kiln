@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "slot": "coverkit",
+  "reconRef": "docs/ideation/2026-10-21-coverkit.md#name-derivation",
+  "title": "Coverkit: Social Studio",
+  "slug": "coverkit",
+  "applicationId": "com.gexetr.coverkit",
+  "archetype": "carrier_job_noun",
+  "candidates": [
+    {
+      "name": "Coverkit: Social Studio",
+      "archetype": "carrier_job_noun",
+      "score": 85,
+      "dimensions": {
+        "jobFit": 4.5,
+        "searchability": 4.0,
+        "distinctiveness": 4.5,
+        "radioTest": 4.5,
+        "uniqueness": 3.5,
+        "lengthFit": 4.5,
+        "localeSurvival": 4.0
+      },
+      "why": "Cover + kit names a toolkit of social covers; Social Studio keeps the job noun under Play's 30-character cap with slack."
+    },
+    {
+      "name": "Coverkit",
+      "archetype": "coined",
+      "score": 82,
+      "dimensions": {
+        "jobFit": 4.0,
+        "searchability": 3.5,
+        "distinctiveness": 4.5,
+        "radioTest": 5.0,
+        "uniqueness": 3.5,
+        "lengthFit": 5.0,
+        "localeSurvival": 4.0
+      },
+      "why": "Short carrier alone; slightly weaker search without the studio noun."
+    },
+    {
+      "name": "Framecast",
+      "archetype": "compound",
+      "score": 74,
+      "dimensions": {
+        "jobFit": 3.5,
+        "searchability": 3.0,
+        "distinctiveness": 4.5,
+        "radioTest": 4.0,
+        "uniqueness": 4.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 3.5
+      },
+      "why": "Memorable but less obvious that the job is social covers."
+    },
+    {
+      "name": "Postframe",
+      "archetype": "compound",
+      "score": 72,
+      "dimensions": {
+        "jobFit": 3.5,
+        "searchability": 3.5,
+        "distinctiveness": 4.0,
+        "radioTest": 4.0,
+        "uniqueness": 3.5,
+        "lengthFit": 5.0,
+        "localeSurvival": 3.5
+      },
+      "why": "Says posts more than thumbnails/covers; weaker YouTube association."
+    },
+    {
+      "name": "Thumbnail Maker",
+      "archetype": "descriptive",
+      "score": 36,
+      "dimensions": {
+        "jobFit": 5.0,
+        "searchability": 5.0,
+        "distinctiveness": 1.0,
+        "radioTest": 5.0,
+        "uniqueness": 1.0,
+        "lengthFit": 5.0,
+        "localeSurvival": 3.0
+      },
+      "why": "Negative control: bare category phrase already used by multiple 1M–10M incumbents."
+    }
+  ],
+  "rejected": [
+    {
+      "name": "Thumbnail Maker",
+      "reason": "Bare category noun owned by Cards, Nilesh Jain and others; also too narrow for Instagram/TikTok/WhatsApp."
+    },
+    {
+      "name": "Framecast",
+      "reason": "Weaker job-fit and radio clarity than Coverkit for a cover/post studio."
+    },
+    {
+      "name": "Postframe",
+      "reason": "Undersells YouTube thumbnails and stories; Coverkit covers both."
+    }
+  ],
+  "searchPhrases": [
+    "youtube thumbnail maker",
+    "instagram story maker",
+    "social media post maker",
+    "tiktok cover maker"
+  ],
+  "audience": "Creators and small brands who need matching covers and posts across YouTube, Instagram, TikTok and WhatsApp.",
+  "rationale": "MEASURED — shelf titles centre on Thumbnail Maker, Story Maker and Social Media Post Maker; Coverkit avoids those exact head phrases while Social Studio keeps the job noun.",
+  "collisionCheck": "UNVERIFIED — no trademark-register or dedicated Coverkit Play collision screen has been run.",
+  "localisationCheck": "INFERRED — en-US \"Coverkit: Social Studio\" is 24 characters (6 slack); ru-RU \"Coverkit: студия\" is 17 characters with slack; Cyrillic search for the Latin carrier is unmeasured.",
+  "evidence": "docs/ideation/2026-10-21-coverkit.md#name-derivation",
+  "localizedTitles": {
+    "en-US": "Coverkit: Social Studio",
+    "ru-RU": "Coverkit: студия"
+  },
+  "scoringRubric": {
+    "scale": "0-5 per dimension, weighted",
+    "weights": {
+      "jobFit": 20,
+      "searchability": 15,
+      "distinctiveness": 15,
+      "radioTest": 15,
+      "uniqueness": 15,
+      "lengthFit": 10,
+      "localeSurvival": 10
+    },
+    "floor": "chosen >= 70 with no dimension below 2.5; a hard collision check outranks the score"
+  },
+  "assumptionsUnverified": [
+    "Coverkit has not been searched in trademark registers.",
+    "No observed data says Coverkit outranks descriptive thumbnail titles for cold search."
+  ]
+}

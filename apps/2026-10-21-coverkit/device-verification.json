@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "serial": "R58MB3SGZVL",
+  "testedAt": "2026-10-22T19:20:00Z",
+  "artifact": "app/build/outputs/apk/debug/app-debug.apk",
+  "apkSha256": "42695d929c4389374536a644c96d72ef4b4ed058d917bf3633900bce21045d9c",
+  "buildDigest": "1a097df797c156e6562b446f5bcec971304fa42749ffd889ce558acc1773470c",
+  "observations": [
+    "Launch on SM-A405FM (A40, Android 11): Home lists YouTube thumbnail 1280x720, YouTube Shorts, Instagram post 1080x1080 and Instagram story with Projects / Brand / Settings destinations.",
+    "Tapped YouTube thumbnail: Templates screen opened with the header 'Templates - YouTube thumbnail' and the grid WATCH THIS, Bold headline, NO WAY!, Reaction burst, HOW TO, TOP 5, IS IT WORTH IT? plus 'Blank with Photo'.",
+    "Tapped the WATCH THIS template: the editor opened with the Export button, the rail Photo / Text / Stickers / Crop / Layers / Sizes, and the hint 'Tap Text to edit the template words and colour'.",
+    "Tapped Text: the 'Edit text on canvas' sheet opened with the fields 'Your text', Apply, Colour, Hue, FFFFFF, Hex and the Stroke / border outline note; typed edits stay on the canvas behind the sheet.",
+    "Tapped Stickers then Arrow: the callout sheet listed Arrow, Ribbon, Burst, Story frame and Circle with the emoji row, and the Arrow placement returned to the editor canvas.",
+    "Opened Projects from Home: the list showed one draft card 'Bold headline - YouTube thumbnail - 10/22/26 22:07' under 'Your drafts - open to keep editing.'; tapping the card reopened the editor for that draft.",
+    "Tapped Sizes while locked: the one-time unlock sheet showed 'Watermark-free sharp PNG export', 'Multi-network Sizes pack from one design', 'Full template set and Brand kit', Price $9.99, 'One-time purchase. No subscription.', Unlock and Restore purchase.",
+    "Tapped Export on the free tier: the editor reported 'Saved to gallery'; the account stays free and Export carries the small watermark the Studio screen describes.",
+    "Opened Settings: the Studio screen shows the free-export note, Look (Follow system / Light / Dark, wallpaper colours reported not available on this Android version), Language 'App language', and Studio feel 'Vibration feedback'."
+  ]
+}

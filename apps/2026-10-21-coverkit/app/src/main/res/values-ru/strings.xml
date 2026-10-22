@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">Coverkit: Social Studio</string>
+    <string name="app_idea" translatable="true">Офлайн-студия обложек для соцсетей: один макет, чёткие PNG для YouTube Instagram TikTok WhatsApp, разовая покупка, без ключей ИИ.</string>
+    <string name="home_about_action" translatable="true">О приложении</string>
+    <string name="home_intro" translatable="true">Выберите размер сети, чтобы начать обложку.</string>
+    <string name="home_idea_label" translatable="true">Идея</string>
+    <string name="home_pick_section" translatable="true">Выберите раздел, чтобы открыть его здесь.</string>
+    <string name="home_primary_action" translatable="true">Попробовать действие</string>
+    <string name="home_primary_action_again" translatable="true">Повторить</string>
+    <string name="home_status_ready" translatable="true">Готово, когда вы готовы</string>
+    <string name="home_status_complete" translatable="true">Действие выполнено</string>
+    <string name="home_snackbar_completed" translatable="true">Действие выполнено.</string>
+    <string name="home_snackbar_already_completed" translatable="true">Действие уже выполнено.</string>
+    <string name="about_title" translatable="true">Об этом приложении</string>
+    <string name="about_back" translatable="true">Назад</string>
+    <string name="about_body" translatable="true">%1$s делает обложки офлайн. Выберите размер сети, шаблон или фото, правьте текст и стикеры, экспортируйте чёткий PNG — разблокируйте один раз для пакетов без водяного знака.</string>
+    <string name="about_privacy_note" translatable="true">Обложки остаются на устройстве. Покупки — через Google Play. Без аккаунта и без ключей ИИ.</string>
+    <string name="about_privacy_policy" translatable="true">Политика конфиденциальности</string>
+
+    <string name="action_back" translatable="true">Назад</string>
+    <string name="action_undo" translatable="true">Отменить</string>
+    <string name="action_cancel" translatable="true">Отмена</string>
+    <string name="action_dismiss" translatable="true">Закрыть</string>
+
+    <string name="destinations_title" translatable="true">Направления</string>
+    <string name="dest_yt_thumb" translatable="true">Превью YouTube</string>
+    <string name="dest_yt_shorts" translatable="true">YouTube Shorts</string>
+    <string name="dest_ig_post" translatable="true">Пост Instagram</string>
+    <string name="dest_ig_story" translatable="true">Сторис Instagram</string>
+    <string name="dest_tiktok_cover" translatable="true">Обложка TikTok</string>
+    <string name="dest_wa_status" translatable="true">Статус WhatsApp</string>
+    <string name="dest_fb_cover" translatable="true">Обложка Facebook</string>
+    <string name="dest_x_header" translatable="true">Шапка профиля X</string>
+    <string name="dest_linkedin_banner" translatable="true">Баннер LinkedIn</string>
+    <string name="dest_pinterest_pin" translatable="true">Пин Pinterest</string>
+    <string name="dest_size_format" translatable="true">%1$d × %2$d</string>
+
+    <string name="nav_templates" translatable="true">Шаблоны</string>
+    <string name="nav_photo" translatable="true">Фото</string>
+    <string name="nav_text" translatable="true">Текст</string>
+    <string name="nav_stickers" translatable="true">Стикеры</string>
+    <string name="nav_crop" translatable="true">Кадр</string>
+    <string name="nav_layers" translatable="true">Слои</string>
+    <string name="nav_safe_zone" translatable="true">Безопасная зона</string>
+    <string name="nav_safe_zone_on" translatable="true">Зона включена</string>
+    <string name="nav_export" translatable="true">Экспорт</string>
+    <string name="nav_share" translatable="true">Поделиться</string>
+    <string name="nav_save" translatable="true">Сохранить</string>
+    <string name="nav_brand" translatable="true">Бренд</string>
+    <string name="nav_sizes" translatable="true">Размеры</string>
+    <string name="nav_projects" translatable="true">Проекты</string>
+
+    <string name="templates_title_for" translatable="true">Шаблоны · %1$s</string>
+    <string name="template_blank_photo" translatable="true">Пустой с фото</string>
+    <string name="template_headline" translatable="true">Заголовок</string>
+    <string name="template_bold" translatable="true">Яркий акцент</string>
+    <string name="template_pro_frame" translatable="true">Pro-рамка</string>
+    <string name="template_locked" translatable="true">Нужна разблокировка</string>
+
+    <string name="editor_title" translatable="true">Редактор</string>
+    <string name="editor_default_text" translatable="true">Ваш текст</string>
+    <string name="editor_sticker_glyph" translatable="true">▶</string>
+    <string name="editor_shared" translatable="true">Готово к отправке</string>
+    <string name="editor_saved" translatable="true">Сохранено в галерею</string>
+    <string name="editor_draft_saved" translatable="true">Черновик сохранён</string>
+    <string name="layers_move_up" translatable="true">Выше</string>
+    <string name="layers_delete" translatable="true">Удалить</string>
+
+    <string name="projects_empty_title" translatable="true">Здесь будут ваши обложки</string>
+    <string name="projects_empty" translatable="true">Проекты — это ваши черновики. Шаблоны всегда остаются на главной: удаление проекта не удаляет шаблон.</string>
+    <string name="projects_step_1" translatable="true">1. Выберите размер на главном экране</string>
+    <string name="projects_step_2" translatable="true">2. Выберите шаблон</string>
+    <string name="projects_step_3" translatable="true">3. Черновик появится здесь — его можно открыть снова</string>
+    <string name="projects_empty_cta" translatable="true">Перейдите на главный экран, чтобы создать первую обложку</string>
+    <string name="projects_actions_hint" translatable="true">Выберите действие для этой обложки.</string>
+    <string name="projects_more" translatable="true">Ещё</string>
+    <string name="projects_open" translatable="true">Открыть</string>
+    <string name="projects_duplicate" translatable="true">Дублировать</string>
+    <string name="projects_delete" translatable="true">Удалить</string>
+    <string name="brand_hero" translatable="true">Логотип, цвета, шрифт — один раз</string>
+    <string name="brand_intro" translatable="true">Как в Unfold: задайте логотип и несколько цветов бренда. Новые обложки смогут подтянуть их — без повторного ввода.</string>
+    <string name="brand_logo_header" translatable="true">Логотип</string>
+    <string name="brand_pick_logo" translatable="true">Нажмите, чтобы выбрать логотип</string>
+    <string name="brand_logo_set" translatable="true">Логотип задан</string>
+    <string name="brand_clear_logo" translatable="true">Удалить логотип</string>
+    <string name="brand_colors_header" translatable="true">Цвета</string>
+    <string name="brand_colors_hint" translatable="true">Выберите до %1$d цветов. Нажмите ещё раз, чтобы убрать цвет.</string>
+    <string name="brand_font_primary" translatable="true">Стиль заголовка</string>
+    <string name="brand_font_secondary" translatable="true">Стиль основного текста</string>
+    <string name="brand_font_sans" translatable="true">Без засечек</string>
+    <string name="brand_font_bold_sans" translatable="true">Жирный гротеск</string>
+    <string name="brand_font_display" translatable="true">Акцентный</string>
+    <string name="brand_font_rounded" translatable="true">Скруглённый</string>
+    <string name="brand_font_serif" translatable="true">С засечками</string>
+    <string name="brand_font_mono" translatable="true">Моноширинный</string>
+    <string name="brand_save" translatable="true">Сохранить бренд</string>
+
+    <string name="unlock_title" translatable="true">Разблокировать Coverkit</string>
+    <string name="unlock_body" translatable="true">Разовая покупка: экспорт без водяного знака, пакет размеров, все шаблоны и бренд-кит. Черновики бесплатны.</string>
+    <string name="unlock_bullet_watermark" translatable="true">Чёткий PNG без водяного знака</string>
+    <string name="unlock_bullet_sizes" translatable="true">Пакет размеров для сетей из одного макета</string>
+    <string name="unlock_bullet_templates" translatable="true">Полный набор шаблонов и бренд-кит</string>
+    <string name="unlock_price" translatable="true">$9.99</string>
+    <string name="unlock_price_note" translatable="true">Разовая покупка. Без подписки.</string>
+    <string name="unlock_price_label" translatable="true">Цена</string>
+    <string name="unlock_action" translatable="true">Разблокировать</string>
+    <string name="unlock_restore" translatable="true">Восстановить покупку</string>
+    <string name="unlock_busy" translatable="true">Связь с Google Play…</string>
+    <string name="unlock_failed" translatable="true">Покупка не завершилась. Попробуйте снова или восстановите.</string>
+    <string name="unlock_unavailable" translatable="true">Биллинг недоступен на этом устройстве.</string>
+    <string name="unlock_unlocked" translatable="true">Разблокировано</string>
+    <string name="unlock_owned_body" translatable="true">Разблокировка Coverkit уже на этом аккаунте Play.</string>
+
+    <string name="settings_title" translatable="true">Настройки</string>
+    <string name="settings_back" translatable="true">Назад</string>
+    <string name="settings_studio_header" translatable="true">Студия</string>
+    <string name="settings_studio_supporting" translatable="true">Бесплатное сохранение оставляет водяной знак. Разблокируйте один раз — чистые PNG и все размеры сетей из одного макета.</string>
+    <string name="settings_appearance_header" translatable="true">Вид</string>
+    <string name="settings_theme_supporting" translatable="true">Выберите, как выглядит приложение.</string>
+    <string name="settings_theme_system" translatable="true">Как в системе</string>
+    <string name="settings_theme_light" translatable="true">Светлая</string>
+    <string name="settings_theme_dark" translatable="true">Тёмная</string>
+    <string name="settings_dynamic_color_title" translatable="true">Цвета обоев</string>
+    <string name="settings_dynamic_color_supported" translatable="true">Построить палитру по обоям устройства.</string>
+    <string name="settings_dynamic_color_unsupported" translatable="true">Недоступно в этой версии Android.</string>
+    <string name="settings_language_header" translatable="true">Язык</string>
+    <string name="settings_language_title" translatable="true">Язык приложения</string>
+    <string name="settings_language_summary" translatable="true">Выберите язык, который использует приложение.</string>
+    <string name="settings_language_system" translatable="true">Как в системе</string>
+    <string name="settings_behaviour_header" translatable="true">Ощущение студии</string>
+    <string name="settings_haptics_title" translatable="true">Виброотклик</string>
+    <string name="settings_haptics_summary" translatable="true">Лёгкая вибрация при выборе размера обложки.</string>
+    <string name="settings_purchase_header" translatable="true">Покупка</string>
+    <string name="settings_restore_summary" translatable="true">Проверить Google Play на вашу разблокировку.</string>
+    <string name="settings_unlock_summary" translatable="true">Разовая покупка: детали и оплата.</string>
+    <string name="settings_about_header" translatable="true">О приложении</string>
+    <string name="settings_rate_title" translatable="true">Оценить приложение</string>
+    <string name="settings_rate_summary" translatable="true">Расскажите, как приложение работает для вас.</string>
+    <string name="editor_size_item" translatable="true">%1$s · %2$s</string>
+    <string name="editor_brush" translatable="true">Кисть</string>
+    <string name="editor_eraser" translatable="true">Ластик</string>
+    <string name="editor_color_white" translatable="true">Белый</string>
+    <string name="editor_color_black" translatable="true">Чёрный</string>
+    <string name="editor_color_cyan" translatable="true">Циан</string>
+    <string name="editor_color_red" translatable="true">Красный</string>
+    <string name="action_redo" translatable="true">Вернуть</string>
+
+    <string name="app_name_short" translatable="true">Coverkit</string>
+
+    <string name="templates_intro" translatable="true">Каждый шаблон — другая композиция: место заголовка, цвет и кадр. Выберите, затем замените фото и перепишите текст.</string>
+
+    <string name="templates_intro_hint" translatable="true">Один размер, разная раскладка. Закрытые открываются с Studio.</string>
+
+    <string name="editor_save_failed" translatable="true">Не удалось сохранить обложку</string>
+    <string name="editor_hint_tap_text" translatable="true">Нажмите «Текст», чтобы править слова и цвет шаблона. Перетаскивание двигает слой; щипок — масштаб.</string>
+    <string name="editor_text_howto" translatable="true">Измените слова, выберите любой цвет ниже и нажмите «Применить» — холст обновится сразу.</string>
+
+    <string name="editor_text_label" translatable="true">Ваш текст</string>
+    <string name="editor_text_apply" translatable="true">Применить</string>
+
+    <string name="editor_sticker_from_photo" translatable="true">Стикер из галереи</string>
+
+    <string name="editor_sticker_shapes" translatable="true">Фигуры</string>
+    <string name="editor_sticker_emoji" translatable="true">Нажмите эмодзи, чтобы поставить</string>
+
+    <string name="editor_brush_size" translatable="true">Размер кисти: %1$d</string>
+    <string name="projects_list_header" translatable="true">Ваши черновики — откройте, чтобы продолжить. Шаблоны по-прежнему на главной.</string>
+
+    <string name="projects_from_template" translatable="true">Из шаблона · %1$s</string>
+
+    <string name="tpl_yt_thumb_bold" translatable="true">Крупный заголовок</string>
+
+    <string name="tpl_yt_thumb_reaction" translatable="true">Реакция</string>
+
+    <string name="tpl_yt_thumb_howto" translatable="true">Как сделать</string>
+
+    <string name="tpl_yt_thumb_countdown" translatable="true">Топ-лист</string>
+
+    <string name="tpl_yt_thumb_review" translatable="true">Обзор</string>
+
+    <string name="tpl_yt_thumb_split" translatable="true">Разделённый баннер</string>
+
+    <string name="tpl_yt_thumb_cinema" translatable="true">Кино-раскрытие</string>
+
+    <string name="tpl_yt_shorts_vertical" translatable="true">Вертикальный удар</string>
+
+    <string name="tpl_yt_shorts_quicktip" translatable="true">Быстрый совет</string>
+
+    <string name="tpl_yt_shorts_beforeafter" translatable="true">До и после</string>
+
+    <string name="tpl_yt_shorts_daily" translatable="true">Идея дня</string>
+
+    <string name="tpl_yt_shorts_challenge" translatable="true">Челлендж</string>
+
+    <string name="tpl_yt_shorts_neon" translatable="true">Неон</string>
+
+    <string name="tpl_yt_shorts_afterdark" translatable="true">Ночное свечение</string>
+
+    <string name="tpl_ig_post_square" translatable="true">Чистый квадрат</string>
+
+    <string name="tpl_ig_post_quote" translatable="true">Цитата</string>
+
+    <string name="tpl_ig_post_launch" translatable="true">Запуск</string>
+
+    <string name="tpl_ig_post_minimal" translatable="true">Минимализм</string>
+
+    <string name="tpl_ig_post_weekend" translatable="true">Выходные</string>
+
+    <string name="tpl_ig_post_grid" translatable="true">Сетка-промо</string>
+
+    <string name="tpl_ig_post_studio" translatable="true">Студийный</string>
+
+    <string name="tpl_ig_story_story" translatable="true">Рамка сторис</string>
+
+    <string name="tpl_ig_story_morning" translatable="true">Утреннее</string>
+
+    <string name="tpl_ig_story_question" translatable="true">Вопрос</string>
+
+    <string name="tpl_ig_story_newpost" translatable="true">Новый пост</string>
+
+    <string name="tpl_ig_story_quote" translatable="true">Настроение</string>
+
+    <string name="tpl_ig_story_poll" translatable="true">Опрос</string>
+
+    <string name="tpl_ig_story_velvet" translatable="true">Бархатная ночь</string>
+
+    <string name="tpl_tiktok_cover_hook" translatable="true">Хук</string>
+
+    <string name="tpl_tiktok_cover_recipe" translatable="true">Рецепт</string>
+
+    <string name="tpl_tiktok_cover_truth" translatable="true">Правда</string>
+
+    <string name="tpl_tiktok_cover_trend" translatable="true">Тренд</string>
+
+    <string name="tpl_tiktok_cover_glowup" translatable="true">Преображение</string>
+
+    <string name="tpl_tiktok_cover_duet" translatable="true">Дуэт</string>
+
+    <string name="tpl_tiktok_cover_vip" translatable="true">VIP</string>
+
+    <string name="tpl_wa_status_status" translatable="true">Статус</string>
+
+    <string name="tpl_wa_status_hello" translatable="true">Привет</string>
+
+    <string name="tpl_wa_status_celebrate" translatable="true">Праздник</string>
+
+    <string name="tpl_wa_status_weekend" translatable="true">План на выходные</string>
+
+    <string name="tpl_wa_status_thankyou" translatable="true">Спасибо</string>
+
+    <string name="tpl_wa_status_announce" translatable="true">Анонс</string>
+
+    <string name="tpl_wa_status_gold" translatable="true">Золотой анонс</string>
+
+    <string name="tpl_fb_cover_welcome" translatable="true">Добро пожаловать</string>
+
+    <string name="tpl_fb_cover_community" translatable="true">Сообщество</string>
+
+    <string name="tpl_fb_cover_event" translatable="true">Событие</string>
+
+    <string name="tpl_fb_cover_season" translatable="true">Новый сезон</string>
+
+    <string name="tpl_fb_cover_mission" translatable="true">Миссия</string>
+
+    <string name="tpl_fb_cover_signature" translatable="true">Фирменная</string>
+
+    <string name="tpl_fb_cover_members" translatable="true">Только участники</string>
+
+    <string name="tpl_x_header_signal" translatable="true">Сигнал</string>
+
+    <string name="tpl_x_header_maker" translatable="true">Манифест</string>
+
+    <string name="tpl_x_header_launch" translatable="true">Запуск</string>
+
+    <string name="tpl_x_header_dispatch" translatable="true">Ежедневная лента</string>
+
+    <string name="tpl_x_header_focus" translatable="true">Фокус</string>
+
+    <string name="tpl_x_header_midnight" translatable="true">Полночь</string>
+
+    <string name="tpl_x_header_spectrum" translatable="true">Спектр</string>
+
+    <string name="tpl_linkedin_banner_profile" translatable="true">Профиль</string>
+
+    <string name="tpl_linkedin_banner_expertise" translatable="true">Экспертиза</string>
+
+    <string name="tpl_linkedin_banner_speaker" translatable="true">Спикер</string>
+
+    <string name="tpl_linkedin_banner_portfolio" translatable="true">Портфолио</string>
+
+    <string name="tpl_linkedin_banner_hiring" translatable="true">Вакансии</string>
+
+    <string name="tpl_linkedin_banner_executive" translatable="true">Руководитель</string>
+
+    <string name="tpl_linkedin_banner_summit" translatable="true">Саммит</string>
+
+    <string name="tpl_pinterest_pin_recipe" translatable="true">Рецепт</string>
+
+    <string name="tpl_pinterest_pin_home" translatable="true">Дом</string>
+
+    <string name="tpl_pinterest_pin_style" translatable="true">Стиль</string>
+
+    <string name="tpl_pinterest_pin_travel" translatable="true">Путешествие</string>
+
+    <string name="tpl_pinterest_pin_craft" translatable="true">Мастер-класс</string>
+
+    <string name="tpl_pinterest_pin_editorial" translatable="true">Редакция</string>
+
+    <string name="tpl_pinterest_pin_luxe" translatable="true">Люкс</string>
+    <string name="editor_color_custom" translatable="true">Цвет</string>
+
+    <string name="editor_color_hue" translatable="true">Оттенок</string>
+
+    <string name="editor_color_hex" translatable="true">HEX</string>
+    <string name="editor_sizes_title" translatable="true">Экспорт в другие размеры</string>
+
+    <string name="editor_sizes_hint" translatable="true">Этот размер вы уже выбрали. Отметьте сети, чтобы выгрузить тот же дизайн в их пиксельные размеры.</string>
+
+    <string name="editor_sizes_short" translatable="true">Размеры</string>
+
+    <string name="editor_edit_existing" translatable="true">Править текст на холсте</string>
+
+    <string name="editor_add_new_text" translatable="true">Добавить новый текст</string>
+
+    <string name="editor_text_applied" translatable="true">Текст обновлён</string>
+    <string name="editor_text_stroke" translatable="true">Обводка</string>
+    <string name="editor_text_stroke_hint" translatable="true">Контур делает текст читаемым на пёстрых фото (как у InstaSize).</string>
+    <string name="editor_crop_title" translatable="true">Кадр</string>
+    <string name="editor_crop_hint" translatable="true">Подгоните фон под размер обложки — как InstaSize.</string>
+    <string name="editor_crop_fill" translatable="true">Заполнить холст (центр)</string>
+    <string name="editor_crop_fit" translatable="true">Вписать (поля)</string>
+    <string name="editor_crop_done" translatable="true">Фон обрезан</string>
+    <string name="editor_layers_title" translatable="true">Слои</string>
+    <string name="editor_layers_empty" translatable="true">Пока нет стикеров и текста. Сначала добавьте Текст или Стикеры.</string>
+    <string name="editor_layers_text" translatable="true">Текст · %1$s</string>
+    <string name="editor_layers_image" translatable="true">Стикер / фото</string>
+    <string name="editor_layers_delete" translatable="true">Удалить</string>
+    <string name="editor_layers_bring_front" translatable="true">Наверх</string>
+    <string name="editor_callouts" translatable="true">Плашки и рамки</string>
+    <string name="editor_callout_arrow" translatable="true">Стрелка</string>
+    <string name="editor_callout_ribbon" translatable="true">Лента</string>
+    <string name="editor_callout_burst" translatable="true">Взрыв</string>
+    <string name="editor_callout_frame" translatable="true">Рамка сторис</string>
+    <string name="editor_callout_circle" translatable="true">Круг</string>
+    <string name="editor_sticker_howto" translatable="true">Нажмите YouTube-плашку, эмодзи или добавьте фото из галереи как стикер.</string>
+</resources>
